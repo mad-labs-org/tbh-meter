@@ -27,11 +27,17 @@ TBH Meter is a lightweight, always-on-top overlay that tracks your **Task Bar He
 | **MOBS** | Monsters killed / total |
 | **TIME** | Elapsed run time |
 
+<div align="center">
+
+![Live overlay — stage, DPS, kills, damage, gold/s, XP/s and run time](.github/assets/live-overlay.png)
+
+</div>
+
 Every completed run is also saved with full details — result (success / fail / abandoned), gold & XP gained, gold/XP per second, and a complete snapshot of your heroes (class, level, items, mods, skills, and stats) — browsable from the built-in **Runs** window:
 
 <div align="center">
 
-![Runs window — per-run DPS, damage, XP, gold and clear time](.github/assets/runs-window.png)
+![Runs window — per-run DPS, XP, gold, drops and clear time](.github/assets/runs-window.png)
 
 </div>
 
