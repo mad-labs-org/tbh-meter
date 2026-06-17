@@ -1,0 +1,14 @@
+# Code owners — GitHub auto-requests a review from the matching owners on every PR.
+# Rules: last matching pattern WINS (so the global fallback is first); owners must have
+# write access (an owner without it is silently dropped); enforcement requires turning on
+# "Require review from Code Owners" in the main branch ruleset.
+# Docs: https://docs.github.com/articles/about-code-owners
+
+# Default for everything (including data/ and .github/): all maintainers.
+*           @marioalvial @viniarruda @pedrobullo
+
+# Electron overlay app.
+/app/       @marioalvial @viniarruda @pedrobullo
+
+# Memory reader — the highest-risk area (IL2CPP resolution, memory offsets, calibration).
+/reader/    @marioalvial

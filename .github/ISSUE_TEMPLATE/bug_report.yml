@@ -1,0 +1,58 @@
+name: Bug report
+description: Something in the meter is broken or behaving unexpectedly.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! For problems that look like a crash or "antivirus blocked it",
+        attaching `meter.log` (in your `tbh-meter` user-data folder) helps a lot.
+  - type: input
+    id: version
+    attributes:
+      label: Meter version
+      description: Shown in the app (Settings/About) or the installer filename, e.g. 0.34.0.
+      placeholder: "0.34.0"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Windows version
+      description: e.g. Windows 11 23H2.
+      placeholder: "Windows 11"
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which part?
+      options:
+        - Not sure
+        - App / overlay UI
+        - Reader (stats wrong, gold 0, stage "?", not attaching)
+        - Upload / leaderboard
+        - Auto-update
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you expected vs. what you saw.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Launch the meter
+        2. Start a run ...
+        3. ...
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Paste relevant lines from `meter.log` (and `updater.log` for update issues), or drag in a screenshot.
+      render: text
