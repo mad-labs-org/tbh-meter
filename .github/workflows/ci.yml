@@ -1,7 +1,7 @@
 # Continuous integration — runs on every push to main and every pull request.
 # Free unlimited standard runners on public repos. Two independent jobs mirror the two pieces
 # of the meter (the Electron app and the Python reader) and the local verify commands.
-name: Check · CI
+name: Test · CI
 
 on:
   push:
