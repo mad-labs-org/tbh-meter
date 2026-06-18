@@ -9,7 +9,8 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-0078d4)](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-ffdd00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/viniarruda)
 
-![Live overlay — stage, DPS, total damage, mobs, gold/s, EXP/s, loot, party and run time](.github/assets/live-meter.png)
+<img src=".github/assets/live-meter.png" width="600" alt="Live overlay — stage, DPS, total damage, mobs, gold/s, EXP/s, loot, party and run time">
+
 
 _Unaffiliated, open-source fan project — not made by or endorsed by the game's developer._
 
