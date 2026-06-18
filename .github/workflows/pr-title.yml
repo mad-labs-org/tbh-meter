@@ -1,0 +1,28 @@
+name: Check · PR title
+
+# Enforces Conventional Commits on the PR title. Titles are load-bearing: the release pipeline
+# derives the version (feat→minor, fix→patch, !→major) and the changelog from commit subjects,
+# and a squash-merge uses the PR title as that subject. Inline check — no third-party action.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions: {}
+
+jobs:
+  conventional-title:
+    name: conventional commits
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate PR title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if printf '%s' "$TITLE" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9 ._/-]+\))?!?: .+'; then
+            echo "OK: $TITLE"
+          else
+            echo "::error::PR title must follow Conventional Commits — e.g. 'feat(app): add follow-window toggle'."
+            echo "::error::Allowed types: feat fix docs style refactor perf test build ci chore revert. Got: '$TITLE'"
+            exit 1
+          fi
