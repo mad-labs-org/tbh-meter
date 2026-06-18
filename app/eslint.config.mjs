@@ -23,7 +23,12 @@ export default tseslint.config(
     },
     rules: {
       ...reactPlugin.configs.recommended.rules,
-      ...reactHooksPlugin.configs.recommended.rules,
+      // eslint-plugin-react-hooks v7's `recommended` preset bundles the full React Compiler
+      // ruleset (refs, set-state-in-effect, immutability, purity, …) — 16 rules vs the 2 in
+      // v5. Pin just the two long-standing rules so a dependency bump doesn't silently change
+      // our lint policy; adopting the compiler rules is a separate, deliberate change.
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
