@@ -135,7 +135,7 @@ jobs:
             echo "2. Install & smoke-test it on Windows."
             echo "3. **[TBH Meter / 3. Release to players]($ACTIONS/workflows/meter-3-ship.yml)** — no input needed (ships this newest RC)."
             echo
-            echo "Builds land on [tbh-meter-releases](https://github.com/mad-labs-org/tbh-meter-releases/releases)."
+            echo "Builds land on [tbh-meter](https://github.com/mad-labs-org/tbh-meter/releases)."
           } >> "$GITHUB_STEP_SUMMARY"
 
   clean-pr-slot:

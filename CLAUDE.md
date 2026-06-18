@@ -52,7 +52,7 @@ pipeline:
    `app/`, `reader/`, `data/` changed** (the P1 guard, enforced in `compute-version.mjs`). Also, on
    **any PR close**, deletes that PR's throwaway test-build draft (`tbh-meter-pr-<N>`).
 2. **`meter-2-build.yml` · "TBH Meter / 2. Build test version to download"** — manual. Builds the **RC
-   variant** and publishes a **DRAFT** on the public `mad-labs-org/tbh-meter-releases` repo
+   variant** and publishes a **DRAFT** on the public `mad-labs-org/tbh-meter` repo
    (invisible to anonymous users + electron-updater). Blank = newest staged RC; `candidate=<ver>` = a
    specific RC; `pr=<N>` = a throwaway pre-merge build of that PR's head (version
    `0.0.0-pr.<N>.<run>`, link posted as a PR comment). One mutable draft slot per target.

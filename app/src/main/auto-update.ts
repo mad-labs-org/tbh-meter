@@ -43,7 +43,7 @@ const ERROR_RETRIGGER_COOLDOWN_MS = 30_000;
 // so any failure degrades to null = "no signal" and the gate behaves as before.
 // owner/repo must match electron-builder.yml `publish`.
 const RELEASES_LATEST_API_URL =
-  "https://api.github.com/repos/mad-labs-org/tbh-meter-releases/releases/latest";
+  "https://api.github.com/repos/mad-labs-org/tbh-meter/releases/latest";
 const AUTHORITY_TIMEOUT_MS = 3_000;
 // Convergence budget once staleness is KNOWN: 8 × (3s + one check round-trip) ≈ 45s of
 // splash typically. Not a hard wall-clock cap — each re-check is awaited in full so its

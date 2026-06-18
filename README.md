@@ -4,9 +4,9 @@
 
 **A live DPS / Gold / EXP meter & run tracker overlay for [Task Bar Hero](https://store.steampowered.com/)**
 
-[![Latest release](https://img.shields.io/github/v/release/mad-labs-org/tbh-meter-releases?label=latest&color=4c1)](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/mad-labs-org/tbh-meter-releases/total?color=blue&cacheSeconds=3600)](https://github.com/mad-labs-org/tbh-meter-releases/releases)
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-0078d4)](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest)
+[![Latest release](https://img.shields.io/github/v/release/mad-labs-org/tbh-meter?label=latest&color=4c1)](https://github.com/mad-labs-org/tbh-meter/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/mad-labs-org/tbh-meter/total?color=blue&cacheSeconds=3600)](https://github.com/mad-labs-org/tbh-meter/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-0078d4)](https://github.com/mad-labs-org/tbh-meter/releases/latest)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-ffdd00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/viniarruda)
 
 <img src=".github/assets/meter-hero.png" width="820" alt="TBH Meter — the Runs history window with the live overlay docked at the bottom-left">
@@ -37,7 +37,7 @@ Every finished run is also saved with full detail — result (success / fail / a
 
 > **Windows 10+ only.** The reader uses Windows APIs to read game memory.
 
-1. Download **`tbh-meter-Setup-<version>.exe`** from the [**latest release**](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest).
+1. Download **`tbh-meter-Setup-<version>.exe`** from the [**latest release**](https://github.com/mad-labs-org/tbh-meter/releases/latest).
 2. Run the installer — **no admin rights needed** (it installs per-user).
 3. Launch Task Bar Hero and TBH Meter in any order. The first attach takes **1–2 minutes**; after that, live stats appear automatically.
 

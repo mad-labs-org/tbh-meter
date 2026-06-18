@@ -154,6 +154,6 @@ jobs:
             app/dist/*.blockmap
           if-no-files-found: error
           # Throwaway handoff: build-core is workflow_called and the installer is consumed within
-          # the same run (the durable copy ships to the tbh-meter-releases Release). 1 day is the
+          # the same run (the durable copy ships to the tbh-meter Release). 1 day is the
           # floor and keeps these large Electron+reader bundles from filling the Actions quota.
           retention-days: 1
