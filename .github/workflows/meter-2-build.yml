@@ -16,7 +16,7 @@
 #
 # Each target owns exactly ONE draft slot (its tag name), replaced on every rebuild — so the
 # releases list stays an honest dashboard of what's live, never a pile of duplicates.
-name: TBH Meter / 2. Build test version to download
+name: Release · 2 · build test version
 
 run-name: "Build · ${{ inputs.pr != '' && format('PR #{0}', inputs.pr) || (inputs.candidate != '' && inputs.candidate || 'newest staged RC') }} — ${{ github.actor }}"
 

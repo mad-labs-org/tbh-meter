@@ -19,7 +19,7 @@
 # `-rc.N` tags never become the version base (only clean X.Y.Z tags do — compute-version.mjs),
 # so every RC keeps targeting the same stable version until Meter 3 ships it. Re-runs are
 # idempotent: a commit already staged reuses its tag instead of minting a new rc number.
-name: TBH Meter / 1. Create version tag (auto)
+name: Release · 1 · version tag
 
 run-name: "${{ github.event_name == 'pull_request' && format('Clean up PR #{0} test build', github.event.pull_request.number) || '' }}"
 

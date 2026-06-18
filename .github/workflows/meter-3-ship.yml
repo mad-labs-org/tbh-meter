@@ -17,7 +17,7 @@
 # Continuity: the clean `tbh-meter-v<ver>` tag is pushed to THIS repo at the BUILT commit, so
 # compute-version's base advances. Skipped/abandoned RC tags stay inert (only clean X.Y.Z tags
 # are ever the base), and their drafts are swept here. No tag is ever force-pushed.
-name: TBH Meter / 3. Release to players
+name: Release · 3 · ship to players
 
 run-name: "Release · ${{ inputs.direct_from_main && 'main → stable (direct)' || (inputs.candidate != '' && inputs.candidate || 'newest staged RC') }} — ${{ github.actor }}"
 

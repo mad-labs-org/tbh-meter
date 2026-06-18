@@ -16,7 +16,7 @@
 #            Used for staged-RC builds AND throwaway PR builds — never clobbers a real install.
 #   stable → the shipped app: normal appId/data dir, auto-update ON. Emits latest.yml +
 #            .blockmap (electron-updater needs them).
-name: TBH Meter / core build (internal)
+name: Release · core build
 
 on:
   workflow_call:

@@ -1,7 +1,7 @@
 # Continuous integration — runs on every push to main and every pull request.
 # Free unlimited standard runners on public repos. Two independent jobs mirror the two pieces
 # of the meter (the Electron app and the Python reader) and the local verify commands.
-name: CI
+name: Check · CI
 
 on:
   push:
@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   app:
-    name: app · lint + types + tests
+    name: app
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -63,7 +63,7 @@ jobs:
         run: pnpm test
 
   reader:
-    name: reader · ruff + pytest
+    name: reader
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
