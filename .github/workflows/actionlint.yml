@@ -1,0 +1,35 @@
+name: Check · workflows
+
+# Lints the GitHub Actions workflow files (syntax, expression types, event/glob validity, and
+# shell via shellcheck). Runs only when a workflow changes. The actionlint binary is pinned to a
+# version AND checksum-verified against the release's published checksums (no blind curl|bash).
+on:
+  pull_request:
+    paths: [".github/workflows/**"]
+  push:
+    branches: [main]
+    paths: [".github/workflows/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Run actionlint (pinned + checksum-verified)
+        run: |
+          version=1.7.12
+          base="https://github.com/rhysd/actionlint/releases/download/v${version}"
+          file="actionlint_${version}_linux_amd64.tar.gz"
+          curl -sSfL "$base/$file" -o "$file"
+          curl -sSfL "$base/actionlint_${version}_checksums.txt" -o checksums.txt
+          grep -F "$file" checksums.txt | sha256sum -c -
+          tar -xzf "$file" actionlint
+          ./actionlint -color
