@@ -4,15 +4,12 @@
 
 **A live DPS / Gold / EXP meter & run tracker overlay for [Task Bar Hero](https://store.steampowered.com/)**
 
-[![CI](https://github.com/mad-labs-org/tbh-meter-releases/actions/workflows/ci.yml/badge.svg)](https://github.com/mad-labs-org/tbh-meter-releases/actions/workflows/ci.yml)
-[![Secret scan](https://github.com/mad-labs-org/tbh-meter-releases/actions/workflows/secret-scan.yml/badge.svg)](https://github.com/mad-labs-org/tbh-meter-releases/actions/workflows/secret-scan.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Latest release](https://img.shields.io/github/v/release/mad-labs-org/tbh-meter-releases?label=latest&color=4c1)](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/mad-labs-org/tbh-meter-releases/total?color=blue)](https://github.com/mad-labs-org/tbh-meter-releases/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-0078d4)](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-ffdd00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/viniarruda)
 
-![Live overlay — stage, DPS, total damage, mobs, gold/s, EXP/s, loot, party and run time](.github/assets/live-overlay.png)
+![Live overlay — stage, DPS, total damage, mobs, gold/s, EXP/s, loot, party and run time](.github/assets/live-meter.png)
 
 _Unaffiliated, open-source fan project — not made by or endorsed by the game's developer._
 
@@ -104,6 +101,16 @@ The app bundles a small **game-data snapshot** (committed under [`data/`](./data
 ## Contributing
 
 Issues and PRs are welcome — start with [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for setup, the test gates, and the release flow, and the [Code of Conduct](./.github/CODE_OF_CONDUCT.md). Found a security issue? See [SECURITY.md](./.github/SECURITY.md). Come say hi on [Discord](https://discord.gg/eYqUkxu3).
+
+## Support
+
+If TBH Meter helps your runs, consider buying the team a coffee — it keeps development going.
+
+<div align="center">
+
+[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="45">](https://buymeacoffee.com/viniarruda)
+
+</div>
 
 ## License
 
