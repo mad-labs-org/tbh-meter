@@ -4,17 +4,22 @@
 
 **A live DPS meter & run tracker overlay for [Task Bar Hero](https://store.steampowered.com/)**
 
-[![Latest Release](https://img.shields.io/github/v/release/mad-labs-org/tbh-meter-releases?label=latest&color=4c1)](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/mad-labs-org/tbh-meter-releases/total?color=blue&cacheSeconds=3600)](https://github.com/mad-labs-org/tbh-meter-releases/releases)
+[![CI](https://github.com/mad-labs-org/tbh-meter-releases/actions/workflows/ci.yml/badge.svg)](https://github.com/mad-labs-org/tbh-meter-releases/actions/workflows/ci.yml)
+[![Secret scan](https://github.com/mad-labs-org/tbh-meter-releases/actions/workflows/secret-scan.yml/badge.svg)](https://github.com/mad-labs-org/tbh-meter-releases/actions/workflows/secret-scan.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/mad-labs-org/tbh-meter-releases?label=latest&color=4c1)](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/mad-labs-org/tbh-meter-releases/total?color=blue)](https://github.com/mad-labs-org/tbh-meter-releases/releases)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-0078d4)](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest)
 
-[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="45">](https://buymeacoffee.com/viniarruda)
+![Live overlay — stage, DPS, kills, damage, gold/s, XP/s and run time](.github/assets/live-overlay.png)
 
 </div>
 
+> Unaffiliated, open-source fan project. Not made by or endorsed by the game's developer.
+
 ---
 
-## What is TBH Meter?
+## What it does
 
 TBH Meter is a lightweight, always-on-top overlay that tracks your **Task Bar Hero** runs in real time:
 
@@ -27,13 +32,7 @@ TBH Meter is a lightweight, always-on-top overlay that tracks your **Task Bar He
 | **MOBS** | Monsters killed / total |
 | **TIME** | Elapsed run time |
 
-<div align="center">
-
-![Live overlay — stage, DPS, kills, damage, gold/s, XP/s and run time](.github/assets/live-overlay.png)
-
-</div>
-
-Every completed run is also saved with full details — result (success / fail / abandoned), gold & XP gained, gold/XP per second, and a complete snapshot of your heroes (class, level, items, mods, skills, and stats) — browsable from the built-in **Runs** window:
+Every finished run is also saved with full detail — result (success / fail / abandoned), gold & XP gained, gold/XP per second, and a complete snapshot of your heroes (class, level, items, mods, skills, stats) — browsable from the built-in **Runs** window:
 
 <div align="center">
 
@@ -41,80 +40,86 @@ Every completed run is also saved with full details — result (success / fail /
 
 </div>
 
-## 📥 Installation
+## Install
 
-1. Go to the [**latest release**](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest).
-2. Download **`tbh-meter-Setup-<version>.exe`**.
-3. Run the installer. **No admin rights required** — it installs per-user.
-4. Launch Task Bar Hero, then launch TBH Meter (or the other way around — order doesn't matter).
-5. On first launch the reader takes **1–2 minutes** to lock onto the game. Once it does, live stats appear automatically.
+> **Windows 10+ only.** The reader uses Windows APIs to read game memory.
 
-### ⚠️ "Windows protected your PC" warning
+1. Download **`tbh-meter-Setup-<version>.exe`** from the [**latest release**](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest).
+2. Run the installer — **no admin rights needed** (it installs per-user).
+3. Launch Task Bar Hero and TBH Meter in any order. The first attach takes **1–2 minutes**; after that, live stats appear automatically.
 
-These builds are **not code-signed**, so Windows SmartScreen shows a blue warning the first time you run them. This is expected — the app is open-source and safe. To proceed:
+The app keeps itself up to date — it checks on launch and every 6 hours, downloads in the background, and offers a *Restart to update* prompt.
 
-1. Click **More info**
-2. Click **Run anyway**
+<details>
+<summary><b>"Windows protected your PC" warning</b></summary>
 
-### 🛡️ Antivirus false positive
+The builds are **not code-signed** (signing is expensive for a free fan tool), so SmartScreen shows a blue warning the first time you run them. Click **More info → Run anyway**.
+</details>
 
-If your antivirus quarantines **`tbh-reader.exe`**, it is a **false positive** — that is the bundled game reader. Allow or restore it so the meter can read the game.
+<details>
+<summary><b>Antivirus flags <code>tbh-reader.exe</code></b></summary>
 
-## ⚙️ How it works
+That is a **false positive**. `tbh-reader.exe` is the bundled game reader — it only *reads* memory, never writes to or modifies the game. Allow or restore it so the meter can work. See [SECURITY.md](./.github/SECURITY.md) for what the reader does.
+</details>
 
-TBH Meter has two parts working together:
+## How it works
 
-1. **The reader** (`tbh-reader.exe`) — a small bundled process that reads the game's memory **read-only**. It never writes to or modifies the game in any way. It outputs live stats (~10×/second) and one record per finished run.
-2. **The overlay app** — an Electron app that watches the reader's output and renders the live strip and run history.
+The meter ships as **two pieces** that talk over the filesystem:
 
-Data is stored locally in **`~/tbh-meter/`** (configurable in Settings):
+```
+ Task Bar Hero (game process)
+        │  ReadProcessMemory (read-only)
+        ▼
+ reader/  ──►  tbh-reader.exe        a pure-Python "sensor": resolves IL2CPP classes and
+        │                            writes one run record per finished run + a live feed
+        ▼
+ app/     ──►  tbh-meter (Electron)  converts runs, derives sessions, draws the overlay
+        │                            + runs list, and (optionally) uploads to the leaderboard
+        ▼
+ api.tbherohelper.com                public HTTP — the separate wiki / leaderboard project
+```
 
-- `meter_live.txt` — live stats feed
-- `runs.jsonl` — your full run history, one JSON record per run
+- **`reader/`** — the memory reader. Pure `ctypes` + stdlib (zero runtime dependencies), frozen into a single `tbh-reader.exe` with PyInstaller. A **read-only** sensor: it never modifies game memory, files, or behavior, and never injects code.
+- **`app/`** — the Electron overlay. Owns everything user-facing: the live overlay, the runs list and detail views, session grouping, settings, Discord sign-in, the background uploader, and auto-update.
 
-If the game closes, the reader simply waits and reattaches automatically when you start playing again.
+Your data is stored locally in **`~/tbh-meter/`** (configurable in Settings). Runs are uploaded **only** if you explicitly sign in to the leaderboard.
 
-## 🖥️ Usage
+## Build from source
 
-- **Live overlay** — frameless, draggable, always-on-top strip. Resize its width by dragging the edges.
-- **Follow game window** — pin the meter right below the game window so it moves with it (toggle in Settings; dragging the meter manually disables it).
-- **Tray icon** — left-click to show/hide the meter; right-click for *Show live meter*, *Open runs*, and *Quit*.
-- **Runs window** — browse your run history with full hero/item/stat details per run.
+You need **Node 22 + pnpm** (app) and **Python 3.12** (reader). The live memory-reading path is **Windows-only**; on macOS/Linux you can run the app's UI, lint, and tests, but not attach to the game.
 
-### Settings
+```bash
+# App (Electron overlay)
+cd app
+pnpm install
+pnpm dev          # run the overlay (macOS renders UI only — no game attach)
+pnpm check        # eslint + tsc
+pnpm test         # vitest
+pnpm dist:win     # build the Windows installer (requires Windows)
 
-| Setting | Description |
-| ------- | ----------- |
-| **Meter folder** | Where run data is stored (default `~/tbh-meter`) |
-| **Follow game window** | Auto-pin the overlay below the game |
-| **Window opacity** | 50–100% overlay transparency |
-| **Leaderboard** | Sign in with Discord to auto-upload successful runs to the TBH Helper leaderboard |
-| **Check for updates** | Manually check for a new version |
+# Reader (Python sensor)
+cd reader
+pip install ruff -r requirements-dev.txt
+ruff check .
+python -m pytest
+```
 
-## 🔄 Updates
+The app bundles a small **game-data snapshot** (committed under [`data/`](./data)); `app/scripts/sync-data.mjs` copies it in at build time, so the app builds offline. See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) to refresh it after a game patch.
 
-The app checks for updates on launch and every 6 hours, downloads them in the background, and offers a *Restart to update* prompt — no manual reinstall needed.
+## Contributing
 
-## ❓ FAQ
+Issues and PRs are welcome — start with [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for setup, the test gates, and the release flow, and the [Code of Conduct](./.github/CODE_OF_CONDUCT.md). Found a security issue? See [SECURITY.md](./.github/SECURITY.md). Come say hi on [Discord](https://discord.gg/eYqUkxu3).
 
-**Does it work on macOS / Linux?**
-No — Windows 10+ only. The reader relies on Windows APIs.
+## Support
 
-**Can it get me banned?**
-The reader only *reads* memory and never injects, modifies, or automates anything in the game.
+If TBH Meter helps your runs, consider buying the team a coffee — it keeps development going.
 
-**Where is my data? Is anything sent anywhere?**
-Everything is stored locally in `~/tbh-meter/`. Runs are only uploaded if you explicitly sign in to the leaderboard in Settings.
-
-**The meter says "Starting up — reading the game" forever.**
-Make sure Task Bar Hero is actually running. The first attach can take 1–2 minutes. If it persists, restart both the game and the meter.
-
-## ☕ Support
-
-If TBH Meter helps your runs, consider buying me a coffee — it keeps development going!
+<div align="center">
 
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="45">](https://buymeacoffee.com/viniarruda)
 
----
+</div>
 
-<sub>This repository hosts release artifacts and the auto-update feed only. The app is built and published by the private <code>tbh-wiki</code> CI. © 2025–2026 TBH Wiki Contributors.</sub>
+## License
+
+[MIT](./LICENSE). Task Bar Hero and its assets belong to their respective owner; this project only reads publicly observable game state for the player's own use.

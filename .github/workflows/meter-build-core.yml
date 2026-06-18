@@ -1,0 +1,150 @@
+# TBH Meter / core build (INTERNAL — reusable, never in the dispatch list).
+#
+# Produces ONE tbh-meter installer for an EXACT commit + version, in either variant, and
+# uploads it as a run artifact. Both step 2 (Build test version) and step 3 (Release) call
+# this via `workflow_call`, so the Windows build (reader exe + electron-builder) lives in
+# ONE place instead of the ~80 duplicated lines the old release/promote workflows carried.
+#
+# It only BUILDS + uploads — it never publishes a release or pushes a tag. The caller owns
+# publishing (draft for a test build, Latest for a ship), so this needs no release token and
+# the same build definition serves both channels. The caller passes the exact `version`
+# (computed once, up front) so the in-app version and installer filename match byte-for-byte.
+#
+# variant:
+#   rc     → side-by-side test build: appId `wiki.tbh.meter.rc`, productName `tbh-meter-rc`,
+#            data dir `~/tbh-meter-rc`, auto-update OFF (TBH_BUILD_VARIANT=rc → __TBH_VARIANT__).
+#            Used for staged-RC builds AND throwaway PR builds — never clobbers a real install.
+#   stable → the shipped app: normal appId/data dir, auto-update ON. Emits latest.yml +
+#            .blockmap (electron-updater needs them).
+name: Release · core build
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Exact commit SHA to build."
+        required: true
+        type: string
+      version:
+        description: "Exact version to stamp (e.g. 0.31.0-rc.2 · 0.31.0 · 0.0.0-pr.342.57)."
+        required: true
+        type: string
+      variant:
+        description: "rc = side-by-side test build (auto-update OFF); stable = the shipped app."
+        required: true
+        type: string
+    outputs:
+      artifact:
+        description: "Name of the uploaded build artifact (tbh-meter-<variant>-windows)."
+        value: tbh-meter-${{ inputs.variant }}-windows
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: app
+
+jobs:
+  build:
+    name: build ${{ inputs.variant }} ${{ inputs.version }}
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          package_json_file: app/package.json
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Stamp the exact version into package.json
+        shell: bash
+        # --set stamps the chosen version verbatim (no recompute → no drift), so the installer
+        # filename and app.getVersion() both read exactly inputs.version.
+        run: node scripts/compute-version.mjs --set "${{ inputs.version }}" --write
+
+      # --- Reader sidecar (tbh-reader.exe) — identical for both variants -----------------
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.12"
+
+      - name: Install PyInstaller
+        working-directory: reader
+        run: pip install pyinstaller
+
+      - name: Build reader exe (tbh-reader.exe)
+        working-directory: reader
+        # onefile → a single dist\tbh-reader.exe. --add-data ";" is the Windows separator;
+        # bundles level_curve.json + skill_attr_map.json + the calib seed (first launch on a
+        # shipped build skips the ~70s scan; a missing seed file makes PyInstaller fail loud).
+        run: pyinstaller --noconfirm --clean --name tbh-reader --onefile --console --paths . --add-data "config/level_curve.json;config" --add-data "config/skill_attr_map.json;config" --add-data "config/calib_seed.json;config" meter_windows.py
+
+      - name: Smoke test reader exe (--selftest must exit 0)
+        working-directory: reader
+        run: |
+          .\dist\tbh-reader.exe --selftest
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "tbh-reader.exe --selftest exited with $LASTEXITCODE"
+            exit 1
+          }
+
+      - name: Bundle reader exe into app resources
+        working-directory: .
+        run: |
+          New-Item -ItemType Directory -Force -Path app/resources/reader | Out-Null
+          Copy-Item -Force reader/dist/tbh-reader.exe app/resources/reader/tbh-reader.exe
+
+      - name: Build the ${{ inputs.variant }} installer
+        shell: bash
+        env:
+          # rc → ~/tbh-meter-rc + auto-update OFF; stable (anything else) → defaults to the
+          # shipped identity. electron.vite.config.ts bakes this into __TBH_VARIANT__.
+          TBH_BUILD_VARIANT: ${{ inputs.variant }}
+        run: |
+          if [ "${{ inputs.variant }}" = "rc" ]; then
+            pnpm build
+            # CLI -c.<path> overrides give the RC its own identity so it installs side-by-side
+            # with the real app. --publish never: the caller attaches the asset itself.
+            # shellcheck disable=SC2016  # ${version}/${ext} are electron-builder templates, not shell vars
+            pnpm exec electron-builder --win \
+              -c.appId=wiki.tbh.meter.rc \
+              -c.productName=tbh-meter-rc \
+              -c.nsis.shortcutName=tbh-meter-rc \
+              -c.nsis.uninstallDisplayName=tbh-meter-rc \
+              -c.nsis.artifactName='tbh-meter-rc-Setup-${version}.${ext}' \
+              --publish never
+          else
+            # dist:win = `pnpm build && electron-builder --win`; --publish never (caller attaches).
+            pnpm dist:win --publish never
+          fi
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: tbh-meter-${{ inputs.variant }}-windows
+          # The .exe always exists; latest.yml + .blockmap exist for stable (electron-updater
+          # needs them) and are harmless extras for rc. if-no-files-found:error guards a broken
+          # build (no installer produced).
+          path: |
+            app/dist/*.exe
+            app/dist/latest.yml
+            app/dist/*.blockmap
+          if-no-files-found: error
+          # Throwaway handoff: build-core is workflow_called and the installer is consumed within
+          # the same run (the durable copy ships to the tbh-meter-releases Release). 1 day is the
+          # floor and keeps these large Electron+reader bundles from filling the Actions quota.
+          retention-days: 1

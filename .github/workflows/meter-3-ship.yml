@@ -1,0 +1,394 @@
+# TBH Meter / 3. Release to players — build the STABLE app and publish it as Latest, so
+# installed apps self-update. MANUAL.
+#
+# Two ways to ship (the common case needs NO input):
+#   • blank            → promote the newest staged RC (the one you just tested). The normal flow.
+#   • candidate=…      → promote a specific staged RC, e.g. 0.31.0-rc.2.
+#   • direct_from_main → SKIP the RC: version, build and ship main's CURRENT code straight to
+#                        players. Use when a fix is obvious enough to skip a test build. Refused
+#                        unless main actually changed since the last release (tick allow_empty to
+#                        force a rebuild — e.g. a build-only change).
+#
+# Why it BUILDS (not a flag-flip): the RC you tested is a side-by-side VARIANT (different
+# appId/data dir, auto-update OFF) — a different artifact from what users run. So it re-builds
+# the STABLE variant from the EXACT commit the RC points at (frozen lockfile → "ship == tested
+# commit"); only the trivial variant config differs. direct_from_main builds main's HEAD.
+#
+# Continuity: the clean `tbh-meter-v<ver>` tag is pushed to THIS repo at the BUILT commit, so
+# compute-version's base advances. Skipped/abandoned RC tags stay inert (only clean X.Y.Z tags
+# are ever the base), and their drafts are swept here. No tag is ever force-pushed.
+name: Release · 3 · ship to players
+
+run-name: "Release · ${{ inputs.direct_from_main && 'main → stable (direct)' || (inputs.candidate != '' && inputs.candidate || 'newest staged RC') }} — ${{ github.actor }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate:
+        description: "RC to ship, e.g. 0.31.0-rc.2. Blank = the newest staged RC."
+        required: false
+        type: string
+      direct_from_main:
+        description: "Skip the RC: build & ship main's current code straight to players."
+        required: false
+        type: boolean
+        default: false
+      allow_empty:
+        description: "direct_from_main only — ship even with no meter changes since the last release (forced rebuild)."
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  # All ships serialize globally — never two Latest flips at once. Never cancel one in flight.
+  group: meter-ship-stable
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    name: Resolve + guard
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    outputs:
+      sha: ${{ steps.r.outputs.sha }}
+      version: ${{ steps.r.outputs.version }}
+      stable_tag: ${{ steps.r.outputs.stable_tag }}
+      rc_tag: ${{ steps.r.outputs.rc_tag }}
+      mode: ${{ steps.r.outputs.mode }}
+      version_matrix: ${{ steps.r.outputs.version_matrix }}
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+
+      - name: Resolve target + guard against empty / downgrade / duplicate
+        id: r
+        shell: bash
+        env:
+          # Inputs via env (not direct ${{ }} interpolation into bash) — robust to odd quoting.
+          DIRECT_INPUT: ${{ inputs.direct_from_main }}
+          CAND_INPUT: ${{ inputs.candidate }}
+          ALLOW_INPUT: ${{ inputs.allow_empty }}
+        run: |
+          DIRECT="$DIRECT_INPUT"
+          CAND="$CAND_INPUT"
+          ALLOW="$ALLOW_INPUT"
+          SCRIPT=app/scripts/compute-version.mjs
+
+          if [ "$DIRECT" = "true" ] && [ -n "$CAND" ]; then
+            echo "::error::Pass EITHER a candidate RC OR direct_from_main, not both."; exit 1
+          fi
+
+          if [ "$DIRECT" = "true" ]; then
+            # Ship main's current HEAD, no RC. Resolve main explicitly (FETCH_HEAD), so it works
+            # no matter which ref the workflow was dispatched from — never ships an unmerged branch.
+            git fetch --tags origin main -q
+            git -c advice.detachedHead=false checkout -q FETCH_HEAD
+            SHA=$(git rev-parse HEAD)
+            FLAGS=(); [ "$ALLOW" = "true" ] && FLAGS+=(--allow-empty)
+            set +e
+            VERSION=$(node "$SCRIPT" "${FLAGS[@]}" 2>ship-err.log)  # bare stdout = the version
+            CODE=$?
+            set -e
+            cat ship-err.log >&2
+            if [ "$CODE" -eq 2 ]; then
+              echo "::error::No meter changes since the last release — nothing to ship. Tick allow_empty to force a rebuild."; exit 1
+            fi
+            [ "$CODE" -ne 0 ] && { echo "::error::compute-version failed (exit $CODE)"; exit "$CODE"; }
+            RC_TAG=""
+            MODE="direct"
+          else
+            git fetch --tags -q
+            if [ -z "$CAND" ]; then
+              RC_TAG=$(git -c versionsort.suffix=-rc tag -l 'tbh-meter-v*-rc.*' --sort=-v:refname | head -n1)
+              [ -z "$RC_TAG" ] && { echo "::error::No staged RC to ship. Merge meter work first, or use direct_from_main."; exit 1; }
+            else
+              RC_TAG="tbh-meter-v${CAND#tbh-meter-v}"
+            fi
+            git rev-parse -q --verify "refs/tags/$RC_TAG" >/dev/null || { echo "::error::Tag $RC_TAG does not exist."; exit 1; }
+            SHA=$(git rev-parse "$RC_TAG^{commit}")
+            RC_VERSION="${RC_TAG#tbh-meter-v}"
+            VERSION="${RC_VERSION%%-*}"   # strip the -rc.N suffix
+            MODE="promote"
+          fi
+
+          STABLE_TAG="tbh-meter-v$VERSION"
+
+          # Downgrade guard: never ship a version ≤ the current Latest stable.
+          HIGHEST=$(git -c versionsort.suffix=-rc tag -l 'tbh-meter-v*' --sort=-v:refname \
+            | grep -E '^tbh-meter-v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)
+          if [ -n "$HIGHEST" ]; then
+            HV="${HIGHEST#tbh-meter-v}"
+            TOP=$(printf '%s\n%s\n' "$VERSION" "$HV" | sort -V | tail -n1)
+            if [ "$VERSION" != "$HV" ] && [ "$TOP" = "$HV" ]; then
+              echo "::error::$VERSION ≤ current stable $HV — refusing a downgrade. Stage a newer RC or bump the floor."; exit 1
+            fi
+          fi
+
+          # Idempotency / repair: a clean tag at the SAME sha = a legit re-ship (allowed); a
+          # DIFFERENT sha = this version already shipped from other code → refuse (bump instead).
+          EXIST_SHA=$(git ls-remote origin "refs/tags/$STABLE_TAG" | cut -f1)
+          if [ -n "$EXIST_SHA" ] && [ "$EXIST_SHA" != "$SHA" ]; then
+            echo "::error::$STABLE_TAG already shipped from ${EXIST_SHA:0:7} (≠ ${SHA:0:7}) — bump instead of re-shipping."; exit 1
+          fi
+
+          echo "::notice::Shipping $VERSION from ${SHA:0:7} ($MODE)"
+          {
+            echo "sha=$SHA"
+            echo "version=$VERSION"
+            echo "stable_tag=$STABLE_TAG"
+            echo "rc_tag=${RC_TAG:-}"
+            echo "mode=$MODE"
+            echo "version_matrix=[\"$VERSION\"]"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build
+    needs: resolve
+    permissions:
+      contents: read
+    # Matrix value surfaces the computed version in the sidebar job name (build (0.31.0)).
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.resolve.outputs.version_matrix) }}
+    uses: ./.github/workflows/meter-build-core.yml
+    with:
+      ref: ${{ needs.resolve.outputs.sha }}
+      version: ${{ matrix.version }}
+      variant: stable
+
+  publish:
+    name: Publish + flag Latest
+    needs: [resolve, build]
+    runs-on: ubuntu-latest
+    # Only this job ships: publishes the release + pushes the stable source tag (git push) in
+    # this repo → needs contents: write + the persisted default token. The `production`
+    # environment is the human approval gate + the scope for DISCORD_ANNOUNCE_WEBHOOK.
+    permissions:
+      contents: write
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: tbh-meter-stable-windows
+          path: dist
+
+      - name: Publish, tag, and sweep stale drafts
+        id: ship
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # publishes the release in this repo
+          NOTES_TOKEN: ${{ secrets.GITHUB_TOKEN }} # reads THIS repo for the changelog
+          VERSION: ${{ needs.resolve.outputs.version }}
+          STABLE_TAG: ${{ needs.resolve.outputs.stable_tag }}
+          RC_TAG: ${{ needs.resolve.outputs.rc_tag }}
+          SHA: ${{ needs.resolve.outputs.sha }}
+        run: |
+          RELEASES_REPO="$GITHUB_REPOSITORY"
+          TAG="$STABLE_TAG"
+
+          # Outgoing Latest, captured BEFORE the flip (Discord changelog range).
+          PREV_TAG=$(gh api "repos/$RELEASES_REPO/releases/latest" --jq .tag_name 2>/dev/null || true)
+          echo "prev_tag=$PREV_TAG" >> "$GITHUB_OUTPUT"
+
+          # End-user notes: download + SmartScreen + auto changelog from THIS repo at the built sha.
+          CHANGELOG=$(GH_TOKEN="$NOTES_TOKEN" gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+            -f tag_name="$TAG" -f target_commitish="$SHA" --jq .body 2>/dev/null || true)
+          {
+            echo "## Download"
+            echo
+            echo "Grab the **\`Setup\`** \`.exe\` and run it — it installs the app and keeps itself"
+            echo "up to date automatically."
+            echo
+            echo "## \"Windows protected your PC\" warning"
+            echo
+            echo "These builds are **not code-signed**, so SmartScreen shows a blue warning the first"
+            echo "time you run them. Click **More info → Run anyway**. If your antivirus quarantines"
+            echo "**tbh-reader.exe**, allow/restore it (bundled Python reader)."
+            echo
+            echo "---"
+            echo
+            echo "$CHANGELOG"
+          } > release-notes.md
+
+          # Draft-FIRST: upload all assets to a draft, THEN flip to published+Latest in one edit,
+          # so electron-updater never sees a Latest without latest.yml/installer (no empty window).
+          if gh release view "$TAG" --repo "$RELEASES_REPO" >/dev/null 2>&1; then
+            echo "Release $TAG exists — refreshing assets + re-flagging Latest (repair/re-ship)."
+            gh release upload "$TAG" dist/*.exe dist/latest.yml dist/*.blockmap --repo "$RELEASES_REPO" --clobber
+            gh release edit "$TAG" --repo "$RELEASES_REPO" \
+              --title "tbh-meter v$VERSION" --notes-file release-notes.md \
+              --draft=false --prerelease=false --latest
+          else
+            gh release create "$TAG" --repo "$RELEASES_REPO" --draft \
+              --title "tbh-meter v$VERSION" --notes-file release-notes.md
+            gh release upload "$TAG" dist/*.exe dist/latest.yml dist/*.blockmap --repo "$RELEASES_REPO" --clobber
+            gh release edit "$TAG" --repo "$RELEASES_REPO" --draft=false --prerelease=false --latest
+          fi
+
+          # Source tag at the BUILT sha — plain push, never forced. Same-sha re-push = no-op;
+          # a different sha was refused in resolve (and is rejected here too as a backstop).
+          EXIST_SHA=$(git ls-remote origin "refs/tags/$TAG" | cut -f1)
+          if [ -z "$EXIST_SHA" ]; then
+            git tag "$TAG" "$SHA"
+            git push origin "refs/tags/$TAG"
+            echo "tag_pushed=true" >> "$GITHUB_OUTPUT"
+            echo "Pushed $TAG at ${SHA:0:7}."
+          elif [ "$EXIST_SHA" = "$SHA" ]; then
+            echo "tag_pushed=false" >> "$GITHUB_OUTPUT"
+            echo "$TAG already at ${SHA:0:7} — no tag push (idempotent re-ship)."
+          else
+            echo "::error::$TAG exists at ${EXIST_SHA:0:7} ≠ built ${SHA:0:7}."; exit 1
+          fi
+
+          # GC: drop every RC/legacy draft whose clean base ≤ the shipped version — clears the
+          # promoted stream AND abandoned ones (e.g. 0.24.1-rc.* once 0.25.0 ships, and the old
+          # sha-suffixed throwaway drafts). PR slots (tbh-meter-pr-*) are left for Meter 1's
+          # PR-close cleanup. Newer staged streams (> shipped) are preserved.
+          # Best-effort, fully wrapped: the ship is already complete (tag pushed, Latest flipped),
+          # so NOTHING here may fail the step — a red step would also skip the Discord announce.
+          {
+            gh api "repos/$RELEASES_REPO/releases" --paginate \
+              --jq '.[] | select(.draft==true) | "\(.id) \(.tag_name)"' | while read -r id t; do
+              case "$t" in
+                tbh-meter-v*-rc.*)
+                  cb="${t#tbh-meter-v}"; cb="${cb%%-*}"
+                  top=$(printf '%s\n%s\n' "$cb" "$VERSION" | sort -V | tail -n1)
+                  if [ "$top" = "$VERSION" ]; then
+                    gh api -X DELETE "repos/$RELEASES_REPO/releases/$id" \
+                      && echo "GC: removed stale draft $t" \
+                      || echo "::warning::GC: could not remove draft $t"
+                  fi
+                  ;;
+              esac
+            done
+          } || echo "::warning::GC sweep skipped (listing failed; ship unaffected)"
+
+      - name: Verify players can see it
+        shell: bash
+        env:
+          TAG: ${{ needs.resolve.outputs.stable_tag }}
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: |
+          RELEASES_REPO="mad-labs-org/tbh-meter-releases"
+          # Installed apps resolve "Latest" through the anonymous 302 on /releases/latest
+          # (electron-updater reads the redirect's tag, then pulls latest.yml under it).
+          # The flip above is an API write; what GitHub SERVES can lag it by a moment — and
+          # players (and we) open the meter the second this run goes green, expecting the
+          # boot update. v0.31.0: a boot seconds around the flip concluded "up to date" and
+          # the app stayed blind for the 10–30 min recheck window. Hold the green until the
+          # public pointer + latest.yml actually serve this ship, polling EXACTLY what a
+          # player's app requests (no token on purpose). Warn-only: the ship itself
+          # (assets, Latest flip, tag) is already complete.
+          SEEN=""
+          for i in $(seq 1 24); do
+            SEEN=$(curl -sI --max-time 10 "https://github.com/$RELEASES_REPO/releases/latest" \
+              | tr -d '\r' | awk 'tolower($1)=="location:" {n=split($2,a,"/"); print a[n]; exit}' || true)
+            if [ "$SEEN" = "$TAG" ]; then
+              echo "Public /releases/latest serves $TAG (attempt $i)."
+              break
+            fi
+            sleep 5
+          done
+          if [ "$SEEN" != "$TAG" ]; then
+            echo "::warning::/releases/latest still serves '${SEEN:-nothing}' (≠ $TAG) after ~2 min — a just-restarted app may briefly miss this update."
+          fi
+          YML_VER=$(curl -sL --max-time 15 "https://github.com/$RELEASES_REPO/releases/download/$TAG/latest.yml" \
+            | awk '$1=="version:" {print $2; exit}' || true)
+          if [ "$YML_VER" = "$VERSION" ]; then
+            echo "latest.yml under $TAG serves version $YML_VER."
+          else
+            echo "::warning::latest.yml under $TAG serves '${YML_VER:-nothing}' (expected $VERSION)."
+          fi
+
+      - name: Announce on Discord (only when the tag was newly pushed)
+        if: steps.ship.outputs.tag_pushed == 'true'
+        shell: bash
+        env:
+          DISCORD_ANNOUNCE_WEBHOOK: ${{ secrets.DISCORD_ANNOUNCE_WEBHOOK }}
+          PREV_TAG: ${{ steps.ship.outputs.prev_tag }}
+          TAG: ${{ needs.resolve.outputs.stable_tag }}
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: |
+          if [ -z "$DISCORD_ANNOUNCE_WEBHOOK" ]; then
+            echo "DISCORD_ANNOUNCE_WEBHOOK not set — skipping announcement."; exit 0
+          fi
+          if ! git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "Tag $TAG not in this checkout — skipping announcement."; exit 0
+          fi
+          if [ -n "$PREV_TAG" ] && ! git rev-parse -q --verify "refs/tags/$PREV_TAG" >/dev/null; then
+            echo "Previous tag $PREV_TAG not in this checkout — announcing full history."
+            PREV_TAG=""
+          fi
+          RANGE="${PREV_TAG:+$PREV_TAG..}$TAG"
+          SUBJECTS=$(git log "$RANGE" --no-merges --pretty=%s -- app reader data)
+          FEATURES=$(grep -E '^feat(\([^)]*\))?!?:' <<< "$SUBJECTS" | sed -E 's/^feat(\([^)]*\))?!?:[[:space:]]*/- /' || true)
+          FIXES=$(grep -E '^fix(\([^)]*\))?!?:' <<< "$SUBJECTS" | sed -E 's/^fix(\([^)]*\))?!?:[[:space:]]*/- /' || true)
+          if [ -z "$FEATURES" ] && [ -z "$FIXES" ]; then
+            echo "No feat/fix commits since ${PREV_TAG:-(none)} — skipping announcement."; exit 0
+          fi
+          DESC=""
+          [ -n "$FEATURES" ] && DESC="**New features**\n$FEATURES"
+          [ -n "$FIXES" ] && DESC="${DESC:+$DESC\n\n}**Fixes**\n$FIXES"
+          DESC=$(printf '%b' "$DESC")
+          jq -n \
+            --arg title "TBH Meter v$VERSION" \
+            --arg desc "$DESC" \
+            --arg url "https://github.com/mad-labs-org/tbh-meter-releases/releases/tag/$TAG" \
+            '{
+              username: "TBH Helper",
+              embeds: [{
+                title: ("🚀 " + $title),
+                url: $url,
+                description: $desc,
+                color: 5201407,
+                footer: { text: "Installed apps update themselves automatically." },
+                timestamp: (now | todate)
+              }],
+              allowed_mentions: { parse: [] }
+            }' \
+            | curl -sf -X POST -H 'Content-Type: application/json' -d @- "$DISCORD_ANNOUNCE_WEBHOOK" \
+            || echo "::warning::Discord announcement failed (the ship itself is unaffected)."
+
+      - name: Job summary
+        if: always()
+        shell: bash
+        env:
+          VERSION: ${{ needs.resolve.outputs.version }}
+          STABLE_TAG: ${{ needs.resolve.outputs.stable_tag }}
+          RC_TAG: ${{ needs.resolve.outputs.rc_tag }}
+          MODE: ${{ needs.resolve.outputs.mode }}
+          SHA: ${{ needs.resolve.outputs.sha }}
+          TAG_PUSHED: ${{ steps.ship.outputs.tag_pushed }}
+        run: |
+          {
+            echo "## 🚀 Shipped to players"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| **Version** | \`$VERSION\` |"
+            echo "| **From** | ${MODE} · \`${SHA:0:7}\`${RC_TAG:+ (from \`$RC_TAG\`)} |"
+            echo "| **Latest tag** | \`$STABLE_TAG\` |"
+            echo
+            echo "Installed apps self-update via electron-updater (\`/releases/latest\`)."
+            echo "Release: https://github.com/mad-labs-org/tbh-meter-releases/releases/tag/$STABLE_TAG"
+            if [ "$TAG_PUSHED" != "true" ]; then
+              echo
+              echo "> ℹ️ This was an idempotent re-ship (tag already at this commit), so the Discord"
+              echo "> announcement was skipped. To announce manually, post the release link above."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

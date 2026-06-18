@@ -1,0 +1,166 @@
+# TBH Meter / 1. Create version tag (AUTOMATIC — you never click this).
+#
+# Two cheap, build-free housekeeping jobs:
+#
+#  • stage  (on push to main touching the meter): computes the next RC version from
+#    conventional commits and pushes a marker tag `tbh-meter-v<ver>-rc.<N>` at the commit.
+#    NO build — the Windows build happens on demand in Meter 2 / Meter 3. If NOTHING under
+#    the meter build inputs (app/, reader/, data/) changed since the last release,
+#    compute-version refuses (exit 2) and this is a green no-op ("nothing staged") — that is the
+#    P1 guard: a version exists only when the meter actually changed. (Re-calibrating the reader
+#    after a game patch writes reader/config/calib_seed.json, which IS a meter change, so it
+#    stages normally.)
+#
+#  • clean-pr-slot  (on ANY PR close): deletes that PR's throwaway draft build
+#    (`tbh-meter-pr-<N>`) on the releases repo, so a merged/closed PR never leaves a stale
+#    installer behind. No paths filter on purpose — it must fire even for a PR that never
+#    touched the meter but got a test build.
+#
+# `-rc.N` tags never become the version base (only clean X.Y.Z tags do — compute-version.mjs),
+# so every RC keeps targeting the same stable version until Meter 3 ships it. Re-runs are
+# idempotent: a commit already staged reuses its tag instead of minting a new rc number.
+name: Release · 1 · version tag
+
+run-name: "${{ github.event_name == 'pull_request' && format('Clean up PR #{0} test build', github.event.pull_request.number) || '' }}"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "reader/**"
+      - "data/**"
+      # NOTE: the pipeline workflow files are deliberately NOT listed here yet. Until the source
+      # (app/, reader/) lands, a self-referencing path would fire `stage` on a pipeline-only edit
+      # and fail (no compute-version.mjs). Re-add them in the PR that brings the code.
+  pull_request:
+    types: [closed]
+
+concurrency:
+  # Push-stages serialize together; PR-close cleanups serialize per-PR. cancel-in-progress:false
+  # so a running stage is never aborted. (GitHub keeps one pending run per group, so a 3-push
+  # burst may supersede the middle PENDING run — that is fine: the surviving run stages the
+  # newest commit, which covers the whole range, and rc numbers are recomputed from the tags.)
+  group: meter-stage-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'main' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  stage:
+    name: Compute + push the next RC tag
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    # Only this job needs the token to push the version tag.
+    permissions:
+      contents: write
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          # Full history + tags: compute-version reads tbh-meter-v* tags and commits since
+          # the latest stable one (a shallow clone would see neither).
+          fetch-depth: 0
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+
+      - name: Compute + push RC tag (refuses when the meter did not change)
+        id: rc
+        shell: bash
+        run: |
+          SCRIPT=app/scripts/compute-version.mjs
+
+          # Idempotent: if this commit already carries an rc tag, reuse it (don't mint a new N).
+          EXISTING=$(git tag --points-at "$GITHUB_SHA" --list 'tbh-meter-v*-rc.*' | head -n1)
+          if [ -n "$EXISTING" ]; then
+            VERSION="${EXISTING#tbh-meter-v}"
+            echo "::notice::Commit already staged as $EXISTING — reusing (no new tag)."
+          else
+            # P1 guard: compute-version exits 2 with zero meter commits since the base tag.
+            set +e
+            VERSION=$(node "$SCRIPT" --prerelease rc 2>stage-err.log)
+            CODE=$?
+            set -e
+            cat stage-err.log >&2
+            if [ "$CODE" -eq 2 ]; then
+              echo "::notice::No meter changes since the last release — nothing staged."
+              {
+                echo "## 🟢 Nothing to stage"
+                echo
+                echo "No commits under the meter (\`app/\`, \`reader/\`, \`data/\`) since the last release tag, so no RC was minted."
+                echo "This is correct, not an error — a version exists only when the meter changes."
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            if [ "$CODE" -ne 0 ]; then
+              echo "::error::compute-version failed (exit $CODE)"; exit "$CODE"
+            fi
+            TAG="tbh-meter-v$VERSION"
+            # Lightweight tag; checkout@v4 persists GITHUB_TOKEN so the push is authenticated.
+            # A token-pushed tag does NOT re-trigger any workflow (push trigger is branch-only).
+            git tag "$TAG" "$GITHUB_SHA"
+            git push origin "refs/tags/$TAG"
+            echo "::notice::Staged $TAG"
+          fi
+
+          TAG="tbh-meter-v$VERSION"
+          ACTIONS="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions"
+          LAST_STABLE=$(git -c versionsort.suffix=-rc tag -l 'tbh-meter-v*' --sort=-v:refname \
+            | grep -E '^tbh-meter-v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)
+          RANGE="${LAST_STABLE:+$LAST_STABLE..}HEAD"
+          COUNT=$(git log "$RANGE" --no-merges --oneline -- app reader data | wc -l | tr -d ' ')
+          CHANGES=$(git log "$RANGE" --no-merges --pretty='- %s' -- app reader data | head -n 50)
+          {
+            echo "## 🏷️ Release candidate staged"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| **Version** | \`$VERSION\` |"
+            echo "| **Tag** | \`$TAG\` |"
+            echo "| **Commit** | \`${GITHUB_SHA:0:7}\` |"
+            echo "| **Meter commits since ${LAST_STABLE:-(first release)}** | $COUNT |"
+            echo
+            if [ -n "$CHANGES" ]; then
+              echo "<details><summary>Changes pending in this RC</summary>"
+              echo
+              echo "$CHANGES"
+              echo
+              echo "</details>"
+              echo
+            fi
+            echo "### Next steps"
+            echo "1. **[TBH Meter / 2. Build test version to download]($ACTIONS/workflows/meter-2-build.yml)** — no input needed (builds this newest RC)."
+            echo "2. Install & smoke-test it on Windows."
+            echo "3. **[TBH Meter / 3. Release to players]($ACTIONS/workflows/meter-3-ship.yml)** — no input needed (ships this newest RC)."
+            echo
+            echo "Builds land on [tbh-meter-releases](https://github.com/mad-labs-org/tbh-meter-releases/releases)."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  clean-pr-slot:
+    name: Delete the closed PR's test build
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    # Same-repo: drafts live here now, so the default token deletes them (no cross-repo PAT).
+    permissions:
+      contents: write
+    timeout-minutes: 10
+    steps:
+      - name: Delete draft slot tbh-meter-pr-<N> (if any)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR="${{ github.event.pull_request.number }}"
+          RELEASES_REPO="$GITHUB_REPOSITORY"
+          TAG="tbh-meter-pr-$PR"
+          # Drafts aren't returned by get-release-by-tag, so find the id via the list endpoint.
+          ID=$(gh api "repos/$RELEASES_REPO/releases" --paginate \
+            --jq "[.[] | select(.tag_name==\"$TAG\" and .draft==true)] | .[0].id // empty")
+          if [ -n "$ID" ]; then
+            gh api -X DELETE "repos/$RELEASES_REPO/releases/$ID" && echo "Deleted test build $TAG (id $ID)."
+          else
+            echo "No test build for PR #$PR — nothing to clean."
+          fi
