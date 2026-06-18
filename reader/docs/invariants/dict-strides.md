@@ -1,18 +1,16 @@
 ---
 type: invariant
-description: "Há DUAS geometrias de entry de Dictionary IL2CPP — DictFloat (stride 0x10, valor float @0xC) para os 64 stats vs Dict8B (stride 0x18, valor 8B @0x10) para gold/agregados. Confundir os strides corrompe gold/xp/stats SILENCIOSAMENTE (sem crash). Sempre as constantes nomeadas, nunca um literal solto."
+description: "There are TWO IL2CPP Dictionary entry geometries — DictFloat (stride 0x10, float value @0xC) for the 64 stats vs Dict8B (stride 0x18, 8B value @0x10) for gold/aggregates. Mixing up the strides corrupts gold/xp/stats SILENTLY (no crash). Always the named constants, never a bare literal."
 symptoms:
-  - "gold dobrado"
-  - "gold errado"
-  - "xp errado"
-  - "stats errados"
-  - "garbage stats"
-  - "valores corrompidos"
-  - "dict stride"
-  - "stride trocado"
-  - "stride errado"
-  - "wrong gold"
   - "doubled gold"
+  - "wrong gold"
+  - "wrong xp"
+  - "wrong stats"
+  - "garbage stats"
+  - "corrupted values"
+  - "dict stride"
+  - "swapped stride"
+  - "wrong stride"
   - "1.97T"
 code_anchors:
   - config/offsets.py::DictFloat.STRIDE
@@ -29,48 +27,49 @@ guarded_by:
   - tests/test_offsets.py::TestDictStrides::test_dict_8b_value_at_0x10
 ---
 
-# Geometrias de Dictionary (DictFloat vs Dict8B)
+# Dictionary geometries (DictFloat vs Dict8B)
 
-O jogo guarda dois tipos de `Dictionary<K,V>` que o reader lê, e o **layout do `Entry`
-é diferente em cada um** porque o `V` tem tamanho diferente. As duas geometrias são a
-classe `DictFloat` e a classe `Dict8B` em offsets.py. Elas **compartilham** o cabeçalho
-do entry (`HASH` no início, `NEXT`, e `KEY` como int32 — todos no mesmo lugar), e
-divergem em **exatamente dois campos**: o `STRIDE` (tamanho do entry) e o `VALUE` (onde
-o valor mora). Esse compartilhamento parcial é a armadilha — o agent vê o `KEY` no mesmo
-offset e assume que o resto também coincide.
+The game stores two kinds of `Dictionary<K,V>` that the reader reads, and the **`Entry`
+layout differs between them** because `V` has a different size. The two geometries are the
+`DictFloat` class and the `Dict8B` class in offsets.py. They **share** the entry header
+(`HASH` at the start, `NEXT`, and `KEY` as int32 — all in the same place), and diverge in
+**exactly two fields**: the `STRIDE` (entry size) and the `VALUE` (where the value lives).
+That partial sharing is the trap — the agent sees `KEY` at the same offset and assumes the
+rest lines up too.
 
-| geometria | `STRIDE` | `VALUE` | tipo do valor | usada para |
+| geometry | `STRIDE` | `VALUE` | value type | used for |
 |-----------|----------|---------|---------------|------------|
-| `DictFloat` | `0x10` | `0xC` | `float32` (4B) | `Dict<StatType,float>` — os 64 stats finais (via `StatsHolder.FINAL_STATS`) |
-| `Dict8B` | `0x18` | `0x10` | `int64` OU ponteiro (8B) | `Dict<int,long>` do gold, e o `Dict<EAggregateType,Dict>` dos agregados |
+| `DictFloat` | `0x10` | `0xC` | `float32` (4B) | `Dict<StatType,float>` — the 64 final stats (via `StatsHolder.FINAL_STATS`) |
+| `Dict8B` | `0x18` | `0x10` | `int64` OR pointer (8B) | the gold `Dict<int,long>`, and the aggregates `Dict<EAggregateType,Dict>` |
 
-O valor de 4 bytes do `DictFloat` cabe num entry de `0x10`. O valor de 8 bytes do
-`Dict8B` empurra o `VALUE` para `0x10` (alinhamento de 8) e o entry inteiro para `0x18`.
+`DictFloat`'s 4-byte value fits in a `0x10` entry. `Dict8B`'s 8-byte value pushes the
+`VALUE` to `0x10` (8-byte alignment) and the whole entry to `0x18`.
 
-**A regra:** ao iterar entries de um dicionário, escolha a geometria pelo **tipo do
-valor que a classe declara no dump**, e use as **constantes nomeadas** (`DictFloat.STRIDE`/
-`DictFloat.VALUE` ou `Dict8B.STRIDE`/`Dict8B.VALUE`) — nunca um literal de offset solto.
-Pular tombstones em ambas é `HASH < 0` (hash negativo = entry removido). Para qualquer
-`Dict8B` há um único leitor reutilizável, `dict8b_items` (em shared/memory.py): ele já
-faz `STRIDE 0x18`, `KEY @0x8`, `VALUE @0x10` e o skip de tombstone — a própria docstring
-dele avisa que **NÃO serve para `DictFloat`**. Não exista um segundo walker ad-hoc com
-literais: reuse `dict8b_items` para 8B e respeite `DictFloat` para os stats.
+**The rule:** when iterating a dictionary's entries, pick the geometry by the **value type
+the class declares in the dump**, and use the **named constants** (`DictFloat.STRIDE`/
+`DictFloat.VALUE` or `Dict8B.STRIDE`/`Dict8B.VALUE`) — never a bare offset literal. Skipping
+tombstones in both is `HASH < 0` (negative hash = removed entry). For any `Dict8B` there is a
+single reusable reader, `dict8b_items` (in shared/memory.py): it already does `STRIDE 0x18`,
+`KEY @0x8`, `VALUE @0x10` and the tombstone skip — its own docstring warns it is **NOT for
+`DictFloat`**. Don't grow a second ad-hoc walker with literals: reuse `dict8b_items` for 8B
+and respect `DictFloat` for the stats.
 
-**Por que corrompe em SILÊNCIO (sem crash):** trocar o stride não derruba a leitura — só
-desalinha. Ler um `Dict8B` com `STRIDE 0x10` faz cada entry a partir do segundo cair no
-meio do entry anterior → `KEY`/`VALUE` lidos de bytes arbitrários (foi assim que value-scans
-ruins chegaram a gold fantasma tipo `1.97T`). Ler o dicionário de stats (`DictFloat`) com
-`STRIDE 0x18` / `VALUE @0x10` pula 8 bytes por entry e lê o valor fora da célula float →
-64 stats com lixo. Em nenhum dos casos há exceção: o reader emite **números errados** que
-só aparecem ao conferir gold/xp/stats contra o jogo. Por isso `test_offsets.py::TestDictStrides`
-trava os dois strides como **distintos** e fixa cada `VALUE` — é o guarda contra a fusão
-silenciosa das duas geometrias.
+**Why it corrupts SILENTLY (no crash):** swapping the stride doesn't break the read — it just
+misaligns it. Reading a `Dict8B` with `STRIDE 0x10` makes every entry from the second on land
+in the middle of the previous entry → `KEY`/`VALUE` read from arbitrary bytes (this is how bad
+value-scans reached phantom gold like `1.97T`). Reading the stats dictionary (`DictFloat`) with
+`STRIDE 0x18` / `VALUE @0x10` skips 8 bytes per entry and reads the value outside the float cell →
+64 stats full of garbage. In neither case is there an exception: the reader emits **wrong numbers**
+that only surface when you check gold/xp/stats against the game. That's why
+`test_offsets.py::TestDictStrides` locks the two strides as **distinct** and pins each `VALUE` —
+it's the guard against the silent merge of the two geometries.
 
-O gold é o caso mais escorregadio porque encadeia **dois** `Dict8B`: o `Dict<EAggregateType,Dict>`
-externo (cujo `VALUE @0x10` é o **ponteiro** do dict interno) e o `Dict<SubKey,long>` interno
-(cujo `VALUE @0x10` é o **long** acumulado). Ambos são `Dict8B` — a mesma geometria, lida
-pelo mesmo `dict8b_items`. Como ler/somar os SubKeys certos é outro invariante (ver gold).
+Gold is the slipperiest case because it chains **two** `Dict8B`: the outer
+`Dict<EAggregateType,Dict>` (whose `VALUE @0x10` is the **pointer** to the inner dict) and the
+inner `Dict<SubKey,long>` (whose `VALUE @0x10` is the accumulated **long**). Both are `Dict8B` —
+the same geometry, read by the same `dict8b_items`. How to read/sum the right SubKeys is another
+invariant (see gold).
 
 ## Related
-- [[invariants/gold-singleton-resolution]] — lê os DOIS `Dict8B` encadeados do `GoldEarn` (externo→ponteiro, interno→long).
-- [[invariants/metric-fallback-chains]] — gold/xp errado por stride trocado dispara o fallback, que MASCARA o bug em silêncio.
+- [[invariants/gold-singleton-resolution]] — reads the TWO chained `Dict8B` of `GoldEarn` (outer→pointer, inner→long).
+- [[invariants/metric-fallback-chains]] — wrong gold/xp from a swapped stride triggers the fallback, which MASKS the bug silently.

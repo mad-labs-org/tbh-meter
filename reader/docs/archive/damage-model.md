@@ -1,52 +1,52 @@
 ---
 type: archive
 status: superseded
-description: "SNAPSHOT histórico (RE cru ou plano entregue) — nomes/offsets/linhas podem estar obsoletos; a verdade atual está nas notas vivas (ver _index). Isento do drift-test de código."
+description: "Historical SNAPSHOT (raw RE or delivered plan) — names/offsets/lines may be stale; current truth lives in the living notes (see _index). Exempt from the code drift-test."
 ---
 
-# TBH — Modelo de dano (RE da estrutura, 2026-06-03)
+# TBH — Damage model (structure RE, 2026-06-03)
 
-Reverso do `re/dump/dump.cs`. **Limite honesto:** o dump do Il2CppDumper tem assinaturas +
-RVAs mas **corpos vazios** — o MODELO abaixo é provado pela ESTRUTURA (enums/structs/campos);
-a aritmética EXATA (bracketing) precisa de disassembly dos RVAs listados no fim.
+Reverse of `re/dump/dump.cs`. **Honest limit:** the Il2CppDumper dump has signatures +
+RVAs but **empty bodies** — the MODEL below is proven by the STRUCTURE (enums/structs/fields);
+the EXACT arithmetic (bracketing) needs disassembly of the RVAs listed at the end.
 
-## Sistema de modificadores (provado por nomes de enum — não é suposição)
+## Modifier system (proven by enum names — not a guess)
 - `MODTYPE` (dump.cs:336237): **FLAT=0, ADDITIVE=1, MULTIPLICATIVE=2**
 - `MODSOURCE` (336246): BASE=0, ITEM=1, ATTRIBUTE=2, PASSIVE=3, AccountStatus=4, StatusEffect=5, BuffSkill=6, ENVIRONMENT=7
 - `up` = **StatModifier** (336258): `{StatType@0x10, MODTYPE@0x14, float value@0x18, MODSOURCE@0x1C}`
-- `uq` = **ModifierManager** (336368): `Dict<StatType, List<up>>` + `Dict<MODSOURCE, List<up>>` — cada stat é uma LISTA de modificadores.
-- `xd` = stats holder (342026, via `uf.behg@0x10`): `betr@0x10` (uq) ; `bets@0x18` = **Dict<StatType,float> FINAL (os 64 stats que o meter lê)** ; `bett@0x20` 2º cache. Folders `gbm(List<up>,float)@RVA 0x936E20` e `kau@0x9389A0` dobram a lista de mods num float final.
-- Formatter `pk` (340340) colore/formata cada stat POR MODTYPE → FLAT vs % vs MULTIPLICATIVE são first-class.
+- `uq` = **ModifierManager** (336368): `Dict<StatType, List<up>>` + `Dict<MODSOURCE, List<up>>` — each stat is a LIST of modifiers.
+- `xd` = stats holder (342026, via `uf.behg@0x10`): `betr@0x10` (uq) ; `bets@0x18` = **Dict<StatType,float> FINAL (the 64 stats the meter reads)** ; `bett@0x20` 2nd cache. Folders `gbm(List<up>,float)@RVA 0x936E20` and `kau@0x9389A0` fold the mod list into a final float.
+- Formatter `pk` (340340) colors/formats each stat BY MODTYPE → FLAT vs % vs MULTIPLICATIVE are first-class.
 
-⇒ **FÓRMULA CONFIRMADA por disassembly do `gbm` @ file offset 0x935C20 (RVA 0x936E20)** — não é mais inferência:
-**`stat_final = (base + Σflat) × (1 + Σaditivo%) × Π(multiplicativo)`**
-Trace x64 (capstone): lê `MODTYPE` em `[rcx+0x14]` (= `up.behl`), ramifica em 3 — FLAT(0): `addss xmm7,[rcx+0x18]` (base += valor); ADITIVO(1): `addss xmm6,[rcx+0x18]` (bucket único += valor); MULTIPLICATIVO(2): `mulss xmm8,(valor−k)` (fator SEPARADO, Π). Fecho: `mulss xmm6,xmm7; addss xmm6,xmm7; mulss xmm6,xmm8` = `base × (1 + Σaditivo) × mult`.
-⇒ **% ADITIVO do mesmo bucket = retorno decrescente (1+a+b+c); MULTIPLICATIVO não diminui entre si; base/flat multiplica tudo.**
+⇒ **FORMULA CONFIRMED by disassembly of `gbm` @ file offset 0x935C20 (RVA 0x936E20)** — no longer inference:
+**`stat_final = (base + Σflat) × (1 + Σadditive%) × Π(multiplicative)`**
+x64 trace (capstone): reads `MODTYPE` at `[rcx+0x14]` (= `up.behl`), branches 3 ways — FLAT(0): `addss xmm7,[rcx+0x18]` (base += value); ADDITIVE(1): `addss xmm6,[rcx+0x18]` (single bucket += value); MULTIPLICATIVE(2): `mulss xmm8,(value−k)` (SEPARATE factor, Π). Close: `mulss xmm6,xmm7; addss xmm6,xmm7; mulss xmm6,xmm8` = `base × (1 + Σadditive) × mult`.
+⇒ **ADDITIVE % in the same bucket = diminishing return (1+a+b+c); MULTIPLICATIVE doesn't diminish against each other; base/flat multiplies everything.**
 
-## Atributos e tipos de dano
+## Damage attributes and types
 - `EDamageAttribute` (355638): **Physical=0**, Fire=1, Cold=2, Lightning=3, Chaos=4, AllElement=5, None=6
 - `EDamageType` [Flags] (355651): None=0, **Melee=1, Projectile=2, AOE=4, Summon=8, DOT=16, Trap=32**
 - `EEquipClassType` (354930): All=0, Knight=1, **Ranger=2**, Sorcerer=3, Priest=4, Hunter=5, Slayer=6
-- `DamageInfo` (struct, 319209): `Attacker@0x0, OriginDamage@0x8, IsCritical@0xC, DamageAttribute@0x10, DamageType@0x14, HitEffects@0x20`. Entregue por `Unit.ebi(DamageInfo,bool)` (TakeDamage).
-- Atributo/tipo são **por-skill** (`SkillInfoData.DamageAttribute@0x50 / DamageDeliveryType@0x54`, 355685; cache `un` 335893).
-- Multiplicadores por-atributo vivem no `Unit`: `Dict<EDamageAttribute,float>` × 5 caches (@0x260/0x2A8/0x2B0/0x2B8/0x2C0), lidos por `Unit.gqp/gqq/gqr/gqs(EDamageAttribute)`. Multiplicadores por-TIPO via `xe.drx/kbc/lvr(Unit, EDamageType, float)` (342225) → Increase Projectile/Melee/AOE/Summon.
+- `DamageInfo` (struct, 319209): `Attacker@0x0, OriginDamage@0x8, IsCritical@0xC, DamageAttribute@0x10, DamageType@0x14, HitEffects@0x20`. Delivered by `Unit.ebi(DamageInfo,bool)` (TakeDamage).
+- Attribute/type are **per-skill** (`SkillInfoData.DamageAttribute@0x50 / DamageDeliveryType@0x54`, 355685; cache `un` 335893).
+- Per-attribute multipliers live on the `Unit`: `Dict<EDamageAttribute,float>` × 5 caches (@0x260/0x2A8/0x2B0/0x2B8/0x2C0), read by `Unit.gqp/gqq/gqr/gqs(EDamageAttribute)`. Per-TYPE multipliers via `xe.drx/kbc/lvr(Unit, EDamageType, float)` (342225) → Increase Projectile/Melee/AOE/Summon.
 
-## Como os stats da pergunta entram (camadas)
-- **AttackDamage (1)** = dano BASE global, **agnóstico de atributo** → entra em TODO hit, multiplica em todas as camadas. Nunca desperdiça.
-- **PhysicalDamageAddition (42)** = FLAT, **gated a hits de atributo Physical**. (`DamageAddition` 41 = flat agnóstico.)
-- **PhysicalDamagePercent (24)** = **% multiplicador, gated a Physical**, **aditivo dentro do bucket** → retorno decrescente ao empilhar.
-- **IncreaseProjectileDamage (53)** = % multiplicador **gated por EDamageType.Projectile** (camada SEPARADA, independente do atributo).
-- **ProjectileCount (22) / Multistrike (20)** = multiplicadores de CONTAGEM DE HITS (mais DamageInfo/ataque) → multiplicam ~linear, alavanca enorme de DPS.
-- **CriticalChance (3)/CriticalDamage (4)** → fator esperado `1 + critChance×(critDmg−1)`.
+## How the stats in question feed in (layers)
+- **AttackDamage (1)** = global BASE damage, **attribute-agnostic** → enters EVERY hit, multiplies across all layers. Never wasted.
+- **PhysicalDamageAddition (42)** = FLAT, **gated to Physical-attribute hits**. (`DamageAddition` 41 = agnostic flat.)
+- **PhysicalDamagePercent (24)** = **% multiplier, gated to Physical**, **additive within the bucket** → diminishing return when stacked.
+- **IncreaseProjectileDamage (53)** = % multiplier **gated by EDamageType.Projectile** (SEPARATE layer, independent of attribute).
+- **ProjectileCount (22) / Multistrike (20)** = HIT-COUNT multipliers (more DamageInfo/attack) → multiply ~linearly, huge DPS lever.
+- **CriticalChance (3)/CriticalDamage (4)** → expected factor `1 + critChance×(critDmg−1)`.
 
-## Ranger (classe 2, arco → Physical + Projectile)
-AttackDamage(1), PhysicalDamage%(24), IncreaseProjectileDamage(53) e ProjectileCount/Multistrike
-são **camadas DIFERENTES que multiplicam** → **invista na camada mais MAGRA** (não over-stacka um
-bucket aditivo). Phys%(24) só vale porque o hit é físico; AttackDamage(1) vale sempre.
+## Ranger (class 2, bow → Physical + Projectile)
+AttackDamage(1), PhysicalDamage%(24), IncreaseProjectileDamage(53) and ProjectileCount/Multistrike
+are **DIFFERENT layers that multiply** → **invest in the LEANEST layer** (don't over-stack one
+additive bucket). Phys%(24) only counts because the hit is physical; AttackDamage(1) always counts.
 
-## Pra CRAVAR a aritmética exata (Ghidra/IDA via re/tools/Il2CppDumper) — em ordem
-1. ✅ **FEITO** — `xd.gbm` @ RVA 0x936E20 já desmontado (capstone): fórmula = `(base+Σflat)×(1+Σaditivo)×Πmult` (ver seção do sistema de modificadores acima). `kau` @0x9389A0 = sibling (não precisou).
-2. `ActiveSkill.AttackDamage()` base @ **RVA 0xAAB060** (+ overrides dos skills Archer).
+## To NAIL the exact arithmetic (Ghidra/IDA via re/tools/Il2CppDumper) — in order
+1. ✅ **DONE** — `xd.gbm` @ RVA 0x936E20 already disassembled (capstone): formula = `(base+Σflat)×(1+Σadditive)×Πmult` (see the modifier-system section above). `kau` @0x9389A0 = sibling (not needed).
+2. `ActiveSkill.AttackDamage()` base @ **RVA 0xAAB060** (+ overrides from the Archer skills).
 3. `Unit.gqz()` @ **RVA 0xB432E0** + `Unit.gqp/gqq/gqr/gqs(EDamageAttribute)` @ 0xB42F80/0xB42FD0/0xB43020/0xB430E0.
-4. `xe.drx(Unit,EDamageType,float)` @ **RVA 0x93ACA0** — confirma a camada de projétil.
-Alternativa empírica: A/B com o meter (mede DPS real): equipa +AD, roda; troca +Phys%, roda; compara.
+4. `xe.drx(Unit,EDamageType,float)` @ **RVA 0x93ACA0** — confirms the projectile layer.
+Empirical alternative: A/B with the meter (measures real DPS): equip +AD, run; swap +Phys%, run; compare.

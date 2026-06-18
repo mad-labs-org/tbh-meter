@@ -1,9 +1,9 @@
 // Session derivation (Redesign 2). A "session" is just a GROUPING label over runs — a continuous
 // grind — NOT part of a run's identity (that's the run's own end-ts, raw v2). The reader no longer
-// emits a session; the APP derives it here from the run timestamps + the user's manual "Nova sessão"
+// emits a session; the APP derives it here from the run timestamps + the user's manual "New session"
 // cuts. Pure + deterministic: same runs + same cuts -> same grouping (so re-deriving on every load
-// is stable, and an already-uploaded run keeps the session it had at upload). See progress.md
-// "Redesign 2 — Session = derivada pelo APP".
+// is stable, and an already-uploaded run keeps the session it had at upload). Redesign 2: the
+// session is DERIVED by the app.
 
 /** Idle gap that starts a new session: 6h with no run. In MILLISECONDS — v2 run timestamps are ms.
  *  System rule (not a user setting); mirrors the reader's old SESSION_GAP_SECONDS, now app-side. */
@@ -36,7 +36,7 @@ export function deriveSessions(runs: SessionableRun[], cutsMs: readonly number[]
   for (const run of sorted) {
     const gapBreak = prevTs !== null && run.ts - prevTs > SESSION_GAP_MS;
     // A cut "between" the previous run and this one (exclusive of prev, inclusive of this) opens a
-    // new session at this run — the user pressed "Nova sessão" while idle before this run.
+    // new session at this run — the user pressed "New session" while idle before this run.
     const cutBreak = prevTs !== null && cuts.some((c) => c > prevTs! && c <= run.ts);
     if (label === null || gapBreak || cutBreak) label = String(run.ts);
     out.set(run.id, label);

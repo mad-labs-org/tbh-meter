@@ -1,14 +1,14 @@
-"""memory.py — acesso READ-ONLY à memória do jogo (a base de tudo).
+"""memory.py — READ-ONLY access to the game's memory (the foundation of everything).
 
-Junta o que era memory/{structs,process,scanner,reader}.py num arquivo só:
-  - structs/constantes Win32 (ctypes) do ReadProcessMemory/Toolhelp;
-  - process: anexar (achar pid, abrir handle só-leitura, base do módulo);
-  - scanner: enumerar regiões + varrer bytes (pro resolver IL2CPP);
-  - Reader: leituras tipadas (ptr/int/float/list/dict/Dict8B) ligadas a UM handle.
+Merges what used to be memory/{structs,process,scanner,reader}.py into a single file:
+  - structs/Win32 constants (ctypes) for ReadProcessMemory/Toolhelp;
+  - process: attach (find pid, open read-only handle, module base);
+  - scanner: enumerate regions + scan bytes (for the IL2CPP resolver);
+  - Reader: typed reads (ptr/int/float/list/dict/Dict8B) bound to ONE handle.
 
-INVIOLÁVEL: só PROCESS_QUERY_INFORMATION|PROCESS_VM_READ (sem WRITE, sem inject).
-O kernel32 é lazy (_kernel32()), então importa em qualquer plataforma; só as funções
-exigem Windows em runtime. Usado por il2cpp/ (acha classes) e pelas métricas (via Reader).
+INVIOLABLE: only PROCESS_QUERY_INFORMATION|PROCESS_VM_READ (no WRITE, no inject).
+kernel32 is lazy (_kernel32()), so this imports on any platform; only the functions
+require Windows at runtime. Used by il2cpp/ (finds classes) and by the metrics (via Reader).
 """
 
 import ctypes
@@ -20,7 +20,7 @@ from config.offsets import (PROCESS_NAME, MODULE_NAME,
                             Array, List, String, Dict, Dict8B)
 
 
-# ============================ structs / constantes Win32 ===================== #
+# ============================ structs / Win32 constants ====================== #
 TH32CS_SNAPPROCESS = 0x2
 TH32CS_SNAPMODULE = 0x8
 TH32CS_SNAPMODULE32 = 0x10
@@ -33,8 +33,8 @@ MEM_COMMIT = 0x1000
 PAGE_GUARD = 0x100
 # PAGE_READONLY|READWRITE|WRITECOPY|EXECUTE_READ|EXECUTE_READWRITE|EXECUTE_WRITECOPY
 READABLE = 0x02 | 0x04 | 0x08 | 0x20 | 0x40 | 0x80
-# Subconjunto GRAVÁVEL (READWRITE|WRITECOPY|EXEC_READWRITE|EXEC_WRITECOPY) — onde vivem os
-# objetos do heap gerenciado. Bem menor que READABLE (sem code/read-only) -> value-scan focado.
+# WRITABLE subset (READWRITE|WRITECOPY|EXEC_READWRITE|EXEC_WRITECOPY) — where the managed-heap
+# objects live. Much smaller than READABLE (no code/read-only) -> focused value-scan.
 WRITABLE = 0x04 | 0x08 | 0x40 | 0x80
 
 
@@ -64,12 +64,12 @@ class MBI(ctypes.Structure):
                 ("Type", wintypes.DWORD)]
 
 
-# ============================ process: anexar (read-only) ==================== #
+# ============================ process: attach (read-only) ==================== #
 _K = None
 
 
 def _kernel32():
-    """WinDLL(kernel32) com argtypes, cacheado. Só funciona no Windows (lazy de propósito)."""
+    """WinDLL(kernel32) with argtypes, cached. Windows-only (lazy on purpose)."""
     global _K
     if _K is not None:
         return _K
@@ -116,7 +116,7 @@ def find_pid(name=None):
 
 
 def open_process(pid):
-    """Handle READ-ONLY (QUERY_INFORMATION|VM_READ). ÚNICO ponto de anexação auditado."""
+    """READ-ONLY handle (QUERY_INFORMATION|VM_READ). The ONE audited attach point."""
     return _kernel32().OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, False, pid)
 
 
@@ -129,8 +129,8 @@ def close(handle):
 
 
 def process_image_path(handle):
-    """Caminho completo do exe do processo anexado (QueryFullProcessImageNameW). Funciona
-    com o handle read-only (PROCESS_QUERY_INFORMATION). None se falhar."""
+    """Full exe path of the attached process (QueryFullProcessImageNameW). Works
+    with the read-only handle (PROCESS_QUERY_INFORMATION). None on failure."""
     size = wintypes.DWORD(MAX_PATH * 4)
     buf = ctypes.create_unicode_buffer(size.value)
     if not _kernel32().QueryFullProcessImageNameW(handle, 0, buf, ctypes.byref(size)):
@@ -139,12 +139,12 @@ def process_image_path(handle):
 
 
 def module_base(pid, name=None):
-    """Base de carga de um módulo (enumera módulos, NÃO varre memória -> sem o hang do
-    resolve<3). RVA + base = VA em runtime. Default = GameAssembly.dll."""
+    """Load base of a module (enumerates modules, does NOT scan memory -> none of the
+    resolve<3 hang). RVA + base = VA at runtime. Default = GameAssembly.dll."""
     nm = name or MODULE_NAME
     nm = nm.encode() if isinstance(nm, str) else nm
     k = _kernel32()
-    for _ in range(4):   # SNAPMODULE às vezes pede retry (ERROR_BAD_LENGTH)
+    for _ in range(4):   # SNAPMODULE sometimes needs a retry (ERROR_BAD_LENGTH)
         snap = k.CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid)
         if snap and snap != INVALID_HANDLE:
             try:
@@ -162,10 +162,10 @@ def module_base(pid, name=None):
     return None
 
 
-# ============================ scanner: regiões + varredura =================== #
+# ============================ scanner: regions + scanning ==================== #
 def regions(reader, protect_mask=READABLE):
-    """[(base, size)] das regiões committed do processo. protect_mask filtra por proteção:
-    READABLE (default, p/ resolver classes) ou WRITABLE (só heap gravável, p/ value-scan)."""
+    """[(base, size)] of the process's committed regions. protect_mask filters by protection:
+    READABLE (default, for resolving classes) or WRITABLE (writable heap only, for value-scan)."""
     res = []
     mbi = MBI()
     k = _kernel32()
@@ -185,22 +185,22 @@ def regions(reader, protect_mask=READABLE):
 
 
 def writable_regions(reader):
-    """Só as regiões committed GRAVÁVEIS (heap gerenciado). Atalho de regions(WRITABLE)."""
+    """Only the WRITABLE committed regions (managed heap). Shortcut for regions(WRITABLE)."""
     return regions(reader, WRITABLE)
 
 
 def scan(reader, regs, needles, aligned=False):
-    """Acha cada `needle` (bytes) nas regiões. Retorna {needle: [endereços]}.
-    aligned=True só aceita endereços 8-alinhados (caça de ponteiros).
+    """Find each `needle` (bytes) in the regions. Returns {needle: [addresses]}.
+    aligned=True only accepts 8-aligned addresses (pointer hunting).
 
-    CAÇA DE PONTEIROS (aligned + needles de 8 bytes) = SINGLE-SWEEP: desempacota os qwords
-    8-alinhados de cada chunk UMA vez e cruza com um set dos valores procurados (em C, via
-    set.intersection) — custo O(memória), INDEPENDENTE do nº de needles. Só os chunks que de
-    fato contêm algum needle reconstroem a posição (find restrito aos presentes — barato mesmo
-    com milhares de hits). O caminho antigo (find por needle, abaixo) é O(needles × memória):
-    varria a memória inteira 1× POR needle — com 71 needles, eram 71 varreduras de 2,6 GB,
-    o gargalo do cold scan (pass2 = 65% do tempo). base+off é 8-alinhado (regiões page-aligned,
-    CHUNK múltiplo de 8) -> qword 8-alinhado nunca cruza borda de chunk, dispensa o OVER."""
+    POINTER HUNTING (aligned + 8-byte needles) = SINGLE-SWEEP: unpacks each chunk's 8-aligned
+    qwords ONCE and intersects them with a set of the wanted values (in C, via
+    set.intersection) — cost O(memory), INDEPENDENT of the number of needles. Only the chunks that
+    actually contain some needle reconstruct the position (find restricted to the present ones —
+    cheap even with thousands of hits). The old path (find per needle, below) is O(needles × memory):
+    it scanned the entire memory 1x PER needle — with 71 needles that was 71 sweeps of 2.6 GB,
+    the cold-scan bottleneck (pass2 = 65% of the time). base+off is 8-aligned (page-aligned regions,
+    CHUNK a multiple of 8) -> an 8-aligned qword never crosses a chunk boundary, so OVER isn't needed."""
     found = {n: [] for n in needles}
     if aligned and needles and all(len(n) == 8 for n in needles):
         val2needle = {struct.unpack("<Q", n)[0]: n for n in needles}
@@ -217,14 +217,14 @@ def scan(reader, regs, needles, aligned=False):
                 if data and len(data) >= 8:
                     m = len(data) // 8
                     present = wanted.intersection(struct.unpack("<%dQ" % m, data[:m * 8]))
-                    for v in present:                 # só os needles realmente neste chunk
+                    for v in present:                 # only the needles actually in this chunk
                         nd = val2needle[v]
                         start = 0
                         while True:
                             i = data.find(nd, start)
                             if i < 0:
                                 break
-                            if i % 8 == 0:            # posição 8-alinhada (base+off já é 8-alinhado)
+                            if i % 8 == 0:            # 8-aligned position (base+off is already 8-aligned)
                                 found[nd].append(base + off + i)
                             start = i + 1
                 off += CHUNK
@@ -251,9 +251,9 @@ def scan(reader, regs, needles, aligned=False):
 
 
 def scan_i64_range(reader, regs, lo, hi, cap=20000):
-    """Endereços 8-alinhados cujo int64 (little-endian) cai em [lo, hi]. Varre as regiões dadas
-    desempacotando qwords (rápido em C via struct.unpack). Pra achar um VALOR (ex.: a célula do
-    gold vivo, ~ o save) sem depender de nome de classe. `cap` limita o nº de hits."""
+    """8-aligned addresses whose int64 (little-endian) falls in [lo, hi]. Scans the given regions
+    by unpacking qwords (fast in C via struct.unpack). For finding a VALUE (e.g. the live gold
+    cell, ~ the save) without relying on a class name. `cap` limits the number of hits."""
     hits = []
     CHUNK = 16 * 1024 * 1024
     for base, size in regs:
@@ -279,14 +279,14 @@ def in_region(regs, addr):
     return any(b <= addr < b + s for b, s in regs)
 
 
-# ============================ Reader: leituras tipadas ======================= #
+# ============================ Reader: typed reads ============================ #
 class Reader:
     def __init__(self, handle):
         self.handle = handle
 
-    # ---- núcleo ---------------------------------------------------------- #
+    # ---- core ------------------------------------------------------------ #
     def read(self, addr, size):
-        """bytes lidos do processo, ou None. Defensivo (endereço pode liberar na luta)."""
+        """bytes read from the process, or None. Defensive (an address can free mid-fight)."""
         if not addr or size <= 0:
             return None
         buf = (ctypes.c_char * size)()
@@ -296,7 +296,7 @@ class Reader:
             return None
         return bytes(buf[:n.value])
 
-    # ---- primitivos (mesmos formatos do monólito validado) --------------- #
+    # ---- primitives (same formats as the validated monolith) ------------- #
     def rptr(self, a):
         b = self.read(a, 8)
         return struct.unpack("<Q", b)[0] if b and len(b) == 8 else None
@@ -322,7 +322,7 @@ class Reader:
         return struct.unpack("<f", b)[0] if b and len(b) == 4 else None
 
     def read_cstr(self, a, maxlen=64):
-        """C-string ascii (nome de classe Il2CppClass). '' se vazia, None se ilegível."""
+        """ascii C-string (Il2CppClass class name). '' if empty, None if unreadable."""
         if not a:
             return None
         b = self.read(a, maxlen)
@@ -333,7 +333,7 @@ class Reader:
         return s.decode("ascii", "replace") if s and all(32 <= c < 127 for c in s) else ("" if not s else None)
 
     def read_string(self, a):
-        """System.String do IL2CPP (utf-16). '' se len 0, None se inválido."""
+        """IL2CPP System.String (utf-16). '' if len 0, None if invalid."""
         if not a:
             return None
         ln = self.ri32(a + String.LENGTH)
@@ -344,23 +344,23 @@ class Reader:
         raw = self.read(a + String.CHARS, ln * 2)
         return raw.decode("utf-16-le", "replace") if raw else None
 
-    # ---- leituras em lote (perf: 1 syscall em vez de N) ------------------ #
+    # ---- batch reads (perf: 1 syscall instead of N) --------------------- #
     def read_struct(self, addr, fmt):
-        """Lê + desempacota vários campos contíguos numa só syscall. fmt = struct format."""
+        """Reads + unpacks several contiguous fields in a single syscall. fmt = struct format."""
         size = struct.calcsize(fmt)
         b = self.read(addr, size)
         return struct.unpack(fmt, b) if b and len(b) == size else None
 
     def read_array_ptrs(self, arr, count):
-        """Os `count` ponteiros do array (Il2CppArray.DATA) numa só leitura."""
+        """The `count` pointers of the array (Il2CppArray.DATA) in a single read."""
         if not arr or count <= 0:
             return []
         b = self.read(arr + Array.DATA, count * 8)
         return list(struct.unpack(f"<{count}Q", b)) if b and len(b) == count * 8 else []
 
-    # ---- containers IL2CPP ---------------------------------------------- #
+    # ---- IL2CPP containers ---------------------------------------------- #
     def list_ptrs(self, list_obj, cap=8000):
-        """Ponteiros dos elementos de um List<T> de ref-types, em lote."""
+        """Element pointers of a List<T> of ref-types, in batch."""
         if not list_obj:
             return []
         size = self.ri32(list_obj + List.SIZE)
@@ -373,7 +373,7 @@ class Reader:
         yield from self.list_ptrs(list_obj, cap)
 
     def arr_u64(self, arr, cap=64):
-        """ulong[] (ex.: equippedItemIds) em lote."""
+        """ulong[] (e.g. equippedItemIds) in batch."""
         if not arr:
             return []
         ln = self.ri32(arr + Array.MAX_LENGTH)
@@ -383,7 +383,7 @@ class Reader:
         return list(struct.unpack(f"<{ln}Q", b)) if b and len(b) == ln * 8 else []
 
     def arr_i32(self, arr, cap=64):
-        """int[] (ex.: equippedSKillKey) em lote."""
+        """int[] (e.g. equippedSKillKey) in batch."""
         if not arr:
             return []
         ln = self.ri32(arr + Array.MAX_LENGTH)
@@ -393,10 +393,10 @@ class Reader:
         return list(struct.unpack(f"<{ln}i", b)) if b and len(b) == ln * 4 else []
 
     def dict8b_items(self, dict_obj, cap=100000):
-        """Pares (key:int32, value:int64) de um Dict<K,V8B> (Dict8B: stride 0x18,
-        key@0x8, value@0x10), pulando tombstones (hash<0). Reusável — o GoldEarn usa
-        DOIS desses: o Dict<EAggregateType,Dict> externo (value = ponteiro do interno)
-        e o Dict<SubKey,long> interno. ⚠ NÃO serve pra DictFloat (stride 0x10 / val @0xC)."""
+        """(key:int32, value:int64) pairs of a Dict<K,V8B> (Dict8B: stride 0x18,
+        key@0x8, value@0x10), skipping tombstones (hash<0). Reusable — GoldEarn uses
+        TWO of these: the outer Dict<EAggregateType,Dict> (value = pointer to the inner)
+        and the inner Dict<SubKey,long>. ⚠ Does NOT work for DictFloat (stride 0x10 / val @0xC)."""
         if not dict_obj:
             return
         ent = self.rptr(dict_obj + Dict.ENTRIES)
@@ -416,7 +416,7 @@ class Reader:
             used += 1
             yield self.ri32(e + Dict8B.KEY), self.ri64(e + Dict8B.VALUE)
 
-    # ---- aliases de compatibilidade (API antiga do pacote) -------------- #
+    # ---- compatibility aliases (the package's old API) ------------------ #
     pointer = rptr
     i32 = ri32
     i64 = ri64

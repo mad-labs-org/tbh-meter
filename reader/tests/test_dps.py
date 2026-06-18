@@ -1,21 +1,21 @@
-"""Testes para metrics/dps.py — DpsTracker.
+"""Tests for metrics/dps.py — DpsTracker.
 
-O tracker mede dano pela QUEDA DE HP dos monstros. Casos cobertos:
-  - monstro novo não conta dano
-  - queda de HP conta dano
-  - subida de HP (cura / addr reaproveitado) é ignorada
-  - monstro sumido = golpe final (HP restante)
-  - janela deslizante expira samples antigos
-  - total_damage acumula corretamente
-  - alive conta mobs vivos no tick
-  - reset limpa tudo
+The tracker measures damage from the HP DROP of monsters. Cases covered:
+  - a new monster registers no damage
+  - an HP drop counts as damage
+  - an HP increase (heal / reused addr) is ignored
+  - a vanished monster = final blow (remaining HP)
+  - the sliding window expires old samples
+  - total_damage accumulates correctly
+  - alive counts mobs alive in the tick
+  - reset clears everything
 """
 
 import pytest
 
 from metrics.dps import DpsTracker
 
-# Helpers de conveniência
+# Convenience helpers
 def mob(addr, hp, hp_max=100.0):
     return (addr, hp, hp_max)
 
@@ -51,17 +51,17 @@ class TestDpsTrackerDamage:
         assert t.total_damage == pytest.approx(40.0)
 
     def test_hp_increase_ignored(self):
-        """Cura ou endereço reaproveitado não deve contar como dano."""
+        """A heal or reused address must not count as damage."""
         t = DpsTracker()
         t.update([mob(1, 50.0)], timestamp=0.0)
-        t.update([mob(1, 80.0)], timestamp=0.1)  # HP subiu — ignorar
+        t.update([mob(1, 80.0)], timestamp=0.1)  # HP went up — ignore
         assert t.total_damage == 0.0
 
     def test_monster_death_adds_remaining_hp(self):
-        """Mob sumiu da lista com 30 HP restante → 30 de dano (golpe final)."""
+        """Mob vanished from the list with 30 HP remaining → 30 damage (final blow)."""
         t = DpsTracker()
         t.update([mob(1, 30.0)], timestamp=0.0)
-        t.update([], timestamp=0.1)              # mob morreu
+        t.update([], timestamp=0.1)              # mob died
         assert t.total_damage == pytest.approx(30.0)
 
     def test_multiple_monsters_sum_damage(self):
@@ -71,7 +71,7 @@ class TestDpsTrackerDamage:
         assert t.total_damage == pytest.approx(80.0)
 
     def test_zero_hp_monsters_ignored(self):
-        """Monstro com HP=0 não entra no tracking (já está morto no pool)."""
+        """A monster with HP=0 is not tracked (already dead in the pool)."""
         t = DpsTracker()
         t.update([mob(1, 0.0)], timestamp=0.0)
         t.update([mob(1, 0.0)], timestamp=0.1)
@@ -101,7 +101,7 @@ class TestDpsTrackerAlive:
     def test_alive_decreases_when_monster_dies(self):
         t = DpsTracker()
         t.update([mob(1, 100.0), mob(2, 80.0)], timestamp=0.0)
-        t.update([mob(1, 90.0)], timestamp=0.1)  # mob 2 morreu
+        t.update([mob(1, 90.0)], timestamp=0.1)  # mob 2 died
         assert t.alive == 1
 
     def test_alive_zero_with_no_monsters(self):
@@ -115,7 +115,7 @@ class TestDpsTrackerWindow:
         window = 5.0
         t = DpsTracker(window_seconds=window)
         t.update([mob(1, 100.0)], timestamp=0.0)
-        t.update([mob(1, 50.0)], timestamp=1.0)  # 50 de dano
+        t.update([mob(1, 50.0)], timestamp=1.0)  # 50 damage
         # dps = 50 / 5 = 10/s
         assert t.dps(1.0) == pytest.approx(10.0)
 
@@ -123,16 +123,16 @@ class TestDpsTrackerWindow:
         window = 2.0
         t = DpsTracker(window_seconds=window)
         t.update([mob(1, 100.0)], timestamp=0.0)
-        t.update([mob(1, 50.0)], timestamp=0.5)  # 50 dano em t=0.5
-        # Em t=3.0 a amostra expirou (0.5 < 3.0 - 2.0)
+        t.update([mob(1, 50.0)], timestamp=0.5)  # 50 damage at t=0.5
+        # At t=3.0 the sample has expired (0.5 < 3.0 - 2.0)
         assert t.dps(3.0) == pytest.approx(0.0)
 
     def test_total_damage_not_affected_by_window_expiry(self):
-        """total_damage é cumulativo da run; não cai quando a janela expira."""
+        """total_damage is cumulative for the run; it does not drop when the window expires."""
         t = DpsTracker(window_seconds=1.0)
         t.update([mob(1, 100.0)], timestamp=0.0)
-        t.update([mob(1, 50.0)], timestamp=0.5)   # 50 dano
-        _ = t.dps(10.0)                             # janela expirou
+        t.update([mob(1, 50.0)], timestamp=0.5)   # 50 damage
+        _ = t.dps(10.0)                             # window expired
         assert t.total_damage == pytest.approx(50.0)
 
 
@@ -148,9 +148,9 @@ class TestDpsTrackerReset:
         t = DpsTracker()
         t.update([mob(1, 100.0)], timestamp=0.0)
         t.reset()
-        # Após reset, nenhum monstro é conhecido; próximo tick registra como novo
+        # After reset, no monster is known; the next tick registers it as new
         t.update([mob(1, 100.0)], timestamp=0.1)
-        assert t.total_damage == 0.0  # novo monstro, sem dano
+        assert t.total_damage == 0.0  # new monster, no damage
 
     def test_reset_clears_peak(self):
         t = DpsTracker()
@@ -163,22 +163,22 @@ class TestDpsTrackerReset:
 
 class TestDpsTrackerPeak:
     def test_peak_not_overwritten_by_lower_dps(self):
-        """Peak DPS deve ficar EXATAMENTE no máximo histórico.
+        """Peak DPS must sit EXACTLY at the historical maximum.
 
-        Fluxo: spike de 100 dano (DPS=50/s), depois round mais fraco de 10 dano
-        (DPS=5/s). O peak deve ficar em 50 — nem cair (reset), nem subir (cálculo errado).
-        Usar == em vez de >= para flagrar qualquer desvio nos dois sentidos.
+        Flow: a spike of 100 damage (DPS=50/s), then a weaker round of 10 damage
+        (DPS=5/s). The peak must stay at 50 — neither drop (reset) nor rise (wrong calc).
+        Use == instead of >= to flag any deviation in either direction.
         """
         window = 2.0
         t = DpsTracker(window_seconds=window)
-        # Round 1: mob spawn + morte imediata → 100 dano, DPS = 100/2 = 50/s
+        # Round 1: mob spawn + immediate death → 100 damage, DPS = 100/2 = 50/s
         t.update([mob(1, 100.0)], timestamp=0.0)
-        t.update([mob(1, 0.0)], timestamp=0.0)   # hp=0 → skipped in current; prev_hp=100 → golpe final
+        t.update([mob(1, 0.0)], timestamp=0.0)   # hp=0 → skipped in current; prev_hp=100 → final blow
         peak_after_spike = t.peak_dps
-        assert peak_after_spike == pytest.approx(50.0)   # sanidade: spike registrado
+        assert peak_after_spike == pytest.approx(50.0)   # sanity: spike recorded
 
-        # Round 2: janela antiga expirada (t=5 > window=2), só 10 dano → DPS = 5/s
+        # Round 2: old window expired (t=5 > window=2), only 10 damage → DPS = 5/s
         t.update([mob(2, 10.0)], timestamp=5.0)
         t.update([mob(2, 0.0)], timestamp=5.0)
-        # peak não deve mudar: 5/s < 50/s
+        # peak must not change: 5/s < 50/s
         assert t.peak_dps == pytest.approx(peak_after_spike)

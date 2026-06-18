@@ -1,17 +1,16 @@
 ---
 type: invariant
-description: "Eventos do LogManager são detectados por KLASS-POINTER (kl == sc_class/sf_class/gb_class/...), NUNCA por um campo ELogType — esse campo foi stripado do IL2CPP. Evento novo: classe em TARGETS + klass no cache + campos por constante de offsets.py + exception-safety por entry."
+description: "LogManager events are detected by KLASS-POINTER (kl == sc_class/sf_class/gb_class/...), NEVER by an ELogType field — that field was stripped from the IL2CPP dump. New event: class in TARGETS + klass in the cache + fields by offsets.py constant + per-entry exception-safety."
 symptoms:
-  - "novo evento de log"
-  - "detectar evento"
   - "new log event"
+  - "detect event"
   - "ELogType"
   - "klass pointer"
-  - "ponteiro de classe"
+  - "class pointer"
   - "GetBoxLog"
   - "StageClearLog"
   - "HeroDieLog"
-  - "evento não detectado"
+  - "event not detected"
   - "log event not detected"
 code_anchors:
   - meter_windows.py::TARGETS
@@ -28,60 +27,60 @@ guarded_by:
   - tests/test_events.py::TestEventFeed::test_first_update_is_baseline_no_events
 ---
 
-# Detecção de eventos de log (por klass-pointer, não por ELogType)
+# Log event detection (by klass-pointer, not by ELogType)
 
-O `LogManager` mantém um `List<LogData>` (`LogManager.LOG_LIST`) onde o jogo empurra **uma
-entry por evento** — fim de stage (sucesso/falha), drop de baú, morte/revive de herói. O loop
-em `run` lê do **`size` anterior até o atual** as entries novas a cada tick e decide o que cada
-uma é. Cada `LogData` é um objeto gerenciado, então seu **primeiro campo (offset 0) é o ponteiro
-para a Il2CppClass** — a "classe-K" do tipo concreto do log.
+`LogManager` keeps a `List<LogData>` (`LogManager.LOG_LIST`) where the game pushes **one
+entry per event** — stage end (success/failure), box drop, hero death/revive. The loop
+in `run` reads the new entries from the **previous `size` to the current one** each tick and
+decides what each one is. Each `LogData` is a managed object, so its **first field (offset 0) is the
+pointer to the Il2CppClass** — the "K-class" of the log's concrete type.
 
-**A regra dura: o tipo do evento é decidido por IGUALDADE DE KLASS-POINTER, nunca por um campo
-de tipo.** O loop faz `kl = reader.rptr(e)` (o klass da entry) e compara `kl == sc_class`,
+**The hard rule: the event type is decided by KLASS-POINTER EQUALITY, never by a type
+field.** The loop does `kl = reader.rptr(e)` (the entry's klass) and compares `kl == sc_class`,
 `elif kl == sf_class`, `elif kl == gb_class`, `elif kl == die_class`, `elif kl == res_class`.
-Cada `*_class` é a Il2CppClass que o resolver achou para `StageClearLog`/`StageFailedLog`/
-`GetBoxLog`/`HeroDieLog`/`ResurrectionLog`. **NÃO existe leitura de um campo `ELogType` na entry**
-para rotular o evento — o enum `ELogType` continua em `config/offsets.py` (catálogo dos valores),
-mas o *campo* dentro de `LogData` foi stripado do dump IL2CPP desta build, então não há offset
-pra ler. O `Dictionary<ELogType, List<LogData>>` (`LogManager.LOG_BY_TYPE`) também **não é usado**
-no loop — só o `LOG_LIST` plano. Detectar por tipo-de-classe é o que torna a leitura imune ao
-campo de tipo ausente.
+Each `*_class` is the Il2CppClass the resolver found for `StageClearLog`/`StageFailedLog`/
+`GetBoxLog`/`HeroDieLog`/`ResurrectionLog`. **There is NO read of an `ELogType` field on the entry**
+to label the event — the `ELogType` enum still lives in `config/offsets.py` (a catalog of the values),
+but the *field* inside `LogData` was stripped from this build's IL2CPP dump, so there is no offset
+to read. The `Dictionary<ELogType, List<LogData>>` (`LogManager.LOG_BY_TYPE`) is also **not used**
+in the loop — only the flat `LOG_LIST`. Detecting by class type is what makes the read immune to the
+missing type field.
 
-(Detecção ≠ **roteamento**: decidir EM QUAL run um evento cai é do ciclo de vida. O caso real:
-o `GetBoxLog` de boss é logado ~0.6s DEPOIS do `StageClearLog` e pertence ao success PENDENTE,
-não à run que o close acabou de abrir — ver [[invariants/run-lifecycle]], pending-close.)
+(Detection ≠ **routing**: deciding WHICH run an event lands in belongs to the lifecycle. The real
+case: a boss `GetBoxLog` is logged ~0.6s AFTER the `StageClearLog` and belongs to the PENDING
+success, not to the run the close just opened — see [[invariants/run-lifecycle]], pending-close.)
 
-## Como adicionar um evento novo
+## How to add a new event
 
-1. **Resolver a classe.** Ponha o nome do log em `TARGETS` (lista de classes que o resolver
-   varre/indexa). Sem isso, o resolver nunca aprende o K daquele tipo e o `kl ==` nunca casa.
-2. **Guardar/validar o klass.** Pegue o `*_class` do dict de classes resolvidas (igual a
-   `gb_class`/`die_class`/`res_class`); o fast-path por índice valida cada classe por
-   round-trip de nome antes de servir o K (qualquer mismatch → cai no scan), então o klass que
-   chega ao loop é confiável.
-3. **Ler os campos por CONSTANTE de `offsets.py`, nunca magic number.** Defina uma classe de
-   offsets (estilo `GetBoxLog`/`HeroDieLog`/`ResurrectionLog`) e leia via ela — ex.: o tier do
-   baú vem de `GetBoxLog.MONSTER_TYPE` (e mapeia por `BOX_KEY_BY_TIER`), a vítima/assassino de
-   `HeroDieLog.VICTIM_HERO`/`KILLER_MONSTER`, o revivido de `ResurrectionLog.HERO`. Strings são
-   name-keys `"Nome_<key>"` → use o parser de sufixo, nunca `int()` no string inteiro.
-4. **Exception-safety por entry.** Uma entry ruim deve **pular, não derrubar** o loop. O loop
-   já tem `if not e: continue`, e os primitivos do `Reader` (`rptr`/`ri32`/`read_string`)
-   retornam `None` em memória ilegível (nunca levantam); o parser de sufixo também devolve `None`
-   em entrada inválida. Mantenha esse contrato no campo novo — leia defensivo, trate `None`,
-   e deixe o tick inteiro coberto pelo `try/except` que existe no loop. Lixo numa entry vira
-   um no-op silencioso, não um crash que mata a sessão.
+1. **Resolve the class.** Put the log name in `TARGETS` (the list of classes the resolver
+   scans/indexes). Without it, the resolver never learns that type's K and `kl ==` never matches.
+2. **Store/validate the klass.** Pull the `*_class` from the dict of resolved classes (like
+   `gb_class`/`die_class`/`res_class`); the index fast-path validates each class by a
+   name round-trip before serving the K (any mismatch → falls back to the scan), so the klass that
+   reaches the loop is trustworthy.
+3. **Read the fields by `offsets.py` CONSTANT, never a magic number.** Define an offsets
+   class (in the style of `GetBoxLog`/`HeroDieLog`/`ResurrectionLog`) and read through it — e.g. the
+   box tier comes from `GetBoxLog.MONSTER_TYPE` (and maps via `BOX_KEY_BY_TIER`), the victim/killer from
+   `HeroDieLog.VICTIM_HERO`/`KILLER_MONSTER`, the revived one from `ResurrectionLog.HERO`. Strings are
+   name-keys `"Name_<key>"` → use the suffix parser, never `int()` on the whole string.
+4. **Per-entry exception-safety.** A bad entry must **skip, not crash** the loop. The loop
+   already has `if not e: continue`, and the `Reader` primitives (`rptr`/`ri32`/`read_string`)
+   return `None` on unreadable memory (they never raise); the suffix parser also returns `None`
+   on invalid input. Keep that contract in the new field — read defensively, handle `None`,
+   and leave the whole tick covered by the `try/except` already in the loop. Garbage in an entry
+   becomes a silent no-op, not a crash that kills the session.
 
-**Mudou o campo? É schema.** Adicionar a entry nova ao `rec` da run é uma mudança de forma do
-`runs.jsonl` → exige bumpar `SCHEMA_VERSION` e normalizar no app (ver a nota de versionamento).
+**Changed the field? That's schema.** Adding the new entry to the run's `rec` is a shape change to
+`runs.jsonl` → it requires bumping `SCHEMA_VERSION` and normalizing in the app (see the versioning note).
 
-## metrics/events.py é só CONTAGEM (v1)
+## metrics/events.py is COUNTING only (v1)
 
-`metrics.events.EventFeed` é independente do loop de rótulo acima: ele só conta **quantas entries
-novas** surgiram (delta de `size`, re-ancorando quando a lista trunca), sem olhar tipo nenhum.
-Não é o caminho de detecção de evento — é um contador. **Rotular** (saber QUE evento é) exige o
-klass-pointer, como descrito acima; o TODO de "ler o tipo de cada evento" no header de `events.py`
-foi resolvido no loop de `run` justamente por klass-pointer, não por dumpar o campo `ELogType`.
+`metrics.events.EventFeed` is independent of the labeling loop above: it only counts **how many new
+entries** appeared (delta of `size`, re-anchoring when the list truncates), without looking at any
+type. It is not the event-detection path — it is a counter. **Labeling** (knowing WHICH event it is)
+requires the klass-pointer, as described above; the "read each event's type" TODO in the `events.py`
+header was resolved in the `run` loop precisely by klass-pointer, not by dumping the `ELogType` field.
 
 ## Related
 - [[invariants/offsets-single-source]]
-Veja também: [[invariants/run-lifecycle]] (StageClear/Failed fecham a run a partir desta detecção) · [[invariants/rva-index-resolution]] (o índice que serve os *_class com gate de round-trip) · [[reference/run-data-map]] (os campos de cada *Log) · [[invariants/schema-versioning]] (campo novo = bump) · [[guides/add-log-event]] (passo-a-passo)
+See also: [[invariants/run-lifecycle]] (StageClear/Failed close the run off this detection) · [[invariants/rva-index-resolution]] (the index that serves the *_class with a round-trip gate) · [[reference/run-data-map]] (the fields of each *Log) · [[invariants/schema-versioning]] (new field = bump) · [[guides/add-log-event]] (step-by-step)

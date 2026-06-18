@@ -1,42 +1,43 @@
 #!/usr/bin/env python3
-"""preflight_calib.py — o GATE ESTÁTICO de UM COMANDO antes de re-seedar/shipar o reader.
+"""preflight_calib.py — the ONE-COMMAND STATIC GATE before re-seeding/shipping the reader.
 
-POR QUÊ EXISTE: o reader já quebrou TRÊS vezes shipando um seed/calibração errado, sempre
-SILENCIOSO (o reader lê lixo/vazio SEM erro), sempre porque a verificação foi PARCIAL:
-  (1) gold (1.97T / 0): o singleton AggregateManager (idx_ut) resolveu por um value-scan que não
-      convergia — só um run ao vivo pegaria;
-  (2) party (+0xp, roster no lugar da party): o cap do pick_live_sm estourou a StageManager viva e
-      caiu no roster do save — só um run ao vivo com a party deployada pegaria;
-  (3) 1.00.12 (frota inteira parou de subir): o bucket-box inseriu campos no PlayerSaveData e
-      deslocou TODAS as listas do save +0x10; o offsets.py apontava pro offset velho → read_gold/
-      read_heroes liam a lista ERRADA → pick_live_psd None → run com heroes=[] → o app não subia
-      (eligible exige heroes>0) → sessões vazias. Passou VERDE porque o tripwire estático só checava
-      PRESENÇA de offset (outro campo caiu no offset velho) e o gate ao vivo só exercia o caminho
-      LIVE (StageManager/AggregateManager), nunca o caminho do SAVE que o record de run usa.
+WHY IT EXISTS: the reader has broken THREE times shipping a wrong seed/calibration, always
+SILENTLY (the reader reads garbage/empty WITHOUT erroring), always because the check was PARTIAL:
+  (1) gold (1.97T / 0): the AggregateManager singleton (idx_ut) resolved via a value-scan that
+      didn't converge — only a live run would catch it;
+  (2) party (+0xp, roster instead of the party): the pick_live_sm cap overran the live StageManager
+      and fell back to the save's roster — only a live run with the party deployed would catch it;
+  (3) 1.00.12 (whole fleet stopped recording): the bucket-box inserted fields into PlayerSaveData
+      and shifted ALL of the save's lists by +0x10; offsets.py pointed at the old offset → read_gold/
+      read_heroes read the WRONG list → pick_live_psd None → run with heroes=[] → the app didn't
+      record (eligible requires heroes>0) → empty sessions. It passed GREEN because the static
+      tripwire only checked the PRESENCE of an offset (another field landed at the old offset) and
+      the live gate only exercised the LIVE path (StageManager/AggregateManager), never the SAVE
+      path that the run record uses.
 
-A lição das três: NENHUM gate sozinho basta, e validar só o que você mexeu é o anti-padrão.
-A imunidade é em CAMADAS (ver docs/process/live-validation-gate.md):
-  1. ruff + pytest          — regressão de unidade (offsets pinados, lógica do tripwire, envelopes);
-  2. diff_offsets_vs_dump   — tripwire código↔JOGO contra um dump.cs FRESCO (offsets de campo +
-                              nomes + enums + TypeDefIndex/idx_ut do seed): pega INSERÇÃO/reorder;
-  3. validate_live          — o gate AO VIVO (gold/party/xp/stage/dps/stats/save-build/build-record/
-                              run-cycle/catálogos) que cobre as classes OFUSCADAS que o diff não vê.
+The lesson of all three: NO single gate is enough, and validating only what you touched is the
+anti-pattern. Immunity comes in LAYERS (see docs/process/live-validation-gate.md):
+  1. ruff + pytest          — unit regression (pinned offsets, tripwire logic, envelopes);
+  2. diff_offsets_vs_dump   — code↔GAME tripwire against a FRESH dump.cs (field offsets +
+                              names + enums + the seed's TypeDefIndex/idx_ut): catches INSERTION/reorder;
+  3. validate_live          — the LIVE gate (gold/party/xp/stage/dps/stats/save-build/build-record/
+                              run-cycle/catalogs) covering the OBFUSCATED classes the diff can't see.
 
-Este script roda as CAMADAS 1 e 2 (tudo que dá pra rodar SEM o jogo) num único comando e, no fim,
-IMPRIME o comando exato da camada 3 que o operador TEM que rodar ao vivo (este script NÃO consegue
-rodar o jogo — precisa do Windows com o TBH aberto e EM COMBATE). Exit 0 = as camadas estáticas
-PASSARAM; ainda FALTA a camada 3 (validate_live) antes de bumpar GAME_VERSION / shipar.
+This script runs LAYERS 1 and 2 (everything runnable WITHOUT the game) in a single command and, at
+the end, PRINTS the exact layer-3 command the operator MUST run live (this script CANNOT run the
+game — it needs Windows with TBH open and IN COMBAT). Exit 0 = the static layers PASSED; layer 3
+(validate_live) is still PENDING before bumping GAME_VERSION / shipping.
 
-USO (da raiz do worktree, de reader/, ou de reader/scripts/):
+USAGE (from the worktree root, from reader/, or from reader/scripts/):
     python3 scripts/preflight_calib.py --dump ~/tbh-dump/out/dump.cs --seed config/calib_seed.json
-Sem --dump usa o caminho de saída padrão do Il2CppDumper da skill meter-game-update
-(~/tbh-dump/out/dump.cs); se o dump não existir, FALHA com o comando de dump (nunca passa verde
-sem ter diffado contra o build novo). --seed default = config/calib_seed.json (o seed commitado).
-Pule a camada estática 1/2 só com --skip-ruff/--skip-pytest/--skip-diff (NÃO recomendado fora de
-debug — some com a rede de segurança que cada break histórico provou ser necessária).
+Without --dump it uses the default Il2CppDumper output path from the meter-game-update skill
+(~/tbh-dump/out/dump.cs); if the dump doesn't exist, it FAILS with the dump command (never passes
+green without having diffed against the new build). --seed default = config/calib_seed.json (the
+committed seed). Skip static layer 1/2 only with --skip-ruff/--skip-pytest/--skip-diff (NOT
+recommended outside debugging — it removes the safety net each historical break proved necessary).
 
-ESTE É UM GATE ESTÁTICO. Ele NUNCA pode declarar "pronto pra shipar" — só "as camadas estáticas
-passaram". A camada ao vivo (validate_live.py) é obrigatória e roda na máquina do mantenedor.
+THIS IS A STATIC GATE. It can NEVER declare "ready to ship" — only "the static layers passed". The
+live layer (validate_live.py) is mandatory and runs on the maintainer's machine.
 """
 import argparse
 import os
@@ -44,8 +45,8 @@ import shutil
 import subprocess
 import sys
 
-# bootstrap idêntico aos outros scripts: acha o reader root (o que tem meter_windows.py) a partir
-# da raiz do share tbh-meter-dev (tem reader/ como subpasta), de reader/, ou de reader/scripts/.
+# bootstrap identical to the other scripts: find the reader root (the one with meter_windows.py)
+# from the tbh-meter-dev share root (has reader/ as a subfolder), from reader/, or from reader/scripts/.
 _here = os.path.dirname(os.path.abspath(__file__))
 _reader_root = next(
     (c for c in (os.path.join(_here, "reader"), _here, os.path.dirname(_here),
@@ -54,12 +55,12 @@ _reader_root = next(
     None,
 )
 if _reader_root is None:
-    sys.exit("[x] meter_windows.py não encontrado. Rode da raiz do share tbh-meter-dev (tem reader/) "
-             "ou de dentro de reader/.")
+    sys.exit("[x] meter_windows.py not found. Run from the tbh-meter-dev share root (has reader/) "
+             "or from inside reader/.")
 
 _DIFF = os.path.join(_here, "diff_offsets_vs_dump.py")
 _VALIDATE = os.path.join(_here, "validate_live.py")
-# Caminho de saída padrão do Il2CppDumper na skill meter-game-update (passo 2: `dotnet ... out`).
+# Default Il2CppDumper output path in the meter-game-update skill (step 2: `dotnet ... out`).
 _DEFAULT_DUMP = os.path.expanduser("~/tbh-dump/out/dump.cs")
 _DEFAULT_SEED = os.path.join(_reader_root, "config", "calib_seed.json")
 
@@ -71,8 +72,8 @@ def _hdr(title):
 
 
 def _run(cmd, cwd):
-    """Roda um subprocesso herdando stdout/stderr (o output da ferramenta aparece direto). Devolve
-    o returncode, ou 127 se o executável não existe (FileNotFoundError)."""
+    """Run a subprocess inheriting stdout/stderr (the tool's output shows directly). Returns the
+    returncode, or 127 if the executable doesn't exist (FileNotFoundError)."""
     print(f"$ {' '.join(cmd)}  (cwd={cwd})")
     try:
         return subprocess.run(cmd, cwd=cwd).returncode
@@ -81,9 +82,9 @@ def _run(cmd, cwd):
 
 
 def _ruff_cmd():
-    """`ruff check .` se o ruff está no PATH; senão `uvx ruff check .` (o ruff.toml documenta o uvx
-    como o jeito de rodar sem instalar — `uv` já está no ambiente do mantenedor). None se nem um nem
-    outro existe (aí a camada não dá pra rodar — o operador instala o ruff)."""
+    """`ruff check .` if ruff is on PATH; otherwise `uvx ruff check .` (ruff.toml documents uvx as
+    the way to run it without installing — `uv` is already in the maintainer's environment). None if
+    neither exists (then the layer can't run — the operator installs ruff)."""
     if shutil.which("ruff"):
         return ["ruff", "check", "."]
     if shutil.which("uvx"):
@@ -93,108 +94,108 @@ def _ruff_cmd():
 
 def main():
     ap = argparse.ArgumentParser(
-        description="Gate ESTÁTICO de um comando antes de re-seedar/shipar o reader "
-                    "(ruff + pytest + diff_offsets_vs_dump). Imprime o comando da camada AO VIVO no fim.")
+        description="ONE-command STATIC gate before re-seeding/shipping the reader "
+                    "(ruff + pytest + diff_offsets_vs_dump). Prints the LIVE-layer command at the end.")
     ap.add_argument("--dump", default=_DEFAULT_DUMP,
-                    help=f"dump.cs FRESCO do Il2CppDumper do build novo (default: {_DEFAULT_DUMP})")
+                    help=f"FRESH dump.cs from Il2CppDumper of the new build (default: {_DEFAULT_DUMP})")
     ap.add_argument("--seed", default=_DEFAULT_SEED,
-                    help="config/calib_seed.json a conferir (TypeDefIndex + idx_ut). Default: o commitado")
-    ap.add_argument("--skip-ruff", action="store_true", help="pula o ruff (debug — não recomendado)")
-    ap.add_argument("--skip-pytest", action="store_true", help="pula o pytest (debug — não recomendado)")
+                    help="config/calib_seed.json to check (TypeDefIndex + idx_ut). Default: the committed one")
+    ap.add_argument("--skip-ruff", action="store_true", help="skip ruff (debug — not recommended)")
+    ap.add_argument("--skip-pytest", action="store_true", help="skip pytest (debug — not recommended)")
     ap.add_argument("--skip-diff", action="store_true",
-                    help="pula o diff código↔dump (debug — só se você AINDA não tem o dump.cs)")
+                    help="skip the code↔dump diff (debug — only if you do NOT yet have dump.cs)")
     args = ap.parse_args()
 
-    results = []  # (nome_camada, ok, detalhe)
+    results = []  # (layer_name, ok, detail)
 
-    # --- CAMADA 1a: ruff (lint — pega nome morto/indefinido que o refactor mais arrisca) ----------
-    _hdr("CAMADA 1a — ruff check (lint estático)")
+    # --- LAYER 1a: ruff (lint — catches dead/undefined names that refactors most risk) ------------
+    _hdr("LAYER 1a — ruff check (static lint)")
     if args.skip_ruff:
         print("[skip] --skip-ruff")
-        results.append(("ruff", True, "PULADO (--skip-ruff)"))
+        results.append(("ruff", True, "SKIPPED (--skip-ruff)"))
     else:
         rc = _ruff_cmd()
         if rc is None:
-            print("[x] ruff não encontrado no PATH e uvx indisponível. Instale: brew install ruff "
-                  "(ou rode num ambiente com uv). Ver ruff.toml.")
-            results.append(("ruff", False, "ruff/uvx ausente"))
+            print("[x] ruff not found on PATH and uvx unavailable. Install: brew install ruff "
+                  "(or run in an environment with uv). See ruff.toml.")
+            results.append(("ruff", False, "ruff/uvx missing"))
         else:
             code = _run(rc, _reader_root)
             results.append(("ruff", code == 0, f"exit {code}"))
 
-    # --- CAMADA 1b: pytest (regressão: offsets pinados, lógica do tripwire, envelopes, etc.) ------
-    _hdr("CAMADA 1b — pytest (regressão de unidade, inclui o drift-test docs↔código)")
+    # --- LAYER 1b: pytest (regression: pinned offsets, tripwire logic, envelopes, etc.) -----------
+    _hdr("LAYER 1b — pytest (unit regression, includes the docs↔code drift-test)")
     if args.skip_pytest:
         print("[skip] --skip-pytest")
-        results.append(("pytest", True, "PULADO (--skip-pytest)"))
+        results.append(("pytest", True, "SKIPPED (--skip-pytest)"))
     else:
         code = _run([sys.executable, "-m", "pytest", "-q"], _reader_root)
         results.append(("pytest", code == 0, f"exit {code}"))
 
-    # --- CAMADA 2: diff código↔JOGO (o tripwire que deveria ter pego o 1.00.12 ANTES do ship) -----
-    _hdr("CAMADA 2 — diff_offsets_vs_dump (tripwire código↔JOGO vs dump.cs fresco)")
+    # --- LAYER 2: code↔GAME diff (the tripwire that should have caught 1.00.12 BEFORE shipping) ---
+    _hdr("LAYER 2 — diff_offsets_vs_dump (code↔GAME tripwire vs fresh dump.cs)")
     if args.skip_diff:
-        print("[skip] --skip-diff (você AINDA não tem o dump.cs do build novo? gere-o — ver a skill)")
-        results.append(("diff_offsets", True, "PULADO (--skip-diff)"))
+        print("[skip] --skip-diff (you do NOT yet have the new build's dump.cs? generate it — see the skill)")
+        results.append(("diff_offsets", True, "SKIPPED (--skip-diff)"))
     elif not os.path.isfile(args.dump):
-        # Dump ausente NÃO pode passar verde — é exatamente o cenário 1.00.12 (não diffar = não saber).
-        print(f"[x] dump.cs não encontrado em: {args.dump}")
-        print("    Gere o dump do build NOVO (estático, não precisa do jogo rodando):")
+        # A missing dump must NOT pass green — that's exactly the 1.00.12 scenario (no diff = no knowing).
+        print(f"[x] dump.cs not found at: {args.dump}")
+        print("    Generate the NEW build's dump (static, doesn't need the game running):")
         print("      cd ~/tbh-dump && cp /Volumes/TaskbarHero/GameAssembly.dll . && \\")
         print("        cp /Volumes/TaskbarHero/TaskBarHero_Data/il2cpp_data/Metadata/global-metadata.dat .")
         print("      DOTNET_ROLL_FORWARD=Major dotnet tool/Il2CppDumper.dll GameAssembly.dll "
               "global-metadata.dat out < /dev/null")
-        print("    Depois rode de novo com --dump ~/tbh-dump/out/dump.cs (ou aponte --dump pro seu).")
-        results.append(("diff_offsets", False, f"dump ausente: {args.dump}"))
+        print("    Then run again with --dump ~/tbh-dump/out/dump.cs (or point --dump at yours).")
+        results.append(("diff_offsets", False, f"dump missing: {args.dump}"))
     else:
         cmd = [sys.executable, _DIFF, "--dump", args.dump]
         if args.seed and os.path.isfile(args.seed):
             cmd += ["--seed", args.seed]
         else:
-            print(f"[!] seed não encontrado em {args.seed} — diffando offsets/enums sem checar "
-                  f"TypeDefIndex/idx_ut do seed (recomendado passar --seed config/calib_seed.json).")
+            print(f"[!] seed not found at {args.seed} — diffing offsets/enums without checking the "
+                  f"seed's TypeDefIndex/idx_ut (passing --seed config/calib_seed.json is recommended).")
         code = _run(cmd, _reader_root)
-        # diff: exit 0 = sem drift; 1 = DRIFT (offsets.py/seed precisam atualizar); 2 = dump ilegível.
+        # diff: exit 0 = no drift; 1 = DRIFT (offsets.py/seed need updating); 2 = unreadable dump.
         results.append(("diff_offsets", code == 0,
-                        "sem drift" if code == 0 else f"DRIFT/erro (exit {code})"))
+                        "no drift" if code == 0 else f"DRIFT/error (exit {code})"))
 
-    # --- RESUMO das camadas estáticas -------------------------------------------------------------
-    _hdr("RESUMO — camadas ESTÁTICAS (1 + 2)")
+    # --- SUMMARY of the static layers -------------------------------------------------------------
+    _hdr("SUMMARY — STATIC layers (1 + 2)")
     for name, ok, detail in results:
         print(f"  [{'PASS' if ok else 'FAIL'}] {name:14s} — {detail}")
     all_static_pass = all(ok for _, ok, _ in results)
 
     if not all_static_pass:
         fails = [n for n, ok, _ in results if not ok]
-        print(f"\n[x] ❌ camada estática FALHOU em: {', '.join(fails)}.")
-        print("    NÃO re-seede / NÃO bumpe GAME_VERSION / NÃO shipe. Conserte e rode de novo.")
-        print("    (DRIFT no diff = atualize o símbolo em config/offsets.py a partir do dump — fonte")
-        print("     única; ver docs/invariants/offsets-single-source.md e a skill meter-game-update.)")
+        print(f"\n[x] ❌ static layer FAILED on: {', '.join(fails)}.")
+        print("    Do NOT re-seed / do NOT bump GAME_VERSION / do NOT ship. Fix it and run again.")
+        print("    (DRIFT in the diff = update the symbol in config/offsets.py from the dump — single")
+        print("     source; see docs/invariants/offsets-single-source.md and the meter-game-update skill.)")
         return 1
 
-    # --- camada estática OK → IMPRIME o comando da camada AO VIVO (que este script NÃO roda) -------
-    _hdr("✅ CAMADAS ESTÁTICAS PASSARAM — FALTA a camada AO VIVO (obrigatória)")
-    print("As camadas 1+2 (ruff + pytest + diff código↔jogo) passaram: nada que o reader rastreia")
-    print("deslocou de NOME/OFFSET/ENUM/índice neste dump. Mas as classes OFUSCADAS (gold via")
-    print("AggregateManager, party+xp via HeroRuntime, StatsHolder) e os caminhos do SAVE/record que")
-    print("a run SOBE (save-build/build-record/dps/stats/run-cycle) só se validam AO VIVO — é o ponto")
-    print("cego onde os DOIS bugs do 1.00.11 e a parada de frota do 1.00.12 passaram batidos.")
+    # --- static layer OK → PRINT the LIVE-layer command (which this script does NOT run) ----------
+    _hdr("✅ STATIC LAYERS PASSED — the LIVE layer is still PENDING (mandatory)")
+    print("Layers 1+2 (ruff + pytest + code↔game diff) passed: nothing the reader tracks shifted")
+    print("in NAME/OFFSET/ENUM/index in this dump. But the OBFUSCATED classes (gold via")
+    print("AggregateManager, party+xp via HeroRuntime, StatsHolder) and the SAVE/record paths the")
+    print("run RECORDS through (save-build/build-record/dps/stats/run-cycle) only validate LIVE — it's")
+    print("the blind spot where BOTH 1.00.11 bugs and the 1.00.12 fleet stoppage slipped through.")
     print("")
-    print("ESTE GATE É ESTÁTICO E NÃO PODE RODAR O JOGO. Antes de bumpar GAME_VERSION / shipar, rode")
-    print("a CAMADA 3 na máquina do mantenedor, com o TBH ABERTO e EM COMBATE numa fase:")
+    print("THIS GATE IS STATIC AND CANNOT RUN THE GAME. Before bumping GAME_VERSION / shipping, run")
+    print("LAYER 3 on the maintainer's machine, with TBH OPEN and IN COMBAT on a stage:")
     print("")
-    print("    # Windows, terminal como ADMINISTRADOR, party deployada numa fase:")
+    print("    # Windows, terminal as ADMINISTRATOR, party deployed on a stage:")
     print("    cd C:\\Users\\mario\\tbh-meter-dev")
     print("    python reader\\scripts\\validate_live.py")
     print("")
-    print(f"  (código do gate ao vivo: {os.path.relpath(_VALIDATE, _reader_root)} — resolve pelo SEED")
-    print("   embarcado, igual ao 1º launch do RC, e exige PASS em TODAS: calib/seed, gold,")
-    print("   party-viva, hero-class, save-build, build-record, xp-viva, dps, stats, stage,")
-    print("   run-cycle, catálogos. Exit != 0 = NÃO shipar. Lê de volta validate_live_out.txt.)")
+    print(f"  (live-gate code: {os.path.relpath(_VALIDATE, _reader_root)} — resolves via the embedded")
+    print("   SEED, just like the RC's 1st launch, and requires PASS on ALL: calib/seed, gold,")
+    print("   live-party, hero-class, save-build, build-record, live-xp, dps, stats, stage,")
+    print("   run-cycle, catalogs. Exit != 0 = do NOT ship. Reads back validate_live_out.txt.)")
     print("")
-    print("⚠  NUNCA shipe só com este preflight verde. Validar parcialmente é EXATAMENTE como os três")
-    print("   breaks passaram. Só DEPOIS de validate_live PASS em tudo: bumpe GAME_VERSION e shipe.")
-    print("   Playbook completo: docs/guides/game-update.md + a skill meter-game-update.")
+    print("⚠  NEVER ship on this preflight green alone. Validating partially is EXACTLY how all three")
+    print("   breaks slipped through. Only AFTER validate_live PASSes on everything: bump GAME_VERSION")
+    print("   and ship. Full playbook: docs/guides/game-update.md + the meter-game-update skill.")
     return 0
 
 

@@ -7,7 +7,7 @@
 // flows — the per-run record AND the live overlay. It emits raw numbers/ids; the APP cooks dps/stage
 // label/mode using the SAME shared helpers the converter uses for a finished run (computeDps /
 // resolveStage / modeName), so the overlay and the run record agree by construction — one formula, no
-// Python↔TS drift. See progress.md "Live-meter" + "Estrutura & linguagem (helper compartilhado)".
+// Python↔TS drift.
 //
 // Unlike `raw/<id>.json` (the audited per-run record), live is EPHEMERAL — overwritten every tick,
 // nothing persists. So there is NO envelope here (a field that did not resolve is just `null`, which

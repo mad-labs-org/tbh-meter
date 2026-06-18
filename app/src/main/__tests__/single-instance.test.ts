@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { BrowserWindow } from "electron";
 
-// Unit test for the APP single-writer guarantee (progress.md "Dedup" — single-writer
+// Unit test for the APP single-writer guarantee (single-writer
 // primary). The decision is driven through an injectable SingleInstanceApp so we can
 // assert the lock-and-quit wiring without spinning up Electron: a second instance must
 // QUIT (and return false) so it never reaches startReader, and the primary must register

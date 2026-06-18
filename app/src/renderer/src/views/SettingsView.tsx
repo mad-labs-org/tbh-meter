@@ -381,7 +381,7 @@ function AlwaysOnTopRow({
  *   - minDurationSec (default off): hide runs shorter than N seconds. The minimum the user can pick
  *     is the SYSTEM floor (COUNT_FLOOR_SEC) — runs under it never count anyway — so the input is
  *     clamped to it before persisting; x-10 boss clears are always exempt. The floor is a converter
- *     constant, NOT this setting (progress.md "Configs" — don't conflate the system rule with the pref).
+ *     constant, NOT this setting (don't conflate the system rule with the pref).
  */
 function RunFilterRow({
   settings,

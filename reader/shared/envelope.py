@@ -1,53 +1,53 @@
-"""envelope.py — Result/Either por campo do RAW (raw/<id>.json).
+"""envelope.py — per-field Result/Either for the RAW (raw/<id>.json).
 
-Cada campo de DADO do raw que vem de uma LEITURA de memória pode falhar (o jogo
-fechou, o endereço mudou, a classe não resolveu). Em vez de gravar `0` ou `"?"` — que
-vira lixo eterno e INDISTINGUÍVEL de um zero real (o bug do 1.00.10: gold lido como 0
-ficou permanente no runs.jsonl) — embrulha o valor num envelope marcado:
+Every DATA field in the raw that comes from a memory READ can fail (the game closed, the
+address moved, the class didn't resolve). Instead of writing `0` or `"?"` — which becomes
+permanent garbage, INDISTINGUISHABLE from a real zero (the 1.00.10 bug: gold read as 0
+stuck forever in runs.jsonl) — wrap the value in a tagged envelope:
 
-    {"ok": true,  "value": <leitura>}      # leu
-    {"ok": false, "error": "<motivo>"}     # não leu
+    {"ok": true,  "value": <reading>}      # read
+    {"ok": false, "error": "<reason>"}     # not read
 
-O conversor (app, TS) desembrulha: `ok` → usa o value; erro → registra em `issues` e
-degrada a run, sem nunca confundir "não-li" com "li zero". Espelha o `Field<T>` em
-`app/src/shared/raw-types.ts` (mesma forma nos dois lados do contrato).
+The converter (app, TS) unwraps it: `ok` → use the value; error → record it in `issues` and
+degrade the run, never confusing "couldn't read" with "read zero". Mirrors the `Field<T>` in
+`app/src/shared/raw-types.ts` (same shape on both sides of the contract).
 
-Regra de uso (ver progress.md "Contrato do RAW"):
-- DADO observado (gold, xp, stage, heróis, dano…) → `field(lambda: <leitura>)` ou `ok()/err()`.
-- META estrutural (raw_schema_version, id, ts, run, run_outcome, session) → vai CRU, sem envelope
-  (se isso falta, não existe record).
+Usage rule (see "RAW contract"):
+- observed DATA (gold, xp, stage, heroes, damage…) → `field(lambda: <reading>)` or `ok()/err()`.
+- structural META (raw_schema_version, id, ts, run, run_outcome, session) → goes RAW, no envelope
+  (if this is missing, there is no record).
 """
 
 from typing import Any, Callable
 
 
 def ok(value: Any) -> dict:
-    """Campo lido com sucesso. `value` pode ser qualquer coisa, inclusive None
-    (use `ok(None)` quando None é um valor LEGÍTIMO — ex.: act ausente num stage sem info)."""
+    """Field read successfully. `value` can be anything, including None
+    (use `ok(None)` when None is a LEGITIMATE value — e.g. act absent on a stage with no info)."""
     return {"ok": True, "value": value}
 
 
 def err(error: Any) -> dict:
-    """Campo que NÃO pôde ser lido. `error` é um motivo curto (string) que o conversor
-    propaga pra `issues:{campo: motivo}` — serve de auditoria, não de valor."""
+    """Field that could NOT be read. `error` is a short reason (string) that the converter
+    propagates into `issues:{field: reason}` — it's for auditing, not for value."""
     return {"ok": False, "error": str(error)}
 
 
 def field(read: Callable[[], Any]) -> dict:
-    """Embrulha uma leitura de memória num envelope.
+    """Wrap a memory read in an envelope.
 
-    Chama `read()`:
-    - levantou exceção  → `err` (a leitura de memória pode dar `raise`);
-    - retornou `None`   → `err("none")` (None aqui = "não consegui determinar");
-    - retornou valor    → `ok(value)`.
+    Calls `read()`:
+    - raised an exception → `err` (a memory read can `raise`);
+    - returned `None`     → `err("none")` (None here = "couldn't determine");
+    - returned a value    → `ok(value)`.
 
-    Uso: `field(lambda: reader.ri32(addr + OFF))`. Quando None é um valor VÁLIDO (não um
-    erro), NÃO use `field()` — use `ok(value)` direto, pra não transformar um null legítimo
-    em erro.
+    Usage: `field(lambda: reader.ri32(addr + OFF))`. When None is a VALID value (not an
+    error), do NOT use `field()` — use `ok(value)` directly, so a legitimate null isn't
+    turned into an error.
     """
     try:
         value = read()
-    except Exception as e:  # leitura de memória pode levantar (processo morto, addr inválido)
+    except Exception as e:  # a memory read can raise (dead process, invalid addr)
         return err(f"{type(e).__name__}: {e}")
     if value is None:
         return err("none")

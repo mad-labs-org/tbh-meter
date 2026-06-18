@@ -1,2 +1,2 @@
-# Saída pro usuário. v1 = painel no terminal (rich). Trocar isso por uma janela
-# ou overlay depois não afeta nenhuma das outras camadas.
+# User-facing output. v1 = terminal panel (rich). Swapping this for a window
+# or overlay later doesn't affect any of the other layers.

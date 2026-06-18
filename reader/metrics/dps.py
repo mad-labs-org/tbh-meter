@@ -1,13 +1,13 @@
-"""DPS medido pela QUEDA DE HP dos monstros — o número-mãe do meter.
+"""DPS measured from monsters' HP DROP — the meter's headline number.
 
-Ideia: a cada tick, leio o HP de cada monstro vivo. O quanto o HP caiu desde o
-tick anterior É o dano causado. Somo isso numa janela deslizante -> DPS.
+Idea: each tick, read every live monster's HP. How much HP fell since the
+previous tick IS the damage dealt. Sum that over a sliding window -> DPS.
 
-Casos tratados:
-  - monstro novo (não visto antes): registra, não conta dano.
-  - HP subiu (cura, ou endereço reaproveitado do pool por um monstro novo):
-    ignora, não conta como dano.
-  - monstro sumiu da lista (morreu): conta o HP que restava como o golpe final.
+Cases handled:
+  - new monster (not seen before): record it, count no damage.
+  - HP went up (heal, or address reused from the pool by a new monster):
+    ignore, don't count as damage.
+  - monster gone from the list (died): count its remaining HP as the killing blow.
 """
 
 from shared.utils import RollingWindow, now
@@ -16,14 +16,14 @@ from shared.utils import RollingWindow, now
 class DpsTracker:
     def __init__(self, window_seconds: float = 5.0):
         self._window = RollingWindow(window_seconds)
-        self._last_hp: dict[int, float] = {}   # addr do monstro -> último HP visto
-        self.total_damage: float = 0.0         # acumulado da run
+        self._last_hp: dict[int, float] = {}   # monster addr -> last HP seen
+        self.total_damage: float = 0.0         # run accumulator
         self.peak_dps: float = 0.0
-        self.alive: int = 0                     # mobs vivos no último tick (p/ contagem de kills)
+        self.alive: int = 0                     # mobs alive on the last tick (for kill counting)
 
     def update(self, monsters, timestamp: float | None = None) -> None:
-        """`monsters` = iterável das tuplas (addr, hp_atual, hp_max) dos mobs vivos
-        (ver game.models.live_monsters). Só (addr, hp) importam aqui; hp_max é ignorado."""
+        """`monsters` = iterable of (addr, current_hp, hp_max) tuples for the live mobs
+        (see game.models.live_monsters). Only (addr, hp) matter here; hp_max is ignored."""
         ts = now() if timestamp is None else timestamp
 
         current: dict[int, float] = {}
@@ -35,9 +35,9 @@ class DpsTracker:
             current[addr] = hp
             prev = self._last_hp.get(addr)
             if prev is not None and hp < prev:
-                damage += (prev - hp)   # tomou dano
+                damage += (prev - hp)   # took damage
 
-        # monstros que sumiram desde o tick anterior = morreram -> golpe final
+        # monsters gone since the previous tick = died -> killing blow
         for addr, prev_hp in self._last_hp.items():
             if addr not in current and prev_hp > 0:
                 damage += prev_hp
@@ -53,12 +53,12 @@ class DpsTracker:
             self.peak_dps = dps
 
     def dps(self, timestamp: float | None = None) -> float:
-        """DPS suavizado (dano na janela / tamanho da janela)."""
+        """Smoothed DPS (damage in the window / window size)."""
         return self._window.rate_per_second(timestamp)
 
     def reset(self) -> None:
-        """Zera (ex.: ao trocar de stage / separar por run). O meter prefere instanciar
-        um DpsTracker novo por run, mas isto cobre o reuso in-place."""
+        """Zero out (e.g. on stage change / splitting per run). The meter prefers to instantiate
+        a fresh DpsTracker per run, but this covers in-place reuse."""
         self._window.reset()
         self._last_hp.clear()
         self.total_damage = 0.0

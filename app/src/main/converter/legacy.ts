@@ -1,7 +1,7 @@
 // convertLegacy(record) -> structured RunRecord. The MIGRATION branch of the converter: it adopts a
 // pre-redesign `runs.jsonl` line (schema_version <= 11, mixed PT/EN eras) into the same `logs/<id>.json`
 // the new pipeline reads, so a player's existing run history does NOT restart under the redesign
-// (progress.md "Migração & continuidade"). Same mechanics as convert(), different input shape.
+// (migration & continuity). Same mechanics as convert(), different input shape.
 //
 // TWO invariants this branch exists to hold:
 //  1. PRESERVE the external_id. A legacy record already has its `session_id:run` identity (and was

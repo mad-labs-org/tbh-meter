@@ -1,18 +1,17 @@
 ---
 type: invariant
-description: "Classes (>= 3 letras, estáveis) são resolvidas PRIMARIAMENTE por TypeDefIndex + calibração (fast path, ~ms), com gate round-trip (class_name == nome) + size de instância; QUALQUER sanity-fail cai no scan. O scan é o fallback, não o primário."
+description: "Classes (>= 3 letters, stable) are resolved PRIMARILY via TypeDefIndex + calibration (fast path, ~ms), with a round-trip gate (class_name == name) + instance size; ANY sanity-fail falls back to scan. The scan is the fallback, not the primary."
 symptoms:
-  - "resolver classe nova"
-  - "adicionar classe-alvo"
+  - "resolve new class"
+  - "add target class"
   - "fast path"
-  - "fast path não ativa"
+  - "fast path doesn't activate"
   - "calib"
-  - "calibração"
-  - "índice errado"
+  - "calibration"
   - "wrong index"
   - "TypeDefIndex"
   - "anchor RVA"
-  - "nunca acelera"
+  - "never speeds up"
 code_anchors:
   - il2cpp/resolver.py::resolve_via_rva
   - il2cpp/typeinfo.py::class_by_index
@@ -25,61 +24,62 @@ guarded_by:
   - tests/test_typeinfo.py::test_class_by_index
 ---
 
-# Resolução de classes por índice RVA (fast path) vs. scan (fallback)
+# Resolving classes by RVA index (fast path) vs. scan (fallback)
 
-O PRIMÁRIO hoje é resolver classes por **`TypeDefIndex` + calibração**, não pelo scan. A
-cadeia (em `typeinfo.py`): `[ga_base + anchor_rva]` → base viva da `s_TypeInfoTable`
-(reescrita pelo runtime a cada launch — relê pelo anchor porque o `ga_base` muda por ASLR),
-e `class_by_index` faz a deref crua `[tbase + idx*8]` → `Il2CppClass*`. Os índices são
-constantes do build, aprendidos numa calibração e persistidos no cache por build-fingerprint.
-Isso **mata o cold-start scan** (varrer ~GBs procurando as strings de nome). O `resolve`
-(scan de 3 passadas, `il2cpp/resolver.py`) **continua existindo como FALLBACK permanente** —
-sempre funciona, em qualquer build, e é o que alimenta a calibração na primeira vez.
+The PRIMARY path today is resolving classes via **`TypeDefIndex` + calibration**, not via the
+scan. The chain (in `typeinfo.py`): `[ga_base + anchor_rva]` → live base of `s_TypeInfoTable`
+(rewritten by the runtime every launch — re-read via the anchor because `ga_base` moves under
+ASLR), and `class_by_index` does the raw deref `[tbase + idx*8]` → `Il2CppClass*`. The indices
+are build constants, learned during a calibration and persisted in the cache by build-fingerprint.
+This **kills the cold-start scan** (scanning ~GBs looking for the name strings). `resolve`
+(the 3-pass scan, `il2cpp/resolver.py`) **still exists as a permanent FALLBACK** — always works,
+on any build, and is what feeds the calibration the first time.
 
-**Esta nota NÃO é "name-free-resolution genérico".** Atenção ao drift histórico: a regra antiga
-dizia "classes vêm por scan". O scan é o fallback; o caminho que roda num build calibrado é o
-índice. (O gold/`AggregateManager` tem nome ofuscado `uu` e é tratado por ESTRUTURA num módulo
-próprio — NÃO entra no `resolve_via_rva`; ver a nota de gold.)
+**This note is NOT "generic name-free-resolution".** Mind the historical drift: the old rule
+said "classes come via scan". The scan is the fallback; the path that runs on a calibrated build
+is the index. (Gold/`AggregateManager` has the obfuscated name `uu` and is handled by STRUCTURE
+in its own module — it does NOT go through `resolve_via_rva`; see the gold note.)
 
-## A regra (o gate anti-envenenamento)
+## The rule (the anti-poisoning gate)
 
-`resolve_via_rva` devolve `(classes, instances)` no MESMO shape do scan, ou **`None` em
-QUALQUER sanity-fail** — nunca dados parciais. Para cada nome em `targets`:
+`resolve_via_rva` returns `(classes, instances)` in the SAME shape as the scan, or **`None` on
+ANY sanity-fail** — never partial data. For each name in `targets`:
 
-1. **CLASSE — gate round-trip.** `class_by_index(idx[nome])` dá um `Il2CppClass*` cru
-   (`class_by_index` **não valida nada** — é só a deref da tabela). A validação é exigir
-   `typeinfo.class_name(K) == nome`. `class_name` confere bounds + 8-alinhamento + o
-   round-trip de `element_class`/`cast_class` apontando pra si. **Mismatch → `None` → scan.**
-   É por isso que o índice nunca é confiado sozinho: um anchor/índice envenenado (ou drift de
-   build sem recalibrar) lê outra classe naquele slot, o nome não bate, e a resolução degrada
-   pro scan em vez de servir lixo.
-2. **INSTÂNCIA de singleton — gate de size.** Para os nomes em `SINGLETONS`
-   (`MonsterSpawnManager`, `LogManager`, `StageManager`) a instância vem por `bbwf_from_klass(K)`
-   e passa por `_manager_inst_ok` — a MESMA sanidade do slow path: `MonsterSpawnManager` exige
-   `MONSTER_LIST` size em `[0, 2000)`; `LogManager` exige `LOG_LIST` size em `[0, 100000)` (a
-   `LOG_LIST` cresce a sessão inteira); `StageManager` é aceito como está (a verificação
-   portadora-de-party é deferida pro pick ao vivo, não falha aqui). Size absurdo = lixo de
-   menu → `None` → scan. Classes só-de-classe (logs, `*SaveData`, catálogos) saem com
-   `instances[nome] = []` — o caller resolve essas instâncias por outro caminho.
+1. **CLASS — round-trip gate.** `class_by_index(idx[name])` gives a raw `Il2CppClass*`
+   (`class_by_index` **validates nothing** — it's just the table deref). The validation is to
+   require `typeinfo.class_name(K) == name`. `class_name` checks bounds + 8-alignment + the
+   round-trip of `element_class`/`cast_class` pointing to itself. **Mismatch → `None` → scan.**
+   This is why the index is never trusted on its own: a poisoned anchor/index (or build drift
+   without recalibrating) reads another class in that slot, the name doesn't match, and
+   resolution degrades to the scan instead of serving garbage.
+2. **Singleton INSTANCE — size gate.** For the names in `SINGLETONS`
+   (`MonsterSpawnManager`, `LogManager`, `StageManager`) the instance comes via `bbwf_from_klass(K)`
+   and passes through `_manager_inst_ok` — the SAME sanity check as the slow path: `MonsterSpawnManager`
+   requires `MONSTER_LIST` size in `[0, 2000)`; `LogManager` requires `LOG_LIST` size in `[0, 100000)`
+   (the `LOG_LIST` grows for the whole session); `StageManager` is accepted as-is (the
+   party-carrier check is deferred to the live pick, it does not fail here). Absurd size = menu
+   garbage → `None` → scan. Class-only classes (logs, `*SaveData`, catalogs) come out with
+   `instances[name] = []` — the caller resolves those instances by another path.
 
-`class_name` **só valida, nunca escolhe** a classe — a escolha é por índice. Por isso ele
-devolve até um nome ofuscado se mandarem um (visto em `test_typeinfo`): a estabilidade do
-fast path vem do índice, o nome só identifica/confirma o slot.
+`class_name` **only validates, never picks** the class — the choice is by index. That's why it
+returns even an obfuscated name if you hand it one (seen in `test_typeinfo`): the fast path's
+stability comes from the index, the name only identifies/confirms the slot.
 
-## Adicionar uma classe-alvo nova
+## Adding a new target class
 
-Ponha o nome (>= 3 letras, estável/não-ofuscado) em **`TARGETS`** (em `meter_windows.py`) e
-**deixe o scan achá-la** — a calibração aprende o `TypeDefIndex` dela a partir do K que o scan
-resolveu e o persiste no cache; do próximo launch calibrado em diante ela sai pelo fast path.
-Não há lugar pra hard-codar um índice: ele é descoberto e VERIFICADO contra o build, e mesmo já
-no cache passa pelo gate round-trip toda vez. **NUNCA confie no índice sem o gate** — um índice
-sem `class_name == nome` é exatamente a classe de bug "índice errado / classe trocada".
+Put the name (>= 3 letters, stable/non-obfuscated) in **`TARGETS`** (in `meter_windows.py`) and
+**let the scan find it** — the calibration learns its `TypeDefIndex` from the K the scan resolved
+and persists it in the cache; from the next calibrated launch onward it comes out via the fast
+path. There's no place to hard-code an index: it is discovered and VERIFIED against the build, and
+even when already cached it passes through the round-trip gate every time. **NEVER trust the index
+without the gate** — an index without `class_name == name` is exactly the "wrong index / swapped
+class" class of bug.
 
-Se a calibração falhar (não achar o anchor/índices), o reader **nunca acelera** mas continua
-correto via scan; um build que não acelera tem que ser observável no log — então prefira ver
-um sintoma de "nunca acelera" a silenciar a falha.
+If the calibration fails (can't find the anchor/indices), the reader **never speeds up** but stays
+correct via the scan; a build that doesn't speed up must be observable in the log — so prefer
+seeing a "never speeds up" symptom over silencing the failure.
 
 ## Related
-- [[invariants/instance-selection]] — o size-gate de `_manager_inst_ok` é o MESMO `_pick_list_singleton`/`_valid_list_size` do scan; o fast path reusa a instância validada.
-- [[invariants/gold-singleton-resolution]] — o `uu` ofuscado fica FORA daqui (resolvido por ESTRUTURA, não por índice).
-- [[invariants/cache-management]] — os índices da calib são persistidos por build-fingerprint; bump de `CACHE_FMT` os invalida.
+- [[invariants/instance-selection]] — the `_manager_inst_ok` size-gate is the SAME `_pick_list_singleton`/`_valid_list_size` as the scan; the fast path reuses the validated instance.
+- [[invariants/gold-singleton-resolution]] — the obfuscated `uu` stays OUT of here (resolved by STRUCTURE, not by index).
+- [[invariants/cache-management]] — the calib indices are persisted by build-fingerprint; a `CACHE_FMT` bump invalidates them.

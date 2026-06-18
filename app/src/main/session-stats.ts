@@ -34,7 +34,7 @@ export function sessionStatsUrl(siteUrl: string, sessionId: string): string {
   return `${siteUrl}/meter/session/${encodeURIComponent(sessionId)}`;
 }
 
-/** App-side "Nova sessão" cut markers (Redesign 2): the timestamps (ms) at which the user asked for
+/** App-side "New session" cut markers (Redesign 2): the timestamps (ms) at which the user asked for
  *  a fresh grind. The session is DERIVED app-side (deriveSessions) from run ts + these cuts — the
  *  reader no longer owns sessions. Stored as a JSON number[] in the output dir. */
 export const SESSION_CUTS_FILENAME = "session-cuts.json";
@@ -52,7 +52,7 @@ export function readSessionCuts(outputDir: string | null): number[] {
 }
 
 /**
- * "Nova sessão": record a manual cut at `nowMs` so the app's session derivation starts a NEW session
+ * "New session": record a manual cut at `nowMs` so the app's session derivation starts a NEW session
  * for runs after it (Redesign 2). App-side now — replaces the old reader flag file (the reader no
  * longer owns sessions). Appends to the cuts file (keeps the most recent 500). Returns false when
  * there is no output dir or the write fails — never throws across IPC.

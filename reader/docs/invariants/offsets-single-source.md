@@ -1,19 +1,17 @@
 ---
 type: invariant
-description: "Todo offset/enum/stride estrutural mora em config/offsets.py (fonte única); constante de REGRA DE NEGÓCIO mora no módulo da lógica (ex.: COMBAT_SUBKEY em metrics/gold.py); SCHEMA_VERSION/GAME_VERSION moram em meter_windows.py — nunca duplicar."
+description: "Every structural offset/enum/stride lives in config/offsets.py (single source); a BUSINESS-RULE constant lives in the logic module (e.g. COMBAT_SUBKEY in metrics/gold.py); SCHEMA_VERSION/GAME_VERSION live in meter_windows.py — never duplicate."
 symptoms:
-  - "offset errado"
   - "wrong offset"
-  - "onde fica o offset"
-  - "gold corrompido"
-  - "stats errados"
-  - "constante no arquivo errado"
-  - "magic number espalhado"
-  - "duas fontes de verdade"
+  - "where does the offset live"
+  - "gold corrupted"
+  - "wrong stats"
+  - "constant in the wrong file"
+  - "magic number scattered"
   - "two sources of truth"
-  - "schema bumpado no lugar errado"
-  - "version definido em dois módulos"
-  - "test_version_constants_unique falhou"
+  - "schema bumped in the wrong place"
+  - "version defined in two modules"
+  - "test_version_constants_unique failed"
 code_anchors:
   - config/offsets.py
   - metrics/gold.py::COMBAT_SUBKEY
@@ -27,44 +25,44 @@ guarded_by:
   - tests/test_docs_consistency.py::test_version_constants_unique
 ---
 
-# Fonte única de offsets (e onde NÃO botar uma constante)
+# Single source for offsets (and where NOT to put a constant)
 
-`config/offsets.py` é **a bíblia de offsets**: o único lugar onde mora cada offset de campo,
-enum e **stride** estrutural do jogo (todos derivados do dump IL2CPP e validados ao vivo). Um
-agent que vá ler um campo novo **lê o símbolo daqui**, nunca crava um literal `@0x` no meio da
-lógica — um número solto desincroniza em silêncio quando o build muda, e ninguém acha a segunda
-cópia pra atualizar. Adicionar um campo = adicionar a classe/atributo aqui e referenciar o
-símbolo (`UnitHealthController.HP_CURRENT`, `Dict8B.VALUE`), não o offset cru.
+`config/offsets.py` is **the offset bible**: the one place where every field offset, enum and
+structural **stride** of the game lives (all derived from the IL2CPP dump and validated live). An
+agent reading a new field **reads the symbol from here**, never hard-codes a `@0x` literal in the
+middle of the logic — a loose number silently desyncs when the build changes, and nobody finds the
+second copy to update. Adding a field = add the class/attribute here and reference the symbol
+(`UnitHealthController.HP_CURRENT`, `Dict8B.VALUE`), not the raw offset.
 
-**O que NÃO mora aqui — e por quê.** O próprio cabeçalho de `offsets.py` avisa: *"as constantes
-de regra de negócio (curva, filtros) NÃO moram aqui — só offsets/enums"*. Duas categorias têm
-dono diferente:
+**What does NOT live here — and why.** The header of `offsets.py` itself warns: *"business-rule
+constants (curve, filters) do NOT live here — only offsets/enums"*. Two categories have a
+different owner:
 
-- **Regra de negócio** (que SubKey/curva/filtro significa o quê) mora no **módulo da lógica**,
-  ao lado de quem a usa. Exemplo cravado: `COMBAT_SUBKEY = 1` e `TOTAL_SUBKEY = 0` moram em
-  `metrics/gold.py`, NÃO em `offsets.py` — `SubKey 1 = gold de combate`, `SubKey 0 = total
-  (rollup, inclui venda)` é semântica do gold, não geometria de struct. O offset que ANDA até
-  lá (`AggregateManager.AGGREGATES`) é estrutural → esse sim mora em `offsets.py`. A linha é:
-  **endereço/forma → `offsets.py`; significado → o módulo da métrica.**
+- **Business rule** (what a given SubKey/curve/filter means) lives in the **logic module**, next
+  to whoever uses it. Concrete example: `COMBAT_SUBKEY = 1` and `TOTAL_SUBKEY = 0` live in
+  `metrics/gold.py`, NOT in `offsets.py` — `SubKey 1 = combat gold`, `SubKey 0 = total (rollup,
+  includes sales)` is gold semantics, not struct geometry. The offset that WALKS there
+  (`AggregateManager.AGGREGATES`) is structural → that one does live in `offsets.py`. The line is:
+  **address/shape → `offsets.py`; meaning → the metric's module.**
 
-- **Versão** (`SCHEMA_VERSION`, `GAME_VERSION`) mora **só em `meter_windows.py`** — é o valor
-  serializado no record do `runs.jsonl`, então a fonte única é o emissor do record. Havia uma
-  cópia MORTA e defasada de `SCHEMA_VERSION` em `offsets.py` (`=5` enquanto o runtime já emitia
-  11): foi **removida**. Bumpar a cópia errada deixa o record real parado → o app fica cego pro
-  campo novo (a classe de bug "schema não bumpado"). `test_version_constants_unique` agora
-  **falha** se `SCHEMA_VERSION` ou `GAME_VERSION` reaparecer em mais de um módulo — é o portão
-  que prova que não voltou a segunda fonte.
+- **Version** (`SCHEMA_VERSION`, `GAME_VERSION`) lives **only in `meter_windows.py`** — it's the
+  value serialized in the `runs.jsonl` record, so the single source is the record's emitter. There
+  was a DEAD, stale copy of `SCHEMA_VERSION` in `offsets.py` (`=5` while the runtime was already
+  emitting 11): it was **removed**. Bumping the wrong copy leaves the real record stuck → the app
+  goes blind to the new field (the "schema not bumped" class of bug). `test_version_constants_unique`
+  now **fails** if `SCHEMA_VERSION` or `GAME_VERSION` reappears in more than one module — it's the
+  gate that proves the second source hasn't come back.
 
-**As duas geometrias de Dictionary.** O alerta mais caro do `offsets.py` é não confundir
-`DictFloat` (valor de 4 bytes, `STRIDE` 0x10) com `Dict8B` (valor de 8 bytes — long OU ponteiro,
-`STRIDE` 0x18). Trocar uma pela outra corrompe gold/stats sem erro. O detalhe de QUANDO usar
-cada uma é invariante próprio (ver Related); aqui o ponto é que **ambos os strides moram em
-`offsets.py`** — não se reinventa um stride local.
+**The two Dictionary geometries.** The costliest warning in `offsets.py` is not to confuse
+`DictFloat` (4-byte value, `STRIDE` 0x10) with `Dict8B` (8-byte value — long OR pointer, `STRIDE`
+0x18). Swapping one for the other corrupts gold/stats with no error. The detail of WHEN to use each
+is its own invariant (see Related); here the point is that **both strides live in `offsets.py`** —
+you don't reinvent a local stride.
 
-Regra de bolso ao adicionar uma constante: **é um endereço/forma do binário?** → `offsets.py`,
-como símbolo. **É uma decisão de produto/semântica?** → o módulo que decide, comentado com o
-oráculo que a cravou. Nunca as duas coisas no mesmo lugar, nunca a mesma coisa em dois lugares.
+Rule of thumb when adding a constant: **is it an address/shape of the binary?** → `offsets.py`, as a
+symbol. **Is it a product/semantics decision?** → the module that decides, commented with the oracle
+that pinned it down. Never both things in the same place, never the same thing in two places.
 
 ## Related
-- [[invariants/schema-versioning]] — a fonte única de `SCHEMA_VERSION` (em `meter_windows.py`) e a receita de bump
-Veja também: [[invariants/dict-strides]] (DictFloat 0x10 vs Dict8B 0x18 — quando usar cada) · [[invariants/gold-singleton-resolution]] (onde COMBAT_SUBKEY + AggregateManager.AGGREGATES atuam juntos) · [[invariants/obscured-data-offlimits]] (campos Obscured marcados em offsets.py que NÃO se lê)
+- [[invariants/schema-versioning]] — the single source of `SCHEMA_VERSION` (in `meter_windows.py`) and the bump recipe
+See also: [[invariants/dict-strides]] (DictFloat 0x10 vs Dict8B 0x18 — when to use each) · [[invariants/gold-singleton-resolution]] (where COMBAT_SUBKEY + AggregateManager.AGGREGATES work together) · [[invariants/obscured-data-offlimits]] (Obscured fields flagged in offsets.py that are NOT read)

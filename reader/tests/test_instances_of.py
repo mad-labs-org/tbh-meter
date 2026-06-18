@@ -1,17 +1,17 @@
-"""Testes para il2cpp/resolver.instances_of — backref direcionado do fast path (mac, sem processo).
+"""Tests for il2cpp/resolver.instances_of — targeted backref from the fast path (mac, no process).
 
-`instances_of` é a pass3 do resolve() isolada: dado {nome: K} (classes já resolvidas por índice),
-acha as INSTÂNCIAS por UM scan de ponteiros 8-alinhados às regiões READABLE. Usado pelo fast path
-(deliverable 05/02) pra PlayerSaveData/CommonSaveData/StageManager sem o scan completo.
+`instances_of` is resolve()'s pass3 in isolation: given {name: K} (classes already resolved by index),
+it finds the INSTANCES via ONE scan of 8-aligned pointers over the READABLE regions. Used by the fast
+path (deliverable 05/02) for PlayerSaveData/CommonSaveData/StageManager without the full scan.
 
-Cobre:
-  happy path  — acha os endereços que apontam pra cada K (1 scan, vários needles)
-  self-refs   — ponteiros em [K, K+0x400) (a própria Il2CppClass) são EXCLUÍDOS
-  cap         — teto de instâncias por classe respeitado
-  null K      — K=0/None ignorado (não vira needle)
+Covers:
+  happy path  — finds the addresses pointing at each K (1 scan, several needles)
+  self-refs   — pointers within [K, K+0x400) (the Il2CppClass itself) are EXCLUDED
+  cap         — per-class instance ceiling honored
+  null K      — K=0/None ignored (doesn't become a needle)
 
-BlobReader é byte-backed: `instances_of` chama shared.memory.scan (que lê blocos via reader.read),
-então montamos UMA região de bytes com ponteiros 8-alinhados de verdade e usamos o scan real.
+BlobReader is byte-backed: `instances_of` calls shared.memory.scan (which reads blocks via reader.read),
+so we build ONE byte region with genuinely 8-aligned pointers and use the real scan.
 """
 
 import struct
@@ -20,7 +20,7 @@ from il2cpp import resolver
 
 
 class BlobReader:
-    """Reader mínimo p/ shared.memory.scan: só precisa de .read(addr, size) sobre uma região."""
+    """Minimal reader for shared.memory.scan: only needs .read(addr, size) over a region."""
 
     def __init__(self, base, blob):
         self._base = base
@@ -37,15 +37,15 @@ BASE = 0x10000000
 
 
 def _blob_with_ptrs(ptrs):
-    """Monta um blob onde a posição i*8 contém o qword ptrs[i] (8-alinhado)."""
+    """Build a blob where position i*8 holds the qword ptrs[i] (8-aligned)."""
     return b"".join(struct.pack("<Q", p) for p in ptrs)
 
 
 def test_happy_path_finds_instances():
-    """Dois K's; cada qword 8-alinhado que == K vira um endereço de instância."""
+    """Two K's; every 8-aligned qword that == K becomes an instance address."""
     K_PSD = 0x900000
     K_CSD = 0xA00000
-    # slots: [K_PSD, junk, K_CSD, K_PSD]  → PSD em offsets 0 e 24, CSD em offset 16
+    # slots: [K_PSD, junk, K_CSD, K_PSD]  → PSD at offsets 0 and 24, CSD at offset 16
     ptrs = [K_PSD, 0xDEAD, K_CSD, K_PSD]
     r = BlobReader(BASE, _blob_with_ptrs(ptrs))
     out = resolver.instances_of(r, [(BASE, len(ptrs) * 8)],
@@ -55,14 +55,14 @@ def test_happy_path_finds_instances():
 
 
 def test_excludes_self_refs():
-    """Ponteiros pra K que estão DENTRO de [K, K+0x400) (a própria classe) são excluídos."""
-    K = BASE + 0x100        # K cai dentro da própria região
-    # slot 0 == K mas o ENDEREÇO do slot (BASE+0) está fora de [K,K+0x400) → mantém
-    # slot em K+0x40 (dentro de [K,K+0x400)) também == K → self-ref, exclui
+    """Pointers to K that sit WITHIN [K, K+0x400) (the class itself) are excluded."""
+    K = BASE + 0x100        # K falls within its own region
+    # slot 0 == K but the slot's ADDRESS (BASE+0) is outside [K,K+0x400) → keep
+    # slot at K+0x40 (within [K,K+0x400)) also == K → self-ref, exclude
     n = (0x100 + 0x40) // 8 + 1
     ptrs = [0] * n
-    ptrs[0] = K                          # endereço BASE+0 → fora da janela self-ref → mantém
-    ptrs[(0x100 + 0x40) // 8] = K        # endereço BASE+0x140 → dentro de [K,K+0x400) → exclui
+    ptrs[0] = K                          # address BASE+0 → outside the self-ref window → keep
+    ptrs[(0x100 + 0x40) // 8] = K        # address BASE+0x140 → within [K,K+0x400) → exclude
     r = BlobReader(BASE, _blob_with_ptrs(ptrs))
     out = resolver.instances_of(r, [(BASE, len(ptrs) * 8)], {"StageManager": K})
     assert out["StageManager"] == [BASE + 0]
@@ -77,7 +77,7 @@ def test_cap_limits_instances():
 
 
 def test_null_k_ignored():
-    """K None/0 não vira needle; sai com lista vazia, sem scan p/ esse nome."""
+    """K None/0 doesn't become a needle; exits with empty list, no scan for that name."""
     K = 0x900000
     ptrs = [K, K]
     r = BlobReader(BASE, _blob_with_ptrs(ptrs))

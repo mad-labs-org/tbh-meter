@@ -50,13 +50,13 @@ describe("deriveSessions — gap-based grouping", () => {
   });
 });
 
-describe("deriveSessions — manual cuts (the 'Nova sessão' button)", () => {
+describe("deriveSessions — manual cuts (the 'New session' button)", () => {
   it("a cut between two runs starts a new session at the later run, even within 6h", () => {
     const runs = [
       { id: "a", ts: base },
       { id: "b", ts: base + 2 * H }, // < 6h, but a cut sits before it
     ];
-    const cutAt = base + 1 * H; // user pressed "Nova sessão" between a and b
+    const cutAt = base + 1 * H; // user pressed "New session" between a and b
     const m = deriveSessions(runs, [cutAt]);
     expect(m.get("a")).toBe(String(base));
     expect(m.get("b")).toBe(String(base + 2 * H)); // cut forced a new grind

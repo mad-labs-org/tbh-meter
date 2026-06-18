@@ -1,5 +1,5 @@
 /** The game outcome the reader observed. (Mirrors the RAW `run_outcome`; a later PR may rename
- *  the `RunRecord.status` field to `runOutcome` once its consumers are touched — see progress.md.) */
+ *  the `RunRecord.status` field to `runOutcome` once its consumers are touched.) */
 export type RunStatus = "success" | "fail" | "abandoned";
 /** The converter's verdict on a run (PR3): `counted` = good data meeting the structural floor;
  *  `skipped` = below floor / not a clear; `partial` = capture incomplete (joined mid-run);
@@ -14,7 +14,7 @@ export type RunQuality = "counted" | "skipped" | "partial" | "degraded";
  *  which seals the verdict) AND the renderer (PR6's duration filter, which must never let the user set
  *  a minimum below this floor) need the SAME value — the renderer cannot import main-process code.
  *  Distinct from the user's display filter (`AppSettings.minDurationSec`): the floor is fixed, the
- *  filter is a preference clamped to it (progress.md "Configs" — never conflate the two). */
+ *  filter is a preference clamped to it (never conflate the two). */
 export const COUNT_FLOOR_SEC = 15;
 
 /** The stage NUMBER (StageNo) exempt from the duration floor — the act boss fight. NOTE the stage

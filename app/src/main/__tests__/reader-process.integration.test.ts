@@ -184,7 +184,7 @@ describe("reader supervisor", () => {
   });
 });
 
-// The APP-side single-writer guarantee (progress.md "Dedup" — single-writer primary):
+// The APP-side single-writer guarantee (single-writer primary):
 // the supervisor must NEVER let two readers run at once, because two readers double-write
 // the per-run raw and drop the live gold read into the 2× SAVE fallback. It enforces this
 // by killing EVERY tbh-reader.exe by image name (taskkill /f /t /im) immediately BEFORE it

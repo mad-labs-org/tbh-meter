@@ -269,7 +269,7 @@ export function registerIpcHandlers(deps: IpcDeps): void {
     void shell.openExternal(sessionStatsUrl(SITE_URL, sessionId));
   });
 
-  // "Nova sessão" (#220): drop the flag file the reader consumes (~1s) to rotate the
+  // "New session" (#220): drop the flag file the reader consumes (~1s) to rotate the
   // session id. Local runs and already-uploaded runs are untouched.
   ipcMain.handle("meter:reset-session", () => requestSessionReset(resolveOutputDir()));
 

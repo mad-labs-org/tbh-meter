@@ -1,31 +1,31 @@
-"""agent_windows.py — AGENTE de inspecao de memoria (RODA NO WINDOWS, jogo aberto).
-ZERO deps de runtime. SO LE memoria (ReadProcessMemory) — nada injetado.
+"""agent_windows.py — memory-inspection AGENT (RUNS ON WINDOWS, game open).
+ZERO runtime deps. ONLY READS memory (ReadProcessMemory) — nothing injected.
 
-Voce roda UMA vez e deixa aberto. Ele resolve as classes-chave 1x e fica escutando
-output/agent_cmd.json. O Claude escreve comandos la; o agente executa e responde em
-output/agent_resp.json. Assim o Claude itera (caca offset, decodifica XOR, acha a
-carteira) SEM voce rodar mais nada.
+You run it ONCE and leave it open. It resolves the key classes once and keeps listening to
+output/agent_cmd.json. Claude writes commands there; the agent runs them and replies in
+output/agent_resp.json. That way Claude iterates (hunt offsets, decode XOR, find the
+wallet) WITHOUT you running anything else.
 
-ORQUESTRADOR: usa as MESMAS logicas isoladas do meter (shared.memory = Reader/scan/
-processo; il2cpp = resolver/finder; config.offsets = offsets; game.save). O que e
-EXCLUSIVO do agente — os comandos op_* (dump/obs/curve/goldsub…) e o loop de comando —
-vive aqui e so aqui.
+ORCHESTRATOR: uses the SAME isolated logic as the meter (shared.memory = Reader/scan/
+process; il2cpp = resolver/finder; config.offsets = offsets; game.save). What's
+EXCLUSIVE to the agent — the op_* commands (dump/obs/curve/goldsub…) and the command
+loop — lives here and only here.
 
-COMANDOS (campo "op"):
-  info                                  -> status + contagens
-  read   {addr,size}                    -> bytes em hex
-  dump   {addr,size?}                   -> cada offset como i32/u32/f32/i64/ptr (inspector)
-  obs    {addr,off,type:int|long|float} -> decodifica ObscuredX (read ATOMICO)
-  obs_stable {addr,off,type,n?}         -> le N vezes e retorna a MODA (vence o racing do ACTk)
-  scanptr{target}                       -> enderecos que APONTAM pra target (back-ref)
-  resolve{name}                         -> instancias de uma classe (por nome, >=3 letras)
-  heroes                                -> herois deployados (StageManager.HeroList) + cache(uf)
-  gold                                  -> CurrencySaveData Key=100001 (saldos)
-  psd                                   -> PlayerSaveData vivo (maior ouro) + herois
-  curve                                 -> LevelInfoData -> curva de XP {nivel: ExpForLevelUp}
-  goldlive                              -> GOLD VIVO cumulativo (GoldEarn) via singleton nn<ut>
-  goldsub                               -> GoldEarn por SubKey (live+save) — quebra p/ oraculo per-run
-addr/target aceitam int ou "0x...". Rodar: python agent_windows.py
+COMMANDS ("op" field):
+  info                                  -> status + counts
+  read   {addr,size}                    -> bytes in hex
+  dump   {addr,size?}                   -> each offset as i32/u32/f32/i64/ptr (inspector)
+  obs    {addr,off,type:int|long|float} -> decode an ObscuredX (ATOMIC read)
+  obs_stable {addr,off,type,n?}         -> read N times and return the MODE (beats the ACTk race)
+  scanptr{target}                       -> addresses that POINT to target (back-ref)
+  resolve{name}                         -> instances of a class (by name, >=3 letters)
+  heroes                                -> deployed heroes (StageManager.HeroList) + cache(uf)
+  gold                                  -> CurrencySaveData Key=100001 (balances)
+  psd                                   -> live PlayerSaveData (most gold) + heroes
+  curve                                 -> LevelInfoData -> XP curve {level: ExpForLevelUp}
+  goldlive                              -> cumulative LIVE GOLD (GoldEarn) via nn<ut> singleton
+  goldsub                               -> GoldEarn per SubKey (live+save) — breakdown for the per-run oracle
+addr/target accept int or "0x...". Run: python agent_windows.py
 """
 
 import json
@@ -35,7 +35,7 @@ import time
 import traceback
 from collections import Counter
 
-# Logicas isoladas (as MESMAS do meter). O exclusivo do agente (op_*) fica aqui embaixo.
+# Isolated logic (the SAME as the meter). What's exclusive to the agent (op_*) lives below.
 from config.offsets import (Array, StageManager, Unit, HeroRuntime, HeroInfoData,
                             PlayerSaveData, CurrencySaveData, HeroSaveData,
                             AggregateManager, AggregateSaveData, EAggregateType, GOLD_KEY)
@@ -49,18 +49,18 @@ from game import save
 CORE_TARGETS = ["StageManager", "PlayerSaveData", "CommonSaveData",
                 "CurrencySaveData", "MonsterSpawnManager"]
 
-# LevelInfoData NAO esta em config.offsets de proposito: so o op_curve (debug) le essa
-# classe. Offset exclusivo do agente -> fica aqui (regra: o que so o agente usa, mora nele).
+# LevelInfoData is NOT in config.offsets on purpose: only op_curve (debug) reads this
+# class. Agent-exclusive offset -> lives here (rule: what only the agent uses, lives in it).
 LID_LEVEL = 0x10            # LevelInfoData.Level
 LID_EXP_FOR_LEVELUP = 0x14  # LevelInfoData.ExpForLevelUp
 
-# Estado vivo (preenchido no main): Reader compartilhado + regioes + instancias resolvidas.
+# Live state (filled in main): shared Reader + regions + resolved instances.
 READER = None
 REGIONS = []
 INST = {}
 CLASSES = {}
 PID = None
-GA_BASE = None   # base de GameAssembly.dll (p/ resolver RVA de TypeInfo/MethodInfo)
+GA_BASE = None   # GameAssembly.dll base (to resolve RVAs of TypeInfo/MethodInfo)
 
 
 def as_addr(x):
@@ -69,7 +69,7 @@ def as_addr(x):
     return int(x)
 
 
-# ----------------------------- comandos (EXCLUSIVOS do agente) -----------------------------
+# ----------------------------- commands (EXCLUSIVE to the agent) -----------------------------
 def op_info(_):
     return {"pid": PID, "regions": len(REGIONS),
             "targets": {t: len(INST.get(t, [])) for t in CORE_TARGETS}}
@@ -86,7 +86,7 @@ def op_dump(c):
     size = int(c.get("size", 192))
     b = READER.read(a, size)
     if not b:
-        return {"error": "read falhou"}
+        return {"error": "read failed"}
     rows = []
     for off in range(0, len(b) - 7, 8):
         q = struct.unpack_from("<Q", b, off)[0]
@@ -102,19 +102,19 @@ def op_dump(c):
 
 
 def op_obs(c):
-    """Decodifica um ObscuredX (ACTk) com read ATOMICO: real = hidden ^ key."""
+    """Decode an ObscuredX (ACTk) with an ATOMIC read: real = hidden ^ key."""
     a = as_addr(c["addr"]) + int(c.get("off", 0))
     typ = c.get("type", "int")
     if typ == "long":
         b = READER.read(a + 0x8, 16)
         if not b or len(b) != 16:
-            return {"error": "read falhou"}
+            return {"error": "read failed"}
         h, k = struct.unpack("<QQ", b)
         v = h ^ k
         return {"type": "long", "value": v - (1 << 64) if v >= (1 << 63) else v}
-    b = READER.read(a + 0x4, 8)   # hidden@+0x4, key@+0x8 (read ATOMICO)
+    b = READER.read(a + 0x4, 8)   # hidden@+0x4, key@+0x8 (ATOMIC read)
     if not b or len(b) != 8:
-        return {"error": "read falhou"}
+        return {"error": "read failed"}
     h, k = struct.unpack("<II", b)
     x = h ^ k
     if typ == "float":
@@ -123,9 +123,9 @@ def op_obs(c):
 
 
 def op_obs_stable(c):
-    """Le um Obscured N vezes em loop apertado e retorna o valor MODA (mais comum) +
-    distribuicao. Vence o racing do ACTk: leitura rasgada e esporadica (so durante a
-    escrita do jogo); o valor REAL domina. type: int|long|float."""
+    """Read an Obscured N times in a tight loop and return the MODE value (most common) +
+    distribution. Beats the ACTk race: torn reads are sporadic (only during the game's
+    write); the REAL value dominates. type: int|long|float."""
     a = as_addr(c["addr"]) + int(c.get("off", 0))
     typ = c.get("type", "float")
     n = int(c.get("n", 120))
@@ -162,11 +162,11 @@ def op_scanptr(c):
 def op_resolve(c):
     name = c["name"]
     if len(name) < 3:
-        # nome de 2 letras -> string-scan EXPLODE/trava. Use o finder (op_goldlive faz
-        # isso pro `ut`: string isolada na regiao de nomes), offset-fixo, ou scanptr.
-        return {"name": name, "error": "nome <3 letras nao resolve por string-scan "
-                "(EXPLODE/trava). Use o finder (string isolada na regiao de nomes), "
-                "offset-fixo a partir de classe legivel, ou scanptr."}
+        # 2-letter name -> string-scan EXPLODES/hangs. Use the finder (op_goldlive does
+        # this for `ut`: isolated string in the names region), a fixed offset, or scanptr.
+        return {"name": name, "error": "name <3 letters won't resolve via string-scan "
+                "(EXPLODES/hangs). Use the finder (isolated string in the names region), "
+                "a fixed offset from a readable class, or scanptr."}
     cls, inst = resolve(READER, REGIONS, [name])
     CLASSES[name] = cls[name]
     INST[name] = inst[name]
@@ -175,9 +175,9 @@ def op_resolve(c):
 
 
 def op_curve(_):
-    """Resolve LevelInfoData e monta a curva de XP {nivel: ExpForLevelUp} numa TACADA.
-    Filtra falsos-positivos (klass != classe real) e valores insanos. 1 round-trip =
-    robusto no canal SMB (em vez de 100+ reads avulsos que estressam o canal)."""
+    """Resolve LevelInfoData and build the XP curve {level: ExpForLevelUp} in ONE GO.
+    Filters false positives (klass != real class) and insane values. 1 round-trip =
+    robust over the SMB channel (instead of 100+ individual reads that stress it)."""
     cls, inst = resolve(READER, REGIONS, ["LevelInfoData"])
     K = next(iter(cls.get("LevelInfoData", set())), None)
     curve = {}
@@ -231,7 +231,7 @@ def op_gold(_):
 def op_psd(_):
     p = save.pick_live_psd(READER, INST.get("PlayerSaveData", []))
     if not p:
-        return {"error": "PlayerSaveData vivo nao achado"}
+        return {"error": "live PlayerSaveData not found"}
     heroes = []
     for h in READER.list_iter(READER.rptr(p + PlayerSaveData.HEROES), cap=200):
         heroes.append({"key": READER.ri32(h + HeroSaveData.HERO_KEY),
@@ -240,12 +240,12 @@ def op_psd(_):
     return {"addr": hex(p), "gold": save.read_gold(READER, p), "heroes": heroes}
 
 
-# ----------------------------- gold vivo (singleton nn<ut>) -----------------------------
-# O CAMINHO (achar `ut` por nome curto sem hang -> singleton nn<T> -> beid[GoldEarn]) vive
-# em il2cpp.finder + shared.Reader.dict8b_items. Aqui fica so a ORQUESTRACAO de debug:
-# o self-test do finder e a quebra por-subkey (oraculo do per-run gold).
+# ----------------------------- live gold (nn<ut> singleton) -----------------------------
+# The PATH (find `ut` by short name without hanging -> nn<T> singleton -> beid[GoldEarn])
+# lives in il2cpp.finder + shared.Reader.dict8b_items. Here lives only the debug
+# ORCHESTRATION: the finder self-test and the per-subkey breakdown (the per-run gold oracle).
 def _goldearn_inner(ut):
-    """ut vivo -> beid -> Dict<SubKey,long> de GoldEarn (via Reader.dict8b_items). None se falhar."""
+    """live ut -> beid -> Dict<SubKey,long> of GoldEarn (via Reader.dict8b_items). None on failure."""
     if not ut:
         return None
     beid = READER.rptr(ut + AggregateManager.AGGREGATES)
@@ -258,7 +258,7 @@ def _goldearn_inner(ut):
 
 
 def _ut_singleton(seed_class):
-    """Classe `ut` (finder, sem hang) -> instancia viva nn<T>. (ut_class, ut) ou (None, None)."""
+    """`ut` class (finder, no hang) -> live nn<T> instance. (ut_class, ut) or (None, None)."""
     ut_class = finder.find_class_by_name(READER, REGIONS, "ut", seed_class)
     if not ut_class:
         return None, None
@@ -267,7 +267,7 @@ def _ut_singleton(seed_class):
 
 
 def _save_goldearn_subkeys(psd):
-    """[(subkey, value)] de GoldEarn no SAVE (PSD.aggregateSaveDatas, defasado). Read-only."""
+    """[(subkey, value)] of GoldEarn in the SAVE (PSD.aggregateSaveDatas, stale). Read-only."""
     subs = []
     for e in READER.list_iter(READER.rptr(psd + PlayerSaveData.AGGREGATES), cap=5000):
         if READER.ri32(e + AggregateSaveData.TYPE) == EAggregateType.GoldEarn:
@@ -278,11 +278,11 @@ def _save_goldearn_subkeys(psd):
 
 
 def op_goldlive(_):
-    """GOLD VIVO cumulativo (GoldEarn) read-only via singleton nn<ut>, 1 round-trip.
-    Acha `ut` pelo finder (string isolada na regiao de nomes — sem hang), chega na
-    instancia viva por nn<T>.static_fields.bbwf, le beid[GoldEarn=2] e soma os int64.
-    Oraculos: finder self-test (acha StageManager e bate com o klass vivo), B (bbwf do
-    StageManager == ele mesmo) e SAVE (aggregateSaveDatas Type==2, defasado)."""
+    """Cumulative LIVE GOLD (GoldEarn) read-only via the nn<ut> singleton, 1 round-trip.
+    Finds `ut` with the finder (isolated string in the names region — no hang), reaches the
+    live instance through nn<T>.static_fields.bbwf, reads beid[GoldEarn=2] and sums the int64s.
+    Oracles: finder self-test (finds StageManager and matches the live klass), B (bbwf of
+    StageManager == itself) and SAVE (aggregateSaveDatas Type==2, stale)."""
     out = {}
     live_sm = save.pick_live_sm(READER, INST.get("StageManager", []))
     klass_sm = READER.rptr(live_sm + 0x0) if live_sm else None
@@ -299,10 +299,10 @@ def op_goldlive(_):
         result = {"ut_class": (hex(ut_class) if ut_class else None), "ut": hex(ut),
                   "subkeys": len(subs), "goldearn": sum(v for _, v in subs)}
     out["live"] = result
-    # B oraculo: bbwf(klass_sm) deve voltar a propria instancia viva
+    # B oracle: bbwf(klass_sm) should return the live instance itself
     bbwf_sm = finder.bbwf_from_klass(READER, klass_sm) if klass_sm else None
     out["B_oracle_ok"] = (bbwf_sm == live_sm) if (live_sm and bbwf_sm) else None
-    # SAVE oraculo (defasado)
+    # SAVE oracle (stale)
     psd = save.pick_live_psd(READER, INST.get("PlayerSaveData", []))
     save_sum = None
     if psd:
@@ -318,11 +318,11 @@ def op_goldlive(_):
 
 
 def op_goldsub(_):
-    """Quebra do GoldEarn por SubKey (read-only, 1 round-trip) — ORACULO do per-run gold.
-    LIVE: ut.beid[GoldEarn=2] = Dict<SubKey,long> -> [(subkey,value)] + soma (cravado).
-    SAVE: PSD.aggregateSaveDatas -> Type==GoldEarn(2) -> [(subkey,value)] + soma (defasado).
-    Os dois devem casar (modulo defasagem do save). O delta por subkey entre dois snapshots
-    (antes/depois de 1 run) revela qual subkey e combate vs ruido (idle/quest/venda)."""
+    """GoldEarn breakdown by SubKey (read-only, 1 round-trip) — ORACLE for per-run gold.
+    LIVE: ut.beid[GoldEarn=2] = Dict<SubKey,long> -> [(subkey,value)] + sum (exact).
+    SAVE: PSD.aggregateSaveDatas -> Type==GoldEarn(2) -> [(subkey,value)] + sum (stale).
+    The two should match (modulo the save's staleness). The per-subkey delta between two
+    snapshots (before/after 1 run) reveals which subkey is combat vs noise (idle/quest/sale)."""
     out = {}
     live_sm = save.pick_live_sm(READER, INST.get("StageManager", []))
     klass_sm = READER.rptr(live_sm + 0x0) if live_sm else None
@@ -354,24 +354,24 @@ OPS = {"info": op_info, "read": op_read, "dump": op_dump, "obs": op_obs,
 
 def main():
     global READER, REGIONS, INST, CLASSES, PID, GA_BASE
-    # espelha stdout/stderr em output/agent.log (pro Claude monitorar de fora, ex.: o share)
+    # mirror stdout/stderr to output/agent.log (so Claude can monitor from outside, e.g. the share)
     tee_stdio(os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", "agent.log"))
     PID = find_pid()
     if not PID:
-        print("[ERRO] jogo fechado.")
+        print("[ERROR] game closed.")
         return
     handle = open_process(PID)
     if not handle:
-        print("[ERRO] OpenProcess falhou (rodar como admin?).")
+        print("[ERROR] OpenProcess failed (run as admin?).")
         return
     READER = Reader(handle)
     GA_BASE = module_base(PID)
-    print(f"[ok] anexado (pid {PID}). GameAssembly.dll base = "
-          f"{hex(GA_BASE) if GA_BASE else 'NAO ACHADO'}. mapeando memoria...")
+    print(f"[ok] attached (pid {PID}). GameAssembly.dll base = "
+          f"{hex(GA_BASE) if GA_BASE else 'NOT FOUND'}. mapping memory...")
     REGIONS = regions(READER)
-    print(f"[ok] {len(REGIONS)} regioes. resolvendo classes-chave (~1-2min)...")
+    print(f"[ok] {len(REGIONS)} regions. resolving key classes (~1-2min)...")
     CLASSES, INST = resolve(READER, REGIONS, CORE_TARGETS)
-    print("[ok] resolvido: " + ", ".join(f"{t}={len(INST.get(t, []))}" for t in CORE_TARGETS))
+    print("[ok] resolved: " + ", ".join(f"{t}={len(INST.get(t, []))}" for t in CORE_TARGETS))
 
     outdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
     try:
@@ -380,7 +380,7 @@ def main():
         pass
     cmd_path = os.path.join(outdir, "agent_cmd.json")
     resp_path = os.path.join(outdir, "agent_resp.json")
-    print(f"\n[PRONTO] escutando {cmd_path}\nDeixe esta janela aberta. Ctrl+C pra sair.\n")
+    print(f"\n[READY] listening on {cmd_path}\nLeave this window open. Ctrl+C to quit.\n")
     last_id = None
     try:
         while True:
@@ -393,7 +393,7 @@ def main():
                 op = cmd.get("op")
                 t0 = time.time()
                 try:
-                    result = OPS[op](cmd) if op in OPS else {"error": f"op desconhecido: {op}"}
+                    result = OPS[op](cmd) if op in OPS else {"error": f"unknown op: {op}"}
                 except Exception:
                     result = {"error": traceback.format_exc()}
                 resp = {"id": last_id, "op": op, "ms": int((time.time() - t0) * 1000),
@@ -405,7 +405,7 @@ def main():
                 print(f"  > #{last_id} {op} ({resp['ms']}ms)")
             time.sleep(0.3)
     except KeyboardInterrupt:
-        print("\n[fim] agente encerrado.")
+        print("\n[done] agent stopped.")
     finally:
         close(handle)
 

@@ -1,7 +1,7 @@
-"""save.py — leitores do PlayerSaveData (plaintext, snapshot) + escolha da instância VIVA.
+"""save.py — PlayerSaveData readers (plaintext, snapshot) + picking the LIVE instance.
 
-Funções livres recebendo (reader, ...). Portado fiel do monólito. O save é DEFASADO
-(snapshot) — bom pra ficha/identidade e como fallback; gold/xp ao vivo ficam em metrics/."""
+Free functions taking (reader, ...). Faithfully ported from the monolith. The save is STALE
+(a snapshot) — good for sheet/identity and as a fallback; live gold/xp live in metrics/."""
 
 from config.offsets import (PlayerSaveData, CurrencySaveData, HeroSaveData,
                             CommonSaveData, GOLD_KEY)
@@ -9,7 +9,7 @@ from game.build import read_live_party
 
 
 def read_gold(reader, psd):
-    """Saldo de ouro (CurrencySaveData Key==GOLD_KEY)."""
+    """Gold balance (CurrencySaveData Key==GOLD_KEY)."""
     if not psd:
         return 0
     for e in reader.list_iter(reader.rptr(psd + PlayerSaveData.CURRENCIES), cap=200):
@@ -19,7 +19,7 @@ def read_gold(reader, psd):
 
 
 def read_heroes(reader, psd):
-    """{heroKey: (level, exp)} dos heróis jogados (do save; exp defasado)."""
+    """{heroKey: (level, exp)} of the played heroes (from the save; exp is stale)."""
     res = {}
     if not psd:
         return res
@@ -35,7 +35,7 @@ def read_heroes(reader, psd):
 
 
 def pick_live_psd(reader, cands):
-    """PlayerSaveData VIVO = o com MAIS ouro (snapshots antigos têm menos)."""
+    """LIVE PlayerSaveData = the one with the MOST gold (older snapshots have less)."""
     best, bg = None, -1
     for a in (cands or [])[:200]:
         g = read_gold(reader, a)
@@ -45,21 +45,21 @@ def pick_live_psd(reader, cands):
 
 
 def pick_live_sm(reader, cands):
-    """StageManager VIVO = a 1ª candidata de onde `read_live_party` extrai uma party (>=1 herói
-    DEPLOYADO válido). Varre TODAS, sem cap (igual `pick_live_csd`): a portadora pode estar em
-    QUALQUER índice; cap fixo (era `[:600]`) a perdia quando o backref devolvia mais que isso —
-    CRAVADO no 1.00.11 (1162 instâncias, portadora além de 600 → `StageManager NOT found` em
-    combate → party caía no roster). `read_live_party` varre TODOS os slots (party solo fora do
-    slot 0 ainda resolve) e nunca levanta.
+    """LIVE StageManager = the 1st candidate from which `read_live_party` extracts a party (>=1
+    valid DEPLOYED hero). Scans ALL, no cap (like `pick_live_csd`): the carrier can be at ANY
+    index; a fixed cap (was `[:600]`) lost it when the backref returned more than that — NAILED in
+    1.00.11 (1162 instances, carrier beyond 600 → `StageManager NOT found` in combat → party fell
+    back to the roster). `read_live_party` scans ALL slots (a solo party outside slot 0 still
+    resolves) and never raises.
 
-    A VALIDAÇÃO É A MESMA de `read_live_party` (por construção: chama-o). Antes, este pick usava um
-    check MAIS FRACO (só `heroKey`) que o `read_live_party` (que exige TAMBÉM nível/exp): uma
-    instância 'ghost' (StageManager torn-down/template — heroKey válido mas lvl=0) passava aqui,
-    era escolhida e CONGELADA (`if not sm` no loop do meter), e o `read_live_party` lia {} a sessão
-    inteira → 1.00.13: `StageManager ok — 0 heroes deployed`, toda run `heroes:err`. É a MESMA
-    família de [[invariants/instance-selection]] (managers): escolher a instância VIVA por
-    validação estrutural, nunca a 1ª-na-faixa. Nenhuma candidata legível → None (degrada honesto;
-    NUNCA um ghost que o `read_live_party` não consegue ler)."""
+    THE VALIDATION IS THE SAME as `read_live_party` (by construction: it calls it). Previously this
+    pick used a WEAKER check (only `heroKey`) than `read_live_party` (which ALSO requires
+    level/exp): a 'ghost' instance (a torn-down/template StageManager — valid heroKey but lvl=0)
+    passed here, got picked and FROZEN (`if not sm` in the meter loop), and `read_live_party` read
+    {} for the entire session → 1.00.13: `StageManager ok — 0 heroes deployed`, every run
+    `heroes:err`. Same family as [[invariants/instance-selection]] (managers): pick the LIVE
+    instance by structural validation, never the 1st-in-range. No readable candidate → None
+    (degrades honestly; NEVER a ghost that `read_live_party` can't read)."""
     for a in (cands or []):
         if read_live_party(reader, a):
             return a
@@ -67,8 +67,8 @@ def pick_live_sm(reader, cands):
 
 
 def pick_live_csd(reader, cands):
-    """CommonSaveData VIVO = o de MAIOR playTime (com stageKey plausível). Lê o
-    currentStageKey ao vivo. Espelha o monólito (varre TODOS os candidatos, sem cap)."""
+    """LIVE CommonSaveData = the one with the HIGHEST playTime (with a plausible stageKey). Reads
+    the currentStageKey live. Mirrors the monolith (scans ALL candidates, no cap)."""
     best, best_pt = None, -1.0
     for a in (cands or []):
         key = reader.ri32(a + CommonSaveData.CURRENT_STAGE_KEY)

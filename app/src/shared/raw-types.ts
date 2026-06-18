@@ -9,7 +9,7 @@
 // So each observed field is wrapped in `Field<T>`; the converter unwraps it and records the
 // failures in `issues` instead of silently trusting garbage. Structural metadata
 // (raw_schema_version, id, ts, run, run_outcome, session) stays plain — if it's missing there
-// is no record at all. Mirrors `reader/shared/envelope.py`. See progress.md "Contrato do RAW".
+// is no record at all. Mirrors `reader/shared/envelope.py`.
 
 /** Result/Either envelope for a single observed field. `ok:true` carries the read value
  *  (including a legitimate `null` or `0`); `ok:false` carries a short failure reason. */
@@ -158,7 +158,7 @@ export interface RawRun extends RawObserved {
 /** The RAW record the reader writes per finished run, schema **v2** (Redesign 2). The run's IDENTITY
  *  is its own end-timestamp — NOT a session+counter — so it can't collide across reader restarts (the
  *  `run_num`-reset bug class is gone). No `session_id`, no `run`: the session is DERIVED by the app
- *  from the run timestamps (6h gap + manual cuts), never part of the id. See progress.md "Redesign 2". */
+ *  from the run timestamps (6h gap + manual cuts), never part of the id. */
 export interface RawRunV2 extends RawObserved {
   raw_schema_version: 2;
   /** Canonical run identity = the run's end timestamp in MILLISECONDS, as a string (e.g.

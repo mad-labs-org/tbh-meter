@@ -1,25 +1,25 @@
-"""typeinfo.py — resolução IL2CPP por RVA FIXO + TypeInfoTable (read-only, name-free).
+"""typeinfo.py — IL2CPP resolution via FIXED RVA + TypeInfoTable (read-only, name-free).
 
-Mata o cold-start scan: em vez de varrer ~2.6 GB procurando as strings de classe, lê a
-TypeInfoTable do runtime IL2CPP por um ANCHOR de RVA FIXO dentro da GameAssembly.dll e indexa
-classes por TypeDefIndex (constante do build). Os Il2CppClass moram no heap (ASLR), MAS o
-ponteiro da tabela mora num RVA fixo do módulo, reescrito pelo runtime a cada launch — ler
-`[ga_base + ANCHOR_RVA]` ao vivo dá a base atual. Índices são constantes do build.
+Kills the cold-start scan: instead of sweeping ~2.6 GB looking for the class strings, it reads the
+IL2CPP runtime's TypeInfoTable via a FIXED-RVA ANCHOR inside GameAssembly.dll and indexes classes
+by TypeDefIndex (a build constant). The Il2CppClass objects live on the heap (ASLR), BUT the table
+pointer lives at a fixed module RVA, rewritten by the runtime on each launch — reading
+`[ga_base + ANCHOR_RVA]` live gives the current base. Indices are build constants.
 
-CADEIA PROVADA (build v1.00.07; ver tasks/meter-rva-startup/README.md):
-    ga_base + ANCHOR_RVA → s_TypeInfoTable (ponteiro no heap)
+PROVEN CHAIN (build v1.00.07; see tasks/meter-rva-startup/README.md):
+    ga_base + ANCHOR_RVA → s_TypeInfoTable (heap pointer)
     table_base + TypeDefIndex*8 → Il2CppClass*
 
-São SÓ os primitivos puros — NENHUMA fiação em resolve_all/meter_windows (vem nas deliverables
-seguintes). Espelha a lógica provada nos probes tbh-meter-dev/rva_probe{3,6,7}.py.
+These are JUST the pure primitives — NO wiring into resolve_all/meter_windows (that comes in the
+following deliverables). Mirrors the proven logic in the probes tbh-meter-dev/rva_probe{3,6,7}.py.
 
-INVARIANTES (tbh-meter-review):
-  §3 NAME-FREE — classes vêm por ÍNDICE/ESTRUTURA. `class_name` SÓ valida, NUNCA escolhe classe.
-  §10 MEMORY SAFETY — read-only; todo rptr/ri32 checa None antes de usar; walks têm cap.
-  §2 OFFSETS — usa Class.* de config/offsets.py. Offsets de FORMATO PE e de struct
-     IL2CPP-runtime NÃO são offsets de jogo (dump.cs) — são layout de SO/runtime, então moram
-     aqui como constantes de módulo documentadas (não duplicar em offsets.py).
-  Importável no mac — kernel32 é lazy (reusa shared.memory._kernel32), não dispara WinDLL no import.
+INVARIANTS (tbh-meter-review):
+  §3 NAME-FREE — classes come by INDEX/STRUCTURE. `class_name` ONLY validates, NEVER picks a class.
+  §10 MEMORY SAFETY — read-only; every rptr/ri32 checks None before use; walks are capped.
+  §2 OFFSETS — uses Class.* from config/offsets.py. PE-FORMAT offsets and IL2CPP-runtime struct
+     offsets are NOT game offsets (dump.cs) — they're OS/runtime layout, so they live here as
+     documented module constants (don't duplicate them in offsets.py).
+  Importable on mac — kernel32 is lazy (reuses shared.memory._kernel32), doesn't fire WinDLL on import.
 """
 
 import ctypes
@@ -31,36 +31,36 @@ from shared import memory
 from shared.memory import MODULEENTRY32
 
 # --------------------------------------------------------------------------- #
-# Constantes de FORMATO PE (Windows DLL) — NÃO são offsets de jogo (dump.cs),
-# são o layout do header PE/COFF, fixo pelo SO. Por isso moram aqui, não em offsets.py.
+# PE-FORMAT constants (Windows DLL) — NOT game offsets (dump.cs); they're the
+# PE/COFF header layout, fixed by the OS. That's why they live here, not in offsets.py.
 # Ref: PE/COFF spec (DOS header e_lfanew @0x3C; "PE\0\0" sig; COFF + Optional Header).
 # --------------------------------------------------------------------------- #
-PE_LFANEW = 0x3C            # DOS header: offset (DWORD) p/ o PE signature
-PE_SIG = b"PE\x00\x00"      # assinatura logo em [base + e_lfanew]
-PE_TIMEDATESTAMP = 0x8      # COFF FileHeader: TimeDateStamp (DWORD), relativo ao PE sig
-PE_SIZEOFIMAGE = 0x18 + 0x38  # Optional Header (após 0x18 do COFF) + offset 0x38 = SizeOfImage
+PE_LFANEW = 0x3C            # DOS header: offset (DWORD) to the PE signature
+PE_SIG = b"PE\x00\x00"      # signature right at [base + e_lfanew]
+PE_TIMEDATESTAMP = 0x8      # COFF FileHeader: TimeDateStamp (DWORD), relative to the PE sig
+PE_SIZEOFIMAGE = 0x18 + 0x38  # Optional Header (after the COFF's 0x18) + offset 0x38 = SizeOfImage
 
-# Toolhelp module-snapshot flags (mesmas de shared.memory; replicadas p/ legibilidade local).
+# Toolhelp module-snapshot flags (same as shared.memory; replicated for local readability).
 TH32CS_SNAPMODULE = memory.TH32CS_SNAPMODULE
 TH32CS_SNAPMODULE32 = memory.TH32CS_SNAPMODULE32
 
-# Caps de varredura (§10): nº máx. de entradas a andar na TypeInfoTable e tamanho do bloco
-# lido por syscall. A tabela do build provado tem alguns milhares de slots; 40k é folga ampla.
-_TABLE_BLOCK = 8192         # ptrs lidos por syscall no walk (1 read em vez de N)
-_MAX_TABLE_ENTRIES = 40000  # cap duro do walk (§10 — não andar infinito em tabela corrompida)
+# Walk caps (§10): max number of entries to walk in the TypeInfoTable and the block size read
+# per syscall. The proven build's table has a few thousand slots; 40k is ample slack.
+_TABLE_BLOCK = 8192         # ptrs read per syscall in the walk (1 read instead of N)
+_MAX_TABLE_ENTRIES = 40000  # hard walk cap (§10 — don't walk forever on a corrupt table)
 
-# Bounds plausíveis de um Il2CppClass* no x64 (mesmo critério dos probes / is_class).
+# Plausible bounds for an Il2CppClass* on x64 (same criterion as the probes / is_class).
 _K_MIN = 0x10000
 _K_MAX = 0x7FFFFFFFFFFF
 
 
 def ga_module(pid):
-    """Base e tamanho de carga da GameAssembly.dll do processo `pid`, via Toolhelp module
-    snapshot. (base:int|None, size:int|None) — (None, None) se não achar/falhar.
+    """Load base and size of process `pid`'s GameAssembly.dll, via a Toolhelp module
+    snapshot. (base:int|None, size:int|None) — (None, None) if not found/on failure.
 
-    Reusa o kernel32 lazy de shared.memory MAS seta os argtypes de Module32First/Next aqui:
-    o _kernel32() do shared os seta também, mas os probes exigiram setá-los explicitamente p/
-    não TRUNCAR o handle 64-bit (ctypes assume int 32-bit sem argtypes). Defensivo e barato."""
+    Reuses shared.memory's lazy kernel32 BUT sets the Module32First/Next argtypes here:
+    shared's _kernel32() sets them too, but the probes required setting them explicitly so as
+    not to TRUNCATE the 64-bit handle (ctypes assumes 32-bit int without argtypes). Defensive and cheap."""
     k = memory._kernel32()
     k.Module32First.argtypes = [wintypes.HANDLE, ctypes.POINTER(MODULEENTRY32)]
     k.Module32Next.argtypes = [wintypes.HANDLE, ctypes.POINTER(MODULEENTRY32)]
@@ -81,17 +81,17 @@ def ga_module(pid):
 
 
 def build_fingerprint(reader, base, version=None):
-    """Identidade do build da GameAssembly.dll = chave do cache de calibração. None se o
-    header PE não puder ser lido (caller cai no scan).
+    """GameAssembly.dll build identity = key of the calibration cache. None if the PE header
+    can't be read (caller falls back to the scan).
 
     fp = f"{version}-{TimeDateStamp:#x}-{SizeOfImage:#x}".
 
-    AMENDMENT R1: TimeDateStamp pode ser 0 (builds determinísticos/reprodutíveis) e SizeOfImage
-    pode colidir entre rebuilds → reforça com a VERSÃO instalada (Version.txt, via
-    _detect_game_version no caller). Se TimeDateStamp==0, NÃO o usa como componente de
-    identidade (vira "0x0" mas a versão + SizeOfImage carregam a identidade; o caller loga e
-    pode cair no scan se desconfiar). Build v1.00.07 = TimeDateStamp 0x6a203f51, SizeOfImage
-    0x62ea000."""
+    AMENDMENT R1: TimeDateStamp can be 0 (deterministic/reproducible builds) and SizeOfImage can
+    collide across rebuilds → reinforce with the installed VERSION (Version.txt, via
+    _detect_game_version in the caller). If TimeDateStamp==0, do NOT use it as an identity
+    component (it becomes "0x0" but version + SizeOfImage carry the identity; the caller logs it
+    and may fall back to the scan if suspicious). Build v1.00.07 = TimeDateStamp 0x6a203f51,
+    SizeOfImage 0x62ea000."""
     if not base:
         return None
     e_lfanew = reader.ri32(base + PE_LFANEW)
@@ -111,28 +111,28 @@ def build_fingerprint(reader, base, version=None):
 
 
 def table_base(reader, ga_base, anchor_rva):
-    """Base atual da s_TypeInfoTable = ponteiro vivo em [ga_base + anchor_rva]. None se nulo
-    (anchor errado / módulo ainda não inicializado)."""
+    """Current base of s_TypeInfoTable = the live pointer at [ga_base + anchor_rva]. None if null
+    (wrong anchor / module not yet initialized)."""
     if not ga_base or anchor_rva is None:
         return None
     return reader.rptr(ga_base + anchor_rva)
 
 
 def class_by_index(reader, tbase, idx):
-    """Il2CppClass* no TypeDefIndex `idx` = [tbase + idx*8]. None se nulo. NÃO valida que é
-    classe (use class_name p/ validar) — é só a deref crua da tabela."""
+    """Il2CppClass* at TypeDefIndex `idx` = [tbase + idx*8]. None if null. Does NOT validate that
+    it's a class (use class_name to validate) — it's just the raw table deref."""
     if not tbase or idx is None or idx < 0:
         return None
     return reader.rptr(tbase + idx * 8)
 
 
 def class_name(reader, K):
-    """VALIDA que K é um Il2CppClass e devolve seu nome, ou None. SÓ p/ VALIDAÇÃO (§3) —
-    NUNCA p/ escolher classe (isso é por índice). Critério (idêntico aos probes):
-      • bounds: _K_MIN <= K <= _K_MAX e 8-alinhado;
-      • nm = read_cstr([K + Class.NAME]) não vazio;
-      • round-trip de classe: [K + Class.ELEMENT_CLASS]==K OU [K + Class.CAST_CLASS]==K
-        (Il2CppClass de tipo normal aponta element/cast pra si mesmo)."""
+    """VALIDATES that K is an Il2CppClass and returns its name, or None. ONLY for VALIDATION (§3) —
+    NEVER for picking a class (that's by index). Criterion (identical to the probes):
+      • bounds: _K_MIN <= K <= _K_MAX and 8-aligned;
+      • nm = read_cstr([K + Class.NAME]) non-empty;
+      • class round-trip: [K + Class.ELEMENT_CLASS]==K OR [K + Class.CAST_CLASS]==K
+        (a normal-type Il2CppClass points element/cast at itself)."""
     if not K or K < _K_MIN or K > _K_MAX or (K & 0x7):
         return None
     nm = reader.read_cstr(reader.rptr(K + Class.NAME))
@@ -144,11 +144,11 @@ def class_name(reader, K):
 
 
 def walk_table_names(reader, tbase, wanted, maxn=_MAX_TABLE_ENTRIES):
-    """Anda a TypeInfoTable lendo nomes e coleta {nome: K} dos que estão em `wanted`.
-    Calibração SCAN-FREE (~0.1s na prova): lê em blocos de _TABLE_BLOCK ptrs por syscall,
-    valida cada ptr não-nulo com class_name, early-exit quando achar TODOS. `maxn` é o cap
-    duro (§10). `wanted` = set/iterable de nomes ESTÁVEIS (não-ofuscados); name-free permanece
-    porque a SAÍDA é índice→classe, e os nomes só identificam quais slots interessam."""
+    """Walks the TypeInfoTable reading names and collects {name: K} for those in `wanted`.
+    SCAN-FREE calibration (~0.1s in the proof): reads in blocks of _TABLE_BLOCK ptrs per syscall,
+    validates each non-null ptr with class_name, early-exits once it finds ALL. `maxn` is the hard
+    cap (§10). `wanted` = set/iterable of STABLE (non-obfuscated) names; name-free still holds
+    because the OUTPUT is index→class, and the names only identify which slots matter."""
     want = set(wanted)
     out = {}
     if not tbase or not want:
@@ -176,11 +176,11 @@ def walk_table_names(reader, tbase, wanted, maxn=_MAX_TABLE_ENTRIES):
 
 
 def _walk_dense_table_start(reader, seed_slot, regs, cap=0x800000):
-    """Dado um SLOT (endereço que contém um Il2CppClass* conhecido), acha onde COMEÇA o array
-    DENSO de Il2CppClass* que o contém, andando pra trás de página em página enquanto a página
-    continua majoritariamente preenchida por ponteiros-classe plausíveis. Espelha walk_bounds
-    do rva_probe3 (semente generosa; a verificação completa em discover_anchor é quem cravna).
-    `regs` limita a região (não sair dela). None se o seed nem estiver numa região conhecida."""
+    """Given a SLOT (an address holding a known Il2CppClass*), finds where the DENSE array of
+    Il2CppClass* containing it STARTS, walking backward page by page while the page stays
+    mostly filled with plausible class pointers. Mirrors walk_bounds in rva_probe3 (generous
+    seed; the full verification in discover_anchor is what nails it down). `regs` bounds the
+    region (don't leave it). None if the seed isn't even in a known region."""
     if not memory.in_region(regs, seed_slot):
         return None
 
@@ -201,27 +201,28 @@ def _walk_dense_table_start(reader, seed_slot, regs, cap=0x800000):
 
 
 def discover_anchor(reader, ga_base, ga_size, known_K, regs):
-    """DESCOBRE o (anchor_rva, table_base, indices) em tempo de CALIBRAÇÃO, DETERMINÍSTICO
-    (não busca fuzzy). `known_K` = {nome: K} de classes JÁ resolvidas (pelo scan legado);
-    `regs` = regiões READABLE já enumeradas por resolve_all (NÃO re-enumerar — o sweep é caro).
-    Retorna (anchor_rva, table_base, {nome: idx}) ou None se não convergir (caller mantém o scan).
+    """DISCOVERS the (anchor_rva, table_base, indices) at CALIBRATION time, DETERMINISTICALLY
+    (no fuzzy search). `known_K` = {name: K} of classes ALREADY resolved (by the legacy scan);
+    `regs` = READABLE regions already enumerated by resolve_all (do NOT re-enumerate — the sweep is
+    expensive). Returns (anchor_rva, table_base, {name: idx}) or None if it doesn't converge (caller
+    keeps the scan).
 
-    AMENDMENT R1 + NEW-4 (determinístico, deriva de UM slot e VERIFICA a tabela inteira):
-      (1) backref de UM known_K (um sweep grande sobre READABLE) → slots candidatos que CONTÊM
-          esse ponteiro (usa shared.memory.scan needle 8-alinhado, como gold._backrefs);
-      (2) p/ cada slot, derivar onde COMEÇA o array denso de Il2CppClass* (_walk_dense_table_start,
-          janela generosa — índices são ESPAROS, ex. StageManager 2592 ↔ HeroInfoData 3198,
-          então janela apertada FALSE-FALHA);
-      (3) VERIFICAÇÃO COMPLETA (à prova de false-pass): p/ um candidato table_base, computa
-          idx[nome] = (slot_do_known_K - table_base)/8 e confirma class_by_index→nome p/ TODOS
-          os known_K via round-trip de class_name. Só aceita se TODOS baterem;
-      (4) achar o ptr IN-MODULE (em [ga_base, ga_base+ga_size)) cujo valor == table_base →
-          anchor_rva = loc - ga_base. Retorna os índices verificados (sem walk separado)."""
+    AMENDMENT R1 + NEW-4 (deterministic, derives from ONE slot and VERIFIES the whole table):
+      (1) backref of ONE known_K (one big sweep over READABLE) → candidate slots that CONTAIN that
+          pointer (uses shared.memory.scan with an 8-aligned needle, like gold._backrefs);
+      (2) for each slot, derive where the dense Il2CppClass* array STARTS (_walk_dense_table_start,
+          generous window — indices are SPARSE, e.g. StageManager 2592 ↔ HeroInfoData 3198, so a
+          tight window FALSE-FAILS);
+      (3) FULL VERIFICATION (false-pass-proof): for a table_base candidate, compute
+          idx[name] = (known_K's slot - table_base)/8 and confirm class_by_index→name for ALL the
+          known_K via a class_name round-trip. Only accept if ALL match;
+      (4) find the IN-MODULE ptr (in [ga_base, ga_base+ga_size)) whose value == table_base →
+          anchor_rva = loc - ga_base. Returns the verified indices (no separate walk)."""
     known = {nm: K for nm, K in (known_K or {}).items() if K}
     if not ga_base or not ga_size or len(known) < 3:
         return None
 
-    # (1) backref de UM known_K — um único sweep grande. Pega um determinístico (menor nome).
+    # (1) backref of ONE known_K — a single big sweep. Picks a deterministic one (smallest name).
     seed_name = sorted(known)[0]
     seed_K = known[seed_name]
     needle = struct.pack("<Q", seed_K)
@@ -229,26 +230,26 @@ def discover_anchor(reader, ga_base, ga_size, known_K, regs):
     if not seed_slots:
         return None
 
-    # (2)+(3): p/ cada slot do seed, derivar a base do array denso e VERIFICAR a tabela inteira.
-    # Só temos backref do seed (um sweep). Derivamos o candidato table_base do slot do seed,
-    # confirmamos que o ÍNDICE do seed bate por nome, e então exigimos que TODOS os known_K
-    # apareçam em algum índice (leitura direta da tabela, barata) — verificação à prova de
-    # false-pass. Janela generosa no walk evita false-fail em índices esparsos.
+    # (2)+(3): for each seed slot, derive the dense array's base and VERIFY the whole table.
+    # We only have the seed's backref (one sweep). We derive the table_base candidate from the
+    # seed's slot, confirm the seed's INDEX matches by name, and then require that ALL the known_K
+    # appear at some index (a direct, cheap table read) — false-pass-proof verification. A generous
+    # window in the walk avoids a false-fail on sparse indices.
     tested = set()
     for slot in seed_slots:
         cand = _walk_dense_table_start(reader, slot, regs)
         if not cand or cand in tested:
             continue
         tested.add(cand)
-        # `cand` é APROXIMADO: o walk para algumas entradas ACIMA da base real (índices baixos —
-        # tipos de engine — são esparsos/baixo-fill). Pré-filtro BARATO (sem varrer módulo): a
-        # tabela a partir de `cand` tem que conter TODOS os known_K; senão `cand` é lixo, pula.
+        # `cand` is APPROXIMATE: the walk stops a few entries ABOVE the real base (low indices —
+        # engine types — are sparse/low-fill). CHEAP pre-filter (no module sweep): the table from
+        # `cand` must contain ALL the known_K; otherwise `cand` is garbage, skip it.
         if _verify_table(reader, cand, known) is None:
             continue
-        # O anchor in-module guarda a base VERDADEIRA (== ou pouco ABAIXO de `cand`), NÃO `cand`.
-        # Acha por RANGE e RE-VERIFICA a tabela a partir do valor real (autoritativo). O match
-        # EXATO em `cand` falhava — o global guarda a base real, não a base aproximada do walk;
-        # foi o bug que travava a calibração mesmo no build provado (rva_probe3 usa range).
+        # The in-module anchor holds the TRUE base (== or slightly BELOW `cand`), NOT `cand`. Find
+        # it by RANGE and RE-VERIFY the table from the real value (authoritative). An EXACT match on
+        # `cand` failed — the global holds the real base, not the walk's approximate base; that was
+        # the bug that stalled calibration even on the proven build (rva_probe3 uses range).
         res = _find_table_anchor(reader, ga_base, ga_size, cand, known, regs)
         if res is not None:
             return res
@@ -256,9 +257,9 @@ def discover_anchor(reader, ga_base, ga_size, known_K, regs):
 
 
 def _verify_table(reader, tbase, known):
-    """Confirma que TODOS os known_K aparecem em algum índice da tabela `tbase` (leitura direta,
-    barata) com round-trip de nome. Retorna {nome: idx} se TODOS baterem, senão None (rejeita
-    o candidato → à prova de false-pass)."""
+    """Confirms that ALL the known_K appear at some index in table `tbase` (a direct, cheap read)
+    via a name round-trip. Returns {name: idx} if ALL match, else None (rejects the candidate →
+    false-pass-proof)."""
     want_by_K = {K: nm for nm, K in known.items()}
     found = {}
     i0 = 0
@@ -281,15 +282,15 @@ def _verify_table(reader, tbase, known):
 
 
 def _find_table_anchor(reader, ga_base, ga_size, approx_base, known, regs):
-    """Acha o ANCHOR in-module: um ptr 8-alinhado em [ga_base, ga_base+ga_size) cujo VALOR é a
-    base VERDADEIRA da tabela. O `_walk_dense_table_start` para algumas entradas ACIMA da base
-    real (índices baixos esparsos) → o anchor NÃO guarda `approx_base`, e sim a base real (== ou
-    pouco abaixo). Varre o módulo por ptrs com valor PERTO de `approx_base` e, p/ cada valor-
-    candidato, RE-VERIFICA a tabela inteira a partir dele (autoritativo). Retorna
-    (anchor_rva, real_base, {nome: idx}) ou None. Espelha a busca por RANGE do rva_probe3."""
+    """Finds the in-module ANCHOR: an 8-aligned ptr in [ga_base, ga_base+ga_size) whose VALUE is the
+    table's TRUE base. `_walk_dense_table_start` stops a few entries ABOVE the real base (sparse low
+    indices) → the anchor does NOT hold `approx_base`, but the real base (== or slightly below).
+    Sweeps the module for ptrs with a value NEAR `approx_base` and, for each candidate value,
+    RE-VERIFIES the whole table from it (authoritative). Returns
+    (anchor_rva, real_base, {name: idx}) or None. Mirrors rva_probe3's search by RANGE."""
     lo, hi = ga_base, ga_base + ga_size
     modregs = [(b, s) for (b, s) in regs if lo <= b < hi]
-    # a base real está EM ou pouco ABAIXO de approx_base (o walk para alto, nunca abaixo).
+    # the real base is AT or slightly BELOW approx_base (the walk stops high, never below).
     locs = memory.scan_i64_range(reader, modregs, approx_base - 0x10000, approx_base + 0x1000)
     seen, cands = set(), []
     for loc in locs:
@@ -297,7 +298,7 @@ def _find_table_anchor(reader, ga_base, ga_size, approx_base, known, regs):
         if v and v not in seen:
             seen.add(v)
             cands.append((v, loc))
-    for val, loc in sorted(cands):              # menor valor primeiro = mais perto do índice 0
+    for val, loc in sorted(cands):              # smallest value first = closest to index 0
         idxs = _verify_table(reader, val, known)
         if idxs is not None:
             return loc - ga_base, val, idxs

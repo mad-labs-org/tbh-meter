@@ -1,15 +1,15 @@
-"""Testes do GATE de resolve_all (deliverable 05/01) — caminho rápido (calib/RVA) vs lento
-(scan) + calibração. Funções de orquestração: a leitura de memória real mora em
-typeinfo/resolver/gold (cobertos pelos próprios testes + probes ao vivo), então aqui
-monkeypatchamos os delegates p/ exercitar SÓ a decisão do gate. Rodam no mac.
+"""Tests for the resolve_all GATE (deliverable 05/01) — fast path (calib/RVA) vs slow path
+(scan) + calibration. These are orchestration functions: the real memory reads live in
+typeinfo/resolver/gold (covered by their own tests + live probes), so here we monkeypatch the
+delegates to exercise ONLY the gate decision. They run on mac.
 
-Cobre:
-  - fast path OK → tupla de 14 do calib, ZERO scan;
-  - fast path sanity-fail (_resolve_fast None) → cai pro scan;
-  - sem ga_base/fp → pula direto pro scan;
-  - slow path → scan + calibra (só com scan completo);
-  - calibração falha (anchor/idx None) → EMITE log observável, NUNCA quebra;
-  - _resolve_fast monta a tupla certa (shape de 14, PSD/CSD/SM do backref direcionado, MSM/LM do rv).
+Covers:
+  - fast path OK → 14-tuple from calib, ZERO scan;
+  - fast path sanity-fail (_resolve_fast None) → falls back to scan;
+  - no ga_base/fp → skips straight to scan;
+  - slow path → scan + calibrate (only on a complete scan);
+  - calibration fails (anchor/idx None) → EMITS an observable log, NEVER crashes;
+  - _resolve_fast builds the right tuple (14-shape, PSD/CSD/SM from the targeted backref, MSM/LM from rv).
 """
 
 import meter_windows as mw
@@ -22,7 +22,7 @@ CALIB = {"anchor_rva": 0x5B070E0,
          "item_cat": {30001: (3, 2, 5)},
          "hero_cat": {601: 1}}
 
-# tupla de 14 sentinela (shape do cache) — o que o scan/fast path devolvem
+# sentinel 14-tuple (cache shape) — what the scan/fast path return
 SCAN_TUP = ("sc", "sf", "msm", "lm", ["csd"], ["psd"], {1: (1, 1, 1, 0)},
             {2: (1, 1, 1)}, {3: 1}, ["sm"], "gold", "gb", "die", "res")
 FAST_TUP = ("scF", "sfF", "msmF", "lmF", ["csdF"], ["psdF"], CALIB["stage_info"],
@@ -45,7 +45,7 @@ class TestFastPath:
         monkeypatch.setattr(mw, "_resolve_scan", _no_scan)
         out = mw.resolve_all(None, 123, FP, str(tmp_path / "c.json"))
         assert out == FAST_TUP
-        assert called["scan"] is False         # fast path NÃO roda scan
+        assert called["scan"] is False         # fast path does NOT run scan
         assert len(out) == 14
 
     def test_fast_sanity_fail_falls_back_to_scan(self, monkeypatch, tmp_path):
@@ -55,7 +55,7 @@ class TestFastPath:
         monkeypatch.setattr(mw, "_resolve_scan", lambda reader: (SCAN_TUP, {}))
         monkeypatch.setattr(mw, "_calibrate", lambda *a, **k: None)
         out = mw.resolve_all(None, 123, FP, str(tmp_path / "c.json"))
-        assert out == SCAN_TUP                 # degradou pro scan, NÃO usou calib ruim
+        assert out == SCAN_TUP                 # degraded to scan, did NOT use bad calib
 
     def test_no_ga_base_skips_fast_path(self, monkeypatch, tmp_path):
         monkeypatch.setattr(mw.typeinfo, "ga_module", lambda pid: (None, None))
@@ -68,11 +68,11 @@ class TestFastPath:
         monkeypatch.setattr(mw, "_calibrate", lambda *a, **k: None)
         out = mw.resolve_all(None, 123, FP, str(tmp_path / "c.json"))
         assert out == SCAN_TUP
-        assert seen["load_calib"] is False     # sem ga_base nem tenta o calib
+        assert seen["load_calib"] is False     # no ga_base → doesn't even try calib
 
     def test_no_calib_goes_to_scan(self, monkeypatch, tmp_path):
         _patch_ga(monkeypatch)
-        monkeypatch.setattr(mw, "load_calib", lambda path, fp: None)  # build novo
+        monkeypatch.setattr(mw, "load_calib", lambda path, fp: None)  # new build
         monkeypatch.setattr(mw, "_resolve_scan", lambda reader: (SCAN_TUP, {}))
         monkeypatch.setattr(mw, "_calibrate", lambda *a, **k: None)
         out = mw.resolve_all(None, 123, FP, str(tmp_path / "c.json"))
@@ -94,7 +94,7 @@ class TestSlowPathCalibration:
     def test_incomplete_scan_skips_calibrate(self, monkeypatch, tmp_path):
         _patch_ga(monkeypatch)
         monkeypatch.setattr(mw, "load_calib", lambda path, fp: None)
-        # scan incompleto: msm=None (falta um manager) → NÃO calibra (persist-gate)
+        # incomplete scan: msm=None (a manager is missing) → does NOT calibrate (persist-gate)
         bad = (None, "sf", None, "lm", [], [], {}, {}, {}, [], None, None, None, None)
         monkeypatch.setattr(mw, "_resolve_scan", lambda reader: (bad, {}))
         calibrated = {"hit": False}
@@ -106,37 +106,37 @@ class TestSlowPathCalibration:
 
 
 class TestCalibrateObservability:
-    """A obrigação carregada da validação 01: um build que NUNCA acelera tem que ser
-    observável via log (stdout → meter.log + relay). _calibrate nunca levanta exceção."""
+    """The obligation carried over from validation 01: a build that NEVER goes fast must be
+    observable via log (stdout → meter.log + relay). _calibrate never raises."""
 
     def test_discover_failure_emits_log(self, monkeypatch, capsys):
         monkeypatch.setattr(mw.typeinfo, "ga_module", lambda pid: (0x7ff800000000, 0x62ea000))
         monkeypatch.setattr(mw, "regions", lambda reader: [])
         monkeypatch.setattr(mw.typeinfo, "discover_anchor",
-                            lambda r, b, s, k, regs: None)  # não converge
+                            lambda r, b, s, k, regs: None)  # doesn't converge
         mw._calibrate(None, 1, FP, "c.json", {"StageClearLog": {0x1}}, {1: (1,)}, {2: (1,)}, {3: 1}, 0xC0FFEE)
         out = capsys.readouterr().out
         assert "FAILED to discover anchor" in out
 
     def test_idx_failure_emits_log(self, monkeypatch, capsys):
-        # AMBOS os caminhos do idx_ut falham: value-scan (gold_index_of_klass) E o walk estrutural
-        # (gold_index_by_structure). Só então a calibração desiste e emite o log.
+        # BOTH idx_ut paths fail: value-scan (gold_index_of_klass) AND the structural walk
+        # (gold_index_by_structure). Only then does calibration give up and emit the log.
         monkeypatch.setattr(mw.typeinfo, "ga_module", lambda pid: (0x7ff800000000, 0x62ea000))
         monkeypatch.setattr(mw, "regions", lambda reader: [])
         monkeypatch.setattr(mw.typeinfo, "discover_anchor",
                             lambda r, b, s, k, regs: (0x5B070E0, 0xdead, {"StageManager": 2592}))
-        monkeypatch.setattr(mw, "gold_index_of_klass", lambda r, t, k: None)       # value-scan não acha
-        monkeypatch.setattr(mw, "gold_index_by_structure", lambda r, t: None)      # estrutural tb não acha
+        monkeypatch.setattr(mw, "gold_index_of_klass", lambda r, t, k: None)       # value-scan finds nothing
+        monkeypatch.setattr(mw, "gold_index_by_structure", lambda r, t: None)      # structural finds nothing too
         saved = {"hit": False}
         monkeypatch.setattr(mw, "save_calib", lambda *a, **k: saved.__setitem__("hit", True))
         mw._calibrate(None, 1, FP, "c.json", {"StageClearLog": {0x1}}, {1: (1,)}, {2: (1,)}, {3: 1}, 0xC0FFEE)
         out = capsys.readouterr().out
         assert "FAILED to locate gold idx in table" in out
-        assert saved["hit"] is False          # idx None → NÃO persiste calib
+        assert saved["hit"] is False          # idx None → does NOT persist calib
 
     def test_idx_via_structure_when_value_scan_none(self, monkeypatch):
-        # value-scan devolveu gold_klass=None (bug 1.00.11) → a calibração NÃO falha: deriva o
-        # idx_ut pelo walk estrutural (name-free) e persiste. gold_index_of_klass nem é chamado.
+        # value-scan returned gold_klass=None (bug 1.00.11) → calibration does NOT fail: it derives
+        # idx_ut via the structural walk (name-free) and persists. gold_index_of_klass isn't even called.
         monkeypatch.setattr(mw.typeinfo, "ga_module", lambda pid: (0x7ff800000000, 0x62ea000))
         monkeypatch.setattr(mw, "regions", lambda reader: [])
         monkeypatch.setattr(mw.typeinfo, "discover_anchor",
@@ -152,7 +152,7 @@ class TestCalibrateObservability:
         mw._calibrate(None, 1, FP, "c.json", {"StageManager": {0x9}}, {1: (1,)}, {2: (1,)}, {3: 1}, None)
         assert captured.get("idx_ut") == 2744
         assert captured.get("anchor") == 0x5B03410
-        assert called["value_scan"] is False   # gold_klass None → atalho pulado, foi pro estrutural
+        assert called["value_scan"] is False   # gold_klass None → shortcut skipped, went structural
 
     def test_module_read_failure_emits_log(self, monkeypatch, capsys):
         monkeypatch.setattr(mw.typeinfo, "ga_module", lambda pid: (None, None))
@@ -160,7 +160,7 @@ class TestCalibrateObservability:
         assert "FAILED to read GameAssembly.dll" in capsys.readouterr().out
 
     def test_no_fp_is_silent_noop(self, monkeypatch, capsys):
-        # sem fp não dá pra calibrar (fp é a chave) → cai fora SEM ruído de log
+        # no fp → can't calibrate (fp is the key) → bails out WITHOUT any log noise
         called = {"ga": False}
         monkeypatch.setattr(mw.typeinfo, "ga_module",
                             lambda pid: (called.__setitem__("ga", True), (1, 1))[1])
@@ -184,9 +184,9 @@ class TestCalibrateObservability:
 
 
 class TestResolveFast:
-    """_resolve_fast monta a tupla de 14 a partir do calib + rv do resolver. Monkeypatcha os
-    delegates (typeinfo.table_base, resolve_via_rva, gold by-index) — a lógica deles é testada
-    em test_typeinfo/test_resolver_rva/test_gold."""
+    """_resolve_fast builds the 14-tuple from the calib + the resolver's rv. Monkeypatches the
+    delegates (typeinfo.table_base, resolve_via_rva, gold by-index) — their logic is tested
+    in test_typeinfo/test_resolver_rva/test_gold."""
 
     def _rv(self):
         classes = {n: {hash(n) & 0xffff} for n in mw.TARGETS}
@@ -197,8 +197,8 @@ class TestResolveFast:
         return classes, instances
 
     def test_builds_14_tuple_psd_csd_sm_from_backref(self, monkeypatch):
-        """PSD/CSD/StageManager vêm do backref direcionado (instances_of); MSM/LM do rv.
-        Os 3 needles do backref são os K's de classe (classes[name]), NÃO as instâncias do rv."""
+        """PSD/CSD/StageManager come from the targeted backref (instances_of); MSM/LM from rv.
+        The 3 backref needles are the class K's (classes[name]), NOT the rv instances."""
         monkeypatch.setattr(mw.typeinfo, "table_base", lambda r, ga, anchor: 0x9000)
         rv = self._rv()
         monkeypatch.setattr(mw, "resolve_via_rva", lambda r, tb, idx, tg, sg: rv)
@@ -213,10 +213,10 @@ class TestResolveFast:
         assert out is not None and len(out) == 14
         (sc, sf, msm, lm, csd, psd, si, ic, hc, sm_list, gold, gb, die, res) = out
         assert sc == next(iter(rv[0]["StageClearLog"]))
-        assert msm == 0xAAA and lm == 0xBBB           # MSM/LM ainda do rv (bbwf size-validado)
-        # PSD/CSD/SM do backref (NÃO das instâncias do rv, que p/ esses são [])
+        assert msm == 0xAAA and lm == 0xBBB           # MSM/LM still from rv (bbwf size-validated)
+        # PSD/CSD/SM from the backref (NOT from the rv instances, which for these are [])
         assert psd == [0x111] and csd == [0x222] and sm_list == [0x333]
-        # o backref usa os K's de CLASSE dos 3, não os singletons
+        # the backref uses the CLASS K's of the 3, not the singletons
         assert seen["k_by_name"] == {n: next(iter(rv[0][n])) for n in
                                      ("PlayerSaveData", "CommonSaveData", "StageManager")}
         assert (si, ic, hc) == (CALIB["stage_info"], CALIB["item_cat"], CALIB["hero_cat"])

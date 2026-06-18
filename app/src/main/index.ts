@@ -67,7 +67,7 @@ let splashWin: BrowserWindow | null = null;
 let splashActive = false;
 let quitting = false;
 
-// Single-writer (progress.md "Dedup"): be the ONE app instance. A second launch of
+// Single-writer: be the ONE app instance. A second launch of
 // the SAME variant fails to grab the lock and quits here BEFORE we register any
 // lifecycle / startReader — guaranteeing a single reader owner (two app copies would
 // otherwise each spawn a reader and race; two readers double-write the per-run raw +

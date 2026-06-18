@@ -112,7 +112,7 @@ function eligible(run: RunRecord, failed: Record<string, string>): boolean {
   return (
     run.status === "success" &&
     // Only a `counted` run uploads — the converter's quality verdict is the redesign's single source
-    // of truth for "counts" (progress.md "Upload": "Degradada/parcial/skipped NÃO sobe"). Before PR4
+    // of truth for "counts" (the upload rule: degraded/partial/skipped never upload). Before PR4
     // the read path dropped success-partials via cleanRecords; that filter is gone (the app now reads
     // pre-converted logs/), so the gate moves HERE, onto the sealed verdict — a partial (under-counted)
     // or degraded (a critical read failed) success must never reach the public leaderboard. A

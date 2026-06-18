@@ -1,24 +1,24 @@
-"""single_instance.py — garante que SÓ UM reader rode por vez.
+"""single_instance.py — guarantees that ONLY ONE reader runs at a time.
 
-Por quê: se dois readers anexam ao mesmo jogo, os dois escrevem os records
-raw/<id>.json — a mesma run sai duplicada, e a disputa pela memória derruba a leitura de gold VIVA,
-caindo no fallback SAVE, que sob contenção rende gold 2×. Cravado nos dados reais:
-uma instância (live) = gold correto, sem duplicata; duas = duplicata + 2×.
+Why: if two readers attach to the same game, both write the raw/<id>.json
+records — the same run comes out duplicated, and the contention over memory knocks out the LIVE gold
+read, falling back to SAVE, which under contention yields 2× gold. Pinned against real data:
+one instance (live) = correct gold, no duplicate; two = duplicate + 2×.
 
-Como (Windows): um MUTEX NOMEADO (kernel32.CreateMutexW). O SO libera o mutex
-AUTOMATICAMENTE quando o processo dono morre — inclusive em crash ou kill — então
-NÃO existe stale-lock pra limpar (ao contrário de um PID-file). Uma segunda instância
-recebe ERROR_ALREADY_EXISTS e desiste. Namespace `Local\\` (escopo de sessão): sempre
-permitido pra usuário não-elevado, e é onde o app + um run manual colidem. (`Global\\`
-exigiria SeCreateGlobalPrivilege, que o app não-elevado não tem.)
+How (Windows): a NAMED MUTEX (kernel32.CreateMutexW). The OS releases the mutex
+AUTOMATICALLY when the owning process dies — including on crash or kill — so
+there is NO stale-lock to clean up (unlike a PID-file). A second instance
+gets ERROR_ALREADY_EXISTS and gives up. The `Local\\` namespace (session scope) is always
+allowed for a non-elevated user, and is where the app + a manual run collide. (`Global\\`
+would require SeCreateGlobalPrivilege, which the non-elevated app doesn't have.)
 
-Fora do Windows é no-op: o reader só anexa ao jogo no Windows, então não há o que
-proteger em dev/CI (o --selftest sequer chega aqui).
+Off Windows it's a no-op: the reader only attaches to the game on Windows, so there's nothing to
+protect in dev/CI (--selftest doesn't even reach here).
 """
 import sys
 
-# Mantém o handle do mutex vivo pela duração do processo. Se ele for coletado pelo GC,
-# o handle fecha e o mutex é liberado — perderíamos o lock. Por isso guardamos aqui.
+# Keep the mutex handle alive for the lifetime of the process. If it gets GC'd,
+# the handle closes and the mutex is released — we'd lose the lock. That's why we stash it here.
 _held = []
 
 MUTEX_NAME = "Local\\TBH_Meter_Reader"
@@ -26,8 +26,8 @@ _ERROR_ALREADY_EXISTS = 183
 
 
 def acquire():
-    """Tenta virar o único reader rodando. True se conseguiu (ou se não há o que
-    proteger fora do Windows); False se outra instância já está rodando."""
+    """Try to become the only reader running. True if it succeeded (or if there's nothing to
+    protect off Windows); False if another instance is already running."""
     if sys.platform != "win32":
         return True
     import ctypes
@@ -40,10 +40,10 @@ def acquire():
     handle = kernel32.CreateMutexW(None, False, MUTEX_NAME)
     err = ctypes.get_last_error()
     if not handle:
-        # Nem criar o mutex deu certo — falha ABERTO: nunca bloqueia o único reader.
+        # Even creating the mutex failed — fail OPEN: never block the only reader.
         return True
     if err == _ERROR_ALREADY_EXISTS:
         kernel32.CloseHandle(handle)
         return False
-    _held.append(handle)  # dono: segura o handle; o SO libera no fim do processo
+    _held.append(handle)  # owner: hold the handle; the OS releases it at process end
     return True

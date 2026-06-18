@@ -1,6 +1,6 @@
 ---
 type: reference
-description: "Enums e structs do sistema de dano que VIVEM em config/offsets.py — modificadores (MODTYPE/MODSOURCE/StatModifier), atributo/tipo de hit (EDamageAttribute/EDamageType/DamageInfo) e classe (EEquipClassType). É catálogo de ESTRUTURA, não cálculo: o reader não roda a fórmula."
+description: "Damage-system enums and structs that LIVE in config/offsets.py — modifiers (MODTYPE/MODSOURCE/StatModifier), hit attribute/type (EDamageAttribute/EDamageType/DamageInfo) and class (EEquipClassType). A STRUCTURE catalog, not the math: the reader doesn't run the formula."
 code_anchors:
   - config/offsets.py::MODTYPE
   - config/offsets.py::MODSOURCE
@@ -22,66 +22,66 @@ guarded_by:
   - tests/test_offsets.py::TestEEquipClassType::test_ranger_is_2
 ---
 
-# Modelo de dano — enums e structs (em `offsets.py`)
+# Damage model — enums and structs (in `offsets.py`)
 
-Esta nota é a parte **testável** do modelo de dano: os enums e structs que existem como
-SÍMBOLO em `config/offsets.py` (a bíblia). É **catálogo de estrutura**, não de aritmética —
-o reader **não calcula dano**. A maioria destes símbolos (`MODTYPE`, `MODSOURCE`,
-`StatModifier`, `DamageInfo`, `EDamageType`) **não tem consumidor vivo** no reader hoje: são
-fatos de RE que documentam COMO o jogo combina stats, úteis pra quem for mapear um valor de
-dano ou explicar a build no front. `EDamageAttribute`, `EEquipClassType` e `StatType` esses
-sim são reexportados/lidos (`game/enums.py`, `game/build.py`).
+This note is the **testable** part of the damage model: the enums and structs that exist as a
+SYMBOL in `config/offsets.py` (the bible). It's a **structure catalog**, not arithmetic —
+the reader **does not compute damage**. Most of these symbols (`MODTYPE`, `MODSOURCE`,
+`StatModifier`, `DamageInfo`, `EDamageType`) have **no live consumer** in the reader today: they're
+RE facts documenting HOW the game combines stats, useful to anyone mapping a damage value
+or explaining a build on the front end. `EDamageAttribute`, `EEquipClassType` and `StatType` are
+the ones actually re-exported/read (`game/enums.py`, `game/build.py`).
 
-> A **fórmula exata** (bracketing/fold) e os **RVAs + disassembly** que a provaram NÃO entram
-> aqui: não são testáveis contra `offsets.py` (rotam por build, são RE bruto). Vivem no
-> snapshot `archive/damage-model`.
-> <!-- criar quando migrar o RE cru: archive/damage-model (fórmula + RVAs gbm@…, capstone) -->
+> The **exact formula** (bracketing/fold) and the **RVAs + disassembly** that proved it do NOT go
+> here: they aren't testable against `offsets.py` (they rotate per build, they're raw RE). They live in
+> the `archive/damage-model` snapshot.
+> <!-- create when migrating the raw RE: archive/damage-model (formula + RVAs gbm@…, capstone) -->
 
-## Sistema de modificadores
+## Modifier system
 
-Cada stat final é o fold de uma LISTA de modificadores. A geometria do modificador é o struct
-`StatModifier` (`up` no dump): campos `STAT_TYPE`, `MOD_TYPE`, `VALUE` (float), `MOD_SOURCE`.
+Each final stat is the fold of a LIST of modifiers. The modifier's geometry is the
+`StatModifier` struct (`up` in the dump): fields `STAT_TYPE`, `MOD_TYPE`, `VALUE` (float), `MOD_SOURCE`.
 
-- **`MODTYPE`** classifica como o modificador entra no fold: `FLAT` (0), `ADDITIVE` (1),
-  `MULTIPLICATIVE` (2). A ORDEM dos valores é load-bearing — o fold ramifica por este enum
-  (flat soma na base; aditivos somam num bucket único → **retorno decrescente** ao empilhar;
-  multiplicativos são um produto separado, **não diminuem entre si**).
-- **`MODSOURCE`** diz de ONDE veio (`BASE`, `ITEM`, `ATTRIBUTE`, `PASSIVE`, `AccountStatus`,
-  `StatusEffect`, `BuffSkill`, `ENVIRONMENT`) — é metadado de proveniência, não muda a conta.
+- **`MODTYPE`** classifies how the modifier enters the fold: `FLAT` (0), `ADDITIVE` (1),
+  `MULTIPLICATIVE` (2). The ORDER of the values is load-bearing — the fold branches on this enum
+  (flat adds to the base; additives sum into a single bucket → **diminishing returns** when stacked;
+  multiplicatives are a separate product, **they don't diminish each other**).
+- **`MODSOURCE`** says WHERE it came from (`BASE`, `ITEM`, `ATTRIBUTE`, `PASSIVE`, `AccountStatus`,
+  `StatusEffect`, `BuffSkill`, `ENVIRONMENT`) — it's provenance metadata, it doesn't change the math.
 
-O stat FINAL já folded NÃO se reconstrói a partir desta lista no reader: lê-se pronto do
-`StatsHolder.FINAL_STATS` (`Dict<StatType,float>`; ver [[invariants/obscured-data-offlimits]] —
-os stats core em `Unit.CORE_STATS_OBSCURED` são XOR-lixo, NÃO leia). `StatsHolder.MODIFIER_MGR`
-é a lista crua de mods (raramente necessária).
+The already-folded FINAL stat is NOT reconstructed from this list in the reader: it's read ready-made from
+`StatsHolder.FINAL_STATS` (`Dict<StatType,float>`; see [[invariants/obscured-data-offlimits]] —
+the core stats in `Unit.CORE_STATS_OBSCURED` are XOR garbage, do NOT read them). `StatsHolder.MODIFIER_MGR`
+is the raw mod list (rarely needed).
 
-## Atributo e tipo do hit
+## Hit attribute and type
 
-- **`EDamageAttribute`** (elemento do dano): `Physical` (0), `Fire`, `Cold`, `Lightning`,
-  `Chaos`, `AllElement`, `NONE` (6). Atenção: o membro "nenhum" chama-se **`NONE`** (maiúsculo)
-  — `None` é palavra reservada do Python.
-- **`EDamageType`** é um **`IntFlag`** (combinável por OR): `NONE` (0), `Melee` (1),
-  `Projectile` (2), `AOE` (4), `Summon` (8), `DOT` (16), `Trap` (32). Por ser flags, valores são
-  potências de 2 — um hit pode ser `Melee|AOE`.
-- **`DamageInfo`** é o struct transiente do hit (campos `ATTACKER`, `ORIGIN_DAMAGE`,
+- **`EDamageAttribute`** (the damage's element): `Physical` (0), `Fire`, `Cold`, `Lightning`,
+  `Chaos`, `AllElement`, `NONE` (6). Note: the "none" member is called **`NONE`** (uppercase)
+  — `None` is a reserved word in Python.
+- **`EDamageType`** is an **`IntFlag`** (OR-combinable): `NONE` (0), `Melee` (1),
+  `Projectile` (2), `AOE` (4), `Summon` (8), `DOT` (16), `Trap` (32). Being flags, the values are
+  powers of 2 — a hit can be `Melee|AOE`.
+- **`DamageInfo`** is the hit's transient struct (fields `ATTACKER`, `ORIGIN_DAMAGE`,
   `IS_CRITICAL`, `DAMAGE_ATTRIBUTE` = `EDamageAttribute`, `DAMAGE_TYPE` = `EDamageType`,
-  `HIT_EFFECTS`). É efêmero — entregue por hit e descartado; o reader não o persiste.
+  `HIT_EFFECTS`). It's ephemeral — delivered per hit and discarded; the reader does not persist it.
 
-Atributo e tipo são **camadas independentes**: `PhysicalDamagePercent` (`StatType` 24) é gated
-ao atributo Physical e é **aditivo** dentro do bucket (empilhar dá retorno decrescente);
-`IncreaseProjectileDamage` (`StatType` 53) é gated ao FLAG `Projectile` — camada SEPARADA, que
-multiplica por cima. `AttackDamage` (`StatType` 1) é base global, agnóstica de atributo (vale em
-todo hit). Investir na camada mais magra rende mais que sobre-empilhar um bucket aditivo.
+Attribute and type are **independent layers**: `PhysicalDamagePercent` (`StatType` 24) is gated
+to the Physical attribute and is **additive** within the bucket (stacking gives diminishing returns);
+`IncreaseProjectileDamage` (`StatType` 53) is gated to the `Projectile` FLAG — a SEPARATE layer that
+multiplies on top. `AttackDamage` (`StatType` 1) is a global base, attribute-agnostic (it applies on
+every hit). Investing in the thinner layer pays off more than over-stacking an additive bucket.
 
-## Classe do herói
+## Hero class
 
-**`EEquipClassType`** (a classe que gate os equipamentos/skills): `All` (0), `Knight`,
-`Ranger` (2), `Sorcerer`, `Priest`, `Hunter`, `Slayer` (6). Lida ao vivo via
-`HeroInfoData.CLASS_TYPE` e exportada como catálogo em `game/build.py`. Ex.: Ranger (arco) gera
-hits `Physical` + `Projectile`, então `PhysicalDamagePercent` E `IncreaseProjectileDamage`
-ambos aplicam — em camadas que se multiplicam.
+**`EEquipClassType`** (the class that gates equipment/skills): `All` (0), `Knight`,
+`Ranger` (2), `Sorcerer`, `Priest`, `Hunter`, `Slayer` (6). Read live via
+`HeroInfoData.CLASS_TYPE` and exported as a catalog in `game/build.py`. E.g.: Ranger (bow) produces
+`Physical` + `Projectile` hits, so `PhysicalDamagePercent` AND `IncreaseProjectileDamage`
+both apply — in layers that multiply.
 
 ## Related
 
-- [[invariants/obscured-data-offlimits]] — por que os stats core do `Unit` são ilegíveis (XOR) e o dano sai do `FINAL_STATS`, não da lista de mods
-- [[reference/run-data-map]] — onde cada campo da run (incl. `classId`) é lido
-Veja também: [[reference/extraction-viability]] (dano per-hero/per-atributo NÃO está em memória) · [[archive/damage-model]] (fórmula exata + RVAs)
+- [[invariants/obscured-data-offlimits]] — why `Unit`'s core stats are unreadable (XOR) and damage comes from `FINAL_STATS`, not the mod list
+- [[reference/run-data-map]] — where each run field (incl. `classId`) is read
+See also: [[reference/extraction-viability]] (per-hero/per-attribute damage is NOT in memory) · [[archive/damage-model]] (exact formula + RVAs)

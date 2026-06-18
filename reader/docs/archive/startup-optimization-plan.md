@@ -1,7 +1,7 @@
 ---
 type: archive
 status: superseded
-description: "SNAPSHOT histórico (RE cru ou plano entregue) — nomes/offsets/linhas podem estar obsoletos; a verdade atual está nas notas vivas (ver _index). Isento do drift-test de código."
+description: "Historical SNAPSHOT (raw RE or delivered plan) — names/offsets/lines may be stale; current truth lives in the live notes (see _index). Exempt from the code drift-test."
 ---
 
 # tbh-meter cold-startup optimization plan

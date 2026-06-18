@@ -1,6 +1,6 @@
 ---
 type: guide
-description: "Receita ponta-a-ponta pra adicionar um campo novo ao record de run (raw/<id>.json → logs/<id>.json): decidir o bump (RAW_SCHEMA_VERSION só se a FORMA mudou; aditivo não bumpa; SCHEMA_VERSION=11 é legado congelado) → inicializar em new_run (se acumula) → serializar no build_raw_record → derivar/coagir no conversor+app → tipo opcional. Pular um passo = campo que vaza da run anterior, conversor cego, ou some no app."
+description: "End-to-end recipe for adding a new field to the run record (raw/<id>.json → logs/<id>.json): decide the bump (RAW_SCHEMA_VERSION only if the SHAPE changed; additive doesn't bump; SCHEMA_VERSION=11 is frozen legacy) → initialize in new_run (if it accumulates) → serialize in build_raw_record → derive/coerce in the converter+app → optional type. Skipping a step = a field that leaks from the previous run, a blind converter, or one that vanishes in the app."
 code_anchors:
   - meter_windows.py::close_run
   - meter_windows.py::new_run
@@ -10,113 +10,116 @@ code_anchors:
   - app/src/shared/run-types.ts
 ---
 
-# Guia: adicionar um campo ao record de run (raw → logs)
+# Guide: adding a field to the run record (raw → logs)
 
-O reader emite **um `raw/<id>.json` por run** (cru, nunca reescrito); o **conversor** do app
-(`converter/convert.ts`) deriva o `logs/<id>.json` estruturado que a UI lê — e registros de
-**todas as eras** convivem (o `runs.jsonl` antigo entra só pela migração). Adicionar um campo
-toca **5 lugares em ordem** — pule um e o campo vaza da run anterior, deixa o conversor cego,
-ou nunca chega ao app. Faça nesta sequência.
+The reader emits **one `raw/<id>.json` per run** (raw, never rewritten); the app's **converter**
+(`converter/convert.ts`) derives the structured `logs/<id>.json` the UI reads — and records from
+**every era** coexist (the old `runs.jsonl` enters only via migration). Adding a field touches
+**5 places in order** — skip one and the field leaks from the previous run, leaves the converter
+blind, or never reaches the app. Do them in this sequence.
 
-## Antes: o campo é de RUN ou de HERÓI?
+## First: is the field RUN-level or HERO-level?
 
-São dois níveis de record com dois normalizadores distintos — decida primeiro:
+There are two record levels with two distinct normalizers — decide first:
 
-- **de run** (vale pra run inteira: `gold_gained`, `deaths`, `drops`): vai no `rec` de
-  `close_run` e é normalizado por `normalizeRecord` em `runs-source.ts`.
-- **de herói** (por herói deployado: `xp_gained`, `killed_by`, `deaths` por herói): vai em cada
-  item de `heroes_out` dentro de `close_run` e é normalizado por `normalizeHero`.
+- **run-level** (applies to the whole run: `gold_gained`, `deaths`, `drops`): goes in the `rec`
+  of `close_run` and is normalized by `normalizeRecord` in `runs-source.ts`.
+- **hero-level** (per deployed hero: `xp_gained`, `killed_by`, per-hero `deaths`): goes in each
+  item of `heroes_out` inside `close_run` and is normalized by `normalizeHero`.
 
-O resto da receita é o mesmo; só muda QUAL dict/normalizador você edita.
+The rest of the recipe is the same; only WHICH dict/normalizer you edit changes.
 
-## 1. Decida o bump — [[invariants/schema-versioning]]
+## 1. Decide the bump — [[invariants/schema-versioning]]
 
-Dois números moram em **`meter_windows.py`**, com papéis opostos:
+Two numbers live in **`meter_windows.py`**, with opposite roles:
 
-- **Mudou a FORMA da saída** (campo que o conversor precisa despachar/interpretar diferente)?
-  → bump **`RAW_SCHEMA_VERSION`** (estenda o comentário de histórico ao lado) **+ o dispatch
-  correspondente no conversor**.
-- **Campo puramente ADITIVO** que o conversor só repassa? → **não bumpa nada**; o campo entra
-  OPCIONAL no contrato TS (passo 5).
-- **`SCHEMA_VERSION` (=11) é o marco LEGADO congelado do `runs.jsonl`** — o reader não escreve
-  mais esse arquivo; bumpá-lo quebra o marco da migração e falha `test_asserts_hold`. NUNCA.
+- **Did the output SHAPE change** (a field the converter must dispatch/interpret differently)?
+  → bump **`RAW_SCHEMA_VERSION`** (extend the history comment next to it) **+ the corresponding
+  dispatch in the converter**.
+- **Purely ADDITIVE field** the converter just passes through? → **bump nothing**; the field
+  enters OPTIONAL in the TS contract (step 5).
+- **`SCHEMA_VERSION` (=11) is the frozen LEGACY marker of `runs.jsonl`** — the reader no longer
+  writes that file; bumping it breaks the migration marker and fails `test_asserts_hold`. NEVER.
 
-A fonte é ÚNICA: NÃO crie cópia em `config/offsets.py` — ela foi removida de propósito e
-`test_version_constants_unique` falha se reaparecer. Bumpar o lugar errado deixa o record real
-parado no número velho e o conversor cego pro campo (a clássica bug-class "schema não bumpado").
+The source is SINGLE: do NOT create a copy in `config/offsets.py` — it was removed on purpose and
+`test_version_constants_unique` fails if it reappears. Bumping the wrong place leaves the real
+record stuck on the old number and the converter blind to the field (the classic "schema not
+bumped" bug class).
 
-## 2. Inicialize em `new_run` SE o campo ACUMULA — [[invariants/run-lifecycle]]
+## 2. Initialize in `new_run` IF the field ACCUMULATES — [[invariants/run-lifecycle]]
 
-`new_run()` é a **fonte única do estado por-run** e devolve o dict zerado. **Regra de ouro:
-todo campo que ACUMULA durante a run nasce aqui** — caso contrário o valor da run anterior vaza
-pra próxima. Acumuladores já presentes: `drops` (lista), `deaths`/`revives`/`killers` (dicts
-heroKey-keyed), `party_seen`. Se o seu campo é um delta/contador/lista que cresce tick-a-tick,
-adicione a chave zerada (`[]`, `{}`, `0`) em `new_run` e atualize-a no loop ou nos handlers de
-log. Se o campo é **derivado só no fechamento** (calculado de outro estado dentro de
-`close_run`), pule este passo.
+`new_run()` is the **single source of per-run state** and returns the zeroed dict. **Golden rule:
+every field that ACCUMULATES during the run is born here** — otherwise the previous run's value
+leaks into the next. Accumulators already present: `drops` (list), `deaths`/`revives`/`killers`
+(heroKey-keyed dicts), `party_seen`. If your field is a delta/counter/list that grows tick by
+tick, add the zeroed key (`[]`, `{}`, `0`) in `new_run` and update it in the loop or in the log
+handlers. If the field is **derived only at close** (computed from other state inside
+`close_run`), skip this step.
 
-## 3. Serialize no `rec` de `close_run`
+## 3. Serialize in the `rec` of `close_run`
 
-Em `close_run`, o record nasce em **`build_raw_record`** — adicione o campo lá (de run) ou ao
-item de herói correspondente, antes do `_write_atomic` que grava o `raw/<id>.json`. Use
-snake_case nas chaves do JSON (convenção do record). Para um campo de herói **esparso** (só faz sentido quando não-vazio, ex.: `deaths`,
-`killed_by`), siga o padrão existente: **só anexe a chave se o valor for truthy** — o app trata a
-ausência como "não rastreado", o que mantém o record enxuto e a semântica honesta.
+In `close_run`, the record is born in **`build_raw_record`** — add the field there (run-level) or
+to the corresponding hero item, before the `_write_atomic` that writes the `raw/<id>.json`. Use
+snake_case for the JSON keys (the record's convention). For a **sparse** hero field (only
+meaningful when non-empty, e.g. `deaths`, `killed_by`), follow the existing pattern: **only attach
+the key if the value is truthy** — the app treats absence as "not tracked", which keeps the record
+lean and the semantics honest.
 
-## 4. Normalize defensivo no app — [[invariants/app-normalization]]
+## 4. Defensive normalization in the app — [[invariants/app-normalization]]
 
-> **Pós-redesign reader↔app:** o app lê os structured **já convertidos** de `logs/` via
-> `loadStructured` (`runs-source.ts`) — quem **deriva/sela** um campo novo a partir do raw é o
-> **conversor** (`converter/convert.ts`; veredito de qualidade em `converter/helpers.ts`), e o
-> `loadStructured` só faz **parse + coerção** (sem re-derivar). `normalizeRecord`/`normalizeHero`
-> abaixo seguem sendo os normalizadores do `runs.jsonl` legado, hoje usados **só na migração**
-> (`converter/legacy.ts`). As coerções valem para os DOIS (mesmos helpers, mesma semântica de
-> "ausente").
+> **Post reader↔app redesign:** the app reads the **already-converted** structured records from
+> `logs/` via `loadStructured` (`runs-source.ts`) — the one that **derives/seals** a new field
+> from the raw is the **converter** (`converter/convert.ts`; quality verdict in
+> `converter/helpers.ts`), and `loadStructured` only does **parse + coercion** (no re-deriving).
+> `normalizeRecord`/`normalizeHero` below remain the normalizers of the legacy `runs.jsonl`, today
+> used **only in migration** (`converter/legacy.ts`). The coercions apply to BOTH (same helpers,
+> same "absent" semantics).
 
-Coaja o campo no normalizador certo. Escolha o helper pela semântica do "ausente":
+Coerce the field in the right normalizer. Pick the helper by the semantics of "absent":
 
-- **numérico genuinamente opcional** (0 ≠ "ausente", ex.: `deaths`/`revives`/`expStart`):
-  `firstDefinedNum(...)` → `undefined` quando falta. **Não** use `firstNum` aqui: o default `0`
-  mente, vira "zero real" num registro que nunca teve o dado.
-- **numérico com default zero** (e/ou múltiplas chaves de era): `firstNum(...)` → `0`.
-- **anulável no DTO** (`act`, `stageNo`): `numOrNull(v)` → `null`.
+- **genuinely optional numeric** (0 ≠ "absent", e.g. `deaths`/`revives`/`expStart`):
+  `firstDefinedNum(...)` → `undefined` when missing. Do **not** use `firstNum` here: the default
+  `0` lies, becoming a "real zero" in a record that never had the data.
+- **numeric with default zero** (and/or multiple era keys): `firstNum(...)` → `0`.
+- **nullable in the DTO** (`act`, `stageNo`): `numOrNull(v)` → `null`.
 - **string**: `str(v, fallback)`.
-- **array tolerante** (`drops`, `killed_by`): `Array.isArray(raw.x) ? raw.x.map(...).filter((e):
-  e is T => e !== null) : []` — cada item vira `T | null`, os `null` caem fora; um item
-  malformado some, o array sobrevive.
+- **tolerant array** (`drops`, `killed_by`): `Array.isArray(raw.x) ? raw.x.map(...).filter((e):
+  e is T => e !== null) : []` — each item becomes `T | null`, the `null`s drop out; a malformed
+  item disappears, the array survives.
 
-**Padrão do campo opcional:** construa o objeto base (literal com os sempre-presentes) e **anexe o
-opcional condicionalmente DEPOIS do literal mas ANTES do `return`** (`if (x !== undefined)
-record.x = x`). **NUNCA depois do `return`** — código morto, o campo nunca chega ao DTO. Um
-registro antigo que não tem o campo vira `undefined`/vazio, **nunca crash, nunca default errado**;
-uma linha que falha na normalização é pulada, não derruba o watcher.
+**Optional-field pattern:** build the base object (literal with the always-present fields) and
+**attach the optional one conditionally AFTER the literal but BEFORE the `return`** (`if (x !==
+undefined) record.x = x`). **NEVER after the `return`** — dead code, the field never reaches the
+DTO. An old record that lacks the field becomes `undefined`/empty, **never a crash, never a wrong
+default**; a line that fails normalization is skipped, it doesn't bring down the watcher.
 
-## 5. Tipe como OPCIONAL em `run-types.ts`
+## 5. Type it as OPTIONAL in `run-types.ts`
 
-Espelhe a escolha do passo 4 no tipo. Em `RunRecord` (run) ou `RunHero` (herói): campo
-genuinamente opcional → `field?: T`; anulável explícito → `field: T | null`. Arrays mapeiam as
-chaves snake_case do JSON → camelCase no TS (ex.: `killed_by` → `killedBy?: number[]`). Um campo
-que não é opcional aqui, mas falta nos registros antigos, força o TS a achar que está sempre
-presente — e o app passa a contar com algo que metade das linhas não tem.
+Mirror the step-4 choice in the type. In `RunRecord` (run) or `RunHero` (hero): genuinely optional
+field → `field?: T`; explicitly nullable → `field: T | null`. Arrays map the JSON's snake_case
+keys → camelCase in TS (e.g. `killed_by` → `killedBy?: number[]`). A field that isn't optional
+here but is missing from old records forces TS to assume it's always present — and the app starts
+relying on something half the lines don't have.
 
-## Não precisa mexer aqui
+## No need to touch here
 
-- O dedup na leitura (`dedupeById` + `dedupeSessionScoped` em `runs-source.ts`) usa só campos
-  **brutos e estáveis** já existentes (`contentSig`) — um campo novo não entra na assinatura; não
-  toque, salvo se o campo novo for ele próprio um critério de dedup. O descarte de `partial`/`skipped`
-  **não** está na leitura — quem sela o veredito é o conversor (`convertLegacy` na migração,
-  `convert` no raw novo) e quem suprime no upload é o `eligible()`; ver [[invariants/app-normalization]].
-- A regra de "30s/x-10" (skip) e a flag `partial` são do ciclo de vida, não da serialização —
-  veja [[invariants/run-lifecycle]] se o campo novo interagir com elas.
+- The read-time dedup (`dedupeById` + `dedupeSessionScoped` in `runs-source.ts`) uses only
+  **raw, stable** fields that already exist (`contentSig`) — a new field doesn't enter the
+  signature; don't touch it, unless the new field is itself a dedup criterion. The discard of
+  `partial`/`skipped` is **not** in the read path — the converter seals the verdict (`convertLegacy`
+  in migration, `convert` on the new raw) and `eligible()` suppresses it at upload; see
+  [[invariants/app-normalization]].
+- The "30s/x-10" rule (skip) and the `partial` flag belong to the lifecycle, not serialization —
+  see [[invariants/run-lifecycle]] if the new field interacts with them.
 
-## Atualize a doc junto
+## Update the doc alongside
 
-Ao bumpar `RAW_SCHEMA_VERSION` no código, atualize o `assert` em
-[[invariants/schema-versioning]] (`RAW_SCHEMA_VERSION == N`) — é o que prova que a base não
-ficou pra trás do runtime. (O assert `SCHEMA_VERSION == 11` fica como está: é o marco congelado.)
+When you bump `RAW_SCHEMA_VERSION` in the code, update the `assert` in
+[[invariants/schema-versioning]] (`RAW_SCHEMA_VERSION == N`) — it's what proves the base didn't
+fall behind the runtime. (The `SCHEMA_VERSION == 11` assert stays as is: it's the frozen marker.)
 
 ## Related
-- [[invariants/schema-versioning]] — por que o bump é obrigatório e por que a fonte é uma só.
-- [[invariants/run-lifecycle]] — `new_run` inicializa todo acumulador; `close_run` é onde o record nasce.
-- [[invariants/app-normalization]] — o detalhe das coerções, dos arrays tolerantes e do "anexe antes do return".
-Veja também: [[reference/run-data-map]] (o mapa campo-a-campo do record que close_run emite)
+- [[invariants/schema-versioning]] — why the bump is mandatory and why the source is single.
+- [[invariants/run-lifecycle]] — `new_run` initializes every accumulator; `close_run` is where the record is born.
+- [[invariants/app-normalization]] — the detail of the coercions, the tolerant arrays, and "attach before the return".
+See also: [[reference/run-data-map]] (the field-by-field map of the record `close_run` emits)

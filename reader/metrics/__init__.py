@@ -1,2 +1,2 @@
-# Cálculo das métricas a partir do que o game/ expõe. Sem tocar em memória
-# diretamente — recebe objetos (monstros, managers) e devolve números.
+# Computes metrics from what game/ exposes. Touches no memory directly —
+# takes objects (monsters, managers) and returns numbers.

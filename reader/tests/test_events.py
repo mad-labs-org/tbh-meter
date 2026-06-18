@@ -1,4 +1,4 @@
-"""Testes para metrics/events.py — EventFeed."""
+"""Tests for metrics/events.py — EventFeed."""
 
 import pytest
 
@@ -12,7 +12,7 @@ class TestEventFeed:
         assert f.total_seen == 0
 
     def test_first_update_is_baseline_no_events(self):
-        """Primeira chamada estabelece baseline; sem eventos contados."""
+        """First call establishes the baseline; no events counted."""
         f = EventFeed()
         f.update(10)
         assert f.new_since_last == 0
@@ -21,7 +21,7 @@ class TestEventFeed:
     def test_count_increase_detected(self):
         f = EventFeed()
         f.update(10)   # baseline
-        f.update(13)   # +3 novos
+        f.update(13)   # +3 new
         assert f.new_since_last == 3
         assert f.total_seen == 3
 
@@ -40,17 +40,17 @@ class TestEventFeed:
         assert f.total_seen == 0
 
     def test_list_truncation_reancors(self):
-        """Quando a lista CAI (truncada pelo runtime, limite de 2000),
-        não deve reportar eventos negativos — apenas re-ancora."""
+        """When the list DROPS (truncated by the runtime, 2000-item cap),
+        it must not report negative events — it just re-anchors."""
         f = EventFeed()
         f.update(1500)
         f.update(1800)   # +300 ok
-        f.update(100)    # caiu — truncado
+        f.update(100)    # dropped — truncated
         assert f.new_since_last == 0
-        assert f.total_seen == 300  # só conta o legítimo
+        assert f.total_seen == 300  # only counts the legitimate gain
 
     def test_none_count_skipped(self):
-        """None (leitura falhou) não altera estado."""
+        """None (read failed) does not change state."""
         f = EventFeed()
         f.update(5)
         f.update(None)
@@ -63,7 +63,7 @@ class TestEventFeed:
         f.update(8)   # +3
         f.update(None)
         assert f.new_since_last == 0
-        assert f.total_seen == 3  # mantém o que tinha
+        assert f.total_seen == 3  # keeps what it had
 
     @pytest.mark.parametrize("counts,expected_total", [
         ([0, 1, 2, 3, 4, 5], 5),

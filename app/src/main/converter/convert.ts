@@ -3,14 +3,14 @@
 // it ONCE into the clean `RunRecord` the app reads from `logs/`. No I/O, no memory reads, no catalog
 // lookups — given the same raw it always yields the same structured record (the golden test relies
 // on this). Dispatch is by `raw_schema_version` (never game_version): additive, so an old raw keeps
-// converting to a stable output forever. See progress.md "Conversor".
+// converting to a stable output forever. This is the converter.
 //
 // What it DERIVES (from what the reader emits): dps, gold/sec, xp/sec, the stage label, the mode
 // label, and the quality verdict (counted/skipped/partial/degraded). What it does NOT do: recompute
 // gold/xp (those need the live memory read — reader's job; the converter only unwraps them) and
 // resolve localized hero/item/skill names (id-based; the render layer resolves those). The reader's
 // `session_id` is passed THROUGH verbatim — the reader owns session identity, the converter never
-// re-mints it (progress.md "Identidade & sessão", which corrected the original "converter mints" idea).
+// re-mints it (identity & session — which corrected the original "converter mints" idea).
 
 import type { Field, AnyRawRun, RawHero, RawDrop, MetricSource } from "../../shared/raw-types.js";
 import type {
@@ -190,7 +190,7 @@ export function convert(raw: AnyRawRun): RunRecord {
   // Seal the verdict by the shared rule (helpers.classifyQuality): degraded (a critical read failed)
   // > partial (under-counted capture) > skipped (below the floor / not a clean success) > counted.
   // Never deletes a run — every verdict yields a record the user sees, marked + filterable
-  // (progress.md "Skip != sumir"). `degraded` here = an envelope error on a critical data field.
+  // (skip != vanish). `degraded` here = an envelope error on a critical data field.
   const { quality, partial } = classifyQuality({
     status,
     stageNo,

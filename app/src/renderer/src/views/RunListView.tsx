@@ -285,7 +285,7 @@ export function RunListView({
 
   // The DISPLAYED runs = the user's display filter (PR6, layer 3): hide non-counted (default) +
   // an optional minimum duration (x-10 exempt). The toggle below reveals the hidden runs — they
-  // are marked + filterable, never deleted (progress.md "Skip != sumir"). Sorted newest-first.
+  // are marked + filterable, never deleted. Sorted newest-first.
   // First the layer-3 DISPLAY filter (settings prefs), then the layer-4 INTERACTIVE filter + sort
   // (the filter bar / sortable columns). Two layers compose: a user can hide non-counted runs in
   // settings AND filter to one stage sorted by gold in the bar.
@@ -317,7 +317,7 @@ export function RunListView({
   }, []);
   // How many runs the QUALITY gate is hiding — the count the "show ignored" toggle governs. It does
   // NOT include duration-hidden runs (those have their own control in Settings), so flipping the
-  // toggle always reveals exactly this many (progress.md "Skip != sumir": the affordance must match
+  // toggle always reveals exactly this many (the affordance must match
   // the gate it controls, never promise N then reveal fewer).
   const qualityHidden = useMemo(
     () => countQualityHidden(allRuns, { hideNonCounted, minDurationSec }),
@@ -391,7 +391,7 @@ export function RunListView({
           <Inbox className="size-6 text-zinc-600" />
           {qualityHidden > 0 ? (
             // Runs exist but the QUALITY filter hides them — say so + offer to reveal, so the meter
-            // never looks broken (progress.md "Skip != sumir": skipped runs are filtered, not gone).
+            // never looks broken (skipped runs are filtered, not gone).
             // The toggle reveals exactly `qualityHidden` runs (the gate it controls).
             <>
               <p className="text-sm">{t("runs.emptyFiltered")}</p>

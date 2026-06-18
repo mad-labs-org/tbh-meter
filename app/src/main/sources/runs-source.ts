@@ -454,7 +454,7 @@ function contentSig(r: RunRecord): string {
  * `sessionId`s — while NEVER collapsing a real farm (two genuinely-distinct runs in the SAME
  * session that happen to look identical).
  *
- * The cause (progress.md "Dedup"): AV kills the reader, the app respawns it; if the old process did
+ * The cause (dedup): AV kills the reader, the app respawns it; if the old process did
  * not die, BOTH readers write the same finished run — but each reader owns its own session, so the
  * two copies carry DIFFERENT session ids (and thus different `id`s). Collapsing only ACROSS sessions
  * catches exactly that phantom and nothing else: a farm's repeated runs all share ONE session id, so
@@ -465,7 +465,7 @@ function contentSig(r: RunRecord): string {
  * signature owns it. Drop a later record only when its signature is owned by a DIFFERENT session.
  * A same-session repeat keeps owner === its own sessionId, so it never collapses (farm intact).
  * The design accepts the doubly-rare residue (a reader restart between two exact-identical runs)
- * over ever hiding a real run (progress.md "Resíduo").
+ * over ever hiding a real run (the accepted residue).
  */
 export function dedupeSessionScoped(records: RunRecord[]): RunRecord[] {
   // content signature -> the sessionId of the first (newest) record seen with that content.
@@ -726,7 +726,7 @@ export class RunsSource extends EventEmitter {
       // still sees every v2 run under the one "" owner — identical to a fresh parse. Nested fields
       // (heroes/drops/issues) are shared by reference: nothing downstream mutates them.
       out.push({ ...record });
-      // On-use staleness (progress.md PR4 step 3): a log from an OLDER converter is re-converted
+      // On-use staleness (PR4 step 3): a log from an OLDER converter is re-converted
       // from its raw so the freshest derivation/quality lands. Fire-and-forget — the converter
       // rewrites the log and the watcher picks up the current version on the next reload.
       if (
@@ -753,7 +753,7 @@ export class RunsSource extends EventEmitter {
     const byId = dedupeById(out);
 
     // (2) Collapse the two-reader phantom: content-identical runs across DIFFERENT sessions. A real
-    // farm (same session) is NEVER collapsed (progress.md "Dedup" — session-scoped net).
+    // farm (same session) is NEVER collapsed (dedup — the session-scoped net).
     const records = dedupeSessionScoped(byId);
 
     // (3) Derive the session for raw-v2 runs (Redesign 2). v2 carries NO reader session (the reader

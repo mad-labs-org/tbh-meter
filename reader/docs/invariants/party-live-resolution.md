@@ -1,19 +1,19 @@
 ---
 type: invariant
-description: "A party de uma run é a VIVA (StageManager.HeroList via pick_live_sm, SEM cap de candidatos) — os heróis DEPLOYADOS, não o roster do save. Sem party viva, degrada honesto (`heroes: err` via hero_in_run, ⚠ no log) — NUNCA despeja o roster (mostrava heróis não-jogados com +0xp) NEM um proxy-chute por xp>0 (pegaria xp idle)."
+description: "A run's party is the LIVE one (StageManager.HeroList via pick_live_sm, NO candidate cap) — the DEPLOYED heroes, not the save roster. With no live party, degrade honestly (`heroes: err` via hero_in_run, ⚠ in the log) — NEVER dump the roster (showed unplayed heroes with +0xp) NOR a proxy-guess by xp>0 (would catch idle xp)."
 symptoms:
-  - "party errada"
-  - "party com heróis a mais"
-  - "heróis com +0xp"
-  - "roster no lugar da party"
+  - "wrong party"
+  - "party with too many heroes"
+  - "heroes with +0xp"
+  - "roster instead of party"
   - "StageManager NOT found"
-  - "party do save"
-  - "jogando solo mas mostra 6"
+  - "party from save"
+  - "playing solo but shows 6"
   - "live party off"
-  - "StageManager ok mas 0 heroes deployed"
-  - "party off com a run em combate"
+  - "StageManager ok but 0 heroes deployed"
+  - "party off while run is in combat"
   - "ghost StageManager"
-  - "runs inválidas sem time"
+  - "invalid runs with no team"
   - "save-degraded"
   - "hero_in_run"
 code_anchors:
@@ -29,49 +29,48 @@ guarded_by:
   - tests/test_raw_record.py::test_party_off_makes_heroes_err
 ---
 
-# Resolução da party de uma run (viva, não roster)
+# Resolving a run's party (live, not roster)
 
-A party canônica de uma run são os heróis **DEPLOYADOS** — lidos AO VIVO do `StageManager.HeroList`
-(`read_live_party`), na instância escolhida por `pick_live_sm`. O save lista o **roster** (todo herói
-com nível > 1): jogando solo com a Ranger, o save lista os 6, mas só a Ranger está em campo. Confundir
-roster com party é mostrar heróis não-jogados (o sintoma: vários com `+0xp`).
+A run's canonical party is the **DEPLOYED** heroes — read LIVE from `StageManager.HeroList`
+(`read_live_party`), on the instance chosen by `pick_live_sm`. The save lists the **roster** (every hero
+above level 1): playing solo with the Ranger, the save lists all 6, but only the Ranger is on the field.
+Confusing roster with party means showing unplayed heroes (the symptom: several with `+0xp`).
 
-## `pick_live_sm`: SEM cap, e MESMA validação do `read_live_party`
+## `pick_live_sm`: NO cap, and the SAME validation as `read_live_party`
 
-`pick_live_sm` varre as instâncias de StageManager e devolve a primeira de onde `read_live_party`
-extrai ≥1 herói DEPLOYADO válido — chama o **próprio** `read_live_party`, então pick e read usam a
-MESMA validação. Tem que varrer **TODAS** as candidatas (como `pick_live_csd`), sem cap fixo: a
-portadora pode estar em QUALQUER índice. Um cap fixo perdia a portadora quando o backref devolvia
-mais que o limite — cravado no 1.00.11: **1162 instâncias** de StageManager (vs ~450 nos builds
-antigos), a portadora além de 600 → `StageManager NOT found` MESMO em combate → a party caía no
-roster.
+`pick_live_sm` scans the StageManager instances and returns the first one from which `read_live_party`
+extracts ≥1 valid DEPLOYED hero — it calls `read_live_party` **itself**, so pick and read use the
+SAME validation. It has to scan **ALL** candidates (like `pick_live_csd`), with no fixed cap: the
+carrier can be at ANY index. A fixed cap lost the carrier whenever the backref returned more than the
+limit — nailed in 1.00.11: **1162 instances** of StageManager (vs ~450 in older builds), the carrier
+beyond 600 → `StageManager NOT found` EVEN in combat → the party fell back to the roster.
 
-**Por que pick e read TÊM que concordar (regressão 1.00.13).** Antes, o pick usava um check MAIS
-FRACO (só `heroKey` válido) que o read (que exige TAMBÉM `nível`/`exp`). Entre as candidatas há
-instâncias **ghost** — StageManager torn-down/template, com `heroKey` válido mas `lvl=0` — a MESMA
-família de [[invariants/instance-selection]] (o scan acha a classe-K em dezenas de slots que não são
-o objeto vivo). O check fraco aceitava um ghost, o meter o CONGELAVA (`if not sm` no loop) e o
-`read_live_party` lia `{}` a sessão inteira → `StageManager ok — 0 heroes deployed`, toda run
-`heroes:err`, runs inválidas sem time. Só batia em quem tivesse um ghost ANTES da carrier na ordem
-de memória (por isso "funcionava na máquina do dev" e passava no `validate_live`). `describe_sm_candidates`
-(no `reader-diag.log`) loga candidatas / carriers-vs-ghosts / escolhida — o dado que faltou no debug.
-Sem candidata legível → `None` (degrada honesto, NUNCA um ghost que o read não consegue ler).
+**Why pick and read MUST agree (the 1.00.13 regression).** Before, pick used a WEAKER check (only a
+valid `heroKey`) than read (which ALSO requires `lvl`/`exp`). Among the candidates there are **ghost**
+instances — torn-down/template StageManagers, with a valid `heroKey` but `lvl=0` — the SAME family as
+[[invariants/instance-selection]] (the scan finds the K-class in dozens of slots that are not the live
+object). The weak check accepted a ghost, the meter FROZE on it (`if not sm` in the loop) and
+`read_live_party` read `{}` the whole session → `StageManager ok — 0 heroes deployed`, every run
+`heroes:err`, invalid runs with no team. It only hit anyone who had a ghost BEFORE the carrier in memory
+order (hence "worked on the dev's machine" and passed `validate_live`). `describe_sm_candidates`
+(in `reader-diag.log`) logs candidates / carriers-vs-ghosts / chosen — the data the debug was missing.
+With no readable candidate → `None` (degrade honestly, NEVER a ghost that read can't read).
 
-## Degradação honesta: party off vira `err`, NUNCA o roster
+## Honest degradation: party off becomes `err`, NEVER the roster
 
-`hero_in_run(hero_key, live_keys)` é a regra única de inclusão: entra **só** quem está na party VIVA
-(`live_keys` = HeroList ∪ party_seen). Quando a party viva não resolve a run INTEIRA (sm nulo),
-**ninguém entra** — o reader emite `heroes: err("party live off")` no envelope do `raw/<id>.json`.
-NUNCA o roster do save (o bug dos 5 heróis com +0xp) nem um proxy-chute por xp>0 (pegaria um herói que
-só ganhou xp idle, re-introduzindo o bug): party desconhecida ≠ party adivinhada.
+`hero_in_run(hero_key, live_keys)` is the single inclusion rule: **only** whoever is in the LIVE party
+gets in (`live_keys` = HeroList ∪ party_seen). When the live party doesn't resolve the WHOLE run (sm
+null), **nobody gets in** — the reader emits `heroes: err("party live off")` in the `raw/<id>.json`
+envelope. NEVER the save roster (the bug of 5 heroes with +0xp) nor a proxy-guess by xp>0 (would catch a
+hero who only gained idle xp, re-introducing the bug): unknown party ≠ guessed party.
 
-`heroes` é campo **CRÍTICO** no conversor ([[process/data-contract-id-based]]): `heroes: err` →
-`issues["heroes"]` → a run é selada **`degraded`**. Pela régua do #262: **não sobe pro leaderboard**
-(`auto-upload` pula degradadas) mas **aparece no app**, marcada e filtrável (`hideNonCounted`,
-"Skip != sumir"). A linha do `meter.log` ainda leva `⚠` p/ o maintainer, e o gate `validate_live` pega
-ao vivo — a degradação nunca é silenciosa.
+`heroes` is a **CRITICAL** field in the converter ([[process/data-contract-id-based]]): `heroes: err` →
+`issues["heroes"]` → the run is sealed **`degraded`**. By the #262 rule: **it doesn't go to the leaderboard**
+(`auto-upload` skips degraded ones) but it **shows in the app**, marked and filterable (`hideNonCounted`,
+"Skip != hide"). The `meter.log` line still carries `⚠` for the maintainer, and the `validate_live` gate
+catches it live — the degradation is never silent.
 
 ## Related
-- [[invariants/instance-selection]] — escolher a instância viva certa de uma classe (mesma família de bug)
-- [[process/live-validation-gate]] — o gate ao vivo que pega party degradada (+ gold/xp/stage) antes do ship
-- [[invariants/metric-fallback-chains]] — a tag de fonte (live/save) que preserva a degradação, igual a gold/xp
+- [[invariants/instance-selection]] — picking the right live instance of a class (same bug family)
+- [[process/live-validation-gate]] — the live gate that catches a degraded party (+ gold/xp/stage) before ship
+- [[invariants/metric-fallback-chains]] — the source tag (live/save) that preserves the degradation, same as gold/xp

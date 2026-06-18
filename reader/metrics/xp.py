@@ -1,14 +1,14 @@
-"""xp.py — XP VIVA por herói: ACUMULADOR tick-a-tick (PartyXpAccumulator) + ponte de
-level-up pela curva.
+"""xp.py — LIVE per-hero XP: tick-by-tick ACCUMULATOR (PartyXpAccumulator) + level-up
+bridging via the curve.
 
-A xp viva (HeroRuntime.EXP_FAKE) é dentro-do-nível e zera no level-up; a curva
-(config/level_curve.json = ExpForLevelUp por nível) preenche a volta. Validado ao vivo:
-em 3 level-ups a conta bateu diff 0. O within-level é MONOTÔNICO fora do level-up
-(detector de dip rodou muitas runs com morte e nunca disparou) — morto só PAUSA o ganho.
+Live xp (HeroRuntime.EXP_FAKE) is within-level and resets on level-up; the curve
+(config/level_curve.json = ExpForLevelUp per level) fills the wrap. Validated live:
+across 3 level-ups the sum matched with diff 0. Within-level is MONOTONIC outside level-up
+(the dip detector ran many runs with a death and never fired) — death only PAUSES the gain.
 
-CAP: nível sem entrada na curva não tem progressão definida (level_capped) — o jogo segue
-incrementando EXP_FAKE no cap sem level-up pra consumir, então o delta same-level é XP
-FANTASMA: herói no cap ganha 0; cruzar PRA DENTRO do cap banka só até o limiar."""
+CAP: a level with no curve entry has no defined progression (level_capped) — the game keeps
+incrementing EXP_FAKE at the cap with no level-up to consume it, so the same-level delta is
+PHANTOM XP: a hero at the cap gains 0; crossing INTO the cap banks only up to the threshold."""
 
 import json
 import os
@@ -19,8 +19,8 @@ _CURVE = None
 
 
 def curve():
-    """{nível: ExpForLevelUp} carregado uma vez de config/level_curve.json.
-    Via resource_path -> funciona em source E congelado (PyInstaller sys._MEIPASS)."""
+    """{level: ExpForLevelUp} loaded once from config/level_curve.json.
+    Via resource_path -> works in source AND frozen (PyInstaller sys._MEIPASS)."""
     global _CURVE
     if _CURVE is None:
         path = resource_path(os.path.join("config", "level_curve.json"))
@@ -30,12 +30,12 @@ def curve():
 
 
 def level_capped(lv):
-    """Nível sem entrada na curva = sem progressão definida = CAP (a curva real cobre
-    1..100 → cap 101). Também neutraliza nível-lixo FORA do range da curva (0/negativo
-    ou acima do cap — melhor 0 que xp fantasma). level_capped(None) é False — sem info
-    de nível, mantém o delta cru. Curva indisponível (bundle quebrado) → False: trata
-    como não-capado (delta cru, comportamento pré-fix) — o reader continua vivo (este é
-    o 1º toque na curva no caminho do close_run); o CI --selftest gateia o bundle quebrado."""
+    """A level with no curve entry = no defined progression = CAP (the real curve covers
+    1..100 → cap 101). Also neutralizes garbage levels OUTSIDE the curve's range (0/negative
+    or above the cap — 0 beats phantom xp). level_capped(None) is False — with no level info,
+    keep the raw delta. Curve unavailable (broken bundle) → False: treat as not-capped (raw
+    delta, pre-fix behavior) — the reader stays alive (this is the 1st touch of the curve on
+    the close_run path); CI --selftest gates the broken bundle."""
     if lv is None:
         return False
     try:
@@ -45,10 +45,10 @@ def level_capped(lv):
 
 
 def xp_through_levelup(lv0, exp0, lv1, exp1):
-    """XP total ganho atravessando um (ou mais) level-up: (curva[lv0]-exp0) + níveis
-    intermediários cheios + exp1. Cruzar PRA DENTRO do cap (lv1 sem entrada na curva)
-    banka só até o limiar — o exp1 pós-cap é fantasma, não conta. None se a curva não
-    cobre lv0/intermediários ou der negativo."""
+    """Total XP gained crossing one (or more) level-up: (curve[lv0]-exp0) + full
+    intermediate levels + exp1. Crossing INTO the cap (lv1 with no curve entry) banks
+    only up to the threshold — the post-cap exp1 is phantom, doesn't count. None if the
+    curve doesn't cover lv0/intermediate levels or it goes negative."""
     c = curve()
     try:
         total = (c[lv0] - exp0) + (exp1 if lv1 in c else 0.0)
@@ -60,10 +60,10 @@ def xp_through_levelup(lv0, exp0, lv1, exp1):
 
 
 def per_hero_gain(lv0, exp0, lv1, exp1):
-    """Ganho de xp de UM herói entre dois snapshots vivos. Trata level-up via curva.
-    Herói NO cap (level_capped) ganha 0.0 no same-level — EXP_FAKE segue subindo no cap
-    sem level-up pra consumir, então o delta é fantasma. 0.0 é ganho zero VÁLIDO
-    (≠ None = não-li). Retorna (gain|None, leveled: bool)."""
+    """XP gain of ONE hero between two live snapshots. Handles level-up via the curve.
+    A hero AT the cap (level_capped) gains 0.0 same-level — EXP_FAKE keeps rising at the cap
+    with no level-up to consume it, so the delta is phantom. 0.0 is a VALID zero gain
+    (≠ None = not-read). Returns (gain|None, leveled: bool)."""
     leveled = (lv1 is not None and lv0 is not None and lv1 > lv0)
     if leveled:
         return xp_through_levelup(lv0, exp0, lv1, exp1), True
@@ -75,41 +75,41 @@ def per_hero_gain(lv0, exp0, lv1, exp1):
 
 
 class PartyXpAccumulator:
-    """Acumulador VIVO de xp por-herói — o LIVE primário da cadeia de xp, pra run INTEIRA.
+    """LIVE per-hero xp accumulator — the primary LIVE of the xp chain, for the WHOLE run.
 
-    Integra os incrementos do within-level (HeroRuntime.EXP_FAKE, shape de
-    build.read_live_party) tick-a-tick, keyed por heroKey, em vez de subtrair dois
-    endpoints (baseline t=0 → leitura no close). O delta de endpoints dava +0 a herói
-    FORA do baseline (deploy tardio, ou morto da run ANTERIOR ainda em revive ~115s:
-    sem exp_start → gain None → +0 no app) — cravado ao vivo em 2 users: runs com morte
-    zeravam um herói em 30–45% dos casos; sem morte, 0%.
+    Integrates the within-level increments (HeroRuntime.EXP_FAKE, build.read_live_party
+    shape) tick-by-tick, keyed by heroKey, instead of subtracting two endpoints
+    (baseline t=0 → read at close). The endpoint delta gave +0 to a hero OUTSIDE the
+    baseline (late deploy, or a death from the PREVIOUS run still reviving ~115s:
+    no exp_start → gain None → +0 in the app) — pinned live on 2 users: runs with a death
+    zeroed a hero in 30–45% of cases; without a death, 0%.
 
-    Regras do update (1 snapshot {heroKey: (lv, exp)} por chamada):
-      - 1º avistamento → semeia o baseline (acc=0, exp_start=exp): crédito DESTE ponto
-        em diante (o fix do +0); não inventa passado.
-      - tick seguinte → soma per_hero_gain(prev, cur) SÓ quando > 0; level-up faz a
-        ponte pela curva e marca `levelup` STICKY.
-      - herói NO CAP (level_capped: nível sem entrada na curva) → ganho 0 (per_hero_gain
-        devolve 0.0, não None); cruzar PRA DENTRO do cap banka só até o limiar. O
-        baseline AVANÇA no g == 0 → exp_start/exp_end seguem a observação CRUA (honesta);
-        só o ganho é suprimido (EXP_FAKE sobe no cap sem level-up = fantasma).
-      - dip same-level (g < 0 = leitura suja; o within-level real é monotônico fora do
-        level-up) → não soma E NÃO avança o baseline: a recuperação telescopa
-        (cur − último_bom) sem double-count.
-      - herói AUSENTE do snapshot (morto/dropout) → nada anda: o acumulado fica banked
-        (morto acumula 0 enquanto morto — comportamento real do jogo, preservado).
-      - entrada lixo (lv/exp None, shape errado) → ignorada; NUNCA levanta (espelha o
-        contrato never-raise de read_live_party).
+    Update rules (1 snapshot {heroKey: (lv, exp)} per call):
+      - 1st sighting → seeds the baseline (acc=0, exp_start=exp): credit from THIS point
+        onward (the +0 fix); doesn't invent past.
+      - next tick → adds per_hero_gain(prev, cur) ONLY when > 0; level-up bridges via the
+        curve and sets `levelup` STICKY.
+      - hero AT THE CAP (level_capped: a level with no curve entry) → gain 0 (per_hero_gain
+        returns 0.0, not None); crossing INTO the cap banks only up to the threshold. The
+        baseline ADVANCES on g == 0 → exp_start/exp_end follow the RAW (honest) observation;
+        only the gain is suppressed (EXP_FAKE rises at the cap with no level-up = phantom).
+      - same-level dip (g < 0 = dirty read; the real within-level is monotonic outside
+        level-up) → doesn't add AND DOESN'T advance the baseline: the recovery telescopes
+        (cur − last_good) without double-count.
+      - hero ABSENT from the snapshot (dead/dropout) → nothing moves: the accumulated value
+        stays banked (a dead hero accumulates 0 while dead — real game behavior, preserved).
+      - garbage entry (lv/exp None, wrong shape) → ignored; NEVER raises (mirrors the
+        never-raise contract of read_live_party).
 
-    Leitura: gain/record devolvem None se o herói NUNCA foi visto (≠ 0.0 = ganho zero
-    VÁLIDO); total() devolve None se NINGUÉM foi visto (fonte viva OFF → o caller cai
-    pro SAVE — nunca conflar None-de-leitura com 0-de-ganho)."""
+    Reads: gain/record return None if the hero was NEVER seen (≠ 0.0 = VALID zero gain);
+    total() returns None if NOBODY was seen (live source OFF → the caller falls back to
+    SAVE — never conflate None-from-read with 0-from-gain)."""
 
     def __init__(self):
         self._heroes = {}   # heroKey -> {acc, lv, exp, exp_start, levelup}
 
     def update(self, party):
-        """Integra um snapshot vivo {heroKey: (lv, exp)}. Never-raises; {}/None = no-op."""
+        """Integrates a live snapshot {heroKey: (lv, exp)}. Never-raises; {}/None = no-op."""
         try:
             items = party.items() if party else ()
             for hk, cur in items:
@@ -125,10 +125,10 @@ class PartyXpAccumulator:
                                         "exp_start": exp, "levelup": False}
                     continue
                 if lv < st["lv"]:
-                    # Nível NUNCA cai mid-run: leitura suja (slot de HeroList pendente que ainda
-                    # devolve um heroKey válido) → não soma E não avança o baseline (simétrico ao
-                    # dip same-level). O tick-a-tick multiplica a exposição a leitura suja ~600x
-                    # vs o delta de 2 endpoints, então o guard de regressão importa aqui.
+                    # Level NEVER drops mid-run: dirty read (a pending HeroList slot that still
+                    # returns a valid heroKey) → doesn't add AND doesn't advance the baseline
+                    # (symmetric to the same-level dip). Tick-by-tick multiplies the exposure to
+                    # dirty reads ~600x vs the 2-endpoint delta, so the regression guard matters here.
                     continue
                 g, leveled = per_hero_gain(st["lv"], st["exp"], lv, exp)
                 if leveled:
@@ -136,20 +136,20 @@ class PartyXpAccumulator:
                 if g is not None and g > 0:
                     st["acc"] += g
                 if g is None or g >= 0:
-                    # Avança o baseline (g=None = level-up que a curva não cobriu: pula a
-                    # ponte mas segue acumulando dali). No dip same-level (g<0) NÃO avança.
+                    # Advance the baseline (g=None = a level-up the curve didn't cover: skips the
+                    # bridge but keeps accumulating from there). On the same-level dip (g<0) DOESN'T advance.
                     st["lv"], st["exp"] = lv, exp
         except Exception:
             return
 
     def gain(self, hk):
-        """Acumulado CRU do herói, ou None se nunca visto (≠ 0.0, ganho zero válido)."""
+        """The hero's RAW accumulated value, or None if never seen (≠ 0.0, valid zero gain)."""
         st = self._heroes.get(hk)
         return st["acc"] if st is not None else None
 
     def record(self, hk):
-        """{gain, levelup, exp_start, exp_end} prontos pro record da run (arredondados),
-        ou None se o herói nunca foi visto vivo."""
+        """{gain, levelup, exp_start, exp_end} ready for the run record (rounded),
+        or None if the hero was never seen live."""
         st = self._heroes.get(hk)
         if st is None:
             return None
@@ -157,7 +157,7 @@ class PartyXpAccumulator:
                 "exp_start": round(st["exp_start"], 2), "exp_end": round(st["exp"], 2)}
 
     def total(self):
-        """Soma CRUA dos acumulados, ou None se NENHUM herói foi visto (fonte viva off)."""
+        """RAW sum of the accumulated values, or None if NO hero was seen (live source off)."""
         if not self._heroes:
             return None
         return sum(st["acc"] for st in self._heroes.values())

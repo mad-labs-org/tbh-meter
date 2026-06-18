@@ -1,13 +1,13 @@
-"""Testes para il2cpp/resolver.resolve_via_rva — fast path por ÍNDICE (mac, sem processo vivo).
+"""Tests for il2cpp/resolver.resolve_via_rva — fast path by INDEX (mac, no live process).
 
-Cobre o gate anti-envenenamento (§6 fallback / cache-correctness):
-  happy path  — todas as classes round-trip + singletons com size válido → (classes, instances)
-  name mismatch — class_name != nome esperado → None (caller cai no scan)
-  size out of range — instância de manager com size absurdo → None
+Covers the anti-poisoning gate (fallback / cache-correctness):
+  happy path  — all classes round-trip + singletons with valid size → (classes, instances)
+  name mismatch — class_name != expected name → None (caller falls through to scan)
+  size out of range — manager instance with an absurd size → None
 
-FakeReader é dict-backed (espelha o de test_typeinfo) + a cadeia bbwf (PARENT→STATIC_FIELDS→
-INSTANCE) e os reads de size de lista (List.SIZE) que _manager_inst_ok usa. resolve_via_rva lê
-classes via rptr(tbase + idx*8), então a tabela vive no dict de ptr (não num blob).
+FakeReader is dict-backed (mirrors the one in test_typeinfo) + the bbwf chain (PARENT→STATIC_FIELDS→
+INSTANCE) and the list-size reads (List.SIZE) that _manager_inst_ok uses. resolve_via_rva reads
+classes via rptr(tbase + idx*8), so the table lives in the ptr dict (not in a blob).
 """
 
 from config.offsets import Class, List, LogManager, MonsterSpawnManager, Singleton
@@ -15,7 +15,7 @@ from il2cpp import resolver
 
 
 class FakeReader:
-    """ri32/rptr/read_cstr de dicts dedicados (resolve_via_rva não usa read de bloco)."""
+    """ri32/rptr/read_cstr from dedicated dicts (resolve_via_rva does no block reads)."""
 
     def __init__(self, i32=None, ptr=None, cstr=None):
         self._i32 = dict(i32 or {})
@@ -33,11 +33,11 @@ class FakeReader:
 
 
 # --------------------------------------------------------------------------- #
-# Builder de layout falso: TypeInfoTable + classes válidas + cadeia singleton.
+# Fake-layout builder: TypeInfoTable + valid classes + singleton chain.
 # --------------------------------------------------------------------------- #
 TBASE = 0x500000
 
-# índices arbitrários (esparsos, como no build real)
+# arbitrary indices (sparse, as in the real build)
 IDX = {
     "StageClearLog": 10,
     "MonsterSpawnManager": 20,
@@ -46,23 +46,23 @@ IDX = {
     "CurrencySaveData": 50,
 }
 
-# K de cada classe (8-alinhado, dentro de bounds de class_name)
+# K of each class (8-aligned, within class_name bounds)
 KOF = {name: 0x100000 + i * 0x1000 for i, name in enumerate(IDX)}
 
 
 def _build(names, *, msm_size=3, lm_size=7, msm_list=True, lm_list=True):
-    """Monta um FakeReader onde cada `name` em `names` é uma Il2CppClass válida no seu índice.
-    Singletons ganham uma cadeia bbwf (PARENT→STATIC_FIELDS→INSTANCE) p/ uma instância viva
-    com listas de size `msm_size`/`lm_size`. `msm_list/lm_list` False = ponteiro de lista nulo."""
+    """Build a FakeReader where each `name` in `names` is a valid Il2CppClass at its index.
+    Singletons get a bbwf chain (PARENT→STATIC_FIELDS→INSTANCE) for a live instance
+    with lists of size `msm_size`/`lm_size`. `msm_list/lm_list` False = null list pointer."""
     ptr = {}
     cstr = {}
     i32 = {}
     for name in names:
         K = KOF[name]
-        ptr[TBASE + IDX[name] * 8] = K     # class_by_index lê via rptr(tbase + idx*8)
+        ptr[TBASE + IDX[name] * 8] = K     # class_by_index reads via rptr(tbase + idx*8)
         name_ptr = K + 0x800
         ptr[K + Class.NAME] = name_ptr
-        ptr[K + Class.ELEMENT_CLASS] = K            # round-trip de class_name
+        ptr[K + Class.ELEMENT_CLASS] = K            # class_name round-trip
         cstr[name_ptr] = name
         if name in resolver.SINGLETONS:
             par = K + 0x10000
@@ -79,7 +79,7 @@ def _build(names, *, msm_size=3, lm_size=7, msm_list=True, lm_list=True):
                 ll = inst + 0x50000
                 ptr[inst + LogManager.LOG_LIST] = ll if lm_list else 0
                 i32[ll + List.SIZE] = lm_size
-            # StageManager não precisa de size (aceito como está)
+            # StageManager needs no size (accepted as-is)
     return FakeReader(ptr=ptr, cstr=cstr, i32=i32)
 
 
@@ -92,9 +92,9 @@ ALL = list(IDX.keys())
 def test_happy_path_shape():
     r = _build(ALL)
     classes, instances = resolver.resolve_via_rva(r, TBASE, IDX, ALL)
-    # classes: {nome: {K}} p/ todos
+    # classes: {name: {K}} for all
     assert classes == {name: {KOF[name]} for name in ALL}
-    # singletons: [inst]; resto: []
+    # singletons: [inst]; rest: []
     assert instances["StageClearLog"] == []
     assert instances["CurrencySaveData"] == []
     for name in resolver.SINGLETONS:
@@ -106,7 +106,7 @@ def test_singletons_constant():
 
 
 def test_stagemanager_accepted_without_size_check():
-    """StageManager: bbwf aceito sem validação de party (deferida pra deliverable 06)."""
+    """StageManager: bbwf accepted without party validation (deferred to deliverable 06)."""
     r = _build(["StageManager"])
     out = resolver.resolve_via_rva(r, TBASE, IDX, ["StageManager"])
     assert out is not None
@@ -118,9 +118,9 @@ def test_stagemanager_accepted_without_size_check():
 # Name mismatch → None
 # --------------------------------------------------------------------------- #
 def test_name_mismatch_returns_none():
-    """class_name no índice != nome esperado (anchor/índice envenenado) → None → scan."""
+    """class_name at the index != expected name (poisoned anchor/index) → None → scan."""
     r = _build(["StageClearLog"])
-    # poison: o nome lido no slot vira outra coisa
+    # poison: the name read at the slot becomes something else
     r._cstr[KOF["StageClearLog"] + 0x800] = "WrongClass"
     assert resolver.resolve_via_rva(r, TBASE, IDX, ["StageClearLog"]) is None
 
@@ -131,7 +131,7 @@ def test_missing_index_returns_none():
 
 
 def test_null_class_returns_none():
-    """Índice aponta p/ slot vazio (K=0) → None."""
+    """Index points to an empty slot (K=0) → None."""
     r = _build(["StageClearLog"])
     assert resolver.resolve_via_rva(r, TBASE, {"StageClearLog": 999}, ["StageClearLog"]) is None
 
@@ -140,13 +140,13 @@ def test_null_class_returns_none():
 # Manager instance size out of range → None
 # --------------------------------------------------------------------------- #
 def test_msm_size_out_of_range_returns_none():
-    """MonsterSpawnManager com MONSTER_LIST size >= 2000 (lixo de menu) → None."""
+    """MonsterSpawnManager with MONSTER_LIST size >= 2000 (menu garbage) → None."""
     r = _build(["MonsterSpawnManager"], msm_size=2001)
     assert resolver.resolve_via_rva(r, TBASE, IDX, ["MonsterSpawnManager"]) is None
 
 
 def test_lm_size_out_of_range_returns_none():
-    """LogManager com LOG_LIST size >= 100000 → None (LOG_LIST cresce a sessão inteira)."""
+    """LogManager with LOG_LIST size >= 100000 → None (LOG_LIST grows the entire session)."""
     r = _build(["LogManager"], lm_size=100001)
     assert resolver.resolve_via_rva(r, TBASE, IDX, ["LogManager"]) is None
 
@@ -157,13 +157,13 @@ def test_msm_negative_size_returns_none():
 
 
 def test_msm_null_list_returns_none():
-    """MONSTER_LIST nulo → size lido em (0 + List.SIZE) → None (not None mas read falha)."""
+    """MONSTER_LIST null → size read at (0 + List.SIZE) → None (not None but read fails)."""
     r = _build(["MonsterSpawnManager"], msm_list=False)
     assert resolver.resolve_via_rva(r, TBASE, IDX, ["MonsterSpawnManager"]) is None
 
 
 def test_size_at_boundary_accepted():
-    """size 0 e 499 (MSM) / 0 e 4999 (LM) ficam DENTRO da faixa → aceitos."""
+    """size 0 and 499 (MSM) / 0 and 4999 (LM) stay WITHIN range → accepted."""
     r = _build(["MonsterSpawnManager", "LogManager"], msm_size=499, lm_size=4999)
     out = resolver.resolve_via_rva(r, TBASE, IDX, ["MonsterSpawnManager", "LogManager"])
     assert out is not None

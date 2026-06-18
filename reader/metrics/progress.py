@@ -1,7 +1,7 @@
-"""Kills/min e estado do stage.
+"""Kills/min and stage state.
 
-Kills: a lista de mortos (MonsterSpawnManager.dead_count) só cresce; a diferença
-entre ticks é quantos morreram. Acumulo numa janela de 60s -> kills no último min.
+Kills: the dead list (MonsterSpawnManager.dead_count) only grows; the diff
+between ticks is how many died. Accumulate over a 60s window -> kills in the last min.
 """
 
 from shared.utils import RollingWindow, now
@@ -19,12 +19,12 @@ class ProgressTracker:
             return
         if self._last_dead is not None:
             delta = dead_count - self._last_dead
-            if delta > 0:                 # mortes novas
+            if delta > 0:                 # new kills
                 self._kills_window.add(delta, ts)
                 self.total_kills += delta
-            # delta < 0 = lista resetou (troca de stage); ignora o salto
+            # delta < 0 = list reset (stage change); ignore the jump
         self._last_dead = dead_count
 
     def kills_per_minute(self, timestamp: float | None = None) -> float:
-        # janela de 60s: o total na janela já É "kills no último minuto"
+        # 60s window: the window total IS "kills in the last minute"
         return self._kills_window.total(timestamp)

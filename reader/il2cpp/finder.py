@@ -1,10 +1,10 @@
-"""finder.py — achar classe de NOME CURTO (ut/yp/ud) sem o hang do resolver, e o
-mecanismo de singleton nn<T> (chegar na instância viva via a classe).
+"""finder.py — find a SHORT-NAME class (ut/yp/ud) without the resolver's hang, plus the
+nn<T> singleton mechanism (reach the live instance via the class).
 
-Por que o resolver normal trava em nome < 3 letras: ele varre "ut\\0" em TODA a
-memória (milhões de falsos) e re-varre por cada um. Aqui o needle é a string
-ISOLADA (\\0ut\\0) buscada SÓ na região de nomes do metadata -> rara. Idêntico ao
-validado no monólito (gold vivo)."""
+Why the normal resolver hangs on names < 3 letters: it scans "ut\\0" across ALL of
+memory (millions of false hits) and re-scans for each one. Here the needle is the
+ISOLATED string (\\0ut\\0) searched ONLY in the metadata name region -> rare. Identical to
+what was validated in the monolith (live gold)."""
 
 import struct
 
@@ -13,7 +13,7 @@ from shared.memory import scan
 
 
 def klass_name(reader, inst):
-    """Nome da classe de um objeto gerenciado (compare barato, NÃO é name-scan)."""
+    """Class name of a managed object (cheap compare, NOT a name-scan)."""
     if not inst:
         return None
     k = reader.rptr(inst + 0x0)
@@ -21,8 +21,8 @@ def klass_name(reader, inst):
 
 
 def find_class_by_name(reader, regions, name, seed_class):
-    """Acha a Il2CppClass de `name` (qualquer tamanho, inclusive 2 letras). `seed_class`
-    = qualquer classe já resolvida (pra localizar a região de nomes). Retorna K ou None."""
+    """Find the Il2CppClass for `name` (any length, even 2 letters). `seed_class`
+    = any already-resolved class (to locate the name region). Returns K or None."""
     if not seed_class:
         return None
     name_ptr = reader.rptr(seed_class + Class.NAME)
@@ -31,7 +31,7 @@ def find_class_by_name(reader, regions, name, seed_class):
     names_reg = [(b, s) for (b, s) in regions if b <= name_ptr < b + s]
     pat = b"\x00" + name.encode() + b"\x00"
     matches = scan(reader, names_reg, [pat]).get(pat, [])
-    str_addrs = sorted(set(m + 1 for m in matches))   # +1 = pula o \0 da frente
+    str_addrs = sorted(set(m + 1 for m in matches))   # +1 = skip the leading \0
     if not str_addrs:
         return None
     needles = {struct.pack("<Q", a): a for a in str_addrs}
@@ -46,8 +46,8 @@ def find_class_by_name(reader, regions, name, seed_class):
 
 
 def bbwf_from_klass(reader, klass):
-    """Subclasse nn<T> -> parent (= nn<T>) -> static_fields -> bbwf = instância viva.
-    Pra instância singleton, bbwf_from_klass(inst.klass) deve voltar a própria instância."""
+    """Subclass nn<T> -> parent (= nn<T>) -> static_fields -> bbwf = live instance.
+    For a singleton instance, bbwf_from_klass(inst.klass) should return that same instance."""
     if not klass:
         return None
     par = reader.rptr(klass + Class.PARENT)
@@ -56,5 +56,5 @@ def bbwf_from_klass(reader, klass):
 
 
 def find_singleton(reader, regions, name, seed_class):
-    """Atalho: classe de `name` -> instância viva (nn<T>). Retorna a instância ou None."""
+    """Shortcut: class for `name` -> live instance (nn<T>). Returns the instance or None."""
     return bbwf_from_klass(reader, find_class_by_name(reader, regions, name, seed_class))

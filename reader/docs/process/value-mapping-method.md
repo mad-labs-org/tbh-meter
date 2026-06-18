@@ -1,6 +1,6 @@
 ---
 type: process
-description: "Metodologia pra mapear/validar QUALQUER valor que o reader lê da memória: cada valor mora em UM lugar (offset→offsets.py, regra-de-negócio→módulo, nome ofuscado→resolver estrutural), e o método do ORÁCULO (tenha o número real ANTES de procurar — sem isso o gold subiu errado 2x: 0 e 1.97T)."
+description: "Methodology to map/validate ANY value the reader reads from memory: each value lives in ONE place (offset→offsets.py, business-rule→module, obfuscated name→structural resolver), plus the ORACLE method (have the real number BEFORE searching — without it gold shipped wrong 2x: 0 and 1.97T)."
 code_anchors:
   - metrics/gold.py::resolve_combat_gold_klass
   - metrics/gold.py::COMBAT_SUBKEY
@@ -11,93 +11,99 @@ asserts:
   - config.offsets.EAggregateType.GoldEarn == 2
 ---
 
-# Como mapear e validar um valor da memória
+# How to map and validate a value from memory
 
-Toda vez que o meter passa a ler um número novo da memória do jogo (um agregado, um stat, um
-recurso), o caminho é o MESMO. Esta é a metodologia que cravou o gold de combate (2026-06-05) e
-que todo valor novo deve seguir — sem ela, vira achismo que erra em silêncio. Resumo: tenha o
-número real ANTES de procurar, ache o objeto por ESTRUTURA (nunca por nome ofuscado nem por valor
-isolado), valide contra o oráculo em várias runs, e guarde cada peça no SEU lugar único.
+Every time the meter starts reading a new number from the game's memory (an aggregate, a stat, a
+resource), the path is the SAME. This is the methodology that nailed combat gold (2026-06-05) and
+that every new value must follow — without it, it becomes guesswork that fails silently. In short:
+have the real number BEFORE searching, find the object by STRUCTURE (never by obfuscated name nor by
+an isolated value), validate against the oracle across several runs, and keep each piece in ITS one
+place.
 
-## 1. Cada valor mora em UM lugar (single source of truth)
+## 1. Each value lives in ONE place (single source of truth)
 
-Reusa a constante, nunca repete o literal — mas *onde* ela mora depende da ESTABILIDADE do valor
-entre builds do `GameAssembly.dll`:
+Reuse the constant, never repeat the literal — but *where* it lives depends on the STABILITY of the
+value across `GameAssembly.dll` builds:
 
-| tipo de valor | muda entre builds? | onde mora | exemplo |
+| value type | changes across builds? | where it lives | example |
 |---|---|---|---|
-| **offset / id / enum** | não, estável | `config/offsets.py` (a bíblia) | `AggregateManager.AGGREGATES`, `GOLD_KEY`, `EAggregateType.GoldEarn` |
-| **regra de negócio** (semântica do jogo) | não | no módulo de lógica, comentada | `COMBAT_SUBKEY=1` / `TOTAL_SUBKEY=0` em `metrics/gold.py` |
-| **nome de classe ofuscado** | **sim, todo build** | **não se guarda** — resolve por estrutura | o singleton do `AggregateManager` (`ut`→`uu`→…) |
+| **offset / id / enum** | no, stable | `config/offsets.py` (the bible) | `AggregateManager.AGGREGATES`, `GOLD_KEY`, `EAggregateType.GoldEarn` |
+| **business rule** (game semantics) | no | in the logic module, commented | `COMBAT_SUBKEY=1` / `TOTAL_SUBKEY=0` in `metrics/gold.py` |
+| **obfuscated class name** | **yes, every build** | **not stored** — resolve by structure | the `AggregateManager` singleton (`ut`→`uu`→…) |
 
-A diferença entre as duas primeiras linhas é fina e o agent erra: o `AGGREGATES` é um **offset**
-(layout do struct, não muda) → `offsets.py`; mas "SubKey 1 = combate, SubKey 0 = total" é a
-**semântica do jogo** (o que o número *significa*), não um offset — mora COMENTADA junto da lógica
-que a usa (`metrics/gold.py`), e o `offsets.py` fica só com offset/enum/stride. Pôr regra-de-negócio
-em `offsets.py` (ou um offset solto no módulo de lógica) fura o single-source. Detalhe do critério em
-[[invariants/dict-strides]] (os strides são offset → bíblia) e no inventário [[invariants/metric-fallback-chains]].
+The difference between the first two rows is subtle and the agent gets it wrong: `AGGREGATES` is an
+**offset** (struct layout, doesn't change) → `offsets.py`; but "SubKey 1 = combat, SubKey 0 = total"
+is **game semantics** (what the number *means*), not an offset — it lives COMMENTED next to the logic
+that uses it (`metrics/gold.py`), and `offsets.py` keeps only offset/enum/stride. Putting a business
+rule in `offsets.py` (or a loose offset in the logic module) breaks the single-source. Criterion
+detail in [[invariants/dict-strides]] (strides are offset → bible) and in the inventory
+[[invariants/metric-fallback-chains]].
 
-## 2. O método do ORÁCULO (tenha o número real ANTES de procurar)
+## 2. The ORACLE method (have the real number BEFORE searching)
 
-**A) Oráculo de resposta conhecida.** Anote o número REAL do jogo ANTES de varrer a memória — o
-gold da carteira, o xp de uma run, o dano de um hit. Sem o oráculo você não tem como PROVAR que
-achou a célula certa, só palpitar — e foi exatamente essa falta que deixou o gold subir errado
-**duas vezes**: o chute "maior valor" pegou uma cópia congelada → **gold 0**; o chute "maior
-crescimento" pegou lixo de heap → **1.97T**. O oráculo é o que separa "achei" de "chutei".
+**A) Known-answer oracle.** Write down the REAL number from the game BEFORE scanning memory — the
+wallet gold, a run's xp, a hit's damage. Without the oracle you have no way to PROVE you found the
+right cell, only to guess — and that exact gap is what let gold ship wrong **twice**: the "largest
+value" guess grabbed a frozen copy → **gold 0**; the "largest growth" guess grabbed heap garbage →
+**1.97T**. The oracle is what separates "found it" from "guessed".
 
-**B) Ache por ESTRUTURA, nunca por nome nem por valor isolado** (as três alavancas, do mais forte
-ao mais fraco):
-- **Assinatura de N valores conhecidos JUNTOS.** O inner-dict GoldEarn vivo é o único onde uma
-  entry `KEY == COMBAT_SUBKEY` e uma irmã `KEY == TOTAL_SUBKEY` aparecem lado a lado com valores na
-  casa do bilhão. Dois números grandes juntos não acontecem por acaso → assinatura quase sem
-  falso-positivo (`metrics/gold.py::_inner_array_of`).
-- **Liveness (crescimento).** A célula viva CRESCE enquanto a ação acontece; cópias congeladas
-  (sobra de autosave/GC) não. Distingue a viva sem depender do valor exato.
-- **Subir ponteiros até a RAIZ.** De uma célula, ache quem aponta pra ela (backrefs) até chegar num
-  objeto ENRAIZADO — um singleton confirmado pelo round-trip do campo estático. Isso é **POSSE**, não
-  palpite: cópia congelada não é enraizada (`metrics/gold.py::_resolve_aggregate_singleton`).
+**B) Find by STRUCTURE, never by name nor by an isolated value** (the three levers, strongest to
+weakest):
+- **Signature of N known values TOGETHER.** The live GoldEarn inner-dict is the only one where an
+  entry `KEY == COMBAT_SUBKEY` and a sibling `KEY == TOTAL_SUBKEY` appear side by side with values in
+  the billions. Two big numbers together don't happen by accident → a near-zero-false-positive
+  signature (`metrics/gold.py::_inner_array_of`).
+- **Liveness (growth).** The live cell GROWS while the action happens; frozen copies (autosave/GC
+  leftovers) don't. Distinguishes the live one without depending on the exact value.
+- **Walk pointers up to the ROOT.** From a cell, find who points to it (backrefs) until you reach a
+  ROOTED object — a singleton confirmed by the static field's round-trip. This is **OWNERSHIP**, not
+  a guess: a frozen copy is not rooted (`metrics/gold.py::_resolve_aggregate_singleton`).
 
-**C) Valide com o oráculo, em VÁRIAS runs, incluindo bordas.** O gold: 3 runs com o delta batendo na
-unidade + 1 run **vendendo** um item, pra provar que o combate (`SubKey1`) EXCLUI a venda — vendeu
-186.480, `live_total − live_combat` deu 186.480 exato. Sem bater em todas, **não sobe**.
+**C) Validate with the oracle, across SEVERAL runs, including edge cases.** Gold: 3 runs with the
+delta matching to the unit + 1 run **selling** an item, to prove that combat (`SubKey1`) EXCLUDES the
+sale — sold 186,480, `live_total − live_combat` gave exactly 186,480. Without matching all of them,
+**it doesn't ship**.
 
-**D) Ferramentas read-only** ficam fora do app, em `tbh-meter-dev/` (cópias fiéis dos primitivos do
-reader): probes que acham a célula por crescimento ou por assinatura de 2 valores, monitor que loga
-as variáveis run a run pra cruzar com o oráculo, e um teste com memória SINTÉTICA (viva vs cópia
-congelada). **Todo valor novo deve ganhar um teste sintético desses** — é o que prende o invariante
-contra regressão sem precisar do jogo aberto.
+**D) Read-only tools** live outside the app, in `tbh-meter-dev/` (faithful copies of the reader's
+primitives): probes that find the cell by growth or by a 2-value signature, a monitor that logs the
+variables run by run to cross-check against the oracle, and a test with SYNTHETIC memory (live vs
+frozen copy). **Every new value must get one of these synthetic tests** — it's what pins the
+invariant against regression without needing the game open.
 
-## 3. A armadilha do nome ofuscado (ut/uu drifta)
+## 3. The obfuscated-name trap (ut/uu drifts)
 
-O dump (`re/dump/dump.cs`) nomeia classes internas com 2 letras (`ut`, `uf`, `xd`, …). Esses nomes
-são **embaralhados a CADA build**: o que era `ut` (o singleton do `AggregateManager`) virou `uu`, e
-`ut` passou a nomear OUTRA classe. Consequência dura:
+The dump (`re/dump/dump.cs`) names internal classes with 2 letters (`ut`, `uf`, `xd`, …). These names
+are **shuffled on EVERY build**: what was `ut` (the `AggregateManager` singleton) became `uu`, and
+`ut` went on to name ANOTHER class. Hard consequence:
 
-- **Nunca** resolva classe interna por nome literal em produção — `find_class_by_name("ut")` pega a
-  classe ERRADA no build seguinte, o singleton não resolve, e o valor sai 0 ou lixo.
-- Onde for singleton de conteúdo identificável (o do `AggregateManager` tem o dict GoldEarn), resolva
-  por ESTRUTURA (`resolve_combat_gold_klass`) ou por TypeDefIndex (RVA) — ambos name-free; o nome só
-  VALIDA num round-trip, nunca ESCOLHE. Esse é o invariante de [[invariants/gold-singleton-resolution]].
-- Os comentários `# ut : nn<ut>` no `offsets.py` são **histórico do dump**, não verdade do runtime —
-  servem só pra rastrear a origem, jamais pra resolver.
-- Classes que chegam por OFFSET a partir de um objeto já resolvido (`HeroRuntime`, `StatsHolder`) não
-  dependem do nome — OK. Audite se algo resolve por nome curto direto e migre pra estrutura.
+- **Never** resolve an internal class by literal name in production — `find_class_by_name("ut")` grabs
+  the WRONG class in the next build, the singleton doesn't resolve, and the value comes out 0 or
+  garbage.
+- Where it's a singleton with identifiable content (the `AggregateManager` one has the GoldEarn dict),
+  resolve by STRUCTURE (`resolve_combat_gold_klass`) or by TypeDefIndex (RVA) — both name-free; the
+  name only VALIDATES in a round-trip, never CHOOSES. That's the invariant in
+  [[invariants/gold-singleton-resolution]].
+- The `# ut : nn<ut>` comments in `offsets.py` are **dump history**, not runtime truth — they only
+  serve to trace the origin, never to resolve.
+- Classes reached by OFFSET from an already-resolved object (`HeroRuntime`, `StatsHolder`) don't depend
+  on the name — OK. Audit whether anything resolves by short name directly and migrate it to structure.
 
-## 4. Workflow pra um valor NOVO (a sequência)
+## 4. Workflow for a NEW value (the sequence)
 
-1. **Oráculo**: anote o número real (início/fim, ou um valor exato).
-2. **Ache** com os probes (assinatura / crescimento / dump).
-3. **Suba à raiz** se quiser fonte VIVA estável (singleton/owner); senão o save serve de fallback.
-4. **Valide**: delta == oráculo em N runs + 1 borda. Sem bater, NÃO sobe.
-5. **Persista no single-source** (§1): offset → `config/offsets.py`; regra de negócio → módulo
-   (`metrics/…`, comentada); nome ofuscado → resolver ESTRUTURAL, nunca hardcode.
-6. **Teste sintético** (memória viva vs congelada) contra o módulo real.
-7. **Isole**: a lógica mora no módulo de domínio (`metrics/…` ou `game/…`); o orquestrador só
-   CHAMA, nunca lê memória inline. Toda métrica por-run segue a cadeia LIVE→SAVE→nunca-carteira de
+1. **Oracle**: write down the real number (start/end, or an exact value).
+2. **Find** it with the probes (signature / growth / dump).
+3. **Walk up to the root** if you want a stable LIVE source (singleton/owner); otherwise the save
+   serves as fallback.
+4. **Validate**: delta == oracle across N runs + 1 edge case. Without matching, it does NOT ship.
+5. **Persist in the single-source** (§1): offset → `config/offsets.py`; business rule → module
+   (`metrics/…`, commented); obfuscated name → STRUCTURAL resolver, never hardcode.
+6. **Synthetic test** (live vs frozen memory) against the real module.
+7. **Isolate**: the logic lives in the domain module (`metrics/…` or `game/…`); the orchestrator only
+   CALLS, never reads memory inline. Every per-run metric follows the LIVE→SAVE→never-wallet chain from
    [[invariants/metric-fallback-chains]].
 
 ## Related
-- [[invariants/gold-singleton-resolution]] — o caso-modelo: resolver o singleton ofuscado por estrutura, não por nome.
-- [[invariants/dict-strides]] — por que stride/offset são "estáveis → bíblia" (e como o stride trocado corrompe em silêncio).
-- [[invariants/metric-fallback-chains]] — a cadeia LIVE→SAVE→nunca-carteira que toda métrica nova herda.
-Veja também: [[guides/map-new-value]] (a receita operacional curta deste método) · [[process/data-contract-id-based]]
+- [[invariants/gold-singleton-resolution]] — the model case: resolve the obfuscated singleton by structure, not by name.
+- [[invariants/dict-strides]] — why stride/offset are "stable → bible" (and how a swapped stride corrupts silently).
+- [[invariants/metric-fallback-chains]] — the LIVE→SAVE→never-wallet chain that every new metric inherits.
+See also: [[guides/map-new-value]] (the short operational recipe of this method) · [[process/data-contract-id-based]]
