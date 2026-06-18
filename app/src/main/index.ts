@@ -396,6 +396,15 @@ const liveDrag = createLiveDrag({
 // --------------------------------------------------------------------------- //
 
 app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
+  // Dev-only mocked API (pnpm dev:mock): intercept the main process's global fetch with MSW
+  // BEFORE any network call (auth/upload/update/error relay all fire below), so the meter runs
+  // end-to-end with no backend. The `import.meta.env.DEV` guard makes electron-vite dead-code-
+  // eliminate this block — and the dynamic import — from the production build, so MSW never ships.
+  if (import.meta.env.DEV && process.env.TBH_MOCK_API === "1") {
+    const { startMockApi } = await import("../mocks/node.js");
+    startMockApi();
+  }
+
   // a second instance is quitting (runIfPrimary skips this) — it must never reach
   // startReader, which would race a second reader against the primary before the quit lands.
   // Match the variant's appId so Windows treats the RC as a distinct app (its own taskbar

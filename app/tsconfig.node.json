@@ -3,6 +3,7 @@
   "include": [
     "electron.vite.config.*",
     "src/main/**/*",
+    "src/mocks/**/*",
     "src/preload/**/*",
     "src/shared/**/*"
   ],
