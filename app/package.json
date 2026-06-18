@@ -45,7 +45,7 @@
     "@types/node": "^22.15.30",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.1.5",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^5.2.0",
     "cross-env": "^10.1.0",
     "electron": "^36.3.1",
     "electron-builder": "^26.15.3",
