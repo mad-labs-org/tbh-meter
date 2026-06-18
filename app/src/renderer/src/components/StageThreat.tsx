@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
 import { ShieldAlert } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { OverlayTooltip } from "~/components/OverlayTooltip";
+import { useHoverTooltip } from "~/lib/use-hover-tooltip";
 import type { StageThreatInfo, ThreatElement } from "~/lib/stage-threat";
 
 // Stage-threat badges (element dots + penalty shield next to the stage label) with a floating
@@ -22,28 +22,9 @@ const ELEMENT_TEXT: Record<ThreatElement, string> = {
   Chaos: "text-fuchsia-300",
 };
 
-const CLOSE_DELAY_MS = 150;
-
 /** The hover trigger + tooltip, self-contained: drop it next to the mode badge. */
 export function StageThreatBadges({ info }: { info: StageThreatInfo }) {
-  const [open, setOpen] = useState(false);
-  const anchorRef = useRef<HTMLSpanElement>(null);
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const hover = (on: boolean): void => {
-    if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
-      closeTimer.current = null;
-    }
-    if (on) setOpen(true);
-    else closeTimer.current = setTimeout(() => setOpen(false), CLOSE_DELAY_MS);
-  };
-  useEffect(
-    () => () => {
-      if (closeTimer.current) clearTimeout(closeTimer.current);
-    },
-    [],
-  );
+  const { open, anchorRef, hover } = useHoverTooltip<HTMLSpanElement>();
 
   return (
     <>

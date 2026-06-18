@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronRight, Power } from "lucide-react";
 import type { ChestCooldown } from "../../../shared/cooldown-types.js";
-import { remainingMs, isReady } from "../../../shared/cooldown-types.js";
+import { remainingMs, isReady, DEFAULT_COOLDOWN_MIN } from "../../../shared/cooldown-types.js";
 import type { AppSettings } from "../../../shared/ipc-types.js";
 import { clampCooldownMin } from "../../../shared/ipc-types.js";
 import { chestSprite, chestLevel, boxBestStage, bossBoxRate, stageDifficulty, stageCode, blueBoxes } from "~/lib/game-data";
 import { modeTextClass, modeLabel, ago } from "~/lib/format";
-import { useCooldowns, useNow, formatRemaining, buildTrackerEntries } from "~/lib/cooldown";
+import { useCooldowns, useNow, formatRemaining, buildTrackerEntries, sortTrackerEntries } from "~/lib/cooldown";
 import { CooldownCard } from "~/components/CooldownCard";
 import { DropRatePct } from "~/components/DropRatePct";
 import { useT } from "~/lib/i18n";
@@ -65,7 +65,7 @@ export function CooldownsView() {
   const t = useT();
   const { active, log } = useCooldowns();
   const now = useNow(1000);
-  const [cfg, setCfg] = useState({ enabled: true, cooldownMin: 13, route: [] as number[] });
+  const [cfg, setCfg] = useState({ enabled: true, cooldownMin: DEFAULT_COOLDOWN_MIN, route: [] as number[] });
   const [historyOpen, setHistoryOpen] = useState(true);
 
   useEffect(() => {
@@ -88,10 +88,7 @@ export function CooldownsView() {
   };
 
   const cooldownMs = cfg.cooldownMin * 60 * 1000;
-  const entries = buildTrackerEntries(active, cfg.route).sort(
-    (a, b) =>
-      (a.cd ? remainingMs(a.cd, now, cooldownMs) : 0) - (b.cd ? remainingMs(b.cd, now, cooldownMs) : 0),
-  );
+  const entries = sortTrackerEntries(buildTrackerEntries(active, cfg.route), now, cooldownMs);
   // History: the 10 most recent drops, newest-first.
   const HISTORY_LIMIT = 10;
   const recent = [...log].sort((a, b) => b.dropAt - a.dropAt).slice(0, HISTORY_LIMIT);

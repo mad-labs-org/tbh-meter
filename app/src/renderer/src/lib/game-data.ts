@@ -227,12 +227,6 @@ export function boxBestStage(boxKey: number | null | undefined): number | null {
   return best;
 }
 
-/** The best (max) base blue-chest drop rate across every stage of this box, or null. */
-export function boxBestRate(boxKey: number | null | undefined): number | null {
-  const s = boxBestStage(boxKey);
-  return s == null ? null : bossBoxRate(s);
-}
-
 // --- Blue box (Stage Boss Box) cross-mode drop spots -------------------------
 // For a blue box, WHERE it drops: per mode, the stage ranges grouped by BASE rate
 // ("first~last"). Feeds the cooldown card's "spots" row. Rune/pet "chest chance"

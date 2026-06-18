@@ -27,17 +27,18 @@ import {
   modeLabel,
   qualityBadge,
 } from "~/lib/format";
-import { heroName, heroSprite } from "~/lib/game-data";
+import { heroName } from "~/lib/game-data";
 import { useI18n } from "~/lib/i18n";
 import { cn } from "~/lib/utils";
 import { ChestDrops } from "~/components/ChestDrops";
+import { HeroPortrait } from "~/components/HeroPortrait";
 
 interface RunDetailViewProps {
   runId: string;
   onBack: () => void;
 }
 
-// Status pill (bg + text + ring), matching statusColor()'s text palette.
+// Status pill (bg + text + ring) per run status.
 const STATUS_CHIP: Record<RunStatus, string> = {
   success: "bg-emerald-500/10 text-emerald-400 ring-emerald-500/30",
   fail: "bg-red-500/10 text-red-400 ring-red-500/30",
@@ -283,20 +284,12 @@ function XpHeroRow({ hero, total, t }: { hero: RunHero; total: number; t: Transl
   const share = hasXp && total > 0 ? xp / total : 0;
   const pct = share * 100;
   const shareLabel = !hasXp ? "" : xp === 0 ? "0%" : pct < 1 ? "<1%" : `${Math.round(pct)}%`;
-  const src = heroSprite(hero.heroKey);
   const deaths = hero.deaths ?? 0;
 
   return (
     <div className="flex items-center gap-2.5">
       {/* Portrait — same sprite source as the runs list / live party, with a 2-char class fallback. */}
-      <span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded bg-surface-950/50 ring-1 ring-surface-700/40">
-        {src ? (
-          // Native 1x — fractional pixel-art scaling looks mangled, so crop instead.
-          <img src={src} alt={hero.class} className="max-w-none [image-rendering:pixelated]" />
-        ) : (
-          <span className="text-[9px] text-zinc-400">{hero.class.slice(0, 2)}</span>
-        )}
-      </span>
+      <HeroPortrait heroKey={hero.heroKey} heroClass={hero.class} />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">

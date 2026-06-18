@@ -1,9 +1,10 @@
-import { app, shell, BrowserWindow } from "electron";
+import { app, shell } from "electron";
 import { createServer, type Server } from "node:http";
 import { randomBytes } from "node:crypto";
 import { readFileSync, writeFileSync, existsSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { API_URL, AUTH_CALLBACK_PORT } from "./config.js";
+import { broadcast } from "./broadcast.js";
 
 // --------------------------------------------------------------------------- //
 // Auth service — Discord OAuth via the API's desktop loopback flow, entirely in
@@ -160,10 +161,7 @@ function statusFromSession(): AuthStatus {
 }
 
 function broadcastStatus(): void {
-  const status = statusFromSession();
-  for (const win of BrowserWindow.getAllWindows()) {
-    if (!win.isDestroyed()) win.webContents.send("meter:auth-changed", status);
-  }
+  broadcast("meter:auth-changed", statusFromSession());
 }
 
 type SignedInListener = () => void;

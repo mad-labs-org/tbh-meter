@@ -1,10 +1,11 @@
-import { app, BrowserWindow } from "electron";
+import { app } from "electron";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { getRunsSource } from "./sources/runs-source.js";
 import { getAccessToken } from "./auth.js";
 import { uploadRun, isUploaded, claimDeviceRuns } from "./share.js";
 import type { RunRecord } from "../shared/run-types.js";
+import { broadcast } from "./broadcast.js";
 
 // --------------------------------------------------------------------------- //
 // Auto-upload service — a background scheduler that uploads successful runs to
@@ -68,9 +69,7 @@ function writeState(state: AutoUploadState): void {
 /** Notify every open window that a run was just uploaded, so an open RunDetailView
  *  flips to "View on TBH Helper" live (same fan-out pattern as the auth broadcast). */
 function broadcastShareUpdated(runId: string, url: string): void {
-  for (const win of BrowserWindow.getAllWindows()) {
-    if (!win.isDestroyed()) win.webContents.send("meter:share-updated", { runId, url });
-  }
+  broadcast("meter:share-updated", { runId, url });
 }
 
 let timer: ReturnType<typeof setTimeout> | null = null;

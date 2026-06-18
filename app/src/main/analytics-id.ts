@@ -1,7 +1,4 @@
-import { randomUUID } from "node:crypto";
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
-import { app } from "electron";
+import { createPersistedUuid } from "./persisted-uuid.js";
 
 // --------------------------------------------------------------------------- //
 // Analytics client id — a random UUID generated once per install, used ONLY as
@@ -16,28 +13,16 @@ import { app } from "electron";
 // counts honest — one id per install, not a fresh "user" every overlay open.
 // --------------------------------------------------------------------------- //
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-interface AnalyticsIdFile {
-  analyticsId: string;
-}
-
-let cached: string | null = null;
+const store = createPersistedUuid({ fileName: "analytics-id.json", field: "analyticsId" });
 
 /** Exported for tests — production callers use getAnalyticsClientId(). */
 export function analyticsIdPath(): string {
-  return join(app.getPath("userData"), "analytics-id.json");
+  return store.path();
 }
 
 /** Exported for tests — parse an analytics-id.json payload, null when unusable. */
 export function parseAnalyticsIdFile(raw: string): string | null {
-  try {
-    const parsed = JSON.parse(raw) as Partial<AnalyticsIdFile> | null;
-    const id = parsed?.analyticsId;
-    return typeof id === "string" && UUID_RE.test(id) ? id : null;
-  } catch {
-    return null;
-  }
+  return store.parse(raw);
 }
 
 /**
@@ -46,25 +31,5 @@ export function parseAnalyticsIdFile(raw: string): string | null {
  * is counted as a new user from then on.
  */
 export function getAnalyticsClientId(): string {
-  if (cached) return cached;
-  const path = analyticsIdPath();
-  if (existsSync(path)) {
-    try {
-      const id = parseAnalyticsIdFile(readFileSync(path, "utf-8"));
-      if (id) {
-        cached = id;
-        return id;
-      }
-    } catch {
-      // unreadable -> regenerate below
-    }
-  }
-  const id = randomUUID();
-  try {
-    writeFileSync(path, JSON.stringify({ analyticsId: id } satisfies AnalyticsIdFile, null, 2), "utf-8");
-  } catch {
-    // best effort — an unpersisted id still works for this app run
-  }
-  cached = id;
-  return id;
+  return store.get();
 }

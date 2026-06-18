@@ -29,8 +29,8 @@ import {
   statusLabel,
   qualityBadge,
 } from "~/lib/format";
-import { heroSprite } from "~/lib/game-data";
 import { ChestDrops } from "~/components/ChestDrops";
+import { HeroPortrait } from "~/components/HeroPortrait";
 import { resolveColumnConfig, reorderColumnConfig, toggleColumnConfig } from "~/lib/run-columns";
 import { applyRunFilter, countQualityHidden } from "~/lib/run-filter";
 import {
@@ -45,6 +45,7 @@ import {
   type SortKey,
 } from "~/lib/run-list-filter";
 import { useI18n } from "~/lib/i18n";
+import { useDismissOnOutsideClick } from "~/lib/use-dismiss-on-outside-click";
 import { cn } from "~/lib/utils";
 
 interface RunListViewProps {
@@ -558,15 +559,7 @@ function SessionStatsButton({
   const { t } = useI18n();
   const [showHint, setShowHint] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!showHint) return;
-    const onDown = (e: MouseEvent): void => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setShowHint(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [showHint]);
+  useDismissOnOutsideClick(ref, showHint, () => setShowHint(false));
 
   const onClick = (): void => {
     if (currentSessionId != null && currentHasRuns) {
@@ -693,8 +686,7 @@ function NewSessionButton() {
 // Filter bar (Feature 4) — a popover of faceted filters (stage / mode / status / favorites-only).
 // LOCAL UI state, not persisted (a transient lens). The button shows a dot + count when a filter is
 // active; the popover offers a "clear filters" escape. Stage/mode options come from the runs present
-// (distinctStages/distinctModes), so it only offers what the user actually ran. Auto-dismiss on
-// outside click, like ColumnsMenu / SessionStatsButton.
+// (distinctStages/distinctModes), so it only offers what the user actually ran.
 // --------------------------------------------------------------------------- //
 const STATUS_OPTIONS: RunStatus[] = ["success", "fail", "abandoned"];
 
@@ -718,15 +710,7 @@ function FilterBar({
     (filter.mode !== null ? 1 : 0) +
     (filter.status !== null ? 1 : 0) +
     (filter.favoritesOnly ? 1 : 0);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent): void => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [open]);
+  useDismissOnOutsideClick(ref, open, () => setOpen(false));
 
   const anyLabel = t("runs.filterAny");
 
@@ -856,15 +840,7 @@ function ColumnsMenu({
   const [open, setOpen] = useState(false);
   const [dragKey, setDragKey] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent): void => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [open]);
+  useDismissOnOutsideClick(ref, open, () => setOpen(false));
 
   return (
     <div ref={ref} className="relative">
@@ -1041,23 +1017,15 @@ function Team({ party, t }: { party: RunIndexEntry["party"]; t: Translate }) {
   if (party.length === 0) return <span className="text-zinc-600">—</span>;
   return (
     <div className="flex items-center gap-1">
-      {party.map((h, i) => {
-        const src = heroSprite(h.heroKey);
-        return (
-          <span
-            key={i}
-            title={t("runs.teamTooltip", { class: h.class, level: h.level })}
-            className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded bg-surface-950/50 ring-1 ring-surface-700/40"
-          >
-            {src ? (
-              // Native 1x — fractional pixel-art scaling looks mangled, so crop instead.
-              <img src={src} alt={h.class} className="max-w-none [image-rendering:pixelated]" />
-            ) : (
-              <span className="text-[9px] text-zinc-400">{h.class.slice(0, 2)}</span>
-            )}
-          </span>
-        );
-      })}
+      {party.map((h, i) => (
+        <span
+          key={i}
+          title={t("runs.teamTooltip", { class: h.class, level: h.level })}
+          className="contents"
+        >
+          <HeroPortrait heroKey={h.heroKey} heroClass={h.class} />
+        </span>
+      ))}
     </div>
   );
 }

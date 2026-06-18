@@ -1,38 +1,22 @@
-import { randomUUID } from "node:crypto";
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
-import { app } from "electron";
+import { createPersistedUuid } from "./persisted-uuid.js";
 
 // --------------------------------------------------------------------------- //
-// Anonymous device id — a random UUID generated once per install, sent as the
-// X-Device-Id header on signed-out uploads so the API can group them, and later
-// presented to POST /runs/claim to re-attribute them after sign-in. The server
-// only ever stores its hash; treat the raw id like a credential (main-process
-// only — it is NOT exposed over IPC).
+// Anonymous device id — a random UUID generated once per install, presented to
+// POST /runs/claim to re-attribute legacy anonymous runs after sign-in. The
+// server only ever stores its hash; treat the raw id like a credential
+// (main-process only — it is NOT exposed over IPC).
 // --------------------------------------------------------------------------- //
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-interface DeviceIdFile {
-  deviceId: string;
-}
-
-let cached: string | null = null;
+const store = createPersistedUuid({ fileName: "device-id.json", field: "deviceId" });
 
 /** Exported for tests — production callers use getDeviceId(). */
 export function deviceIdPath(): string {
-  return join(app.getPath("userData"), "device-id.json");
+  return store.path();
 }
 
 /** Exported for tests — parse a device-id.json payload, null when unusable. */
 export function parseDeviceIdFile(raw: string): string | null {
-  try {
-    const parsed = JSON.parse(raw) as Partial<DeviceIdFile> | null;
-    const id = parsed?.deviceId;
-    return typeof id === "string" && UUID_RE.test(id) ? id : null;
-  } catch {
-    return null;
-  }
+  return store.parse(raw);
 }
 
 /**
@@ -41,25 +25,5 @@ export function parseDeviceIdFile(raw: string): string | null {
  * unclaimed until their TTL.
  */
 export function getDeviceId(): string {
-  if (cached) return cached;
-  const path = deviceIdPath();
-  if (existsSync(path)) {
-    try {
-      const id = parseDeviceIdFile(readFileSync(path, "utf-8"));
-      if (id) {
-        cached = id;
-        return id;
-      }
-    } catch {
-      // unreadable -> regenerate below
-    }
-  }
-  const id = randomUUID();
-  try {
-    writeFileSync(path, JSON.stringify({ deviceId: id } satisfies DeviceIdFile, null, 2), "utf-8");
-  } catch {
-    // best effort — an unpersisted id still works for this app run
-  }
-  cached = id;
-  return id;
+  return store.get();
 }

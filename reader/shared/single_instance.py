@@ -1,7 +1,7 @@
 """single_instance.py — garante que SÓ UM reader rode por vez.
 
-Por quê: se dois readers anexam ao mesmo jogo, os dois escrevem em runs.jsonl —
-a mesma run sai duplicada, e a disputa pela memória derruba a leitura de gold VIVA,
+Por quê: se dois readers anexam ao mesmo jogo, os dois escrevem os records
+raw/<id>.json — a mesma run sai duplicada, e a disputa pela memória derruba a leitura de gold VIVA,
 caindo no fallback SAVE, que sob contenção rende gold 2×. Cravado nos dados reais:
 uma instância (live) = gold correto, sem duplicata; duas = duplicata + 2×.
 

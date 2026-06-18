@@ -48,20 +48,6 @@ export function statusLabel(status: RunStatus, t: Translate = tEn): string {
   }
 }
 
-/** Tailwind text-color class for a run status. */
-export function statusColor(status: RunStatus): string {
-  switch (status) {
-    case "success":
-      return "text-emerald-400";
-    case "fail":
-      return "text-red-400";
-    case "abandoned":
-      return "text-zinc-400";
-    default:
-      return "text-zinc-400";
-  }
-}
-
 // Mode badge color by difficulty (escalating danger). Shared by the runs list and run detail.
 const MODE_BADGE: Record<string, string> = {
   Normal: "bg-emerald-500/15 text-emerald-300",

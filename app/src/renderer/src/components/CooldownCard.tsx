@@ -3,7 +3,7 @@ import type { ChestCooldown } from "../../../shared/cooldown-types.js";
 import { remainingMs, remainingFraction } from "../../../shared/cooldown-types.js";
 import { chestSprite, chestLevel, boxBestStage, stageCode, stageDifficulty } from "~/lib/game-data";
 import { modeAbbrev, modeTextClass } from "~/lib/format";
-import { formatRemaining, buildTrackerEntries, useCooldowns, useCooldownMs, useNow, useRoute, useTrackerEnabled } from "~/lib/cooldown";
+import { formatRemaining, buildTrackerEntries, sortTrackerEntries, useCooldowns, useCooldownMs, useNow, useRoute, useTrackerEnabled } from "~/lib/cooldown";
 import { BlueBoxSpots } from "./BlueBoxSpots";
 import { useT } from "~/lib/i18n";
 import { cn } from "~/lib/utils";
@@ -214,10 +214,7 @@ export function OverlayCooldowns() {
   // Hidden entries (overlay X) leave the strip but stay tracked + visible in the tab.
   const entries = buildTrackerEntries(active, route).filter((e) => !e.cd?.hidden);
   if (entries.length === 0) return null;
-  const sorted = entries.sort(
-    (a, b) =>
-      (a.cd ? remainingMs(a.cd, now, cooldownMs) : 0) - (b.cd ? remainingMs(b.cd, now, cooldownMs) : 0),
-  );
+  const sorted = sortTrackerEntries(entries, now, cooldownMs);
   return (
     <div className="flex flex-col gap-0.5 border-t border-surface-600 bg-surface-900/80 px-1 py-1">
       {sorted.map((e) => (

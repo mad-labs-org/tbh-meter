@@ -99,7 +99,7 @@ GAME_VERSION = "1.00.14"   # FALLBACK: build do GameAssembly.dll contra a qual o
 # por este valor. Espelha app/src/shared/raw-types.ts::RawRunV2. Ver [[invariants/schema-versioning]].
 # v2 (Redesign 2): id = o HORÁRIO DE FIM da run em MILISSEGUNDOS (string), `ts` em ms, SEM session_id
 # nem run — a identidade da run é o próprio instante, não um contador de sessão (mata a classe de bug
-# do run_num-reset → id colidido → run sumida). Session é DERIVADA pelo app. Ver tbh-meter/progress.md.
+# do run_num-reset → id colidido → run sumida). Session é DERIVADA pelo app.
 RAW_SCHEMA_VERSION = 2
 # LEGADO (congelado): última versão do runs.jsonl append-only que o reader emitiu ANTES do raw/. O
 # reader NÃO escreve mais runs.jsonl; o conversor usa este marco p/ ramificar a migração (≤11 = legado).
@@ -883,8 +883,8 @@ def run(hz, output_dir, debug=False):
     except Exception:
         pass
     # Snapshot vivo CRU (~1x/s), sobrescrito: o reader emite números/ids vivos e o APP cozinha o
-    # overlay (computeDps/resolveStage/modeName) — reader burro de apresentação (progress.md
-    # "Live-meter"). Substituiu o meter_live.txt cozido (dps/label/format no reader). Transporte =
+    # overlay (computeDps/resolveStage/modeName) — reader burro de apresentação.
+    # Substituiu o meter_live.txt cozido (dps/label/format no reader). Transporte =
     # arquivo sobrescrito (não canal); o app faz poll por mtime-advance (LiveSource, SMB-skew immune).
     live_path = os.path.join(snap_dir, "live.json")
     raw_dir = os.path.join(snap_dir, "raw")   # 1 arquivo por run: raw/<ts_ms>.json (cru; id = horário)
@@ -1467,7 +1467,7 @@ DEFAULT_OUTPUT = os.path.join(os.path.expanduser("~"), "tbh-meter")
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--hz", type=float, default=10.0)
-    # Pasta de saída de TUDO (raw/<session_id>-<run>.json, live.json, meter.log,
+    # Pasta de saída de TUDO (raw/<ts_ms>.json, live.json, meter.log,
     # resolve_cache.json). Default = ~/tbh-meter (a pasta que o app já lê).
     ap.add_argument("--output", default=DEFAULT_OUTPUT,
                     help="output directory (default: ~/tbh-meter)")
@@ -1531,8 +1531,8 @@ def main():
     except Exception:
         pass
     # Instância única: só UM reader pode rodar. Dois processos anexam ao mesmo jogo e
-    # duplicam runs.jsonl (run duplicada + gold 2× do fallback save sob contenção). O
-    # mutex é liberado pelo SO no fim do processo — sem stale-lock. Ver single_instance.py.
+    # duplicam os records raw/<id>.json (run duplicada + gold 2× do fallback save sob
+    # contenção). O mutex é liberado pelo SO no fim do processo — sem stale-lock. Ver single_instance.py.
     if not acquire_single_instance():
         print("[exit] another tbh-reader is already running — not starting a second one.")
         return

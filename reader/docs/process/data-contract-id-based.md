@@ -6,7 +6,7 @@ code_anchors:
   - meter_windows.py::run
   - game/build.py::read_build
   - game/build.py::read_stats_dict
-  - game/catalog.py::build_item_cat
+  - meter_windows.py::_read_catalogs
   - app/src/shared/run-types.ts
 asserts:
   - meter_windows.SCHEMA_VERSION == 11
@@ -56,7 +56,7 @@ os labels existentes está fazendo uma mudança de contrato → bump `SCHEMA_VER
   restart e sumia a run; removido no Redesign 2.) **Session NÃO é mais do reader** — o app a DERIVA das
   runs (gap 6h + cortes). Upload: `external_id = device:ts` (único global). Ver `progress.md` "Redesign 2".
 - **Ids têm faixa de sanidade** na fonte (`heroKey`/`itemKey` em `0 < k < 10_000_000`, ver
-  `build_item_cat`/`read_live_stats_by_hero`) — lixo de memória não vira id.
+  `_read_catalogs`/`read_live_stats_by_hero`) — lixo de memória não vira id.
 - **Casing**: o JSON usa as chaves originais (`heroKey`, `stageKey`); a normalização snake_case
   (`heroKey→hero_key`) é no boundary de ingest do DB, não no reader. No app, o mapeamento
   snake_case→camelCase é parte da normalização defensiva.
@@ -68,7 +68,7 @@ os labels existentes está fazendo uma mudança de contrato → bump `SCHEMA_VER
   [[invariants/schema-versioning]]; tipe/normalize defensivo no app ([[invariants/app-normalization]]).
 - **Vai exibir o nome?** Resolva no front via `web/src/data/*.json`; não peça ao reader pra mandar o
   nome. O reader, no máximo, exporta os **catálogos** (id→atributos) — é o `--dump-catalogs` planejado,
-  cuja matéria-prima já existe em `game/catalog.py` (`build_stage_info`/`build_item_cat`/`build_hero_cat`)
+  cuja matéria-prima já existe em `meter_windows.py` (`_read_catalogs`, que deriva stage_info/item_cat/hero_cat)
   e nos enums de `config/offsets.py`.
 
 ## Related

@@ -5,7 +5,6 @@ import {
   bossBoxForStage,
   bossBoxRate,
   boxBestStage,
-  boxBestRate,
   blueBoxes,
   chestLevel,
   formatDropRate,
@@ -76,9 +75,7 @@ describe("blue-chest drop rate + best farm spot (base, per-mille)", () => {
 
   it("finds a box's best (max-rate) farm spot — box 920051 peaks at Normal 1-4 (100%)", () => {
     expect(boxBestStage(920051)).toBe(1104); // Normal 1-4
-    expect(boxBestRate(920051)).toBe(1000); // 100%, the max across its stages
     expect(boxBestStage(999999)).toBeNull();
-    expect(boxBestRate(999999)).toBeNull();
   });
 });
 

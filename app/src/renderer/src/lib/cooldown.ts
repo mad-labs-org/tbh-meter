@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ChestCooldown, CooldownState } from "../../../shared/cooldown-types.js";
-import { DEFAULT_COOLDOWN_MS } from "../../../shared/cooldown-types.js";
+import { DEFAULT_COOLDOWN_MS, remainingMs } from "../../../shared/cooldown-types.js";
 import { clampCooldownMin } from "../../../shared/ipc-types.js";
 
 const EMPTY: CooldownState = { active: [], log: [] };
@@ -89,4 +89,17 @@ export function buildTrackerEntries(active: ChestCooldown[], route: number[]): T
   for (const cd of active) boxes.add(cd.boxKey);
   for (const k of route) boxes.add(k);
   return [...boxes].map((boxKey) => ({ boxKey, cd: byBox.get(boxKey) ?? null }));
+}
+
+/** Sort tracker entries soonest-ready first: a placeholder (no cd) sorts as 0 remaining (ready),
+ *  an active cooldown by its remaining time. Sorts in place (the caller passes its own array). */
+export function sortTrackerEntries(
+  entries: TrackerEntry[],
+  now: number,
+  cooldownMs: number,
+): TrackerEntry[] {
+  return entries.sort(
+    (a, b) =>
+      (a.cd ? remainingMs(a.cd, now, cooldownMs) : 0) - (b.cd ? remainingMs(b.cd, now, cooldownMs) : 0),
+  );
 }

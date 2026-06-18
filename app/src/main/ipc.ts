@@ -33,6 +33,7 @@ import { reportError } from "./error-report.js";
 import { requestUploadNow } from "./auto-upload.js";
 import { isValidSessionId, sessionStatsUrl, requestSessionReset } from "./session-stats.js";
 import { SITE_URL, DISCORD_INVITE_URL } from "./config.js";
+import { broadcast } from "./broadcast.js";
 
 interface IpcDeps {
   /** Apply opacity/always-on-top/font-scale from settings to the live window. */
@@ -54,12 +55,6 @@ interface IpcDeps {
   endWindowDrag(): void;
   /** Recenter the live overlay on-screen at the default size (lost-window recovery). */
   resetLiveWindow(): void;
-}
-
-function broadcast(channel: string, payload?: unknown): void {
-  for (const win of BrowserWindow.getAllWindows()) {
-    if (!win.isDestroyed()) win.webContents.send(channel, payload);
-  }
 }
 
 /** Re-point the file sources at the currently-resolved output directory. */
@@ -278,8 +273,6 @@ export function registerIpcHandlers(deps: IpcDeps): void {
   // session id. Local runs and already-uploaded runs are untouched.
   ipcMain.handle("meter:reset-session", () => requestSessionReset(resolveOutputDir()));
 
-  // The reader's current session id (from session.json) — authoritative, persists across
-  // restarts. The runs list reads it to mark the current session in the list.
   // The CURRENT session = the session of the newest run, DERIVED app-side (Redesign 2) — same source
   // as the session-stats URL above (not the reader's vestigial session.json). null when no runs yet.
   ipcMain.handle("meter:get-current-session", () => getRunsSource().all()[0]?.sessionId ?? null);
