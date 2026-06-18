@@ -1,0 +1,4818 @@
+[
+ {
+  "key": 10001,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [
+   "Melee"
+  ],
+  "range": 140,
+  "baseValue": 1000,
+  "params": [
+   600,
+   200,
+   200,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 10101,
+  "name": "Piercing Thrust",
+  "names": {
+   "zh-hans": "穿透突刺",
+   "zh-hant": "穿透突刺",
+   "en-us": "Piercing Thrust",
+   "fr-fr": "Estoc Perçant",
+   "de-de": "Durchstoß",
+   "id-id": "Tusukan Tembus",
+   "ja-jp": "貫通突き",
+   "ko-kr": "관통 찌르기",
+   "pl-pl": "Przebijające Pchnięcie",
+   "pt-br": "Estocada Perfurante",
+   "ru-ru": "Пронзающий удар",
+   "es-es": "Estocada Perforante",
+   "th-th": "แทงทะลุ",
+   "tr-tr": "Delici İtme",
+   "uk-ua": "Пронизуючий удар",
+   "vi-vn": "Đâm Xuyên"
+  },
+  "description": "Thrust your sword deeply forward, dealing {0}% physical damage to enemies in range.",
+  "order": 400,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK_COUNT",
+  "activationValue": 6,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 101003,
+  "deliveryType": [
+   "Melee",
+   "AOE"
+  ],
+  "range": 200,
+  "baseValue": null,
+  "params": [
+   700,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 2500
+   },
+   {
+    "level": 2,
+    "value": 2700
+   },
+   {
+    "level": 3,
+    "value": 2900
+   },
+   {
+    "level": 4,
+    "value": 3100
+   },
+   {
+    "level": 5,
+    "value": 3300
+   },
+   {
+    "level": 6,
+    "value": 3500
+   },
+   {
+    "level": 7,
+    "value": 3700
+   },
+   {
+    "level": 8,
+    "value": 3900
+   },
+   {
+    "level": 9,
+    "value": 4100
+   },
+   {
+    "level": 10,
+    "value": 4300
+   }
+  ]
+ },
+ {
+  "key": 10201,
+  "name": "Shield Charge",
+  "names": {
+   "zh-hans": "盾牌冲锋",
+   "zh-hant": "盾牌衝鋒",
+   "en-us": "Shield Charge",
+   "fr-fr": "Charge du Bouclier",
+   "de-de": "Schildansturm",
+   "id-id": "Serangan Perisai",
+   "ja-jp": "シールドチャージ",
+   "ko-kr": "방패 돌격",
+   "pl-pl": "Szarża Tarczą",
+   "pt-br": "Investida do Escudo",
+   "ru-ru": "Натиск щитом",
+   "es-es": "Carga con Escudo",
+   "th-th": "พุ่งชนด้วยโล่",
+   "tr-tr": "Kalkan Hücumu",
+   "uk-ua": "Атака щитом",
+   "vi-vn": "Lao Khiên"
+  },
+  "description": "Raise your shield and charge forward. Deal {0}% physical damage to enemies you collide with.",
+  "order": 500,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 4,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 101004,
+  "deliveryType": [
+   "Melee"
+  ],
+  "range": 900,
+  "baseValue": null,
+  "params": [
+   3500,
+   150,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 3000
+   },
+   {
+    "level": 2,
+    "value": 3300
+   },
+   {
+    "level": 3,
+    "value": 3600
+   },
+   {
+    "level": 4,
+    "value": 3900
+   },
+   {
+    "level": 5,
+    "value": 4200
+   },
+   {
+    "level": 6,
+    "value": 4500
+   },
+   {
+    "level": 7,
+    "value": 4800
+   },
+   {
+    "level": 8,
+    "value": 5100
+   },
+   {
+    "level": 9,
+    "value": 5400
+   },
+   {
+    "level": 10,
+    "value": 5700
+   }
+  ]
+ },
+ {
+  "key": 10301,
+  "name": "Retribution Strike",
+  "names": {
+   "zh-hans": "报应打击",
+   "zh-hant": "報應打擊",
+   "en-us": "Retribution Strike",
+   "fr-fr": "Frappe de Rétribution",
+   "de-de": "Vergeltungsschlag",
+   "id-id": "Serangan Pembalasan",
+   "ja-jp": "応報の打撃",
+   "ko-kr": "응징 타격",
+   "pl-pl": "Uderzenie Odwetu",
+   "pt-br": "Golpe de Retribuição",
+   "ru-ru": "Удар возмездия",
+   "es-es": "Golpe de Retribución",
+   "th-th": "การลงทัณฑ์",
+   "tr-tr": "Karşılık Darbesi",
+   "uk-ua": "Удар відплати",
+   "vi-vn": "Đòn Trừng Phạt"
+  },
+  "description": "Strike enemies multiple times, dealing {0}% physical damage per hit. The lower the hero's HP, the more strikes.",
+  "order": 600,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK_COUNT",
+  "activationValue": 5,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 101013,
+  "deliveryType": [
+   "Melee"
+  ],
+  "range": 150,
+  "baseValue": null,
+  "params": [
+   2,
+   500,
+   3,
+   8,
+   235
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 1500
+   },
+   {
+    "level": 2,
+    "value": 1700
+   },
+   {
+    "level": 3,
+    "value": 1900
+   },
+   {
+    "level": 4,
+    "value": 2100
+   },
+   {
+    "level": 5,
+    "value": 2300
+   },
+   {
+    "level": 6,
+    "value": 2500
+   },
+   {
+    "level": 7,
+    "value": 2700
+   },
+   {
+    "level": 8,
+    "value": 2900
+   },
+   {
+    "level": 9,
+    "value": 3100
+   },
+   {
+    "level": 10,
+    "value": 3300
+   }
+  ]
+ },
+ {
+  "key": 10401,
+  "name": "Aegis Field",
+  "names": {
+   "zh-hans": "神盾领域",
+   "zh-hant": "神盾領域",
+   "en-us": "Aegis Field",
+   "fr-fr": "Champ d'Égide",
+   "de-de": "Ägisfeld",
+   "id-id": "Medan Aegis",
+   "ja-jp": "イージスフィールド",
+   "ko-kr": "수호 영역",
+   "pl-pl": "Pole Egidy",
+   "pt-br": "Campo de Égide",
+   "ru-ru": "Поле Эгиды",
+   "es-es": "Campo de Égida",
+   "th-th": "สนามอีจิส",
+   "tr-tr": "Aegis Alanı",
+   "uk-ua": "Поле Егіди",
+   "vi-vn": "Trường Hộ Vệ"
+  },
+  "description": "Deploy a protective aura that blocks {0} damage for allies within the area.",
+  "order": 600,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 20,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 101023,
+  "deliveryType": [
+   "AOE"
+  ],
+  "range": 150,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 500
+   },
+   {
+    "level": 2,
+    "value": 650
+   },
+   {
+    "level": 3,
+    "value": 800
+   },
+   {
+    "level": 4,
+    "value": 950
+   },
+   {
+    "level": 5,
+    "value": 1100
+   },
+   {
+    "level": 6,
+    "value": 1250
+   },
+   {
+    "level": 7,
+    "value": 1400
+   },
+   {
+    "level": 8,
+    "value": 1550
+   },
+   {
+    "level": 9,
+    "value": 1700
+   },
+   {
+    "level": 10,
+    "value": 1850
+   }
+  ]
+ },
+ {
+  "key": 10501,
+  "name": "Sacred Blade",
+  "names": {
+   "zh-hans": "神圣之刃",
+   "zh-hant": "神聖之刃",
+   "en-us": "Sacred Blade",
+   "fr-fr": "Lame Sacrée",
+   "de-de": "Heilige Klinge",
+   "id-id": "Pedang Suci",
+   "ja-jp": "セイクリッドブレード",
+   "ko-kr": "성스러운 검",
+   "pl-pl": "Święte Ostrze",
+   "pt-br": "Lâmina Sagrada",
+   "ru-ru": "Священный Клинок",
+   "es-es": "Hoja Sagrada",
+   "th-th": "ดาบศักดิ์สิทธิ์",
+   "tr-tr": "Kutsal Kılıç",
+   "uk-ua": "Священний Клинок",
+   "vi-vn": "Thánh Kiếm"
+  },
+  "description": "Imbue your sword with holy power. While buffed, attack damage increases by 50% and attacks restore {0} HP.",
+  "order": 600,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 17,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 10501,
+  "attributeKey": 101033,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": null,
+  "params": [
+   800,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 20
+   },
+   {
+    "level": 2,
+    "value": 40
+   },
+   {
+    "level": 3,
+    "value": 60
+   },
+   {
+    "level": 4,
+    "value": 80
+   },
+   {
+    "level": 5,
+    "value": 100
+   },
+   {
+    "level": 6,
+    "value": 120
+   },
+   {
+    "level": 7,
+    "value": 140
+   },
+   {
+    "level": 8,
+    "value": 160
+   },
+   {
+    "level": 9,
+    "value": 180
+   },
+   {
+    "level": 10,
+    "value": 200
+   }
+  ]
+ },
+ {
+  "key": 10601,
+  "name": "Unyielding Will",
+  "names": {
+   "zh-hans": "不屈意志",
+   "zh-hant": "不屈意志",
+   "en-us": "Unyielding Will",
+   "fr-fr": "Volonté Inébranlable",
+   "de-de": "Unbeugsamer Wille",
+   "id-id": "Tekad Pantang Menyerah",
+   "ja-jp": "不屈の意志",
+   "ko-kr": "불굴의 의지",
+   "pl-pl": "Niezłomna Wola",
+   "pt-br": "Vontade Inabalável",
+   "ru-ru": "Несгибаемая Воля",
+   "es-es": "Voluntad Inquebrantable",
+   "th-th": "เจตจำนงไม่สั่นคลอน",
+   "tr-tr": "Yılmaz İrade",
+   "uk-ua": "Непохитна Воля",
+   "vi-vn": "Ý Chí Bất Khuất"
+  },
+  "description": "Once per stage, when near-death, focus your mind to rise again with {0}% HP.",
+  "order": 600,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 50,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 101043,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 300
+   },
+   {
+    "level": 2,
+    "value": 400
+   },
+   {
+    "level": 3,
+    "value": 500
+   },
+   {
+    "level": 4,
+    "value": 600
+   },
+   {
+    "level": 5,
+    "value": 700
+   },
+   {
+    "level": 6,
+    "value": 800
+   },
+   {
+    "level": 7,
+    "value": 900
+   },
+   {
+    "level": 8,
+    "value": 1000
+   },
+   {
+    "level": 9,
+    "value": 1100
+   },
+   {
+    "level": 10,
+    "value": 1200
+   }
+  ]
+ },
+ {
+  "key": 20001,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [
+   "Projectile"
+  ],
+  "range": 1100,
+  "baseValue": 1000,
+  "params": [
+   650,
+   150,
+   200,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 20101,
+  "name": "Rapid Fire",
+  "names": {
+   "zh-hans": "快速射击",
+   "zh-hant": "快速射擊",
+   "en-us": "Rapid Fire",
+   "fr-fr": "Tir Rapide",
+   "de-de": "Schnellfeuer",
+   "id-id": "Tembakan Cepat",
+   "ja-jp": "連射",
+   "ko-kr": "화살 연발",
+   "pl-pl": "Szybkie Strzelanie",
+   "pt-br": "Tiro Rápido",
+   "ru-ru": "Скорострельность",
+   "es-es": "Fuego Rápido",
+   "th-th": "ยิงเร็ว",
+   "tr-tr": "Hızlı Ateş",
+   "uk-ua": "Швидкий вогонь",
+   "vi-vn": "Bắn Liên Thanh"
+  },
+  "description": "Fire multiple arrows in succession, dealing {0}% physical damage per arrow.",
+  "order": 400,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK_COUNT",
+  "activationValue": 5,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 201003,
+  "deliveryType": [
+   "Projectile"
+  ],
+  "range": 1150,
+  "baseValue": null,
+  "params": [
+   3,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 1320
+   },
+   {
+    "level": 2,
+    "value": 1440
+   },
+   {
+    "level": 3,
+    "value": 1560
+   },
+   {
+    "level": 4,
+    "value": 1680
+   },
+   {
+    "level": 5,
+    "value": 1800
+   },
+   {
+    "level": 6,
+    "value": 1920
+   },
+   {
+    "level": 7,
+    "value": 2040
+   },
+   {
+    "level": 8,
+    "value": 2160
+   },
+   {
+    "level": 9,
+    "value": 2280
+   },
+   {
+    "level": 10,
+    "value": 2400
+   }
+  ]
+ },
+ {
+  "key": 20201,
+  "name": "Scatter Shot",
+  "names": {
+   "zh-hans": "散弹射击",
+   "zh-hant": "散彈射擊",
+   "en-us": "Scatter Shot",
+   "fr-fr": "Tir Dispersé",
+   "de-de": "Streuschuss",
+   "id-id": "Tembakan Sebar",
+   "ja-jp": "散弾射撃",
+   "ko-kr": "분산 사격",
+   "pl-pl": "Strzał Rozpryskowy",
+   "pt-br": "Tiro Disperso",
+   "ru-ru": "Разрывной выстрел",
+   "es-es": "Tiro Disperso",
+   "th-th": "ยิงกระจาย",
+   "tr-tr": "Saçma Atışı",
+   "uk-ua": "Розсіяний постріл",
+   "vi-vn": "Bắn Phân Tán"
+  },
+  "description": "Fire multiple homing arrows. Deal {0}% physical damage per arrow.",
+  "order": 500,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 7,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 201004,
+  "deliveryType": [
+   "Projectile"
+  ],
+  "range": 1650,
+  "baseValue": null,
+  "params": [
+   3,
+   40,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 1620
+   },
+   {
+    "level": 2,
+    "value": 1780
+   },
+   {
+    "level": 3,
+    "value": 1940
+   },
+   {
+    "level": 4,
+    "value": 2100
+   },
+   {
+    "level": 5,
+    "value": 2260
+   },
+   {
+    "level": 6,
+    "value": 2420
+   },
+   {
+    "level": 7,
+    "value": 2580
+   },
+   {
+    "level": 8,
+    "value": 2740
+   },
+   {
+    "level": 9,
+    "value": 2900
+   },
+   {
+    "level": 10,
+    "value": 3060
+   }
+  ]
+ },
+ {
+  "key": 20301,
+  "name": "Arrow Rain",
+  "names": {
+   "zh-hans": "箭雨",
+   "zh-hant": "箭雨",
+   "en-us": "Arrow Rain",
+   "fr-fr": "Pluie de Flèches",
+   "de-de": "Pfeilregen",
+   "id-id": "Hujan Panah",
+   "ja-jp": "矢の雨",
+   "ko-kr": "화살비",
+   "pl-pl": "Deszcz Strzał",
+   "pt-br": "Chuva de Flechas",
+   "ru-ru": "Дождь стрел",
+   "es-es": "Lluvia de Flechas",
+   "th-th": "ฝนธนู",
+   "tr-tr": "Ok Yağmuru",
+   "uk-ua": "Дощ стріл",
+   "vi-vn": "Mưa Tên"
+  },
+  "description": "Fire multiple arrows into the sky, dealing {0}% physical damage to enemies in a wide area.",
+  "order": 200,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 10,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 201013,
+  "deliveryType": [
+   "AOE"
+  ],
+  "range": 1300,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 2150
+   },
+   {
+    "level": 2,
+    "value": 2410
+   },
+   {
+    "level": 3,
+    "value": 2670
+   },
+   {
+    "level": 4,
+    "value": 2930
+   },
+   {
+    "level": 5,
+    "value": 3190
+   },
+   {
+    "level": 6,
+    "value": 3450
+   },
+   {
+    "level": 7,
+    "value": 3710
+   },
+   {
+    "level": 8,
+    "value": 3970
+   },
+   {
+    "level": 9,
+    "value": 4230
+   },
+   {
+    "level": 10,
+    "value": 4490
+   }
+  ]
+ },
+ {
+  "key": 20401,
+  "name": "Swift Surge",
+  "names": {
+   "zh-hans": "迅捷觉醒",
+   "zh-hant": "迅捷覺醒",
+   "en-us": "Swift Surge",
+   "fr-fr": "Élan Rapide",
+   "de-de": "Schneller Ansturm",
+   "id-id": "Lonjakan Kecepatan",
+   "ja-jp": "スウィフトサージ",
+   "ko-kr": "신속 각성",
+   "pl-pl": "Błyskawiczny Zryw",
+   "pt-br": "Surto Veloz",
+   "ru-ru": "Стремительный Рывок",
+   "es-es": "Impulso Veloz",
+   "th-th": "พลังความรวดเร็ว",
+   "tr-tr": "Hızlı Atılım",
+   "uk-ua": "Стрімкий Ривок",
+   "vi-vn": "Bùng Phát Tốc Độ"
+  },
+  "description": "Temporarily accelerate your metabolism. Attack speed increases by {0}% for the duration.",
+  "order": 700,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 21,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 20401,
+  "attributeKey": 201023,
+  "deliveryType": [],
+  "range": 1200,
+  "baseValue": null,
+  "params": [
+   700,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 500
+   },
+   {
+    "level": 2,
+    "value": 600
+   },
+   {
+    "level": 3,
+    "value": 700
+   },
+   {
+    "level": 4,
+    "value": 800
+   },
+   {
+    "level": 5,
+    "value": 900
+   },
+   {
+    "level": 6,
+    "value": 1000
+   },
+   {
+    "level": 7,
+    "value": 1100
+   },
+   {
+    "level": 8,
+    "value": 1200
+   },
+   {
+    "level": 9,
+    "value": 1300
+   },
+   {
+    "level": 10,
+    "value": 1400
+   }
+  ]
+ },
+ {
+  "key": 20501,
+  "name": "Piercing Arrow",
+  "names": {
+   "zh-hans": "穿透之箭",
+   "zh-hant": "穿透之箭",
+   "en-us": "Piercing Arrow",
+   "fr-fr": "Flèche Perçante",
+   "de-de": "Durchbohrungspfeil",
+   "id-id": "Panah Tembus",
+   "ja-jp": "ピアシングアロー",
+   "ko-kr": "꿰뚫는 화살",
+   "pl-pl": "Przeszywająca Strzała",
+   "pt-br": "Flecha Perfurante",
+   "ru-ru": "Пронзающая Стрела",
+   "es-es": "Flecha Perforadora",
+   "th-th": "ลูกศรเจาะทะลุ",
+   "tr-tr": "Delici Ok",
+   "uk-ua": "Пронизлива Стріла",
+   "vi-vn": "Mũi Tên Xuyên Thấu"
+  },
+  "description": "Fire a piercing arrow that deals {0}% physical damage to enemies hit.",
+  "order": 800,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK_COUNT",
+  "activationValue": 13,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 201033,
+  "deliveryType": [
+   "Projectile"
+  ],
+  "range": 1200,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 2440
+   },
+   {
+    "level": 2,
+    "value": 2600
+   },
+   {
+    "level": 3,
+    "value": 2760
+   },
+   {
+    "level": 4,
+    "value": 2920
+   },
+   {
+    "level": 5,
+    "value": 3080
+   },
+   {
+    "level": 6,
+    "value": 3240
+   },
+   {
+    "level": 7,
+    "value": 3400
+   },
+   {
+    "level": 8,
+    "value": 3560
+   },
+   {
+    "level": 9,
+    "value": 3720
+   },
+   {
+    "level": 10,
+    "value": 3880
+   }
+  ]
+ },
+ {
+  "key": 20601,
+  "name": "Skewer Shot",
+  "names": {
+   "zh-hans": "穿刺射击",
+   "zh-hant": "穿刺射擊",
+   "en-us": "Skewer Shot",
+   "fr-fr": "Tir Embrocheur",
+   "de-de": "Spießschuss",
+   "id-id": "Tembakan Tusuk",
+   "ja-jp": "スキュワーショット",
+   "ko-kr": "꼬챙이 사격",
+   "pl-pl": "Strzał na Rożen",
+   "pt-br": "Disparo Espetador",
+   "ru-ru": "Пронзающий Выстрел",
+   "es-es": "Disparo Empalador",
+   "th-th": "ยิงเสียบ",
+   "tr-tr": "Şiş Atışı",
+   "uk-ua": "Прошивний Постріл",
+   "vi-vn": "Phát Bắn Xiên"
+  },
+  "description": "Fire a deep-wounding arrow. Damage increases by {0}% per lodged arrow; 3+ arrows cause bleeding.",
+  "order": 900,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK_COUNT",
+  "activationValue": 8,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 20601,
+  "attributeKey": 201043,
+  "deliveryType": [
+   "Projectile"
+  ],
+  "range": 1200,
+  "baseValue": null,
+  "params": [
+   3000,
+   4,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 1000
+   },
+   {
+    "level": 2,
+    "value": 1300
+   },
+   {
+    "level": 3,
+    "value": 1600
+   },
+   {
+    "level": 4,
+    "value": 1900
+   },
+   {
+    "level": 5,
+    "value": 2200
+   },
+   {
+    "level": 6,
+    "value": 2500
+   },
+   {
+    "level": 7,
+    "value": 2800
+   },
+   {
+    "level": 8,
+    "value": 3100
+   },
+   {
+    "level": 9,
+    "value": 3400
+   },
+   {
+    "level": 10,
+    "value": 3700
+   }
+  ]
+ },
+ {
+  "key": 30001,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Fire",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [
+   "Projectile"
+  ],
+  "range": 900,
+  "baseValue": 1000,
+  "params": [
+   700,
+   300,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 30101,
+  "name": "Fireball",
+  "names": {
+   "zh-hans": "火球术",
+   "zh-hant": "火球術",
+   "en-us": "Fireball",
+   "fr-fr": "Boule de Feu",
+   "de-de": "Feuerball",
+   "id-id": "Bola Api",
+   "ja-jp": "ファイアボール",
+   "ko-kr": "파이어볼",
+   "pl-pl": "Kula Ognia",
+   "pt-br": "Bola de Fogo",
+   "ru-ru": "Огненный шар",
+   "es-es": "Bola de Fuego",
+   "th-th": "ลูกไฟ",
+   "tr-tr": "Ateş Topu",
+   "uk-ua": "Вогняна куля",
+   "vi-vn": "Cầu Lửa"
+  },
+  "description": "A fireball that explodes on impact, dealing {0}% AoE fire damage.",
+  "order": 400,
+  "damageType": "Fire",
+  "activationType": "COOLDOWN",
+  "activationValue": 6,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 301003,
+  "deliveryType": [
+   "Projectile",
+   "AOE"
+  ],
+  "range": 950,
+  "baseValue": null,
+  "params": [
+   600,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 2700
+   },
+   {
+    "level": 2,
+    "value": 2950
+   },
+   {
+    "level": 3,
+    "value": 3200
+   },
+   {
+    "level": 4,
+    "value": 3450
+   },
+   {
+    "level": 5,
+    "value": 3700
+   },
+   {
+    "level": 6,
+    "value": 3950
+   },
+   {
+    "level": 7,
+    "value": 4200
+   },
+   {
+    "level": 8,
+    "value": 4450
+   },
+   {
+    "level": 9,
+    "value": 4700
+   },
+   {
+    "level": 10,
+    "value": 4950
+   }
+  ]
+ },
+ {
+  "key": 30201,
+  "name": "Ice Orb",
+  "names": {
+   "zh-hans": "冰球术",
+   "zh-hant": "冰球術",
+   "en-us": "Ice Orb",
+   "fr-fr": "Orbe de Glace",
+   "de-de": "Eiskugel",
+   "id-id": "Bola Es",
+   "ja-jp": "アイスオーブ",
+   "ko-kr": "아이스 오브",
+   "pl-pl": "Lodowa Kula",
+   "pt-br": "Orbe de Gelo",
+   "ru-ru": "Ледяная сфера",
+   "es-es": "Orbe de Hielo",
+   "th-th": "ลูกน้ำแข็ง",
+   "tr-tr": "Buz Küresi",
+   "uk-ua": "Крижана сфера",
+   "vi-vn": "Cầu Băng"
+  },
+  "description": "Summon an ice orb and hurl it at enemies. Slows enemies hit and deals {0}% multi-hit cold damage.",
+  "order": 500,
+  "damageType": "Cold",
+  "activationType": "COOLDOWN",
+  "activationValue": 8,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 301004,
+  "deliveryType": [
+   "Projectile",
+   "AOE"
+  ],
+  "range": 950,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 1500
+   },
+   {
+    "level": 2,
+    "value": 1620
+   },
+   {
+    "level": 3,
+    "value": 1740
+   },
+   {
+    "level": 4,
+    "value": 1860
+   },
+   {
+    "level": 5,
+    "value": 1980
+   },
+   {
+    "level": 6,
+    "value": 2100
+   },
+   {
+    "level": 7,
+    "value": 2220
+   },
+   {
+    "level": 8,
+    "value": 2340
+   },
+   {
+    "level": 9,
+    "value": 2460
+   },
+   {
+    "level": 10,
+    "value": 2580
+   }
+  ]
+ },
+ {
+  "key": 30301,
+  "name": "Lightning",
+  "names": {
+   "zh-hans": "闪电术",
+   "zh-hant": "閃電術",
+   "en-us": "Lightning",
+   "fr-fr": "Éclair",
+   "de-de": "Blitz",
+   "id-id": "Petir",
+   "ja-jp": "ライトニング",
+   "ko-kr": "라이트닝",
+   "pl-pl": "Błyskawica",
+   "pt-br": "Raio",
+   "ru-ru": "Молния",
+   "es-es": "Rayo",
+   "th-th": "สายฟ้า",
+   "tr-tr": "Şimşek",
+   "uk-ua": "Блискавка",
+   "vi-vn": "Sấm Sét"
+  },
+  "description": "Unleash electricity forward, dealing {0}% lightning damage to enemies.",
+  "order": 600,
+  "damageType": "Lightning",
+  "activationType": "COOLDOWN",
+  "activationValue": 15,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 301013,
+  "deliveryType": [
+   "AOE"
+  ],
+  "range": 1050,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 2550
+   },
+   {
+    "level": 2,
+    "value": 2820
+   },
+   {
+    "level": 3,
+    "value": 3090
+   },
+   {
+    "level": 4,
+    "value": 3360
+   },
+   {
+    "level": 5,
+    "value": 3630
+   },
+   {
+    "level": 6,
+    "value": 3900
+   },
+   {
+    "level": 7,
+    "value": 4170
+   },
+   {
+    "level": 8,
+    "value": 4440
+   },
+   {
+    "level": 9,
+    "value": 4710
+   },
+   {
+    "level": 10,
+    "value": 4980
+   }
+  ]
+ },
+ {
+  "key": 30401,
+  "name": "Flame Hydra",
+  "names": {
+   "zh-hans": "烈焰九头蛇",
+   "zh-hant": "烈焰九頭蛇",
+   "en-us": "Flame Hydra",
+   "fr-fr": "Hydre de Flammes",
+   "de-de": "Flammenhydra",
+   "id-id": "Flame Hydra",
+   "ja-jp": "フレイムヒュドラ",
+   "ko-kr": "플레임 히드라",
+   "pl-pl": "Ognista Hydra",
+   "pt-br": "Hidra de Chamas",
+   "ru-ru": "Огненная Гидра",
+   "es-es": "Hidra de Llamas",
+   "th-th": "ไฮดราเพลิง",
+   "tr-tr": "Alev Hidrası",
+   "uk-ua": "Вогняна Гідра",
+   "vi-vn": "Rồng Lửa Hydra"
+  },
+  "description": "Summon a hydra that fires fireballs dealing {0}% damage.",
+  "order": 700,
+  "damageType": "Fire",
+  "activationType": "COOLDOWN",
+  "activationValue": 13,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 301023,
+  "deliveryType": [
+   "Projectile",
+   "Summon"
+  ],
+  "range": 1100,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 2300
+   },
+   {
+    "level": 2,
+    "value": 2450
+   },
+   {
+    "level": 3,
+    "value": 2600
+   },
+   {
+    "level": 4,
+    "value": 2750
+   },
+   {
+    "level": 5,
+    "value": 2900
+   },
+   {
+    "level": 6,
+    "value": 3050
+   },
+   {
+    "level": 7,
+    "value": 3200
+   },
+   {
+    "level": 8,
+    "value": 3350
+   },
+   {
+    "level": 9,
+    "value": 3500
+   },
+   {
+    "level": 10,
+    "value": 3650
+   }
+  ]
+ },
+ {
+  "key": 30501,
+  "name": "Snowstorm",
+  "names": {
+   "zh-hans": "暴风雪",
+   "zh-hant": "暴風雪",
+   "en-us": "Snowstorm",
+   "fr-fr": "Tempête de Neige",
+   "de-de": "Schneesturm",
+   "id-id": "Badai Salju",
+   "ja-jp": "スノーストーム",
+   "ko-kr": "눈폭풍",
+   "pl-pl": "Śnieżyca",
+   "pt-br": "Nevasca",
+   "ru-ru": "Снежная Буря",
+   "es-es": "Tormenta de Nieve",
+   "th-th": "พายุหิมะ",
+   "tr-tr": "Kar Fırtınası",
+   "uk-ua": "Снігова Буря",
+   "vi-vn": "Bão Tuyết"
+  },
+  "description": "Summon a mass of ice shards raining on enemies. Deals {0}% cold damage per second and chills enemies in the area.",
+  "order": 800,
+  "damageType": "Cold",
+  "activationType": "COOLDOWN",
+  "activationValue": 22,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 301033,
+  "deliveryType": [
+   "AOE"
+  ],
+  "range": 1100,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 500
+   },
+   {
+    "level": 2,
+    "value": 660
+   },
+   {
+    "level": 3,
+    "value": 820
+   },
+   {
+    "level": 4,
+    "value": 980
+   },
+   {
+    "level": 5,
+    "value": 1140
+   },
+   {
+    "level": 6,
+    "value": 1300
+   },
+   {
+    "level": 7,
+    "value": 1460
+   },
+   {
+    "level": 8,
+    "value": 1620
+   },
+   {
+    "level": 9,
+    "value": 1780
+   },
+   {
+    "level": 10,
+    "value": 1940
+   }
+  ]
+ },
+ {
+  "key": 30601,
+  "name": "Meteor Strike",
+  "names": {
+   "zh-hans": "陨石打击",
+   "zh-hant": "隕石打擊",
+   "en-us": "Meteor Strike",
+   "fr-fr": "Frappe Météore",
+   "de-de": "Meteoreinschlag",
+   "id-id": "Serangan Meteor",
+   "ja-jp": "メテオストライク",
+   "ko-kr": "유성 강타",
+   "pl-pl": "Uderzenie Meteoru",
+   "pt-br": "Golpe Meteórico",
+   "ru-ru": "Удар Метеора",
+   "es-es": "Golpe Meteórico",
+   "th-th": "อุกกาบาต",
+   "tr-tr": "Meteor Darbesi",
+   "uk-ua": "Удар Метеора",
+   "vi-vn": "Thiên Thạch"
+  },
+  "description": "Summon a meteor, dealing {0}% damage to enemies in a wide area.",
+  "order": 900,
+  "damageType": "Fire",
+  "activationType": "COOLDOWN",
+  "activationValue": 18,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 301043,
+  "deliveryType": [
+   "AOE"
+  ],
+  "range": 1100,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 5500
+   },
+   {
+    "level": 2,
+    "value": 5950
+   },
+   {
+    "level": 3,
+    "value": 6400
+   },
+   {
+    "level": 4,
+    "value": 6850
+   },
+   {
+    "level": 5,
+    "value": 7300
+   },
+   {
+    "level": 6,
+    "value": 7750
+   },
+   {
+    "level": 7,
+    "value": 8200
+   },
+   {
+    "level": 8,
+    "value": 8650
+   },
+   {
+    "level": 9,
+    "value": 9100
+   },
+   {
+    "level": 10,
+    "value": 9550
+   }
+  ]
+ },
+ {
+  "key": 40001,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [
+   "Melee"
+  ],
+  "range": 170,
+  "baseValue": 1000,
+  "params": [
+   600,
+   200,
+   200,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 40101,
+  "name": "Heal",
+  "names": {
+   "zh-hans": "治愈",
+   "zh-hant": "治癒",
+   "en-us": "Heal",
+   "fr-fr": "Soin",
+   "de-de": "Heilung",
+   "id-id": "Penyembuhan",
+   "ja-jp": "ヒール",
+   "ko-kr": "힐",
+   "pl-pl": "Leczenie",
+   "pt-br": "Cura",
+   "ru-ru": "Исцеление",
+   "es-es": "Curar",
+   "th-th": "รักษา",
+   "tr-tr": "İyileştirme",
+   "uk-ua": "Зцілення",
+   "vi-vn": "Hồi Máu"
+  },
+  "description": "Restore one ally's HP by an amount equal to {0}% of their maximum HP.",
+  "order": 400,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 8,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 401003,
+  "deliveryType": [],
+  "range": 950,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 100
+   },
+   {
+    "level": 2,
+    "value": 120
+   },
+   {
+    "level": 3,
+    "value": 140
+   },
+   {
+    "level": 4,
+    "value": 160
+   },
+   {
+    "level": 5,
+    "value": 180
+   },
+   {
+    "level": 6,
+    "value": 200
+   },
+   {
+    "level": 7,
+    "value": 220
+   },
+   {
+    "level": 8,
+    "value": 240
+   },
+   {
+    "level": 9,
+    "value": 260
+   },
+   {
+    "level": 10,
+    "value": 280
+   }
+  ]
+ },
+ {
+  "key": 40201,
+  "name": "Blessing Of Might",
+  "names": {
+   "zh-hans": "力量祝福",
+   "zh-hant": "力量祝福",
+   "en-us": "Blessing Of Might",
+   "fr-fr": "Bénédiction de Force",
+   "de-de": "Segen der Stärke",
+   "id-id": "Berkah Kekuatan",
+   "ja-jp": "力の祝福",
+   "ko-kr": "힘의 축복",
+   "pl-pl": "Błogosławieństwo Mocy",
+   "pt-br": "Bênção do Poder",
+   "ru-ru": "Благословение Силы",
+   "es-es": "Bendición del Poder",
+   "th-th": "พรแห่งพลัง",
+   "tr-tr": "Güç Kutsanması",
+   "uk-ua": "Благословення Сили",
+   "vi-vn": "Phước Lành Sức Mạnh"
+  },
+  "description": "A blessing active while equipped. Increases attack damage of self and nearby party members by {0}%.",
+  "order": 500,
+  "damageType": "Physical",
+  "activationType": "CONTINUOUS",
+  "activationValue": null,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 40201,
+  "attributeKey": 401004,
+  "deliveryType": [
+   "AOE"
+  ],
+  "range": 950,
+  "baseValue": null,
+  "params": [
+   1200,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 500
+   },
+   {
+    "level": 2,
+    "value": 600
+   },
+   {
+    "level": 3,
+    "value": 700
+   },
+   {
+    "level": 4,
+    "value": 800
+   },
+   {
+    "level": 5,
+    "value": 900
+   },
+   {
+    "level": 6,
+    "value": 1000
+   },
+   {
+    "level": 7,
+    "value": 1100
+   },
+   {
+    "level": 8,
+    "value": 1200
+   },
+   {
+    "level": 9,
+    "value": 1300
+   },
+   {
+    "level": 10,
+    "value": 1400
+   }
+  ]
+ },
+ {
+  "key": 40301,
+  "name": "Wrath of Heaven",
+  "names": {
+   "zh-hans": "天堂之怒",
+   "zh-hant": "天堂之怒",
+   "en-us": "Wrath of Heaven",
+   "fr-fr": "Courroux Céleste",
+   "de-de": "Zorn des Himmels",
+   "id-id": "Murka Surga",
+   "ja-jp": "天上の怒り",
+   "ko-kr": "천상의 분노",
+   "pl-pl": "Gniew Niebios",
+   "pt-br": "Ira dos Céus",
+   "ru-ru": "Небесный Гнев",
+   "es-es": "Ira del Cielo",
+   "th-th": "พิโรธแห่งสวรรค์",
+   "tr-tr": "Cennetin Gazabı",
+   "uk-ua": "Гнів Небес",
+   "vi-vn": "Thịnh Nộ Thiên Đường"
+  },
+  "description": "Imbue your scepter with divine lightning. For the duration, attacks deal {0}% lightning area damage.",
+  "order": 600,
+  "damageType": "Lightning",
+  "activationType": "COOLDOWN",
+  "activationValue": 20,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 40301,
+  "attributeKey": 401013,
+  "deliveryType": [
+   "AOE"
+  ],
+  "range": 1050,
+  "baseValue": null,
+  "params": [
+   650,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 4300
+   },
+   {
+    "level": 2,
+    "value": 4700
+   },
+   {
+    "level": 3,
+    "value": 5100
+   },
+   {
+    "level": 4,
+    "value": 5500
+   },
+   {
+    "level": 5,
+    "value": 5900
+   },
+   {
+    "level": 6,
+    "value": 6300
+   },
+   {
+    "level": 7,
+    "value": 6700
+   },
+   {
+    "level": 8,
+    "value": 7100
+   },
+   {
+    "level": 9,
+    "value": 7500
+   },
+   {
+    "level": 10,
+    "value": 7900
+   }
+  ]
+ },
+ {
+  "key": 40401,
+  "name": "Sanctuary",
+  "names": {
+   "zh-hans": "圣域",
+   "zh-hant": "聖域",
+   "en-us": "Sanctuary",
+   "fr-fr": "Sanctuaire",
+   "de-de": "Heiligtum",
+   "id-id": "Sanctuary",
+   "ja-jp": "サンクチュアリ",
+   "ko-kr": "성역",
+   "pl-pl": "Sanktuarium",
+   "pt-br": "Santuário",
+   "ru-ru": "Святилище",
+   "es-es": "Santuario",
+   "th-th": "สถานศักดิ์สิทธิ์",
+   "tr-tr": "Kutsal Alan",
+   "uk-ua": "Святилище",
+   "vi-vn": "Thánh Địa"
+  },
+  "description": "Deploy a holy sanctuary across the battlefield. For the duration, all allies inside regenerate {0} HP per second.",
+  "order": 700,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 17,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 401023,
+  "deliveryType": [
+   "AOE"
+  ],
+  "range": 1100,
+  "baseValue": null,
+  "params": [
+   750,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 300
+   },
+   {
+    "level": 2,
+    "value": 400
+   },
+   {
+    "level": 3,
+    "value": 520
+   },
+   {
+    "level": 4,
+    "value": 660
+   },
+   {
+    "level": 5,
+    "value": 820
+   },
+   {
+    "level": 6,
+    "value": 1000
+   },
+   {
+    "level": 7,
+    "value": 1200
+   },
+   {
+    "level": 8,
+    "value": 1420
+   },
+   {
+    "level": 9,
+    "value": 1660
+   },
+   {
+    "level": 10,
+    "value": 1920
+   }
+  ]
+ },
+ {
+  "key": 40501,
+  "name": "Blessing of Warding",
+  "names": {
+   "zh-hans": "守护祝福",
+   "zh-hant": "守護祝福",
+   "en-us": "Blessing of Warding",
+   "fr-fr": "Bénédiction de Protection",
+   "de-de": "Schutzsegen",
+   "id-id": "Berkah Perlindungan",
+   "ja-jp": "守護の祝福",
+   "ko-kr": "방어의 축복",
+   "pl-pl": "Błogosławieństwo Ochrony",
+   "pt-br": "Bênção de Proteção",
+   "ru-ru": "Благословение Защиты",
+   "es-es": "Bendición de Guardia",
+   "th-th": "พรแห่งการปกป้อง",
+   "tr-tr": "Koruma Kutsanması",
+   "uk-ua": "Благословення Захисту",
+   "vi-vn": "Phước Lành Phòng Hộ"
+  },
+  "description": "A blessing active while equipped. Increases elemental resistance of self and nearby party members by {0}.",
+  "order": 800,
+  "damageType": "Physical",
+  "activationType": "CONTINUOUS",
+  "activationValue": null,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 40501,
+  "attributeKey": 401033,
+  "deliveryType": [
+   "AOE"
+  ],
+  "range": 1100,
+  "baseValue": null,
+  "params": [
+   1200,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 10
+   },
+   {
+    "level": 2,
+    "value": 15
+   },
+   {
+    "level": 3,
+    "value": 20
+   },
+   {
+    "level": 4,
+    "value": 25
+   },
+   {
+    "level": 5,
+    "value": 30
+   },
+   {
+    "level": 6,
+    "value": 35
+   },
+   {
+    "level": 7,
+    "value": 40
+   },
+   {
+    "level": 8,
+    "value": 45
+   },
+   {
+    "level": 9,
+    "value": 50
+   },
+   {
+    "level": 10,
+    "value": 55
+   }
+  ]
+ },
+ {
+  "key": 40601,
+  "name": "Resurrection",
+  "names": {
+   "zh-hans": "复活",
+   "zh-hant": "復活",
+   "en-us": "Resurrection",
+   "fr-fr": "Résurrection",
+   "de-de": "Auferstehung",
+   "id-id": "Kebangkitan",
+   "ja-jp": "リザレクション",
+   "ko-kr": "부활",
+   "pl-pl": "Wskrzeszenie",
+   "pt-br": "Ressurreição",
+   "ru-ru": "Воскрешение",
+   "es-es": "Resurrección",
+   "th-th": "คืนชีพ",
+   "tr-tr": "Diriliş",
+   "uk-ua": "Воскресіння",
+   "vi-vn": "Hồi Sinh"
+  },
+  "description": "Revive a fallen party member with {0}% of their max HP.",
+  "order": 900,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 45,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 401043,
+  "deliveryType": [],
+  "range": 1100,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 300
+   },
+   {
+    "level": 2,
+    "value": 350
+   },
+   {
+    "level": 3,
+    "value": 400
+   },
+   {
+    "level": 4,
+    "value": 450
+   },
+   {
+    "level": 5,
+    "value": 500
+   },
+   {
+    "level": 6,
+    "value": 550
+   },
+   {
+    "level": 7,
+    "value": 600
+   },
+   {
+    "level": 8,
+    "value": 650
+   },
+   {
+    "level": 9,
+    "value": 700
+   },
+   {
+    "level": 10,
+    "value": 750
+   }
+  ]
+ },
+ {
+  "key": 50001,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [
+   "Projectile"
+  ],
+  "range": 1000,
+  "baseValue": 1000,
+  "params": [
+   600,
+   200,
+   200,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 50101,
+  "name": "Explosive Bolt",
+  "names": {
+   "zh-hans": "爆炸弩箭",
+   "zh-hant": "爆炸弩箭",
+   "en-us": "Explosive Bolt",
+   "fr-fr": "Carreau Explosif",
+   "de-de": "Explosivbolzen",
+   "id-id": "Panah Ledak",
+   "ja-jp": "エクスプロージョンボルト",
+   "ko-kr": "폭발 볼트",
+   "pl-pl": "Wybuchowy Bełt",
+   "pt-br": "Virote Explosivo",
+   "ru-ru": "Взрывной Болт",
+   "es-es": "Virote Explosivo",
+   "th-th": "สลักระเบิด",
+   "tr-tr": "Patlayıcı Bolt",
+   "uk-ua": "Вибуховий Болт",
+   "vi-vn": "Mũi Tên Nổ"
+  },
+  "description": "Fire a crossbow bolt that explodes on impact, dealing {0}% area fire damage.",
+  "order": 400,
+  "damageType": "Fire",
+  "activationType": "BASEATTACK_COUNT",
+  "activationValue": 6,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 501003,
+  "deliveryType": [
+   "Projectile"
+  ],
+  "range": 1100,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 4840
+   },
+   {
+    "level": 2,
+    "value": 5350
+   },
+   {
+    "level": 3,
+    "value": 5860
+   },
+   {
+    "level": 4,
+    "value": 6370
+   },
+   {
+    "level": 5,
+    "value": 6880
+   },
+   {
+    "level": 6,
+    "value": 7390
+   },
+   {
+    "level": 7,
+    "value": 7900
+   },
+   {
+    "level": 8,
+    "value": 8410
+   },
+   {
+    "level": 9,
+    "value": 8920
+   },
+   {
+    "level": 10,
+    "value": 9430
+   }
+  ]
+ },
+ {
+  "key": 50201,
+  "name": "Frost Bolt",
+  "names": {
+   "zh-hans": "寒霜弩箭",
+   "zh-hant": "寒霜弩箭",
+   "en-us": "Frost Bolt",
+   "fr-fr": "Carreau de Givre",
+   "de-de": "Frostbolzen",
+   "id-id": "Panah Es",
+   "ja-jp": "フロストボルト",
+   "ko-kr": "프로스트 볼트",
+   "pl-pl": "Lodowy Bełt",
+   "pt-br": "Virote de Gelo",
+   "ru-ru": "Ледяной Болт",
+   "es-es": "Virote de Escarcha",
+   "th-th": "สลักน้ำแข็ง",
+   "tr-tr": "Buz Boltu",
+   "uk-ua": "Крижаний Болт",
+   "vi-vn": "Mũi Tên Băng"
+  },
+  "description": "Fire a crossbow bolt that explodes on impact, dealing {0}% area cold damage and freezing enemies hit.",
+  "order": 500,
+  "damageType": "Cold",
+  "activationType": "COOLDOWN",
+  "activationValue": 8,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 501004,
+  "deliveryType": [
+   "Projectile"
+  ],
+  "range": 1100,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 2100
+   },
+   {
+    "level": 2,
+    "value": 2250
+   },
+   {
+    "level": 3,
+    "value": 2400
+   },
+   {
+    "level": 4,
+    "value": 2550
+   },
+   {
+    "level": 5,
+    "value": 2700
+   },
+   {
+    "level": 6,
+    "value": 2850
+   },
+   {
+    "level": 7,
+    "value": 3000
+   },
+   {
+    "level": 8,
+    "value": 3150
+   },
+   {
+    "level": 9,
+    "value": 3300
+   },
+   {
+    "level": 10,
+    "value": 3450
+   }
+  ]
+ },
+ {
+  "key": 50301,
+  "name": "Quick Loader",
+  "names": {
+   "zh-hans": "快速装填",
+   "zh-hant": "快速裝填",
+   "en-us": "Quick Loader",
+   "fr-fr": "Rechargeur Rapide",
+   "de-de": "Schnelllader",
+   "id-id": "Isi Ulang Cepat",
+   "ja-jp": "クイックローダー",
+   "ko-kr": "빠른 장전",
+   "pl-pl": "Szybki Ładowacz",
+   "pt-br": "Recarga Rápida",
+   "ru-ru": "Быстрая Перезарядка",
+   "es-es": "Carga Rápida",
+   "th-th": "บรรจุกระสุนเร็ว",
+   "tr-tr": "Hızlı Yükleyici",
+   "uk-ua": "Швидке Перезарядження",
+   "vi-vn": "Nạp Đạn Nhanh"
+  },
+  "description": "Rapidly reload crossbow bolts. Attack speed increases by 50% for {0} attacks.",
+  "order": 600,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 14,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 50301,
+  "attributeKey": 501013,
+  "deliveryType": [],
+  "range": 1050,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 3
+   },
+   {
+    "level": 2,
+    "value": 4
+   },
+   {
+    "level": 3,
+    "value": 5
+   },
+   {
+    "level": 4,
+    "value": 6
+   },
+   {
+    "level": 5,
+    "value": 7
+   },
+   {
+    "level": 6,
+    "value": 8
+   },
+   {
+    "level": 7,
+    "value": 9
+   },
+   {
+    "level": 8,
+    "value": 10
+   },
+   {
+    "level": 9,
+    "value": 11
+   },
+   {
+    "level": 10,
+    "value": 12
+   }
+  ]
+ },
+ {
+  "key": 50401,
+  "name": "Charge Trap",
+  "names": {
+   "zh-hans": "充能陷阱",
+   "zh-hant": "充能陷阱",
+   "en-us": "Charge Trap",
+   "fr-fr": "Piège à Charge",
+   "de-de": "Ladefalle",
+   "id-id": "Jebakan Muatan",
+   "ja-jp": "チャージトラップ",
+   "ko-kr": "충전용 덫",
+   "pl-pl": "Pułapka Ładunkowa",
+   "pt-br": "Armadilha de Carga",
+   "ru-ru": "Зарядная Ловушка",
+   "es-es": "Trampa de Carga",
+   "th-th": "กับดักชาร์จ",
+   "tr-tr": "Şarj Tuzağı",
+   "uk-ua": "Зарядна Пастка",
+   "vi-vn": "Bẫy Sạc"
+  },
+  "description": "Launch {0} traps that explode when struck by elemental damage.",
+  "order": 700,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 5,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 501023,
+  "deliveryType": [
+   "Trap"
+  ],
+  "range": 1150,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 1000
+   },
+   {
+    "level": 2,
+    "value": 1500
+   },
+   {
+    "level": 3,
+    "value": 2000
+   },
+   {
+    "level": 4,
+    "value": 2500
+   },
+   {
+    "level": 5,
+    "value": 3000
+   },
+   {
+    "level": 6,
+    "value": 3500
+   },
+   {
+    "level": 7,
+    "value": 4000
+   },
+   {
+    "level": 8,
+    "value": 4500
+   },
+   {
+    "level": 9,
+    "value": 5000
+   },
+   {
+    "level": 10,
+    "value": 5500
+   }
+  ]
+ },
+ {
+  "key": 50501,
+  "name": "Crossbow Turret",
+  "names": {
+   "zh-hans": "弩炮塔",
+   "zh-hant": "弩砲塔",
+   "en-us": "Crossbow Turret",
+   "fr-fr": "Tourelle Arbalète",
+   "de-de": "Armbrustturm",
+   "id-id": "Menara Crossbow",
+   "ja-jp": "クロスボウタレット",
+   "ko-kr": "석궁 포탑",
+   "pl-pl": "Wieżyczka Kusznicza",
+   "pt-br": "Torre de Besta",
+   "ru-ru": "Арбалетная Турель",
+   "es-es": "Torreta de Ballesta",
+   "th-th": "ป้อมธนูหน้าไม้",
+   "tr-tr": "Arbalet Kulesi",
+   "uk-ua": "Арбалетна Турель",
+   "vi-vn": "Tháp Nỏ"
+  },
+  "description": "Deploy an automated crossbow that fires bolts dealing {0}% physical damage.",
+  "order": 800,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 12,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 501033,
+  "deliveryType": [
+   "Projectile",
+   "Summon"
+  ],
+  "range": 1100,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 1750
+   },
+   {
+    "level": 2,
+    "value": 1910
+   },
+   {
+    "level": 3,
+    "value": 2070
+   },
+   {
+    "level": 4,
+    "value": 2230
+   },
+   {
+    "level": 5,
+    "value": 2390
+   },
+   {
+    "level": 6,
+    "value": 2550
+   },
+   {
+    "level": 7,
+    "value": 2710
+   },
+   {
+    "level": 8,
+    "value": 2870
+   },
+   {
+    "level": 9,
+    "value": 3030
+   },
+   {
+    "level": 10,
+    "value": 3190
+   }
+  ]
+ },
+ {
+  "key": 50601,
+  "name": "Shock Bolt",
+  "names": {
+   "zh-hans": "电击弩箭",
+   "zh-hant": "電擊弩箭",
+   "en-us": "Shock Bolt",
+   "fr-fr": "Carreau de Choc",
+   "de-de": "Schockbolzen",
+   "id-id": "Panah Kejut",
+   "ja-jp": "ショックボルト",
+   "ko-kr": "감전 볼트",
+   "pl-pl": "Porażający Bełt",
+   "pt-br": "Virote de Choque",
+   "ru-ru": "Шоковый Болт",
+   "es-es": "Virote de Descarga",
+   "th-th": "สลักช็อก",
+   "tr-tr": "Şok Boltu",
+   "uk-ua": "Шоковий Болт",
+   "vi-vn": "Mũi Tên Điện"
+  },
+  "description": "Fire a crossbow bolt that lodges in an enemy and emits lightning for a time. The bolt releases currents dealing {0}% lightning damage to nearby enemies.",
+  "order": 900,
+  "damageType": "Lightning",
+  "activationType": "BASEATTACK_COUNT",
+  "activationValue": 11,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 50601,
+  "attributeKey": 501043,
+  "deliveryType": [
+   "Projectile"
+  ],
+  "range": 1100,
+  "baseValue": null,
+  "params": [
+   400,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 2700
+   },
+   {
+    "level": 2,
+    "value": 2900
+   },
+   {
+    "level": 3,
+    "value": 3100
+   },
+   {
+    "level": 4,
+    "value": 3300
+   },
+   {
+    "level": 5,
+    "value": 3500
+   },
+   {
+    "level": 6,
+    "value": 3700
+   },
+   {
+    "level": 7,
+    "value": 3900
+   },
+   {
+    "level": 8,
+    "value": 4100
+   },
+   {
+    "level": 9,
+    "value": 4300
+   },
+   {
+    "level": 10,
+    "value": 4500
+   }
+  ]
+ },
+ {
+  "key": 60001,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [
+   "Melee"
+  ],
+  "range": 120,
+  "baseValue": 1000,
+  "params": [
+   600,
+   200,
+   200,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 60101,
+  "name": "Slam Jump",
+  "names": {
+   "zh-hans": "猛击跳跃",
+   "zh-hant": "猛擊跳躍",
+   "en-us": "Slam Jump",
+   "fr-fr": "Saut Fracassant",
+   "de-de": "Sprungschlag",
+   "id-id": "Lompat Hantam",
+   "ja-jp": "スラムジャンプ",
+   "ko-kr": "강타 점프",
+   "pl-pl": "Skoczny Grom",
+   "pt-br": "Salto Devastador",
+   "ru-ru": "Прыжок-Удар",
+   "es-es": "Salto Aplastante",
+   "th-th": "กระโดดทุบ",
+   "tr-tr": "Çarpmalı Zıplama",
+   "uk-ua": "Стрибок-Удар",
+   "vi-vn": "Nhảy Đập"
+  },
+  "description": "Gather strength and smash an enemy for {0}% physical damage. If it kills the enemy, a shockwave deals 350% damage to nearby enemies.",
+  "order": 400,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 6,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 601003,
+  "deliveryType": [
+   "Melee",
+   "AOE"
+  ],
+  "range": 850,
+  "baseValue": null,
+  "params": [
+   35,
+   100,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 3100
+   },
+   {
+    "level": 2,
+    "value": 3350
+   },
+   {
+    "level": 3,
+    "value": 3600
+   },
+   {
+    "level": 4,
+    "value": 3850
+   },
+   {
+    "level": 5,
+    "value": 4100
+   },
+   {
+    "level": 6,
+    "value": 4350
+   },
+   {
+    "level": 7,
+    "value": 4600
+   },
+   {
+    "level": 8,
+    "value": 4850
+   },
+   {
+    "level": 9,
+    "value": 5100
+   },
+   {
+    "level": 10,
+    "value": 5350
+   }
+  ]
+ },
+ {
+  "key": 60201,
+  "name": "Crushing Blow",
+  "names": {
+   "zh-hans": "粉碎强击",
+   "zh-hant": "粉碎強擊",
+   "en-us": "Crushing Blow",
+   "fr-fr": "Coup Écrasant",
+   "de-de": "Zermalmender Schlag",
+   "id-id": "Pukulan Penghancur",
+   "ja-jp": "クラッシングブロー",
+   "ko-kr": "분쇄 강타",
+   "pl-pl": "Miażdżący Cios",
+   "pt-br": "Golpe Esmagador",
+   "ru-ru": "Сокрушительный Удар",
+   "es-es": "Golpe Devastador",
+   "th-th": "ทุบบด",
+   "tr-tr": "Ezici Darbe",
+   "uk-ua": "Нищівний Удар",
+   "vi-vn": "Đòn Nghiền Nát"
+  },
+  "description": "Gather strength and smash an enemy for {0}% physical damage. If it kills the enemy, a shockwave deals 350% damage to nearby enemies.",
+  "order": 500,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK_COUNT",
+  "activationValue": 5,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 601004,
+  "deliveryType": [
+   "Melee"
+  ],
+  "range": 200,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 6200
+   },
+   {
+    "level": 2,
+    "value": 6600
+   },
+   {
+    "level": 3,
+    "value": 7000
+   },
+   {
+    "level": 4,
+    "value": 7400
+   },
+   {
+    "level": 5,
+    "value": 7800
+   },
+   {
+    "level": 6,
+    "value": 8200
+   },
+   {
+    "level": 7,
+    "value": 8600
+   },
+   {
+    "level": 8,
+    "value": 9000
+   },
+   {
+    "level": 9,
+    "value": 9400
+   },
+   {
+    "level": 10,
+    "value": 9800
+   }
+  ]
+ },
+ {
+  "key": 60301,
+  "name": "Commander’s Cry",
+  "names": {
+   "zh-hans": "将军怒吼",
+   "zh-hant": "將軍怒吼",
+   "en-us": "Commander’s Cry",
+   "fr-fr": "Cri du Commandant",
+   "de-de": "Feldherrnschrei",
+   "id-id": "Teriakan Komandan",
+   "ja-jp": "コマンダーズクライ",
+   "ko-kr": "장군의 함성",
+   "pl-pl": "Okrzyk Dowódcy",
+   "pt-br": "Grito do Comandante",
+   "ru-ru": "Клич Командира",
+   "es-es": "Grito del Comandante",
+   "th-th": "เสียงกองทัพ",
+   "tr-tr": "Komutanın Narası",
+   "uk-ua": "Клич Командира",
+   "vi-vn": "Tiếng Hét Chỉ Huy"
+  },
+  "description": "Let out a cry that stuns nearby enemies and increases party critical chance multiplier by {0}%.",
+  "order": 600,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 12,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 60301,
+  "attributeKey": 601013,
+  "deliveryType": [
+   "AOE"
+  ],
+  "range": 150,
+  "baseValue": null,
+  "params": [
+   700,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 500
+   },
+   {
+    "level": 2,
+    "value": 550
+   },
+   {
+    "level": 3,
+    "value": 600
+   },
+   {
+    "level": 4,
+    "value": 650
+   },
+   {
+    "level": 5,
+    "value": 700
+   },
+   {
+    "level": 6,
+    "value": 750
+   },
+   {
+    "level": 7,
+    "value": 800
+   },
+   {
+    "level": 8,
+    "value": 850
+   },
+   {
+    "level": 9,
+    "value": 900
+   },
+   {
+    "level": 10,
+    "value": 950
+   }
+  ]
+ },
+ {
+  "key": 60401,
+  "name": "Ground Slam",
+  "names": {
+   "zh-hans": "大地强击",
+   "zh-hant": "大地強擊",
+   "en-us": "Ground Slam",
+   "fr-fr": "Frappe au Sol",
+   "de-de": "Erdschlag",
+   "id-id": "Hantaman Tanah",
+   "ja-jp": "グラウンドスラム",
+   "ko-kr": "대지 강타",
+   "pl-pl": "Uderzenie w Ziemię",
+   "pt-br": "Golpe no Chão",
+   "ru-ru": "Удар о Землю",
+   "es-es": "Golpe Terrestre",
+   "th-th": "ทุบพื้น",
+   "tr-tr": "Yer Darbesi",
+   "uk-ua": "Удар об Землю",
+   "vi-vn": "Đập Đất"
+  },
+  "description": "Smash the ground hard, causing an earthquake that deals {0}% physical damage to enemies. Rocks created by the earthquake explode when hit by AoE physical attacks.",
+  "order": 700,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK_COUNT",
+  "activationValue": 9,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": 601023,
+  "deliveryType": [
+   "Melee",
+   "AOE"
+  ],
+  "range": 300,
+  "baseValue": null,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 3700
+   },
+   {
+    "level": 2,
+    "value": 3950
+   },
+   {
+    "level": 3,
+    "value": 4200
+   },
+   {
+    "level": 4,
+    "value": 4450
+   },
+   {
+    "level": 5,
+    "value": 4700
+   },
+   {
+    "level": 6,
+    "value": 4950
+   },
+   {
+    "level": 7,
+    "value": 5200
+   },
+   {
+    "level": 8,
+    "value": 5450
+   },
+   {
+    "level": 9,
+    "value": 5700
+   },
+   {
+    "level": 10,
+    "value": 5950
+   }
+  ]
+ },
+ {
+  "key": 60501,
+  "name": "Axe Spin",
+  "names": {
+   "zh-hans": "旋转斧",
+   "zh-hant": "旋轉斧",
+   "en-us": "Axe Spin",
+   "fr-fr": "Tourbillon de Hache",
+   "de-de": "Axtwirbel",
+   "id-id": "Putaran Kapak",
+   "ja-jp": "アックススピン",
+   "ko-kr": "도끼 돌리기",
+   "pl-pl": "Obrót Toporem",
+   "pt-br": "Giro de Machado",
+   "ru-ru": "Вращение Топором",
+   "es-es": "Giro de Hacha",
+   "th-th": "หมุนขวาน",
+   "tr-tr": "Balta Dönüşü",
+   "uk-ua": "Обертання Сокирою",
+   "vi-vn": "Xoay Rìu"
+  },
+  "description": "Spin with an axe, dealing {0}% physical damage per second to nearby enemies and a chance to apply bleeding. Attacks against bleeding enemies deal bonus damage.",
+  "order": 800,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 18,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 60501,
+  "attributeKey": 601033,
+  "deliveryType": [
+   "Melee",
+   "AOE"
+  ],
+  "range": 150,
+  "baseValue": null,
+  "params": [
+   500,
+   500,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 1000
+   },
+   {
+    "level": 2,
+    "value": 1080
+   },
+   {
+    "level": 3,
+    "value": 1160
+   },
+   {
+    "level": 4,
+    "value": 1240
+   },
+   {
+    "level": 5,
+    "value": 1320
+   },
+   {
+    "level": 6,
+    "value": 1400
+   },
+   {
+    "level": 7,
+    "value": 1480
+   },
+   {
+    "level": 8,
+    "value": 1560
+   },
+   {
+    "level": 9,
+    "value": 1640
+   },
+   {
+    "level": 10,
+    "value": 1720
+   }
+  ]
+ },
+ {
+  "key": 60601,
+  "name": "Bloodlust",
+  "names": {
+   "zh-hans": "嗜血",
+   "zh-hant": "嗜血",
+   "en-us": "Bloodlust",
+   "fr-fr": "Soif de Sang",
+   "de-de": "Blutgier",
+   "id-id": "Haus Darah",
+   "ja-jp": "ブラッドラスト",
+   "ko-kr": "피의 갈증",
+   "pl-pl": "Żądza Krwi",
+   "pt-br": "Sede de Sangue",
+   "ru-ru": "Жажда Крови",
+   "es-es": "Sed de Sangre",
+   "th-th": "กระหายเลือด",
+   "tr-tr": "Kan Susuzluğu",
+   "uk-ua": "Жага Крові",
+   "vi-vn": "Khát Máu"
+  },
+  "description": "Consume half of current HP to increase attack damage by {0}% for a time.",
+  "order": 900,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 25,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 60601,
+  "attributeKey": 601043,
+  "deliveryType": [],
+  "range": 900,
+  "baseValue": null,
+  "params": [
+   800,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "value": 4000
+   },
+   {
+    "level": 2,
+    "value": 4300
+   },
+   {
+    "level": 3,
+    "value": 4600
+   },
+   {
+    "level": 4,
+    "value": 4900
+   },
+   {
+    "level": 5,
+    "value": 5200
+   },
+   {
+    "level": 6,
+    "value": 5500
+   },
+   {
+    "level": 7,
+    "value": 5800
+   },
+   {
+    "level": 8,
+    "value": 6100
+   },
+   {
+    "level": 9,
+    "value": 6400
+   },
+   {
+    "level": 10,
+    "value": 6700
+   }
+  ]
+ },
+ {
+  "key": 100111,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 200,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 100211,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 130,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 100221,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 170,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 100231,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Fire",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 100311,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 200,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 100411,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 100421,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 170,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 100431,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 250,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 100511,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 100521,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 900,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 100531,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 300,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 109011,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 300,
+  "baseValue": 1000,
+  "params": [
+   750,
+   250,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 109021,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK_COUNT",
+  "activationValue": 4,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 450,
+  "baseValue": 1500,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 109031,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 10,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 700,
+  "baseValue": 1500,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 109041,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 12,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 300,
+  "baseValue": 1500,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 109051,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 8,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 700,
+  "baseValue": 1500,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 209011,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 230,
+  "baseValue": 1000,
+  "params": [
+   750,
+   250,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 209021,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 8,
+  "slotType": "SKILL",
+  "buffType": "Buff",
+  "buffGroupKey": 209021,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 250,
+  "baseValue": 1800,
+  "params": [
+   500,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 209031,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK_COUNT",
+  "activationValue": 6,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 600,
+  "baseValue": 1350,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 209041,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 16,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 270,
+  "baseValue": 2300,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 209051,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 10,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 600,
+  "baseValue": 2000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 309011,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Chaos",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 700,
+  "baseValue": 1000,
+  "params": [
+   750,
+   250,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 309021,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Chaos",
+  "activationType": "COOLDOWN",
+  "activationValue": 5,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 700,
+  "baseValue": 800,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 309031,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "COOLDOWN",
+  "activationValue": 11,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1500,
+  "params": [
+   500,
+   300,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 309041,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Chaos",
+  "activationType": "COOLDOWN",
+  "activationValue": 9,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 700,
+  "baseValue": 1700,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 309051,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Chaos",
+  "activationType": "COOLDOWN",
+  "activationValue": 18,
+  "slotType": "SKILL",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 600,
+  "baseValue": 2300,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200111,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200211,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 130,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200221,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 900,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200231,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200241,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 170,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200311,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 200,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200411,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Chaos",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200421,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Chaos",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200511,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 200,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200611,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 170,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200621,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 900,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200711,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200811,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 200911,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Fire",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 201111,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 170,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 201211,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 130,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300111,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 130,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300121,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300131,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 170,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300211,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 250,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300311,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Fire",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300411,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 170,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300421,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 900,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300431,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 200,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300441,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Cold",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300511,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 200,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300611,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Fire",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 170,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300711,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Chaos",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300811,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300821,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Fire",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300831,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 250,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300841,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 130,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 300911,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Fire",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 300,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 301015,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Fire",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 301025,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Cold",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 301035,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Lightning",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 301045,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Chaos",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 800,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ },
+ {
+  "key": 301111,
+  "name": null,
+  "names": null,
+  "description": null,
+  "order": 999,
+  "damageType": "Physical",
+  "activationType": "BASEATTACK",
+  "activationValue": 0,
+  "slotType": "BASEATTACK",
+  "buffType": "Normal",
+  "buffGroupKey": null,
+  "attributeKey": null,
+  "deliveryType": [],
+  "range": 150,
+  "baseValue": 1000,
+  "params": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "levels": []
+ }
+]

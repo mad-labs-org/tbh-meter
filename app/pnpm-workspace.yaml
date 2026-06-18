@@ -1,0 +1,12 @@
+# tbh-meter/app is a STANDALONE pnpm project (Electron app with its own pnpm-lock.yaml),
+# but it lives inside a repo whose ROOT is now a pnpm workspace (../../pnpm-workspace.yaml,
+# members: web / api / packages/*). Without this file, `pnpm install` run here walks UP,
+# finds the root workspace, and installs THAT instead — leaving tbh-meter/app/node_modules
+# empty (no electron-vite) and breaking `pnpm build` and the release CI ("electron-vite is
+# not recognized ... node_modules missing").
+#
+# An (empty) workspace file here makes pnpm stop the upward search and treat THIS dir as its
+# own workspace root, so `pnpm install` installs this project's deps from its own lockfile —
+# no `--ignore-workspace` flag to remember. tbh-meter is NOT a member of the root workspace,
+# so the root monorepo install is unaffected.
+packages: []

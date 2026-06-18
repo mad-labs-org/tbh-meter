@@ -1,0 +1,8634 @@
+[
+ {
+  "key": 1101,
+  "name": "Pasture",
+  "names": {
+   "zh-hans": "牧场",
+   "zh-hant": "牧場",
+   "en-us": "Pasture",
+   "fr-fr": "Pâturage",
+   "de-de": "Weide",
+   "id-id": "Padang Rumput",
+   "ja-jp": "牧草地",
+   "ko-kr": "목초지",
+   "pl-pl": "Pastwisko",
+   "pt-br": "Pasto",
+   "ru-ru": "Пастбище",
+   "es-es": "Pasto",
+   "th-th": "ทุ่งหญ้า",
+   "tr-tr": "Otlak",
+   "uk-ua": "Пасовище",
+   "vi-vn": "Đồng cỏ"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 1,
+  "stageNo": 1,
+  "stageLevel": 1,
+  "nextStageKey": 1102,
+  "waveAmount": 10,
+  "waveMonsterAmount": 1,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 10022,
+  "monsterDrop": {
+   "itemKey": 910011,
+   "rate": 160
+  },
+  "bossDrop": {
+   "itemKey": 920011,
+   "rate": 1000
+  },
+  "firstClearDropKey": 9200010,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 2000,
+   "hp": 3000,
+   "gold": 2000,
+   "exp": 3000
+  },
+  "levelScaling": {
+   "atk": 100,
+   "hp": 100,
+   "gold": 100,
+   "exp": 100
+  }
+ },
+ {
+  "key": 1102,
+  "name": "Shadow Meadow",
+  "names": {
+   "zh-hans": "阴影草原",
+   "zh-hant": "陰影草原",
+   "en-us": "Shadow Meadow",
+   "fr-fr": "Prairie d'Ombre",
+   "de-de": "Schattenwiese",
+   "id-id": "Padang Bayangan",
+   "ja-jp": "影の草原",
+   "ko-kr": "그림자 초원",
+   "pl-pl": "Łąka Cieni",
+   "pt-br": "Prado Sombrio",
+   "ru-ru": "Теневая поляна",
+   "es-es": "Prado Sombrío",
+   "th-th": "ทุ่งหญ้าเงา",
+   "tr-tr": "Gölge Çayırı",
+   "uk-ua": "Тінисті луки",
+   "vi-vn": "Đồng cỏ Bóng"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 1,
+  "stageNo": 2,
+  "stageLevel": 2,
+  "nextStageKey": 1103,
+  "waveAmount": 11,
+  "waveMonsterAmount": 2,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 10023,
+  "monsterDrop": {
+   "itemKey": 910011,
+   "rate": 160
+  },
+  "bossDrop": {
+   "itemKey": 920011,
+   "rate": 1000
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 2500,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 4000
+  },
+  "levelScaling": {
+   "atk": 130,
+   "hp": 180,
+   "gold": 150,
+   "exp": 130
+  }
+ },
+ {
+  "key": 1103,
+  "name": "Wasteland",
+  "names": {
+   "zh-hans": "荒野",
+   "zh-hant": "荒野",
+   "en-us": "Wasteland",
+   "fr-fr": "Terre Désolée",
+   "de-de": "Ödland",
+   "id-id": "Tanah Tandus",
+   "ja-jp": "荒れ地",
+   "ko-kr": "황무지",
+   "pl-pl": "Pustkowia",
+   "pt-br": "Terra Devastada",
+   "ru-ru": "Пустошь",
+   "es-es": "Tierra Baldía",
+   "th-th": "ดินแดนเสื่อมโทรม",
+   "tr-tr": "Çorak Arazi",
+   "uk-ua": "Пустка",
+   "vi-vn": "Vùng đất hoang"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 1,
+  "stageNo": 3,
+  "stageLevel": 3,
+  "nextStageKey": 1104,
+  "waveAmount": 11,
+  "waveMonsterAmount": 3,
+  "monsters": [
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 600
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 10041,
+  "monsterDrop": {
+   "itemKey": 910011,
+   "rate": 160
+  },
+  "bossDrop": {
+   "itemKey": 920011,
+   "rate": 1000
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 2500,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 160,
+   "hp": 220,
+   "gold": 200,
+   "exp": 160
+  }
+ },
+ {
+  "key": 1104,
+  "name": "Eerie Canyon",
+  "names": {
+   "zh-hans": "阴森峡谷",
+   "zh-hant": "陰森峽谷",
+   "en-us": "Eerie Canyon",
+   "fr-fr": "Canyon Sinistre",
+   "de-de": "Unheimliche Schlucht",
+   "id-id": "Ngarai Mengerikan",
+   "ja-jp": "不気味な峡谷",
+   "ko-kr": "으스스한 협곡",
+   "pl-pl": "Upiorna Dolina",
+   "pt-br": "Desfiladeiro Sinistro",
+   "ru-ru": "Жуткий каньон",
+   "es-es": "Cañón Escalofriante",
+   "th-th": "หุบเขาอ้าง",
+   "tr-tr": "Ürkütücü Kanyon",
+   "uk-ua": "Моторошний каньйон",
+   "vi-vn": "Hẻm núi rùng rợn"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 1,
+  "stageNo": 4,
+  "stageLevel": 5,
+  "nextStageKey": 1105,
+  "waveAmount": 12,
+  "waveMonsterAmount": 3,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 800
+   },
+   {
+    "monster": "10041",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 10042,
+  "monsterDrop": {
+   "itemKey": 910051,
+   "rate": 120
+  },
+  "bossDrop": {
+   "itemKey": 920051,
+   "rate": 1000
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 2500,
+   "hp": 5000,
+   "gold": 3000,
+   "exp": 8000
+  },
+  "levelScaling": {
+   "atk": 220,
+   "hp": 320,
+   "gold": 350,
+   "exp": 450
+  }
+ },
+ {
+  "key": 1105,
+  "name": "Burning Village Entrance",
+  "names": {
+   "zh-hans": "燃烧村庄入口",
+   "zh-hant": "燃燒村莊入口",
+   "en-us": "Burning Village Entrance",
+   "fr-fr": "Entrée du Village en Flammes",
+   "de-de": "Brennender Dorfeingang",
+   "id-id": "Pintu Desa Terbakar",
+   "ja-jp": "燃える村の入口",
+   "ko-kr": "불타는 마을 입구",
+   "pl-pl": "Wejście do Płonącej Wioski",
+   "pt-br": "Entrada da Vila em Chamas",
+   "ru-ru": "Вход в горящую деревню",
+   "es-es": "Entrada del Pueblo Ardiente",
+   "th-th": "ทางเข้าหมู่บ้านเพลิง",
+   "tr-tr": "Yanan Köy Girişi",
+   "uk-ua": "Вхід до палаючого села",
+   "vi-vn": "Lối vào Làng Cháy"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 1,
+  "stageNo": 5,
+  "stageLevel": 6,
+  "nextStageKey": 1106,
+  "waveAmount": 12,
+  "waveMonsterAmount": 4,
+  "monsters": [
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   },
+   {
+    "monster": "10041",
+    "weight": 1000
+   },
+   {
+    "monster": "10042",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 10043,
+  "monsterDrop": {
+   "itemKey": 910051,
+   "rate": 120
+  },
+  "bossDrop": {
+   "itemKey": 920051,
+   "rate": 800
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 5000,
+   "gold": 3000,
+   "exp": 10000
+  },
+  "levelScaling": {
+   "atk": 260,
+   "hp": 440,
+   "gold": 380,
+   "exp": 650
+  }
+ },
+ {
+  "key": 1106,
+  "name": "Rumstreet Square",
+  "names": {
+   "zh-hans": "朗姆街广场",
+   "zh-hant": "蘭姆街廣場",
+   "en-us": "Rumstreet Square",
+   "fr-fr": "Place de Rumstreet",
+   "de-de": "Rumstraßenplatz",
+   "id-id": "Alun-alun Rumstreet",
+   "ja-jp": "ラムストリート広場",
+   "ko-kr": "럼스트리트 광장",
+   "pl-pl": "Plac Rumstreet",
+   "pt-br": "Praça Rumstreet",
+   "ru-ru": "Площадь Рамстрит",
+   "es-es": "Plaza Rumstreet",
+   "th-th": "จัตุรัสรัมสตรีท",
+   "tr-tr": "Rumstreet Meydanı",
+   "uk-ua": "Площа Рамстріт",
+   "vi-vn": "Quảng trường Rumstreet"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 1,
+  "stageNo": 6,
+  "stageLevel": 7,
+  "nextStageKey": 1107,
+  "waveAmount": 12,
+  "waveMonsterAmount": 5,
+  "monsters": [
+   {
+    "monster": "10041",
+    "weight": 1000
+   },
+   {
+    "monster": "10042",
+    "weight": 1000
+   },
+   {
+    "monster": "10043",
+    "weight": 600
+   },
+   {
+    "monster": "10011",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 10051,
+  "monsterDrop": {
+   "itemKey": 910051,
+   "rate": 80
+  },
+  "bossDrop": {
+   "itemKey": 920051,
+   "rate": 800
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 12000
+  },
+  "levelScaling": {
+   "atk": 310,
+   "hp": 590,
+   "gold": 410,
+   "exp": 950
+  }
+ },
+ {
+  "key": 1107,
+  "name": "City Outskirts",
+  "names": {
+   "zh-hans": "城市外围",
+   "zh-hant": "城市外圍",
+   "en-us": "City Outskirts",
+   "fr-fr": "Périphérie de la Ville",
+   "de-de": "Stadtrand",
+   "id-id": "Pinggir Kota",
+   "ja-jp": "街の外れ",
+   "ko-kr": "도시 외곽",
+   "pl-pl": "Przedmieścia",
+   "pt-br": "Arredores da Cidade",
+   "ru-ru": "Окраины города",
+   "es-es": "Afueras de la Ciudad",
+   "th-th": "ชานเมือง",
+   "tr-tr": "Şehir Kenarı",
+   "uk-ua": "Околиці міста",
+   "vi-vn": "Ngoại ô"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 1,
+  "stageNo": 7,
+  "stageLevel": 8,
+  "nextStageKey": 1108,
+  "waveAmount": 12,
+  "waveMonsterAmount": 6,
+  "monsters": [
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 10053,
+  "monsterDrop": {
+   "itemKey": 910051,
+   "rate": 80
+  },
+  "bossDrop": {
+   "itemKey": 920051,
+   "rate": 600
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 350,
+   "hp": 720,
+   "gold": 440,
+   "exp": 1350
+  }
+ },
+ {
+  "key": 1108,
+  "name": "Cemetery",
+  "names": {
+   "zh-hans": "公墓",
+   "zh-hant": "公墓",
+   "en-us": "Cemetery",
+   "fr-fr": "Cimetière",
+   "de-de": "Friedhof",
+   "id-id": "Pemakaman",
+   "ja-jp": "墓地",
+   "ko-kr": "공동묘지",
+   "pl-pl": "Cmentarz",
+   "pt-br": "Cemitério",
+   "ru-ru": "Кладбище",
+   "es-es": "Cementerio",
+   "th-th": "สุสาน",
+   "tr-tr": "Mezarlık",
+   "uk-ua": "Кладовище",
+   "vi-vn": "Nghĩa trang"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 1,
+  "stageNo": 8,
+  "stageLevel": 10,
+  "nextStageKey": 1109,
+  "waveAmount": 13,
+  "waveMonsterAmount": 6,
+  "monsters": [
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10053",
+    "weight": 500
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 10052,
+  "monsterDrop": {
+   "itemKey": 910101,
+   "rate": 30
+  },
+  "bossDrop": {
+   "itemKey": 920101,
+   "rate": 400
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 410,
+   "hp": 970,
+   "gold": 550,
+   "exp": 2300
+  }
+ },
+ {
+  "key": 1109,
+  "name": "Cursed Land",
+  "names": {
+   "zh-hans": "诅咒之地",
+   "zh-hant": "詛咒之地",
+   "en-us": "Cursed Land",
+   "fr-fr": "Terre maudite",
+   "de-de": "Verfluchtes Land",
+   "id-id": "Tanah Terkutuk",
+   "ja-jp": "呪われた大地",
+   "ko-kr": "저주받은 대지",
+   "pl-pl": "Przeklęta kraina",
+   "pt-br": "Terra amaldiçoada",
+   "ru-ru": "Проклятая земля",
+   "es-es": "Tierra maldita",
+   "th-th": "ดินแดนต้องสาป",
+   "tr-tr": "Lanetli toprak",
+   "uk-ua": "Прокляті землі",
+   "vi-vn": "Vùng đất nguyền rủa"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 1,
+  "stageNo": 9,
+  "stageLevel": 11,
+  "nextStageKey": 1110,
+  "waveAmount": 13,
+  "waveMonsterAmount": 7,
+  "monsters": [
+   {
+    "monster": "10042",
+    "weight": 1000
+   },
+   {
+    "monster": "10043",
+    "weight": 600
+   },
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10053",
+    "weight": 500
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 10043,
+  "monsterDrop": {
+   "itemKey": 910101,
+   "rate": 30
+  },
+  "bossDrop": {
+   "itemKey": 920101,
+   "rate": 400
+  },
+  "firstClearDropKey": 9200220,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 440,
+   "hp": 1070,
+   "gold": 600,
+   "exp": 2900
+  }
+ },
+ {
+  "key": 1110,
+  "name": "Throne of Darkness",
+  "names": {
+   "zh-hans": "黑暗王座",
+   "zh-hant": "黑暗王座",
+   "en-us": "Throne of Darkness",
+   "fr-fr": "Trône des Ténèbres",
+   "de-de": "Thron der Finsternis",
+   "id-id": "Singgasana Kegelapan",
+   "ja-jp": "闇の玉座",
+   "ko-kr": "어둠의 왕좌",
+   "pl-pl": "Tron Ciemności",
+   "pt-br": "Trono das Trevas",
+   "ru-ru": "Трон тьмы",
+   "es-es": "Trono de la Oscuridad",
+   "th-th": "บัลลังก์แห่งความมืด",
+   "tr-tr": "Karanlığın Tahtı",
+   "uk-ua": "Трон темряви",
+   "vi-vn": "Ngai Bóng Tối"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "NORMAL",
+  "act": 1,
+  "stageNo": 10,
+  "stageLevel": 12,
+  "nextStageKey": 1201,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 10901,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930101,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190001,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 470,
+   "hp": 1470,
+   "gold": 650,
+   "exp": 3700
+  }
+ },
+ {
+  "key": 1201,
+  "name": "Oasis Road",
+  "names": {
+   "zh-hans": "绿洲路",
+   "zh-hant": "綠洲路",
+   "en-us": "Oasis Road",
+   "fr-fr": "Route de l'Oasis",
+   "de-de": "Oasisweg",
+   "id-id": "Jalan Oase",
+   "ja-jp": "オアシスの道",
+   "ko-kr": "오아시스 길목",
+   "pl-pl": "Droga Oazy",
+   "pt-br": "Caminho do Oásis",
+   "ru-ru": "Путь оазиса",
+   "es-es": "Camino del Oasis",
+   "th-th": "เส้นทางโอเอซิส",
+   "tr-tr": "Vaha Yolu",
+   "uk-ua": "Шлях оазису",
+   "vi-vn": "Đường Ốc đảo"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 2,
+  "stageNo": 1,
+  "stageLevel": 13,
+  "nextStageKey": 1202,
+  "waveAmount": 14,
+  "waveMonsterAmount": 7,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20024,
+  "monsterDrop": {
+   "itemKey": 910101,
+   "rate": 30
+  },
+  "bossDrop": {
+   "itemKey": 920101,
+   "rate": 400
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 500,
+   "hp": 1970,
+   "gold": 710,
+   "exp": 4700
+  }
+ },
+ {
+  "key": 1202,
+  "name": "Sandstorm Valley",
+  "names": {
+   "zh-hans": "沙风暴谷",
+   "zh-hant": "沙風暴谷",
+   "en-us": "Sandstorm Valley",
+   "fr-fr": "Vallée de la Tempête de Sable",
+   "de-de": "Sandsturmtal",
+   "id-id": "Lembah Badai Pasir",
+   "ja-jp": "砂嵐の谷",
+   "ko-kr": "모래바람 골짜기",
+   "pl-pl": "Dolina Burzy Piaskowej",
+   "pt-br": "Vale da Tempestade de Areia",
+   "ru-ru": "Долина песчаной бури",
+   "es-es": "Valle de la Tormenta de Arena",
+   "th-th": "หุบเขาพายุทราย",
+   "tr-tr": "Kum Fırtınası Vadisi",
+   "uk-ua": "Долина піщаної бурі",
+   "vi-vn": "Thung lũng Bão Cát"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 2,
+  "stageNo": 2,
+  "stageLevel": 14,
+  "nextStageKey": 1203,
+  "waveAmount": 14,
+  "waveMonsterAmount": 7,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   },
+   {
+    "monster": "20024",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20021,
+  "monsterDrop": {
+   "itemKey": 910101,
+   "rate": 30
+  },
+  "bossDrop": {
+   "itemKey": 920101,
+   "rate": 400
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 530,
+   "hp": 2570,
+   "gold": 780,
+   "exp": 5900
+  }
+ },
+ {
+  "key": 1203,
+  "name": "Desert Underground Cave",
+  "names": {
+   "zh-hans": "沙漠地下洞窟",
+   "zh-hant": "沙漠地下洞窟",
+   "en-us": "Desert Underground Cave",
+   "fr-fr": "Grotte Souterraine du Désert",
+   "de-de": "Wüsten-Untergrundhöhle",
+   "id-id": "Gua Bawah Padang Pasir",
+   "ja-jp": "砂漠地下洞窟",
+   "ko-kr": "사막 지하 동굴",
+   "pl-pl": "Pustynna Jaskinia Podziemna",
+   "pt-br": "Caverna Subterrânea do Deserto",
+   "ru-ru": "Пустынная подземная пещера",
+   "es-es": "Cueva Subterránea del Desierto",
+   "th-th": "ถ้ำใต้ดินทะเลทราย",
+   "tr-tr": "Çöl Yeraltı Mağarası",
+   "uk-ua": "Пустельна підземна печера",
+   "vi-vn": "Hang Ngầm Sa mạc"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 2,
+  "stageNo": 3,
+  "stageLevel": 15,
+  "nextStageKey": 1204,
+  "waveAmount": 14,
+  "waveMonsterAmount": 7,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20023",
+    "weight": 1000
+   },
+   {
+    "monster": "20041",
+    "weight": 100
+   },
+   {
+    "monster": "10031",
+    "weight": 300
+   }
+  ],
+  "bossMonsterKey": 20031,
+  "monsterDrop": {
+   "itemKey": 910151,
+   "rate": 25
+  },
+  "bossDrop": {
+   "itemKey": 920151,
+   "rate": 300
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 560,
+   "hp": 3270,
+   "gold": 860,
+   "exp": 7300
+  }
+ },
+ {
+  "key": 1204,
+  "name": "Bug Nest",
+  "names": {
+   "zh-hans": "虫巢",
+   "zh-hant": "蟲巢",
+   "en-us": "Bug Nest",
+   "fr-fr": "Nid d'Insectes",
+   "de-de": "Insektennest",
+   "id-id": "Sarang Serangga",
+   "ja-jp": "虫の巣",
+   "ko-kr": "벌레 둥지",
+   "pl-pl": "Gniazdo Robactwa",
+   "pt-br": "Ninho de Insetos",
+   "ru-ru": "Гнездо жуков",
+   "es-es": "Nido de Insectos",
+   "th-th": "รังแมลง",
+   "tr-tr": "Böcek Yuvası",
+   "uk-ua": "Гніздо комах",
+   "vi-vn": "Tổ Bọ"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 2,
+  "stageNo": 4,
+  "stageLevel": 16,
+  "nextStageKey": 1205,
+  "waveAmount": 15,
+  "waveMonsterAmount": 7,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20023",
+    "weight": 1000
+   },
+   {
+    "monster": "20041",
+    "weight": 200
+   },
+   {
+    "monster": "20051",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20041,
+  "monsterDrop": {
+   "itemKey": 910151,
+   "rate": 25
+  },
+  "bossDrop": {
+   "itemKey": 920151,
+   "rate": 300
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 590,
+   "hp": 4070,
+   "gold": 950,
+   "exp": 8900
+  }
+ },
+ {
+  "key": 1205,
+  "name": "Scorching Dunes",
+  "names": {
+   "zh-hans": "炽热沙丘",
+   "zh-hant": "熾熱沙丘",
+   "en-us": "Scorching Dunes",
+   "fr-fr": "Dunes Brûlantes",
+   "de-de": "Brennende Dünen",
+   "id-id": "Bukit Pasir Membara",
+   "ja-jp": "灼熱の砂丘",
+   "ko-kr": "작열의 사구",
+   "pl-pl": "Palące Wydmy",
+   "pt-br": "Dunas Escaldantes",
+   "ru-ru": "Обжигающие дюны",
+   "es-es": "Dunas Abrasadoras",
+   "th-th": "เนินทรายร้อน",
+   "tr-tr": "Yanan Kumullar",
+   "uk-ua": "Палючі дюни",
+   "vi-vn": "Đụn cát Cháy bỏng"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 2,
+  "stageNo": 5,
+  "stageLevel": 17,
+  "nextStageKey": 1206,
+  "waveAmount": 15,
+  "waveMonsterAmount": 7,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   },
+   {
+    "monster": "20051",
+    "weight": 2000
+   }
+  ],
+  "bossMonsterKey": 20071,
+  "monsterDrop": {
+   "itemKey": 910151,
+   "rate": 25
+  },
+  "bossDrop": {
+   "itemKey": 920151,
+   "rate": 300
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 620,
+   "hp": 4970,
+   "gold": 1050,
+   "exp": 10700
+  }
+ },
+ {
+  "key": 1206,
+  "name": "Sunset Ruins",
+  "names": {
+   "zh-hans": "夕阳废墟",
+   "zh-hant": "夕陽廢墟",
+   "en-us": "Sunset Ruins",
+   "fr-fr": "Ruines du Crépuscule",
+   "de-de": "Sonnenuntergangsruinen",
+   "id-id": "Reruntuhan Senja",
+   "ja-jp": "夕暮れの廃墟",
+   "ko-kr": "석양의 폐허",
+   "pl-pl": "Ruiny Zachodu",
+   "pt-br": "Ruínas do Pôr do Sol",
+   "ru-ru": "Руины заката",
+   "es-es": "Ruinas del Crepúsculo",
+   "th-th": "ซากปรักหักพังยามอาทิตย์ตก",
+   "tr-tr": "Gün Batımı Harabeleri",
+   "uk-ua": "Руїни заходу",
+   "vi-vn": "Phế tích Hoàng hôn"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 2,
+  "stageNo": 6,
+  "stageLevel": 18,
+  "nextStageKey": 1207,
+  "waveAmount": 15,
+  "waveMonsterAmount": 8,
+  "monsters": [
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20024",
+    "weight": 1000
+   },
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20081,
+  "monsterDrop": {
+   "itemKey": 910151,
+   "rate": 25
+  },
+  "bossDrop": {
+   "itemKey": 920151,
+   "rate": 300
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 650,
+   "hp": 5970,
+   "gold": 1160,
+   "exp": 12700
+  }
+ },
+ {
+  "key": 1207,
+  "name": "Midnight Sands",
+  "names": {
+   "zh-hans": "午夜沙漠",
+   "zh-hant": "午夜沙漠",
+   "en-us": "Midnight Sands",
+   "fr-fr": "Sables de Minuit",
+   "de-de": "Mitternachtswüste",
+   "id-id": "Pasir Tengah Malam",
+   "ja-jp": "真夜中の砂漠",
+   "ko-kr": "한밤의 사막",
+   "pl-pl": "Piaski Północy",
+   "pt-br": "Areias da Meia-Noite",
+   "ru-ru": "Полуночные пески",
+   "es-es": "Arenas de Medianoche",
+   "th-th": "ทรายเที่ยงคืน",
+   "tr-tr": "Gece Yarısı Kumları",
+   "uk-ua": "Піски півночі",
+   "vi-vn": "Cát Nửa đêm"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 2,
+  "stageNo": 7,
+  "stageLevel": 19,
+  "nextStageKey": 1208,
+  "waveAmount": 15,
+  "waveMonsterAmount": 8,
+  "monsters": [
+   {
+    "monster": "20081",
+    "weight": 300
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   },
+   {
+    "monster": "20011",
+    "weight": 500
+   },
+   {
+    "monster": "20023",
+    "weight": 700
+   },
+   {
+    "monster": "10052",
+    "weight": 550
+   }
+  ],
+  "bossMonsterKey": 20023,
+  "monsterDrop": {
+   "itemKey": 910151,
+   "rate": 25
+  },
+  "bossDrop": {
+   "itemKey": 920151,
+   "rate": 300
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 680,
+   "hp": 7070,
+   "gold": 1280,
+   "exp": 15000
+  }
+ },
+ {
+  "key": 1208,
+  "name": "Sacred Tomb",
+  "names": {
+   "zh-hans": "神圣墓穴",
+   "zh-hant": "神聖墓穴",
+   "en-us": "Sacred Tomb",
+   "fr-fr": "Tombeau Sacré",
+   "de-de": "Heiliges Grab",
+   "id-id": "Makam Suci",
+   "ja-jp": "神聖なる墓",
+   "ko-kr": "신성한 무덤",
+   "pl-pl": "Święty Grób",
+   "pt-br": "Túmulo Sagrado",
+   "ru-ru": "Священная гробница",
+   "es-es": "Tumba Sagrada",
+   "th-th": "สุสานศักดิ์สิทธิ์",
+   "tr-tr": "Kutsal Mezar",
+   "uk-ua": "Священна гробниця",
+   "vi-vn": "Lăng Thần Thánh"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 2,
+  "stageNo": 8,
+  "stageLevel": 20,
+  "nextStageKey": 1209,
+  "waveAmount": 16,
+  "waveMonsterAmount": 8,
+  "monsters": [
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20062",
+    "weight": 1000
+   },
+   {
+    "monster": "20091",
+    "weight": 200
+   },
+   {
+    "monster": "20101",
+    "weight": 1000
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20061,
+  "monsterDrop": {
+   "itemKey": 910201,
+   "rate": 20
+  },
+  "bossDrop": {
+   "itemKey": 920201,
+   "rate": 200
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 710,
+   "hp": 8270,
+   "gold": 1410,
+   "exp": 17600
+  }
+ },
+ {
+  "key": 1209,
+  "name": "Pharaoh's Crypt",
+  "names": {
+   "zh-hans": "法老陵墓",
+   "zh-hant": "法老陵墓",
+   "en-us": "Pharaoh's Crypt",
+   "fr-fr": "Crypte du Pharaon",
+   "de-de": "Pharaonengruft",
+   "id-id": "Ruang Mayat Firaun",
+   "ja-jp": "ファラオの墓室",
+   "ko-kr": "파라오의 묘실",
+   "pl-pl": "Krypta Faraona",
+   "pt-br": "Cripta do Faraó",
+   "ru-ru": "Склеп фараона",
+   "es-es": "Cripta del Faraón",
+   "th-th": "ห้องสุสานฟาโรห์",
+   "tr-tr": "Firavunun Mezarı",
+   "uk-ua": "Склеп фараона",
+   "vi-vn": "Hầm mộ Pharaoh"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 2,
+  "stageNo": 9,
+  "stageLevel": 21,
+  "nextStageKey": 1210,
+  "waveAmount": 16,
+  "waveMonsterAmount": 8,
+  "monsters": [
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20062",
+    "weight": 1000
+   },
+   {
+    "monster": "20091",
+    "weight": 400
+   },
+   {
+    "monster": "20101",
+    "weight": 1000
+   },
+   {
+    "monster": "20111",
+    "weight": 1000
+   },
+   {
+    "monster": "20081",
+    "weight": 500
+   }
+  ],
+  "bossMonsterKey": 20111,
+  "monsterDrop": {
+   "itemKey": 910201,
+   "rate": 20
+  },
+  "bossDrop": {
+   "itemKey": 920201,
+   "rate": 200
+  },
+  "firstClearDropKey": 9200220,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 740,
+   "hp": 9570,
+   "gold": 1550,
+   "exp": 20400
+  }
+ },
+ {
+  "key": 1210,
+  "name": "Pharaoh's Underchannel",
+  "names": {
+   "zh-hans": "法老地下水道",
+   "zh-hant": "法老地下水道",
+   "en-us": "Pharaoh's Underchannel",
+   "fr-fr": "Canal Souterrain du Pharaon",
+   "de-de": "Unterkanal des Pharaos",
+   "id-id": "Saluran Bawah Firaun",
+   "ja-jp": "ファラオの地下水路",
+   "ko-kr": "파라오의 지하수도",
+   "pl-pl": "Podziemny Kanał Faraona",
+   "pt-br": "Canal Subterrâneo do Faraó",
+   "ru-ru": "Подземный канал фараона",
+   "es-es": "Canal Subterráneo del Faraón",
+   "th-th": "ทางน้ำใต้ดินฟาโรห์",
+   "tr-tr": "Firavunun Yeraltı Kanalı",
+   "uk-ua": "Підземний канал фараона",
+   "vi-vn": "Cống Ngầm Pharaoh"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "NORMAL",
+  "act": 2,
+  "stageNo": 10,
+  "stageLevel": 22,
+  "nextStageKey": 1301,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 20901,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930201,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190001,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 770,
+   "hp": 10970,
+   "gold": 1700,
+   "exp": 23400
+  }
+ },
+ {
+  "key": 1301,
+  "name": "Snowbound Outpost",
+  "names": {
+   "zh-hans": "雪原前哨",
+   "zh-hant": "雪原前哨",
+   "en-us": "Snowbound Outpost",
+   "fr-fr": "Avant-poste Enneigé",
+   "de-de": "Verschneiter Außenposten",
+   "id-id": "Pos Bersalju",
+   "ja-jp": "雪原の前哨地",
+   "ko-kr": "설원의 전초기지",
+   "pl-pl": "Zaśnieżona Placówka",
+   "pt-br": "Posto Avançado Nevado",
+   "ru-ru": "Заснеженный аванпост",
+   "es-es": "Puesto Cubierto de Nieve",
+   "th-th": "ด่านหน้าหิมะ",
+   "tr-tr": "Karlı İleri Karakol",
+   "uk-ua": "Засніжений форпост",
+   "vi-vn": "Tiền đồn Tuyết"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 3,
+  "stageNo": 1,
+  "stageLevel": 23,
+  "nextStageKey": 1302,
+  "waveAmount": 16,
+  "waveMonsterAmount": 8,
+  "monsters": [
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30012",
+    "weight": 700
+   },
+   {
+    "monster": "30013",
+    "weight": 500
+   }
+  ],
+  "bossMonsterKey": 20024,
+  "monsterDrop": {
+   "itemKey": 910201,
+   "rate": 20
+  },
+  "bossDrop": {
+   "itemKey": 920201,
+   "rate": 200
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 800,
+   "hp": 12470,
+   "gold": 1860,
+   "exp": 26600
+  }
+ },
+ {
+  "key": 1302,
+  "name": "Frozen Battlefield",
+  "names": {
+   "zh-hans": "冰封战场",
+   "zh-hant": "冰封戰場",
+   "en-us": "Frozen Battlefield",
+   "fr-fr": "Champ de Bataille Gelé",
+   "de-de": "Gefrorenes Schlachtfeld",
+   "id-id": "Medan Beku",
+   "ja-jp": "凍結した戦場",
+   "ko-kr": "얼어붙은 전장",
+   "pl-pl": "Zamarznięte Pole Bitwy",
+   "pt-br": "Campo de Batalha Congelado",
+   "ru-ru": "Замёрзшее поле битвы",
+   "es-es": "Campo de Batalla Congelado",
+   "th-th": "สนามรบเยือกแข็ง",
+   "tr-tr": "Donmuş Savaş Alanı",
+   "uk-ua": "Замерзле поле битви",
+   "vi-vn": "Chiến trường Đóng băng"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 3,
+  "stageNo": 2,
+  "stageLevel": 24,
+  "nextStageKey": 1303,
+  "waveAmount": 16,
+  "waveMonsterAmount": 8,
+  "monsters": [
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30012",
+    "weight": 700
+   },
+   {
+    "monster": "30013",
+    "weight": 500
+   },
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30021",
+    "weight": 200
+   }
+  ],
+  "bossMonsterKey": 20021,
+  "monsterDrop": {
+   "itemKey": 910201,
+   "rate": 20
+  },
+  "bossDrop": {
+   "itemKey": 920201,
+   "rate": 200
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 830,
+   "hp": 14070,
+   "gold": 2030,
+   "exp": 30000
+  }
+ },
+ {
+  "key": 1303,
+  "name": "Glacial Cave Entrance",
+  "names": {
+   "zh-hans": "冰川洞窟入口",
+   "zh-hant": "冰川洞窟入口",
+   "en-us": "Glacial Cave Entrance",
+   "fr-fr": "Entrée de la Grotte Glaciaire",
+   "de-de": "Gletscherhöhleneingang",
+   "id-id": "Pintu Gua Gletser",
+   "ja-jp": "氷河洞窟の入口",
+   "ko-kr": "빙하 동굴 입구",
+   "pl-pl": "Wejście do Lodowcowej Jaskini",
+   "pt-br": "Entrada da Caverna Glacial",
+   "ru-ru": "Вход в ледниковую пещеру",
+   "es-es": "Entrada a la Cueva Glacial",
+   "th-th": "ทางเข้าถ้ำธารน้ำแข็ง",
+   "tr-tr": "Buzul Mağarası Girişi",
+   "uk-ua": "Вхід до льодовикової печери",
+   "vi-vn": "Lối vào Hang Băng"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 3,
+  "stageNo": 3,
+  "stageLevel": 25,
+  "nextStageKey": 1304,
+  "waveAmount": 17,
+  "waveMonsterAmount": 9,
+  "monsters": [
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30042",
+    "weight": 700
+   },
+   {
+    "monster": "30021",
+    "weight": 200
+   },
+   {
+    "monster": "30013",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20031,
+  "monsterDrop": {
+   "itemKey": 910201,
+   "rate": 20
+  },
+  "bossDrop": {
+   "itemKey": 920201,
+   "rate": 200
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 860,
+   "hp": 15770,
+   "gold": 2210,
+   "exp": 33600
+  }
+ },
+ {
+  "key": 1304,
+  "name": "Frozen Glacier Cavern",
+  "names": {
+   "zh-hans": "冰川洞窟深处",
+   "zh-hant": "冰川洞窟深處",
+   "en-us": "Frozen Glacier Cavern",
+   "fr-fr": "Caverne Glaciaire Gelée",
+   "de-de": "Eisige Gletscherkammer",
+   "id-id": "Gua Gletser Beku",
+   "ja-jp": "凍りつく氷河洞窟",
+   "ko-kr": "빙하 동굴 심부",
+   "pl-pl": "Zamrożona Jaskinia Lodowca",
+   "pt-br": "Caverna Glacial Congelada",
+   "ru-ru": "Замёрзшая ледниковая пещера",
+   "es-es": "Caverna Glacial Congelada",
+   "th-th": "ถ้ำธารน้ำแข็งลึก",
+   "tr-tr": "Donmuş Buzul Mağarası",
+   "uk-ua": "Замерзла льодовикова печера",
+   "vi-vn": "Hang Sông Băng Sâu"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 3,
+  "stageNo": 4,
+  "stageLevel": 26,
+  "nextStageKey": 1305,
+  "waveAmount": 17,
+  "waveMonsterAmount": 9,
+  "monsters": [
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30042",
+    "weight": 700
+   },
+   {
+    "monster": "30021",
+    "weight": 400
+   },
+   {
+    "monster": "30051",
+    "weight": 1000
+   },
+   {
+    "monster": "30043",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20041,
+  "monsterDrop": {
+   "itemKey": 910201,
+   "rate": 20
+  },
+  "bossDrop": {
+   "itemKey": 920201,
+   "rate": 200
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 890,
+   "hp": 17570,
+   "gold": 2400,
+   "exp": 37400
+  }
+ },
+ {
+  "key": 1305,
+  "name": "Hell Gate",
+  "names": {
+   "zh-hans": "地狱之门",
+   "zh-hant": "地獄之門",
+   "en-us": "Hell Gate",
+   "fr-fr": "Porte de l'Enfer",
+   "de-de": "Höllenpforte",
+   "id-id": "Gerbang Neraka",
+   "ja-jp": "地獄の関門",
+   "ko-kr": "지옥 관문",
+   "pl-pl": "Piekielna Brama",
+   "pt-br": "Portão do Inferno",
+   "ru-ru": "Врата ада",
+   "es-es": "Puerta del Infierno",
+   "th-th": "ประตูนรก",
+   "tr-tr": "Cehennem Kapısı",
+   "uk-ua": "Врата пекла",
+   "vi-vn": "Cổng Địa ngục"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 3,
+  "stageNo": 5,
+  "stageLevel": 27,
+  "nextStageKey": 1306,
+  "waveAmount": 17,
+  "waveMonsterAmount": 9,
+  "monsters": [
+   {
+    "monster": "30031",
+    "weight": 300
+   },
+   {
+    "monster": "30051",
+    "weight": 700
+   },
+   {
+    "monster": "30043",
+    "weight": 1000
+   },
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30012",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20071,
+  "monsterDrop": {
+   "itemKey": 910201,
+   "rate": 20
+  },
+  "bossDrop": {
+   "itemKey": 920201,
+   "rate": 200
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 920,
+   "hp": 19470,
+   "gold": 2600,
+   "exp": 41400
+  }
+ },
+ {
+  "key": 1306,
+  "name": "Burning Ravine",
+  "names": {
+   "zh-hans": "燃烧峡谷",
+   "zh-hant": "燃燒峽谷",
+   "en-us": "Burning Ravine",
+   "fr-fr": "Ravin Brûlant",
+   "de-de": "Brennende Schlucht",
+   "id-id": "Jurang Membara",
+   "ja-jp": "燃える峡谷",
+   "ko-kr": "불타는 협곡",
+   "pl-pl": "Płonący Jar",
+   "pt-br": "Desfiladeiro Ardente",
+   "ru-ru": "Горящее ущелье",
+   "es-es": "Barranco Ardiente",
+   "th-th": "หุบเขาเพลิง",
+   "tr-tr": "Yanan Uçurum",
+   "uk-ua": "Палаюча ущелина",
+   "vi-vn": "Vực Cháy"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 3,
+  "stageNo": 6,
+  "stageLevel": 28,
+  "nextStageKey": 1307,
+  "waveAmount": 17,
+  "waveMonsterAmount": 9,
+  "monsters": [
+   {
+    "monster": "30061",
+    "weight": 500
+   },
+   {
+    "monster": "30081",
+    "weight": 1000
+   },
+   {
+    "monster": "30082",
+    "weight": 200
+   },
+   {
+    "monster": "30084",
+    "weight": 300
+   },
+   {
+    "monster": "30091",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20081,
+  "monsterDrop": {
+   "itemKey": 910201,
+   "rate": 20
+  },
+  "bossDrop": {
+   "itemKey": 920201,
+   "rate": 200
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 950,
+   "hp": 21470,
+   "gold": 2810,
+   "exp": 45600
+  }
+ },
+ {
+  "key": 1307,
+  "name": "Plains of Torment",
+  "names": {
+   "zh-hans": "痛苦平原",
+   "zh-hant": "痛苦平原",
+   "en-us": "Plains of Torment",
+   "fr-fr": "Plaines du Tourment",
+   "de-de": "Ebenen der Qual",
+   "id-id": "Dataran Penderitaan",
+   "ja-jp": "苦痛の平原",
+   "ko-kr": "고통의 벌판",
+   "pl-pl": "Pola Udręki",
+   "pt-br": "Planícies do Tormento",
+   "ru-ru": "Равнины мучений",
+   "es-es": "Llanuras del Tormento",
+   "th-th": "ทุ่งทรมาน",
+   "tr-tr": "Azap Ovaları",
+   "uk-ua": "Рівнини мук",
+   "vi-vn": "Đồng bằng Đau khổ"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 3,
+  "stageNo": 7,
+  "stageLevel": 29,
+  "nextStageKey": 1308,
+  "waveAmount": 17,
+  "waveMonsterAmount": 10,
+  "monsters": [
+   {
+    "monster": "30081",
+    "weight": 1000
+   },
+   {
+    "monster": "30082",
+    "weight": 250
+   },
+   {
+    "monster": "30083",
+    "weight": 500
+   },
+   {
+    "monster": "30084",
+    "weight": 600
+   },
+   {
+    "monster": "30031",
+    "weight": 300
+   }
+  ],
+  "bossMonsterKey": 20023,
+  "monsterDrop": {
+   "itemKey": 910201,
+   "rate": 20
+  },
+  "bossDrop": {
+   "itemKey": 920201,
+   "rate": 200
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 980,
+   "hp": 23570,
+   "gold": 3030,
+   "exp": 50000
+  }
+ },
+ {
+  "key": 1308,
+  "name": "Citadel of Ruin",
+  "names": {
+   "zh-hans": "毁灭要塞",
+   "zh-hant": "毀滅要塞",
+   "en-us": "Citadel of Ruin",
+   "fr-fr": "Citadelle de la Ruine",
+   "de-de": "Zitadelle des Untergangs",
+   "id-id": "Benteng Kehancuran",
+   "ja-jp": "破滅の要塞",
+   "ko-kr": "파멸의 성채",
+   "pl-pl": "Cytadela Zguby",
+   "pt-br": "Cidadela da Ruína",
+   "ru-ru": "Цитадель гибели",
+   "es-es": "Ciudadela de la Ruina",
+   "th-th": "ป้อมปราการแห่งความหายนะ",
+   "tr-tr": "Yıkım Kalesi",
+   "uk-ua": "Цитадель загибелі",
+   "vi-vn": "Thành lũy Hủy diệt"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 3,
+  "stageNo": 8,
+  "stageLevel": 30,
+  "nextStageKey": 1309,
+  "waveAmount": 18,
+  "waveMonsterAmount": 10,
+  "monsters": [
+   {
+    "monster": "30083",
+    "weight": 1000
+   },
+   {
+    "monster": "30111",
+    "weight": 700
+   },
+   {
+    "monster": "30051",
+    "weight": 500
+   },
+   {
+    "monster": "30101",
+    "weight": 350
+   }
+  ],
+  "bossMonsterKey": 20061,
+  "monsterDrop": {
+   "itemKey": 910301,
+   "rate": 20
+  },
+  "bossDrop": {
+   "itemKey": 920301,
+   "rate": 200
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 1010,
+   "hp": 25770,
+   "gold": 3260,
+   "exp": 54600
+  }
+ },
+ {
+  "key": 1309,
+  "name": "Core of the Abyss",
+  "names": {
+   "zh-hans": "深渊之核",
+   "zh-hant": "深淵之核",
+   "en-us": "Core of the Abyss",
+   "fr-fr": "Cœur de l'Abîme",
+   "de-de": "Kern des Abgrunds",
+   "id-id": "Inti Jurang",
+   "ja-jp": "深淵の中心",
+   "ko-kr": "심연의 중심",
+   "pl-pl": "Rdzeń Otchłani",
+   "pt-br": "Núcleo do Abismo",
+   "ru-ru": "Ядро бездны",
+   "es-es": "Núcleo del Abismo",
+   "th-th": "แก่นกลางเหว",
+   "tr-tr": "Uçurumun Merkezi",
+   "uk-ua": "Ядро безодні",
+   "vi-vn": "Trung tâm Vực thẳm"
+  },
+  "type": "NORMAL",
+  "difficulty": "NORMAL",
+  "act": 3,
+  "stageNo": 9,
+  "stageLevel": 31,
+  "nextStageKey": 1310,
+  "waveAmount": 18,
+  "waveMonsterAmount": 11,
+  "monsters": [
+   {
+    "monster": "30083",
+    "weight": 1000
+   },
+   {
+    "monster": "30081",
+    "weight": 1000
+   },
+   {
+    "monster": "30111",
+    "weight": 1000
+   },
+   {
+    "monster": "30051",
+    "weight": 700
+   },
+   {
+    "monster": "30101",
+    "weight": 500
+   }
+  ],
+  "bossMonsterKey": 20111,
+  "monsterDrop": {
+   "itemKey": 910301,
+   "rate": 20
+  },
+  "bossDrop": {
+   "itemKey": 920301,
+   "rate": 200
+  },
+  "firstClearDropKey": 9200220,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 15000
+  },
+  "levelScaling": {
+   "atk": 1045,
+   "hp": 28070,
+   "gold": 3500,
+   "exp": 59400
+  }
+ },
+ {
+  "key": 1310,
+  "name": "Hell Command Chamber",
+  "names": {
+   "zh-hans": "地狱指挥室",
+   "zh-hant": "地獄指揮室",
+   "en-us": "Hell Command Chamber",
+   "fr-fr": "Salle de Commandement Infernale",
+   "de-de": "Höllen-Kommandokammer",
+   "id-id": "Ruang Komando Neraka",
+   "ja-jp": "地獄の執務室",
+   "ko-kr": "지옥의 집무실",
+   "pl-pl": "Komnata Dowodzenia Piekła",
+   "pt-br": "Sala de Comando do Inferno",
+   "ru-ru": "Командный зал ада",
+   "es-es": "Cámara de Mando del Infierno",
+   "th-th": "ห้องบัญชาการนรก",
+   "tr-tr": "Cehennem Komuta Odası",
+   "uk-ua": "Командна зала пекла",
+   "vi-vn": "Phòng Chỉ huy Địa ngục"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "NORMAL",
+  "act": 3,
+  "stageNo": 10,
+  "stageLevel": 32,
+  "nextStageKey": 2101,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 30901,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930301,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190001,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 1085,
+   "hp": 30470,
+   "gold": 3750,
+   "exp": 64400
+  }
+ },
+ {
+  "key": 2101,
+  "name": "Pasture",
+  "names": {
+   "zh-hans": "牧场",
+   "zh-hant": "牧場",
+   "en-us": "Pasture",
+   "fr-fr": "Pâturage",
+   "de-de": "Weide",
+   "id-id": "Padang Rumput",
+   "ja-jp": "牧草地",
+   "ko-kr": "목초지",
+   "pl-pl": "Pastwisko",
+   "pt-br": "Pasto",
+   "ru-ru": "Пастбище",
+   "es-es": "Pasto",
+   "th-th": "ทุ่งหญ้า",
+   "tr-tr": "Otlak",
+   "uk-ua": "Пасовище",
+   "vi-vn": "Đồng cỏ"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 1,
+  "stageNo": 1,
+  "stageLevel": 33,
+  "nextStageKey": 2102,
+  "waveAmount": 20,
+  "waveMonsterAmount": 10,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20024,
+  "monsterDrop": {
+   "itemKey": 910301,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920301,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1130,
+   "hp": 32970,
+   "gold": 4010,
+   "exp": 69600
+  }
+ },
+ {
+  "key": 2102,
+  "name": "Shadow Meadow",
+  "names": {
+   "zh-hans": "阴影草原",
+   "zh-hant": "陰影草原",
+   "en-us": "Shadow Meadow",
+   "fr-fr": "Prairie d'Ombre",
+   "de-de": "Schattenwiese",
+   "id-id": "Padang Bayangan",
+   "ja-jp": "影の草原",
+   "ko-kr": "그림자 초원",
+   "pl-pl": "Łąka Cieni",
+   "pt-br": "Prado Sombrio",
+   "ru-ru": "Теневая поляна",
+   "es-es": "Prado Sombrío",
+   "th-th": "ทุ่งหญ้าเงา",
+   "tr-tr": "Gölge Çayırı",
+   "uk-ua": "Тінисті луки",
+   "vi-vn": "Đồng cỏ Bóng"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 1,
+  "stageNo": 2,
+  "stageLevel": 34,
+  "nextStageKey": 2103,
+  "waveAmount": 20,
+  "waveMonsterAmount": 10,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20021,
+  "monsterDrop": {
+   "itemKey": 910301,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920301,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1180,
+   "hp": 35570,
+   "gold": 4280,
+   "exp": 75000
+  }
+ },
+ {
+  "key": 2103,
+  "name": "Wasteland",
+  "names": {
+   "zh-hans": "荒野",
+   "zh-hant": "荒野",
+   "en-us": "Wasteland",
+   "fr-fr": "Terre Désolée",
+   "de-de": "Ödland",
+   "id-id": "Tanah Tandus",
+   "ja-jp": "荒れ地",
+   "ko-kr": "황무지",
+   "pl-pl": "Pustkowia",
+   "pt-br": "Terra Devastada",
+   "ru-ru": "Пустошь",
+   "es-es": "Tierra Baldía",
+   "th-th": "ดินแดนเสื่อมโทรม",
+   "tr-tr": "Çorak Arazi",
+   "uk-ua": "Пустка",
+   "vi-vn": "Vùng đất hoang"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 1,
+  "stageNo": 3,
+  "stageLevel": 35,
+  "nextStageKey": 2104,
+  "waveAmount": 20,
+  "waveMonsterAmount": 11,
+  "monsters": [
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20031,
+  "monsterDrop": {
+   "itemKey": 910301,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920301,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1235,
+   "hp": 38270,
+   "gold": 4560,
+   "exp": 80600
+  }
+ },
+ {
+  "key": 2104,
+  "name": "Eerie Canyon",
+  "names": {
+   "zh-hans": "阴森峡谷",
+   "zh-hant": "陰森峽谷",
+   "en-us": "Eerie Canyon",
+   "fr-fr": "Canyon Sinistre",
+   "de-de": "Unheimliche Schlucht",
+   "id-id": "Ngarai Mengerikan",
+   "ja-jp": "不気味な峡谷",
+   "ko-kr": "으스스한 협곡",
+   "pl-pl": "Upiorna Dolina",
+   "pt-br": "Desfiladeiro Sinistro",
+   "ru-ru": "Жуткий каньон",
+   "es-es": "Cañón Escalofriante",
+   "th-th": "หุบเขาอ้าง",
+   "tr-tr": "Ürkütücü Kanyon",
+   "uk-ua": "Моторошний каньйон",
+   "vi-vn": "Hẻm núi rùng rợn"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 1,
+  "stageNo": 4,
+  "stageLevel": 35,
+  "nextStageKey": 2105,
+  "waveAmount": 21,
+  "waveMonsterAmount": 11,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   },
+   {
+    "monster": "10041",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20041,
+  "monsterDrop": {
+   "itemKey": 910301,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920301,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1235,
+   "hp": 38270,
+   "gold": 4560,
+   "exp": 80600
+  }
+ },
+ {
+  "key": 2105,
+  "name": "Burning Village Entrance",
+  "names": {
+   "zh-hans": "燃烧村庄入口",
+   "zh-hant": "燃燒村莊入口",
+   "en-us": "Burning Village Entrance",
+   "fr-fr": "Entrée du Village en Flammes",
+   "de-de": "Brennender Dorfeingang",
+   "id-id": "Pintu Desa Terbakar",
+   "ja-jp": "燃える村の入口",
+   "ko-kr": "불타는 마을 입구",
+   "pl-pl": "Wejście do Płonącej Wioski",
+   "pt-br": "Entrada da Vila em Chamas",
+   "ru-ru": "Вход в горящую деревню",
+   "es-es": "Entrada del Pueblo Ardiente",
+   "th-th": "ทางเข้าหมู่บ้านเพลิง",
+   "tr-tr": "Yanan Köy Girişi",
+   "uk-ua": "Вхід до палаючого села",
+   "vi-vn": "Lối vào Làng Cháy"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 1,
+  "stageNo": 5,
+  "stageLevel": 36,
+  "nextStageKey": 2106,
+  "waveAmount": 21,
+  "waveMonsterAmount": 12,
+  "monsters": [
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   },
+   {
+    "monster": "10041",
+    "weight": 1000
+   },
+   {
+    "monster": "10042",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20071,
+  "monsterDrop": {
+   "itemKey": 910301,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920301,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1295,
+   "hp": 41070,
+   "gold": 4850,
+   "exp": 86400
+  }
+ },
+ {
+  "key": 2106,
+  "name": "Rumstreet Square",
+  "names": {
+   "zh-hans": "朗姆街广场",
+   "zh-hant": "蘭姆街廣場",
+   "en-us": "Rumstreet Square",
+   "fr-fr": "Place de Rumstreet",
+   "de-de": "Rumstraßenplatz",
+   "id-id": "Alun-alun Rumstreet",
+   "ja-jp": "ラムストリート広場",
+   "ko-kr": "럼스트리트 광장",
+   "pl-pl": "Plac Rumstreet",
+   "pt-br": "Praça Rumstreet",
+   "ru-ru": "Площадь Рамстрит",
+   "es-es": "Plaza Rumstreet",
+   "th-th": "จัตุรัสรัมสตรีท",
+   "tr-tr": "Rumstreet Meydanı",
+   "uk-ua": "Площа Рамстріт",
+   "vi-vn": "Quảng trường Rumstreet"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 1,
+  "stageNo": 6,
+  "stageLevel": 37,
+  "nextStageKey": 2107,
+  "waveAmount": 21,
+  "waveMonsterAmount": 12,
+  "monsters": [
+   {
+    "monster": "10041",
+    "weight": 1000
+   },
+   {
+    "monster": "10042",
+    "weight": 1000
+   },
+   {
+    "monster": "10043",
+    "weight": 600
+   },
+   {
+    "monster": "10011",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20081,
+  "monsterDrop": {
+   "itemKey": 910301,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920301,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1360,
+   "hp": 43970,
+   "gold": 5150,
+   "exp": 92400
+  }
+ },
+ {
+  "key": 2107,
+  "name": "City Outskirts",
+  "names": {
+   "zh-hans": "城市外围",
+   "zh-hant": "城市外圍",
+   "en-us": "City Outskirts",
+   "fr-fr": "Périphérie de la Ville",
+   "de-de": "Stadtrand",
+   "id-id": "Pinggir Kota",
+   "ja-jp": "街の外れ",
+   "ko-kr": "도시 외곽",
+   "pl-pl": "Przedmieścia",
+   "pt-br": "Arredores da Cidade",
+   "ru-ru": "Окраины города",
+   "es-es": "Afueras de la Ciudad",
+   "th-th": "ชานเมือง",
+   "tr-tr": "Şehir Kenarı",
+   "uk-ua": "Околиці міста",
+   "vi-vn": "Ngoại ô"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 1,
+  "stageNo": 7,
+  "stageLevel": 38,
+  "nextStageKey": 2108,
+  "waveAmount": 21,
+  "waveMonsterAmount": 13,
+  "monsters": [
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20023,
+  "monsterDrop": {
+   "itemKey": 910301,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920301,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1430,
+   "hp": 46970,
+   "gold": 5460,
+   "exp": 98600
+  }
+ },
+ {
+  "key": 2108,
+  "name": "Cemetery",
+  "names": {
+   "zh-hans": "公墓",
+   "zh-hant": "公墓",
+   "en-us": "Cemetery",
+   "fr-fr": "Cimetière",
+   "de-de": "Friedhof",
+   "id-id": "Pemakaman",
+   "ja-jp": "墓地",
+   "ko-kr": "공동묘지",
+   "pl-pl": "Cmentarz",
+   "pt-br": "Cemitério",
+   "ru-ru": "Кладбище",
+   "es-es": "Cementerio",
+   "th-th": "สุสาน",
+   "tr-tr": "Mezarlık",
+   "uk-ua": "Кладовище",
+   "vi-vn": "Nghĩa trang"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 1,
+  "stageNo": 8,
+  "stageLevel": 39,
+  "nextStageKey": 2109,
+  "waveAmount": 21,
+  "waveMonsterAmount": 13,
+  "monsters": [
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10053",
+    "weight": 500
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20061,
+  "monsterDrop": {
+   "itemKey": 910301,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920301,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1510,
+   "hp": 50070,
+   "gold": 5780,
+   "exp": 105000
+  }
+ },
+ {
+  "key": 2109,
+  "name": "Cursed Land",
+  "names": {
+   "zh-hans": "诅咒之地",
+   "zh-hant": "詛咒之地",
+   "en-us": "Cursed Land",
+   "fr-fr": "Terre maudite",
+   "de-de": "Verfluchtes Land",
+   "id-id": "Tanah Terkutuk",
+   "ja-jp": "呪われた大地",
+   "ko-kr": "저주받은 대지",
+   "pl-pl": "Przeklęta kraina",
+   "pt-br": "Terra amaldiçoada",
+   "ru-ru": "Проклятая земля",
+   "es-es": "Tierra maldita",
+   "th-th": "ดินแดนต้องสาป",
+   "tr-tr": "Lanetli toprak",
+   "uk-ua": "Прокляті землі",
+   "vi-vn": "Vùng đất nguyền rủa"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 1,
+  "stageNo": 9,
+  "stageLevel": 40,
+  "nextStageKey": 2110,
+  "waveAmount": 22,
+  "waveMonsterAmount": 13,
+  "monsters": [
+   {
+    "monster": "10042",
+    "weight": 1000
+   },
+   {
+    "monster": "10043",
+    "weight": 600
+   },
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10053",
+    "weight": 500
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20111,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": 9200320,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1600,
+   "hp": 53270,
+   "gold": 6110,
+   "exp": 111600
+  }
+ },
+ {
+  "key": 2110,
+  "name": "Throne of Darkness",
+  "names": {
+   "zh-hans": "黑暗王座",
+   "zh-hant": "黑暗王座",
+   "en-us": "Throne of Darkness",
+   "fr-fr": "Trône des Ténèbres",
+   "de-de": "Thron der Finsternis",
+   "id-id": "Singgasana Kegelapan",
+   "ja-jp": "闇の玉座",
+   "ko-kr": "어둠의 왕좌",
+   "pl-pl": "Tron Ciemności",
+   "pt-br": "Trono das Trevas",
+   "ru-ru": "Трон тьмы",
+   "es-es": "Trono de la Oscuridad",
+   "th-th": "บัลลังก์แห่งความมืด",
+   "tr-tr": "Karanlığın Tahtı",
+   "uk-ua": "Трон темряви",
+   "vi-vn": "Ngai Bóng Tối"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "NIGHTMARE",
+  "act": 1,
+  "stageNo": 10,
+  "stageLevel": 40,
+  "nextStageKey": 2201,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 10902,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930401,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190002,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 1600,
+   "hp": 53270,
+   "gold": 6110,
+   "exp": 111600
+  }
+ },
+ {
+  "key": 2201,
+  "name": "Oasis Road",
+  "names": {
+   "zh-hans": "绿洲路",
+   "zh-hant": "綠洲路",
+   "en-us": "Oasis Road",
+   "fr-fr": "Route de l'Oasis",
+   "de-de": "Oasisweg",
+   "id-id": "Jalan Oase",
+   "ja-jp": "オアシスの道",
+   "ko-kr": "오아시스 길목",
+   "pl-pl": "Droga Oazy",
+   "pt-br": "Caminho do Oásis",
+   "ru-ru": "Путь оазиса",
+   "es-es": "Camino del Oasis",
+   "th-th": "เส้นทางโอเอซิส",
+   "tr-tr": "Vaha Yolu",
+   "uk-ua": "Шлях оазису",
+   "vi-vn": "Đường Ốc đảo"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 2,
+  "stageNo": 1,
+  "stageLevel": 41,
+  "nextStageKey": 2202,
+  "waveAmount": 22,
+  "waveMonsterAmount": 13,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20024,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1700,
+   "hp": 56570,
+   "gold": 6450,
+   "exp": 118400
+  }
+ },
+ {
+  "key": 2202,
+  "name": "Sandstorm Valley",
+  "names": {
+   "zh-hans": "沙风暴谷",
+   "zh-hant": "沙風暴谷",
+   "en-us": "Sandstorm Valley",
+   "fr-fr": "Vallée de la Tempête de Sable",
+   "de-de": "Sandsturmtal",
+   "id-id": "Lembah Badai Pasir",
+   "ja-jp": "砂嵐の谷",
+   "ko-kr": "모래바람 골짜기",
+   "pl-pl": "Dolina Burzy Piaskowej",
+   "pt-br": "Vale da Tempestade de Areia",
+   "ru-ru": "Долина песчаной бури",
+   "es-es": "Valle de la Tormenta de Arena",
+   "th-th": "หุบเขาพายุทราย",
+   "tr-tr": "Kum Fırtınası Vadisi",
+   "uk-ua": "Долина піщаної бурі",
+   "vi-vn": "Thung lũng Bão Cát"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 2,
+  "stageNo": 2,
+  "stageLevel": 41,
+  "nextStageKey": 2203,
+  "waveAmount": 22,
+  "waveMonsterAmount": 13,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   },
+   {
+    "monster": "20024",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20021,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1700,
+   "hp": 56570,
+   "gold": 6450,
+   "exp": 118400
+  }
+ },
+ {
+  "key": 2203,
+  "name": "Desert Underground Cave",
+  "names": {
+   "zh-hans": "沙漠地下洞窟",
+   "zh-hant": "沙漠地下洞窟",
+   "en-us": "Desert Underground Cave",
+   "fr-fr": "Grotte Souterraine du Désert",
+   "de-de": "Wüsten-Untergrundhöhle",
+   "id-id": "Gua Bawah Padang Pasir",
+   "ja-jp": "砂漠地下洞窟",
+   "ko-kr": "사막 지하 동굴",
+   "pl-pl": "Pustynna Jaskinia Podziemna",
+   "pt-br": "Caverna Subterrânea do Deserto",
+   "ru-ru": "Пустынная подземная пещера",
+   "es-es": "Cueva Subterránea del Desierto",
+   "th-th": "ถ้ำใต้ดินทะเลทราย",
+   "tr-tr": "Çöl Yeraltı Mağarası",
+   "uk-ua": "Пустельна підземна печера",
+   "vi-vn": "Hang Ngầm Sa mạc"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 2,
+  "stageNo": 3,
+  "stageLevel": 42,
+  "nextStageKey": 2204,
+  "waveAmount": 22,
+  "waveMonsterAmount": 13,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20023",
+    "weight": 1000
+   },
+   {
+    "monster": "20041",
+    "weight": 300
+   },
+   {
+    "monster": "10031",
+    "weight": 300
+   }
+  ],
+  "bossMonsterKey": 20031,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1810,
+   "hp": 59970,
+   "gold": 6800,
+   "exp": 125400
+  }
+ },
+ {
+  "key": 2204,
+  "name": "Bug Nest",
+  "names": {
+   "zh-hans": "虫巢",
+   "zh-hant": "蟲巢",
+   "en-us": "Bug Nest",
+   "fr-fr": "Nid d'Insectes",
+   "de-de": "Insektennest",
+   "id-id": "Sarang Serangga",
+   "ja-jp": "虫の巣",
+   "ko-kr": "벌레 둥지",
+   "pl-pl": "Gniazdo Robactwa",
+   "pt-br": "Ninho de Insetos",
+   "ru-ru": "Гнездо жуков",
+   "es-es": "Nido de Insectos",
+   "th-th": "รังแมลง",
+   "tr-tr": "Böcek Yuvası",
+   "uk-ua": "Гніздо комах",
+   "vi-vn": "Tổ Bọ"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 2,
+  "stageNo": 4,
+  "stageLevel": 42,
+  "nextStageKey": 2205,
+  "waveAmount": 22,
+  "waveMonsterAmount": 13,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20023",
+    "weight": 1000
+   },
+   {
+    "monster": "20041",
+    "weight": 400
+   },
+   {
+    "monster": "20051",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20041,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1810,
+   "hp": 59970,
+   "gold": 6800,
+   "exp": 125400
+  }
+ },
+ {
+  "key": 2205,
+  "name": "Scorching Dunes",
+  "names": {
+   "zh-hans": "炽热沙丘",
+   "zh-hant": "熾熱沙丘",
+   "en-us": "Scorching Dunes",
+   "fr-fr": "Dunes Brûlantes",
+   "de-de": "Brennende Dünen",
+   "id-id": "Bukit Pasir Membara",
+   "ja-jp": "灼熱の砂丘",
+   "ko-kr": "작열의 사구",
+   "pl-pl": "Palące Wydmy",
+   "pt-br": "Dunas Escaldantes",
+   "ru-ru": "Обжигающие дюны",
+   "es-es": "Dunas Abrasadoras",
+   "th-th": "เนินทรายร้อน",
+   "tr-tr": "Yanan Kumullar",
+   "uk-ua": "Палючі дюни",
+   "vi-vn": "Đụn cát Cháy bỏng"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 2,
+  "stageNo": 5,
+  "stageLevel": 43,
+  "nextStageKey": 2206,
+  "waveAmount": 22,
+  "waveMonsterAmount": 13,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   },
+   {
+    "monster": "20051",
+    "weight": 2000
+   }
+  ],
+  "bossMonsterKey": 20071,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1930,
+   "hp": 63470,
+   "gold": 7160,
+   "exp": 132600
+  }
+ },
+ {
+  "key": 2206,
+  "name": "Sunset Ruins",
+  "names": {
+   "zh-hans": "夕阳废墟",
+   "zh-hant": "夕陽廢墟",
+   "en-us": "Sunset Ruins",
+   "fr-fr": "Ruines du Crépuscule",
+   "de-de": "Sonnenuntergangsruinen",
+   "id-id": "Reruntuhan Senja",
+   "ja-jp": "夕暮れの廃墟",
+   "ko-kr": "석양의 폐허",
+   "pl-pl": "Ruiny Zachodu",
+   "pt-br": "Ruínas do Pôr do Sol",
+   "ru-ru": "Руины заката",
+   "es-es": "Ruinas del Crepúsculo",
+   "th-th": "ซากปรักหักพังยามอาทิตย์ตก",
+   "tr-tr": "Gün Batımı Harabeleri",
+   "uk-ua": "Руїни заходу",
+   "vi-vn": "Phế tích Hoàng hôn"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 2,
+  "stageNo": 6,
+  "stageLevel": 43,
+  "nextStageKey": 2207,
+  "waveAmount": 22,
+  "waveMonsterAmount": 13,
+  "monsters": [
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20024",
+    "weight": 1000
+   },
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20081,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 1930,
+   "hp": 63470,
+   "gold": 7160,
+   "exp": 132600
+  }
+ },
+ {
+  "key": 2207,
+  "name": "Midnight Sands",
+  "names": {
+   "zh-hans": "午夜沙漠",
+   "zh-hant": "午夜沙漠",
+   "en-us": "Midnight Sands",
+   "fr-fr": "Sables de Minuit",
+   "de-de": "Mitternachtswüste",
+   "id-id": "Pasir Tengah Malam",
+   "ja-jp": "真夜中の砂漠",
+   "ko-kr": "한밤의 사막",
+   "pl-pl": "Piaski Północy",
+   "pt-br": "Areias da Meia-Noite",
+   "ru-ru": "Полуночные пески",
+   "es-es": "Arenas de Medianoche",
+   "th-th": "ทรายเที่ยงคืน",
+   "tr-tr": "Gece Yarısı Kumları",
+   "uk-ua": "Піски півночі",
+   "vi-vn": "Cát Nửa đêm"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 2,
+  "stageNo": 7,
+  "stageLevel": 44,
+  "nextStageKey": 2208,
+  "waveAmount": 22,
+  "waveMonsterAmount": 14,
+  "monsters": [
+   {
+    "monster": "20081",
+    "weight": 300
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   },
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20023",
+    "weight": 700
+   },
+   {
+    "monster": "10052",
+    "weight": 550
+   }
+  ],
+  "bossMonsterKey": 20023,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 2060,
+   "hp": 67070,
+   "gold": 7530,
+   "exp": 140000
+  }
+ },
+ {
+  "key": 2208,
+  "name": "Sacred Tomb",
+  "names": {
+   "zh-hans": "神圣墓穴",
+   "zh-hant": "神聖墓穴",
+   "en-us": "Sacred Tomb",
+   "fr-fr": "Tombeau Sacré",
+   "de-de": "Heiliges Grab",
+   "id-id": "Makam Suci",
+   "ja-jp": "神聖なる墓",
+   "ko-kr": "신성한 무덤",
+   "pl-pl": "Święty Grób",
+   "pt-br": "Túmulo Sagrado",
+   "ru-ru": "Священная гробница",
+   "es-es": "Tumba Sagrada",
+   "th-th": "สุสานศักดิ์สิทธิ์",
+   "tr-tr": "Kutsal Mezar",
+   "uk-ua": "Священна гробниця",
+   "vi-vn": "Lăng Thần Thánh"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 2,
+  "stageNo": 8,
+  "stageLevel": 44,
+  "nextStageKey": 2209,
+  "waveAmount": 22,
+  "waveMonsterAmount": 14,
+  "monsters": [
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20062",
+    "weight": 1000
+   },
+   {
+    "monster": "20091",
+    "weight": 800
+   },
+   {
+    "monster": "20101",
+    "weight": 1000
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20061,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 2060,
+   "hp": 67070,
+   "gold": 7530,
+   "exp": 140000
+  }
+ },
+ {
+  "key": 2209,
+  "name": "Pharaoh's Crypt",
+  "names": {
+   "zh-hans": "法老陵墓",
+   "zh-hant": "法老陵墓",
+   "en-us": "Pharaoh's Crypt",
+   "fr-fr": "Crypte du Pharaon",
+   "de-de": "Pharaonengruft",
+   "id-id": "Ruang Mayat Firaun",
+   "ja-jp": "ファラオの墓室",
+   "ko-kr": "파라오의 묘실",
+   "pl-pl": "Krypta Faraona",
+   "pt-br": "Cripta do Faraó",
+   "ru-ru": "Склеп фараона",
+   "es-es": "Cripta del Faraón",
+   "th-th": "ห้องสุสานฟาโรห์",
+   "tr-tr": "Firavunun Mezarı",
+   "uk-ua": "Склеп фараона",
+   "vi-vn": "Hầm mộ Pharaoh"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 2,
+  "stageNo": 9,
+  "stageLevel": 45,
+  "nextStageKey": 2210,
+  "waveAmount": 23,
+  "waveMonsterAmount": 14,
+  "monsters": [
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20062",
+    "weight": 1000
+   },
+   {
+    "monster": "20091",
+    "weight": 800
+   },
+   {
+    "monster": "20101",
+    "weight": 1000
+   },
+   {
+    "monster": "20111",
+    "weight": 1000
+   },
+   {
+    "monster": "20081",
+    "weight": 500
+   }
+  ],
+  "bossMonsterKey": 20111,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": 9200320,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 2200,
+   "hp": 70770,
+   "gold": 7910,
+   "exp": 147600
+  }
+ },
+ {
+  "key": 2210,
+  "name": "Pharaoh's Underchannel",
+  "names": {
+   "zh-hans": "法老地下水道",
+   "zh-hant": "法老地下水道",
+   "en-us": "Pharaoh's Underchannel",
+   "fr-fr": "Canal Souterrain du Pharaon",
+   "de-de": "Unterkanal des Pharaos",
+   "id-id": "Saluran Bawah Firaun",
+   "ja-jp": "ファラオの地下水路",
+   "ko-kr": "파라오의 지하수도",
+   "pl-pl": "Podziemny Kanał Faraona",
+   "pt-br": "Canal Subterrâneo do Faraó",
+   "ru-ru": "Подземный канал фараона",
+   "es-es": "Canal Subterráneo del Faraón",
+   "th-th": "ทางน้ำใต้ดินฟาโรห์",
+   "tr-tr": "Firavunun Yeraltı Kanalı",
+   "uk-ua": "Підземний канал фараона",
+   "vi-vn": "Cống Ngầm Pharaoh"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "NIGHTMARE",
+  "act": 2,
+  "stageNo": 10,
+  "stageLevel": 45,
+  "nextStageKey": 2301,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 20902,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930451,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190002,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 2200,
+   "hp": 70770,
+   "gold": 7910,
+   "exp": 147600
+  }
+ },
+ {
+  "key": 2301,
+  "name": "Snowbound Outpost",
+  "names": {
+   "zh-hans": "雪原前哨",
+   "zh-hant": "雪原前哨",
+   "en-us": "Snowbound Outpost",
+   "fr-fr": "Avant-poste Enneigé",
+   "de-de": "Verschneiter Außenposten",
+   "id-id": "Pos Bersalju",
+   "ja-jp": "雪原の前哨地",
+   "ko-kr": "설원의 전초기지",
+   "pl-pl": "Zaśnieżona Placówka",
+   "pt-br": "Posto Avançado Nevado",
+   "ru-ru": "Заснеженный аванпост",
+   "es-es": "Puesto Cubierto de Nieve",
+   "th-th": "ด่านหน้าหิมะ",
+   "tr-tr": "Karlı İleri Karakol",
+   "uk-ua": "Засніжений форпост",
+   "vi-vn": "Tiền đồn Tuyết"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 3,
+  "stageNo": 1,
+  "stageLevel": 46,
+  "nextStageKey": 2302,
+  "waveAmount": 23,
+  "waveMonsterAmount": 14,
+  "monsters": [
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30012",
+    "weight": 1000
+   },
+   {
+    "monster": "30013",
+    "weight": 500
+   }
+  ],
+  "bossMonsterKey": 20024,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 2350,
+   "hp": 74570,
+   "gold": 8300,
+   "exp": 155400
+  }
+ },
+ {
+  "key": 2302,
+  "name": "Frozen Battlefield",
+  "names": {
+   "zh-hans": "冰封战场",
+   "zh-hant": "冰封戰場",
+   "en-us": "Frozen Battlefield",
+   "fr-fr": "Champ de Bataille Gelé",
+   "de-de": "Gefrorenes Schlachtfeld",
+   "id-id": "Medan Beku",
+   "ja-jp": "凍結した戦場",
+   "ko-kr": "얼어붙은 전장",
+   "pl-pl": "Zamarznięte Pole Bitwy",
+   "pt-br": "Campo de Batalha Congelado",
+   "ru-ru": "Замёрзшее поле битвы",
+   "es-es": "Campo de Batalla Congelado",
+   "th-th": "สนามรบเยือกแข็ง",
+   "tr-tr": "Donmuş Savaş Alanı",
+   "uk-ua": "Замерзле поле битви",
+   "vi-vn": "Chiến trường Đóng băng"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 3,
+  "stageNo": 2,
+  "stageLevel": 47,
+  "nextStageKey": 2303,
+  "waveAmount": 23,
+  "waveMonsterAmount": 14,
+  "monsters": [
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30012",
+    "weight": 1000
+   },
+   {
+    "monster": "30013",
+    "weight": 500
+   },
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30021",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20021,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 2510,
+   "hp": 78470,
+   "gold": 8700,
+   "exp": 163400
+  }
+ },
+ {
+  "key": 2303,
+  "name": "Glacial Cave Entrance",
+  "names": {
+   "zh-hans": "冰川洞窟入口",
+   "zh-hant": "冰川洞窟入口",
+   "en-us": "Glacial Cave Entrance",
+   "fr-fr": "Entrée de la Grotte Glaciaire",
+   "de-de": "Gletscherhöhleneingang",
+   "id-id": "Pintu Gua Gletser",
+   "ja-jp": "氷河洞窟の入口",
+   "ko-kr": "빙하 동굴 입구",
+   "pl-pl": "Wejście do Lodowcowej Jaskini",
+   "pt-br": "Entrada da Caverna Glacial",
+   "ru-ru": "Вход в ледниковую пещеру",
+   "es-es": "Entrada a la Cueva Glacial",
+   "th-th": "ทางเข้าถ้ำธารน้ำแข็ง",
+   "tr-tr": "Buzul Mağarası Girişi",
+   "uk-ua": "Вхід до льодовикової печери",
+   "vi-vn": "Lối vào Hang Băng"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 3,
+  "stageNo": 3,
+  "stageLevel": 48,
+  "nextStageKey": 2304,
+  "waveAmount": 23,
+  "waveMonsterAmount": 14,
+  "monsters": [
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30042",
+    "weight": 700
+   },
+   {
+    "monster": "30044",
+    "weight": 300
+   },
+   {
+    "monster": "30021",
+    "weight": 200
+   },
+   {
+    "monster": "30013",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20031,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 2680,
+   "hp": 82470,
+   "gold": 9110,
+   "exp": 171600
+  }
+ },
+ {
+  "key": 2304,
+  "name": "Frozen Glacier Cavern",
+  "names": {
+   "zh-hans": "冰川洞窟深处",
+   "zh-hant": "冰川洞窟深處",
+   "en-us": "Frozen Glacier Cavern",
+   "fr-fr": "Caverne Glaciaire Gelée",
+   "de-de": "Eisige Gletscherkammer",
+   "id-id": "Gua Gletser Beku",
+   "ja-jp": "凍りつく氷河洞窟",
+   "ko-kr": "빙하 동굴 심부",
+   "pl-pl": "Zamrożona Jaskinia Lodowca",
+   "pt-br": "Caverna Glacial Congelada",
+   "ru-ru": "Замёрзшая ледниковая пещера",
+   "es-es": "Caverna Glacial Congelada",
+   "th-th": "ถ้ำธารน้ำแข็งลึก",
+   "tr-tr": "Donmuş Buzul Mağarası",
+   "uk-ua": "Замерзла льодовикова печера",
+   "vi-vn": "Hang Sông Băng Sâu"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 3,
+  "stageNo": 4,
+  "stageLevel": 49,
+  "nextStageKey": 2305,
+  "waveAmount": 23,
+  "waveMonsterAmount": 14,
+  "monsters": [
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30042",
+    "weight": 700
+   },
+   {
+    "monster": "30044",
+    "weight": 300
+   },
+   {
+    "monster": "30021",
+    "weight": 400
+   },
+   {
+    "monster": "30051",
+    "weight": 1000
+   },
+   {
+    "monster": "30043",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20041,
+  "monsterDrop": {
+   "itemKey": 910401,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920401,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 2855,
+   "hp": 86570,
+   "gold": 9530,
+   "exp": 180000
+  }
+ },
+ {
+  "key": 2305,
+  "name": "Hell Gate",
+  "names": {
+   "zh-hans": "地狱之门",
+   "zh-hant": "地獄之門",
+   "en-us": "Hell Gate",
+   "fr-fr": "Porte de l'Enfer",
+   "de-de": "Höllenpforte",
+   "id-id": "Gerbang Neraka",
+   "ja-jp": "地獄の関門",
+   "ko-kr": "지옥 관문",
+   "pl-pl": "Piekielna Brama",
+   "pt-br": "Portão do Inferno",
+   "ru-ru": "Врата ада",
+   "es-es": "Puerta del Infierno",
+   "th-th": "ประตูนรก",
+   "tr-tr": "Cehennem Kapısı",
+   "uk-ua": "Врата пекла",
+   "vi-vn": "Cổng Địa ngục"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 3,
+  "stageNo": 5,
+  "stageLevel": 50,
+  "nextStageKey": 2306,
+  "waveAmount": 23,
+  "waveMonsterAmount": 14,
+  "monsters": [
+   {
+    "monster": "30031",
+    "weight": 700
+   },
+   {
+    "monster": "30051",
+    "weight": 700
+   },
+   {
+    "monster": "30044",
+    "weight": 300
+   },
+   {
+    "monster": "30043",
+    "weight": 1000
+   },
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30012",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20071,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 3050,
+   "hp": 90770,
+   "gold": 9960,
+   "exp": 188600
+  }
+ },
+ {
+  "key": 2306,
+  "name": "Burning Ravine",
+  "names": {
+   "zh-hans": "燃烧峡谷",
+   "zh-hant": "燃燒峽谷",
+   "en-us": "Burning Ravine",
+   "fr-fr": "Ravin Brûlant",
+   "de-de": "Brennende Schlucht",
+   "id-id": "Jurang Membara",
+   "ja-jp": "燃える峡谷",
+   "ko-kr": "불타는 협곡",
+   "pl-pl": "Płonący Jar",
+   "pt-br": "Desfiladeiro Ardente",
+   "ru-ru": "Горящее ущелье",
+   "es-es": "Barranco Ardiente",
+   "th-th": "หุบเขาเพลิง",
+   "tr-tr": "Yanan Uçurum",
+   "uk-ua": "Палаюча ущелина",
+   "vi-vn": "Vực Cháy"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 3,
+  "stageNo": 6,
+  "stageLevel": 50,
+  "nextStageKey": 2307,
+  "waveAmount": 23,
+  "waveMonsterAmount": 14,
+  "monsters": [
+   {
+    "monster": "30061",
+    "weight": 1000
+   },
+   {
+    "monster": "30081",
+    "weight": 1000
+   },
+   {
+    "monster": "30082",
+    "weight": 500
+   },
+   {
+    "monster": "30084",
+    "weight": 300
+   },
+   {
+    "monster": "30091",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20081,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 3050,
+   "hp": 90770,
+   "gold": 9960,
+   "exp": 188600
+  }
+ },
+ {
+  "key": 2307,
+  "name": "Plains of Torment",
+  "names": {
+   "zh-hans": "痛苦平原",
+   "zh-hant": "痛苦平原",
+   "en-us": "Plains of Torment",
+   "fr-fr": "Plaines du Tourment",
+   "de-de": "Ebenen der Qual",
+   "id-id": "Dataran Penderitaan",
+   "ja-jp": "苦痛の平原",
+   "ko-kr": "고통의 벌판",
+   "pl-pl": "Pola Udręki",
+   "pt-br": "Planícies do Tormento",
+   "ru-ru": "Равнины мучений",
+   "es-es": "Llanuras del Tormento",
+   "th-th": "ทุ่งทรมาน",
+   "tr-tr": "Azap Ovaları",
+   "uk-ua": "Рівнини мук",
+   "vi-vn": "Đồng bằng Đau khổ"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 3,
+  "stageNo": 7,
+  "stageLevel": 51,
+  "nextStageKey": 2308,
+  "waveAmount": 23,
+  "waveMonsterAmount": 15,
+  "monsters": [
+   {
+    "monster": "30081",
+    "weight": 1000
+   },
+   {
+    "monster": "30082",
+    "weight": 700
+   },
+   {
+    "monster": "30083",
+    "weight": 500
+   },
+   {
+    "monster": "30084",
+    "weight": 600
+   },
+   {
+    "monster": "30031",
+    "weight": 700
+   }
+  ],
+  "bossMonsterKey": 20023,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 3265,
+   "hp": 95070,
+   "gold": 10400,
+   "exp": 197400
+  }
+ },
+ {
+  "key": 2308,
+  "name": "Citadel of Ruin",
+  "names": {
+   "zh-hans": "毁灭要塞",
+   "zh-hant": "毀滅要塞",
+   "en-us": "Citadel of Ruin",
+   "fr-fr": "Citadelle de la Ruine",
+   "de-de": "Zitadelle des Untergangs",
+   "id-id": "Benteng Kehancuran",
+   "ja-jp": "破滅の要塞",
+   "ko-kr": "파멸의 성채",
+   "pl-pl": "Cytadela Zguby",
+   "pt-br": "Cidadela da Ruína",
+   "ru-ru": "Цитадель гибели",
+   "es-es": "Ciudadela de la Ruina",
+   "th-th": "ป้อมปราการแห่งความหายนะ",
+   "tr-tr": "Yıkım Kalesi",
+   "uk-ua": "Цитадель загибелі",
+   "vi-vn": "Thành lũy Hủy diệt"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 3,
+  "stageNo": 8,
+  "stageLevel": 51,
+  "nextStageKey": 2309,
+  "waveAmount": 23,
+  "waveMonsterAmount": 15,
+  "monsters": [
+   {
+    "monster": "30083",
+    "weight": 1000
+   },
+   {
+    "monster": "30111",
+    "weight": 1000
+   },
+   {
+    "monster": "30051",
+    "weight": 500
+   },
+   {
+    "monster": "30101",
+    "weight": 700
+   },
+   {
+    "monster": "30102",
+    "weight": 400
+   }
+  ],
+  "bossMonsterKey": 20061,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 150
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 3265,
+   "hp": 95070,
+   "gold": 10400,
+   "exp": 197400
+  }
+ },
+ {
+  "key": 2309,
+  "name": "Core of the Abyss",
+  "names": {
+   "zh-hans": "深渊之核",
+   "zh-hant": "深淵之核",
+   "en-us": "Core of the Abyss",
+   "fr-fr": "Cœur de l'Abîme",
+   "de-de": "Kern des Abgrunds",
+   "id-id": "Inti Jurang",
+   "ja-jp": "深淵の中心",
+   "ko-kr": "심연의 중심",
+   "pl-pl": "Rdzeń Otchłani",
+   "pt-br": "Núcleo do Abismo",
+   "ru-ru": "Ядро бездны",
+   "es-es": "Núcleo del Abismo",
+   "th-th": "แก่นกลางเหว",
+   "tr-tr": "Uçurumun Merkezi",
+   "uk-ua": "Ядро безодні",
+   "vi-vn": "Trung tâm Vực thẳm"
+  },
+  "type": "NORMAL",
+  "difficulty": "NIGHTMARE",
+  "act": 3,
+  "stageNo": 9,
+  "stageLevel": 52,
+  "nextStageKey": 2310,
+  "waveAmount": 23,
+  "waveMonsterAmount": 15,
+  "monsters": [
+   {
+    "monster": "30084",
+    "weight": 1000
+   },
+   {
+    "monster": "30111",
+    "weight": 1000
+   },
+   {
+    "monster": "30051",
+    "weight": 700
+   },
+   {
+    "monster": "30101",
+    "weight": 500
+   },
+   {
+    "monster": "30102",
+    "weight": 200
+   },
+   {
+    "monster": "30103",
+    "weight": 400
+   }
+  ],
+  "bossMonsterKey": 20111,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 15
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 150
+  },
+  "firstClearDropKey": 9200320,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 3500,
+   "hp": 99470,
+   "gold": 10850,
+   "exp": 206400
+  }
+ },
+ {
+  "key": 2310,
+  "name": "Hell Command Chamber",
+  "names": {
+   "zh-hans": "地狱指挥室",
+   "zh-hant": "地獄指揮室",
+   "en-us": "Hell Command Chamber",
+   "fr-fr": "Salle de Commandement Infernale",
+   "de-de": "Höllen-Kommandokammer",
+   "id-id": "Ruang Komando Neraka",
+   "ja-jp": "地獄の執務室",
+   "ko-kr": "지옥의 집무실",
+   "pl-pl": "Komnata Dowodzenia Piekła",
+   "pt-br": "Sala de Comando do Inferno",
+   "ru-ru": "Командный зал ада",
+   "es-es": "Cámara de Mando del Infierno",
+   "th-th": "ห้องบัญชาการนรก",
+   "tr-tr": "Cehennem Komuta Odası",
+   "uk-ua": "Командна зала пекла",
+   "vi-vn": "Phòng Chỉ huy Địa ngục"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "NIGHTMARE",
+  "act": 3,
+  "stageNo": 10,
+  "stageLevel": 52,
+  "nextStageKey": 3101,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 30902,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930501,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190002,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 3500,
+   "hp": 99470,
+   "gold": 10850,
+   "exp": 206400
+  }
+ },
+ {
+  "key": 3101,
+  "name": "Pasture",
+  "names": {
+   "zh-hans": "牧场",
+   "zh-hant": "牧場",
+   "en-us": "Pasture",
+   "fr-fr": "Pâturage",
+   "de-de": "Weide",
+   "id-id": "Padang Rumput",
+   "ja-jp": "牧草地",
+   "ko-kr": "목초지",
+   "pl-pl": "Pastwisko",
+   "pt-br": "Pasto",
+   "ru-ru": "Пастбище",
+   "es-es": "Pasto",
+   "th-th": "ทุ่งหญ้า",
+   "tr-tr": "Otlak",
+   "uk-ua": "Пасовище",
+   "vi-vn": "Đồng cỏ"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 1,
+  "stageNo": 1,
+  "stageLevel": 53,
+  "nextStageKey": 3102,
+  "waveAmount": 24,
+  "waveMonsterAmount": 15,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20024,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 3755,
+   "hp": 103970,
+   "gold": 11310,
+   "exp": 215600
+  }
+ },
+ {
+  "key": 3102,
+  "name": "Shadow Meadow",
+  "names": {
+   "zh-hans": "阴影草原",
+   "zh-hant": "陰影草原",
+   "en-us": "Shadow Meadow",
+   "fr-fr": "Prairie d'Ombre",
+   "de-de": "Schattenwiese",
+   "id-id": "Padang Bayangan",
+   "ja-jp": "影の草原",
+   "ko-kr": "그림자 초원",
+   "pl-pl": "Łąka Cieni",
+   "pt-br": "Prado Sombrio",
+   "ru-ru": "Теневая поляна",
+   "es-es": "Prado Sombrío",
+   "th-th": "ทุ่งหญ้าเงา",
+   "tr-tr": "Gölge Çayırı",
+   "uk-ua": "Тінисті луки",
+   "vi-vn": "Đồng cỏ Bóng"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 1,
+  "stageNo": 2,
+  "stageLevel": 54,
+  "nextStageKey": 3103,
+  "waveAmount": 24,
+  "waveMonsterAmount": 15,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20021,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 4030,
+   "hp": 108570,
+   "gold": 11780,
+   "exp": 225000
+  }
+ },
+ {
+  "key": 3103,
+  "name": "Wasteland",
+  "names": {
+   "zh-hans": "荒野",
+   "zh-hant": "荒野",
+   "en-us": "Wasteland",
+   "fr-fr": "Terre Désolée",
+   "de-de": "Ödland",
+   "id-id": "Tanah Tandus",
+   "ja-jp": "荒れ地",
+   "ko-kr": "황무지",
+   "pl-pl": "Pustkowia",
+   "pt-br": "Terra Devastada",
+   "ru-ru": "Пустошь",
+   "es-es": "Tierra Baldía",
+   "th-th": "ดินแดนเสื่อมโทรม",
+   "tr-tr": "Çorak Arazi",
+   "uk-ua": "Пустка",
+   "vi-vn": "Vùng đất hoang"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 1,
+  "stageNo": 3,
+  "stageLevel": 55,
+  "nextStageKey": 3104,
+  "waveAmount": 25,
+  "waveMonsterAmount": 15,
+  "monsters": [
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20031,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 4325,
+   "hp": 113270,
+   "gold": 12260,
+   "exp": 234600
+  }
+ },
+ {
+  "key": 3104,
+  "name": "Eerie Canyon",
+  "names": {
+   "zh-hans": "阴森峡谷",
+   "zh-hant": "陰森峽谷",
+   "en-us": "Eerie Canyon",
+   "fr-fr": "Canyon Sinistre",
+   "de-de": "Unheimliche Schlucht",
+   "id-id": "Ngarai Mengerikan",
+   "ja-jp": "不気味な峡谷",
+   "ko-kr": "으스스한 협곡",
+   "pl-pl": "Upiorna Dolina",
+   "pt-br": "Desfiladeiro Sinistro",
+   "ru-ru": "Жуткий каньон",
+   "es-es": "Cañón Escalofriante",
+   "th-th": "หุบเขาอ้าง",
+   "tr-tr": "Ürkütücü Kanyon",
+   "uk-ua": "Моторошний каньйон",
+   "vi-vn": "Hẻm núi rùng rợn"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 1,
+  "stageNo": 4,
+  "stageLevel": 56,
+  "nextStageKey": 3105,
+  "waveAmount": 25,
+  "waveMonsterAmount": 15,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   },
+   {
+    "monster": "10041",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20041,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 4640,
+   "hp": 118070,
+   "gold": 12750,
+   "exp": 244400
+  }
+ },
+ {
+  "key": 3105,
+  "name": "Burning Village Entrance",
+  "names": {
+   "zh-hans": "燃烧村庄入口",
+   "zh-hant": "燃燒村莊入口",
+   "en-us": "Burning Village Entrance",
+   "fr-fr": "Entrée du Village en Flammes",
+   "de-de": "Brennender Dorfeingang",
+   "id-id": "Pintu Desa Terbakar",
+   "ja-jp": "燃える村の入口",
+   "ko-kr": "불타는 마을 입구",
+   "pl-pl": "Wejście do Płonącej Wioski",
+   "pt-br": "Entrada da Vila em Chamas",
+   "ru-ru": "Вход в горящую деревню",
+   "es-es": "Entrada del Pueblo Ardiente",
+   "th-th": "ทางเข้าหมู่บ้านเพลิง",
+   "tr-tr": "Yanan Köy Girişi",
+   "uk-ua": "Вхід до палаючого села",
+   "vi-vn": "Lối vào Làng Cháy"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 1,
+  "stageNo": 5,
+  "stageLevel": 57,
+  "nextStageKey": 3106,
+  "waveAmount": 25,
+  "waveMonsterAmount": 15,
+  "monsters": [
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   },
+   {
+    "monster": "10041",
+    "weight": 1000
+   },
+   {
+    "monster": "10042",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20071,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 4975,
+   "hp": 122970,
+   "gold": 13250,
+   "exp": 254400
+  }
+ },
+ {
+  "key": 3106,
+  "name": "Rumstreet Square",
+  "names": {
+   "zh-hans": "朗姆街广场",
+   "zh-hant": "蘭姆街廣場",
+   "en-us": "Rumstreet Square",
+   "fr-fr": "Place de Rumstreet",
+   "de-de": "Rumstraßenplatz",
+   "id-id": "Alun-alun Rumstreet",
+   "ja-jp": "ラムストリート広場",
+   "ko-kr": "럼스트리트 광장",
+   "pl-pl": "Plac Rumstreet",
+   "pt-br": "Praça Rumstreet",
+   "ru-ru": "Площадь Рамстрит",
+   "es-es": "Plaza Rumstreet",
+   "th-th": "จัตุรัสรัมสตรีท",
+   "tr-tr": "Rumstreet Meydanı",
+   "uk-ua": "Площа Рамстріт",
+   "vi-vn": "Quảng trường Rumstreet"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 1,
+  "stageNo": 6,
+  "stageLevel": 58,
+  "nextStageKey": 3107,
+  "waveAmount": 25,
+  "waveMonsterAmount": 15,
+  "monsters": [
+   {
+    "monster": "10041",
+    "weight": 1000
+   },
+   {
+    "monster": "10042",
+    "weight": 1000
+   },
+   {
+    "monster": "10043",
+    "weight": 600
+   },
+   {
+    "monster": "10011",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20081,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 5330,
+   "hp": 127970,
+   "gold": 13760,
+   "exp": 264600
+  }
+ },
+ {
+  "key": 3107,
+  "name": "City Outskirts",
+  "names": {
+   "zh-hans": "城市外围",
+   "zh-hant": "城市外圍",
+   "en-us": "City Outskirts",
+   "fr-fr": "Périphérie de la Ville",
+   "de-de": "Stadtrand",
+   "id-id": "Pinggir Kota",
+   "ja-jp": "街の外れ",
+   "ko-kr": "도시 외곽",
+   "pl-pl": "Przedmieścia",
+   "pt-br": "Arredores da Cidade",
+   "ru-ru": "Окраины города",
+   "es-es": "Afueras de la Ciudad",
+   "th-th": "ชานเมือง",
+   "tr-tr": "Şehir Kenarı",
+   "uk-ua": "Околиці міста",
+   "vi-vn": "Ngoại ô"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 1,
+  "stageNo": 7,
+  "stageLevel": 59,
+  "nextStageKey": 3108,
+  "waveAmount": 25,
+  "waveMonsterAmount": 16,
+  "monsters": [
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20023,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 5705,
+   "hp": 133070,
+   "gold": 14280,
+   "exp": 275000
+  }
+ },
+ {
+  "key": 3108,
+  "name": "Cemetery",
+  "names": {
+   "zh-hans": "公墓",
+   "zh-hant": "公墓",
+   "en-us": "Cemetery",
+   "fr-fr": "Cimetière",
+   "de-de": "Friedhof",
+   "id-id": "Pemakaman",
+   "ja-jp": "墓地",
+   "ko-kr": "공동묘지",
+   "pl-pl": "Cmentarz",
+   "pt-br": "Cemitério",
+   "ru-ru": "Кладбище",
+   "es-es": "Cementerio",
+   "th-th": "สุสาน",
+   "tr-tr": "Mezarlık",
+   "uk-ua": "Кладовище",
+   "vi-vn": "Nghĩa trang"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 1,
+  "stageNo": 8,
+  "stageLevel": 59,
+  "nextStageKey": 3109,
+  "waveAmount": 25,
+  "waveMonsterAmount": 16,
+  "monsters": [
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10053",
+    "weight": 500
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20061,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 5705,
+   "hp": 133070,
+   "gold": 14280,
+   "exp": 275000
+  }
+ },
+ {
+  "key": 3109,
+  "name": "Cursed Land",
+  "names": {
+   "zh-hans": "诅咒之地",
+   "zh-hant": "詛咒之地",
+   "en-us": "Cursed Land",
+   "fr-fr": "Terre maudite",
+   "de-de": "Verfluchtes Land",
+   "id-id": "Tanah Terkutuk",
+   "ja-jp": "呪われた大地",
+   "ko-kr": "저주받은 대지",
+   "pl-pl": "Przeklęta kraina",
+   "pt-br": "Terra amaldiçoada",
+   "ru-ru": "Проклятая земля",
+   "es-es": "Tierra maldita",
+   "th-th": "ดินแดนต้องสาป",
+   "tr-tr": "Lanetli toprak",
+   "uk-ua": "Прокляті землі",
+   "vi-vn": "Vùng đất nguyền rủa"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 1,
+  "stageNo": 9,
+  "stageLevel": 60,
+  "nextStageKey": 3110,
+  "waveAmount": 25,
+  "waveMonsterAmount": 16,
+  "monsters": [
+   {
+    "monster": "10042",
+    "weight": 1000
+   },
+   {
+    "monster": "10043",
+    "weight": 600
+   },
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10053",
+    "weight": 500
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20111,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": 9200420,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 6085,
+   "hp": 138270,
+   "gold": 14810,
+   "exp": 285600
+  }
+ },
+ {
+  "key": 3110,
+  "name": "Throne of Darkness",
+  "names": {
+   "zh-hans": "黑暗王座",
+   "zh-hant": "黑暗王座",
+   "en-us": "Throne of Darkness",
+   "fr-fr": "Trône des Ténèbres",
+   "de-de": "Thron der Finsternis",
+   "id-id": "Singgasana Kegelapan",
+   "ja-jp": "闇の玉座",
+   "ko-kr": "어둠의 왕좌",
+   "pl-pl": "Tron Ciemności",
+   "pt-br": "Trono das Trevas",
+   "ru-ru": "Трон тьмы",
+   "es-es": "Trono de la Oscuridad",
+   "th-th": "บัลลังก์แห่งความมืด",
+   "tr-tr": "Karanlığın Tahtı",
+   "uk-ua": "Трон темряви",
+   "vi-vn": "Ngai Bóng Tối"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "HELL",
+  "act": 1,
+  "stageNo": 10,
+  "stageLevel": 60,
+  "nextStageKey": 3201,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 10903,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930601,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190003,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 6085,
+   "hp": 138270,
+   "gold": 14810,
+   "exp": 285600
+  }
+ },
+ {
+  "key": 3201,
+  "name": "Oasis Road",
+  "names": {
+   "zh-hans": "绿洲路",
+   "zh-hant": "綠洲路",
+   "en-us": "Oasis Road",
+   "fr-fr": "Route de l'Oasis",
+   "de-de": "Oasisweg",
+   "id-id": "Jalan Oase",
+   "ja-jp": "オアシスの道",
+   "ko-kr": "오아시스 길목",
+   "pl-pl": "Droga Oazy",
+   "pt-br": "Caminho do Oásis",
+   "ru-ru": "Путь оазиса",
+   "es-es": "Camino del Oasis",
+   "th-th": "เส้นทางโอเอซิส",
+   "tr-tr": "Vaha Yolu",
+   "uk-ua": "Шлях оазису",
+   "vi-vn": "Đường Ốc đảo"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 2,
+  "stageNo": 1,
+  "stageLevel": 61,
+  "nextStageKey": 3202,
+  "waveAmount": 26,
+  "waveMonsterAmount": 16,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20024,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 6515,
+   "hp": 143570,
+   "gold": 15350,
+   "exp": 296400
+  }
+ },
+ {
+  "key": 3202,
+  "name": "Sandstorm Valley",
+  "names": {
+   "zh-hans": "沙风暴谷",
+   "zh-hant": "沙風暴谷",
+   "en-us": "Sandstorm Valley",
+   "fr-fr": "Vallée de la Tempête de Sable",
+   "de-de": "Sandsturmtal",
+   "id-id": "Lembah Badai Pasir",
+   "ja-jp": "砂嵐の谷",
+   "ko-kr": "모래바람 골짜기",
+   "pl-pl": "Dolina Burzy Piaskowej",
+   "pt-br": "Vale da Tempestade de Areia",
+   "ru-ru": "Долина песчаной бури",
+   "es-es": "Valle de la Tormenta de Arena",
+   "th-th": "หุบเขาพายุทราย",
+   "tr-tr": "Kum Fırtınası Vadisi",
+   "uk-ua": "Долина піщаної бурі",
+   "vi-vn": "Thung lũng Bão Cát"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 2,
+  "stageNo": 2,
+  "stageLevel": 62,
+  "nextStageKey": 3203,
+  "waveAmount": 26,
+  "waveMonsterAmount": 16,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   },
+   {
+    "monster": "20024",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20021,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 6995,
+   "hp": 148970,
+   "gold": 15900,
+   "exp": 307400
+  }
+ },
+ {
+  "key": 3203,
+  "name": "Desert Underground Cave",
+  "names": {
+   "zh-hans": "沙漠地下洞窟",
+   "zh-hant": "沙漠地下洞窟",
+   "en-us": "Desert Underground Cave",
+   "fr-fr": "Grotte Souterraine du Désert",
+   "de-de": "Wüsten-Untergrundhöhle",
+   "id-id": "Gua Bawah Padang Pasir",
+   "ja-jp": "砂漠地下洞窟",
+   "ko-kr": "사막 지하 동굴",
+   "pl-pl": "Pustynna Jaskinia Podziemna",
+   "pt-br": "Caverna Subterrânea do Deserto",
+   "ru-ru": "Пустынная подземная пещера",
+   "es-es": "Cueva Subterránea del Desierto",
+   "th-th": "ถ้ำใต้ดินทะเลทราย",
+   "tr-tr": "Çöl Yeraltı Mağarası",
+   "uk-ua": "Пустельна підземна печера",
+   "vi-vn": "Hang Ngầm Sa mạc"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 2,
+  "stageNo": 3,
+  "stageLevel": 63,
+  "nextStageKey": 3204,
+  "waveAmount": 26,
+  "waveMonsterAmount": 16,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20023",
+    "weight": 1000
+   },
+   {
+    "monster": "20041",
+    "weight": 700
+   },
+   {
+    "monster": "10031",
+    "weight": 300
+   }
+  ],
+  "bossMonsterKey": 20031,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 7525,
+   "hp": 154470,
+   "gold": 16460,
+   "exp": 318600
+  }
+ },
+ {
+  "key": 3204,
+  "name": "Bug Nest",
+  "names": {
+   "zh-hans": "虫巢",
+   "zh-hant": "蟲巢",
+   "en-us": "Bug Nest",
+   "fr-fr": "Nid d'Insectes",
+   "de-de": "Insektennest",
+   "id-id": "Sarang Serangga",
+   "ja-jp": "虫の巣",
+   "ko-kr": "벌레 둥지",
+   "pl-pl": "Gniazdo Robactwa",
+   "pt-br": "Ninho de Insetos",
+   "ru-ru": "Гнездо жуков",
+   "es-es": "Nido de Insectos",
+   "th-th": "รังแมลง",
+   "tr-tr": "Böcek Yuvası",
+   "uk-ua": "Гніздо комах",
+   "vi-vn": "Tổ Bọ"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 2,
+  "stageNo": 4,
+  "stageLevel": 64,
+  "nextStageKey": 3205,
+  "waveAmount": 26,
+  "waveMonsterAmount": 16,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20023",
+    "weight": 1000
+   },
+   {
+    "monster": "20041",
+    "weight": 800
+   },
+   {
+    "monster": "20042",
+    "weight": 500
+   },
+   {
+    "monster": "20051",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20041,
+  "monsterDrop": {
+   "itemKey": 910501,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920501,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 8105,
+   "hp": 160070,
+   "gold": 17030,
+   "exp": 330000
+  }
+ },
+ {
+  "key": 3205,
+  "name": "Scorching Dunes",
+  "names": {
+   "zh-hans": "炽热沙丘",
+   "zh-hant": "熾熱沙丘",
+   "en-us": "Scorching Dunes",
+   "fr-fr": "Dunes Brûlantes",
+   "de-de": "Brennende Dünen",
+   "id-id": "Bukit Pasir Membara",
+   "ja-jp": "灼熱の砂丘",
+   "ko-kr": "작열의 사구",
+   "pl-pl": "Palące Wydmy",
+   "pt-br": "Dunas Escaldantes",
+   "ru-ru": "Обжигающие дюны",
+   "es-es": "Dunas Abrasadoras",
+   "th-th": "เนินทรายร้อน",
+   "tr-tr": "Yanan Kumullar",
+   "uk-ua": "Палючі дюни",
+   "vi-vn": "Đụn cát Cháy bỏng"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 2,
+  "stageNo": 5,
+  "stageLevel": 65,
+  "nextStageKey": 3206,
+  "waveAmount": 26,
+  "waveMonsterAmount": 16,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   },
+   {
+    "monster": "20051",
+    "weight": 2000
+   },
+   {
+    "monster": "20041",
+    "weight": 200
+   }
+  ],
+  "bossMonsterKey": 20071,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 8735,
+   "hp": 165770,
+   "gold": 17610,
+   "exp": 341600
+  }
+ },
+ {
+  "key": 3206,
+  "name": "Sunset Ruins",
+  "names": {
+   "zh-hans": "夕阳废墟",
+   "zh-hant": "夕陽廢墟",
+   "en-us": "Sunset Ruins",
+   "fr-fr": "Ruines du Crépuscule",
+   "de-de": "Sonnenuntergangsruinen",
+   "id-id": "Reruntuhan Senja",
+   "ja-jp": "夕暮れの廃墟",
+   "ko-kr": "석양의 폐허",
+   "pl-pl": "Ruiny Zachodu",
+   "pt-br": "Ruínas do Pôr do Sol",
+   "ru-ru": "Руины заката",
+   "es-es": "Ruinas del Crepúsculo",
+   "th-th": "ซากปรักหักพังยามอาทิตย์ตก",
+   "tr-tr": "Gün Batımı Harabeleri",
+   "uk-ua": "Руїни заходу",
+   "vi-vn": "Phế tích Hoàng hôn"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 2,
+  "stageNo": 6,
+  "stageLevel": 66,
+  "nextStageKey": 3207,
+  "waveAmount": 26,
+  "waveMonsterAmount": 16,
+  "monsters": [
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20024",
+    "weight": 1000
+   },
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   },
+   {
+    "monster": "20041",
+    "weight": 300
+   }
+  ],
+  "bossMonsterKey": 20081,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 9415,
+   "hp": 171570,
+   "gold": 18200,
+   "exp": 353400
+  }
+ },
+ {
+  "key": 3207,
+  "name": "Midnight Sands",
+  "names": {
+   "zh-hans": "午夜沙漠",
+   "zh-hant": "午夜沙漠",
+   "en-us": "Midnight Sands",
+   "fr-fr": "Sables de Minuit",
+   "de-de": "Mitternachtswüste",
+   "id-id": "Pasir Tengah Malam",
+   "ja-jp": "真夜中の砂漠",
+   "ko-kr": "한밤의 사막",
+   "pl-pl": "Piaski Północy",
+   "pt-br": "Areias da Meia-Noite",
+   "ru-ru": "Полуночные пески",
+   "es-es": "Arenas de Medianoche",
+   "th-th": "ทรายเที่ยงคืน",
+   "tr-tr": "Gece Yarısı Kumları",
+   "uk-ua": "Піски півночі",
+   "vi-vn": "Cát Nửa đêm"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 2,
+  "stageNo": 7,
+  "stageLevel": 67,
+  "nextStageKey": 3208,
+  "waveAmount": 26,
+  "waveMonsterAmount": 17,
+  "monsters": [
+   {
+    "monster": "20081",
+    "weight": 300
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   },
+   {
+    "monster": "20042",
+    "weight": 500
+   },
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20023",
+    "weight": 700
+   },
+   {
+    "monster": "10052",
+    "weight": 550
+   }
+  ],
+  "bossMonsterKey": 20023,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 10145,
+   "hp": 177470,
+   "gold": 18800,
+   "exp": 365400
+  }
+ },
+ {
+  "key": 3208,
+  "name": "Sacred Tomb",
+  "names": {
+   "zh-hans": "神圣墓穴",
+   "zh-hant": "神聖墓穴",
+   "en-us": "Sacred Tomb",
+   "fr-fr": "Tombeau Sacré",
+   "de-de": "Heiliges Grab",
+   "id-id": "Makam Suci",
+   "ja-jp": "神聖なる墓",
+   "ko-kr": "신성한 무덤",
+   "pl-pl": "Święty Grób",
+   "pt-br": "Túmulo Sagrado",
+   "ru-ru": "Священная гробница",
+   "es-es": "Tumba Sagrada",
+   "th-th": "สุสานศักดิ์สิทธิ์",
+   "tr-tr": "Kutsal Mezar",
+   "uk-ua": "Священна гробниця",
+   "vi-vn": "Lăng Thần Thánh"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 2,
+  "stageNo": 8,
+  "stageLevel": 68,
+  "nextStageKey": 3209,
+  "waveAmount": 26,
+  "waveMonsterAmount": 17,
+  "monsters": [
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20062",
+    "weight": 1000
+   },
+   {
+    "monster": "20091",
+    "weight": 1000
+   },
+   {
+    "monster": "20101",
+    "weight": 1000
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   },
+   {
+    "monster": "20042",
+    "weight": 600
+   }
+  ],
+  "bossMonsterKey": 20061,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 10925,
+   "hp": 183470,
+   "gold": 19410,
+   "exp": 377600
+  }
+ },
+ {
+  "key": 3209,
+  "name": "Pharaoh's Crypt",
+  "names": {
+   "zh-hans": "法老陵墓",
+   "zh-hant": "法老陵墓",
+   "en-us": "Pharaoh's Crypt",
+   "fr-fr": "Crypte du Pharaon",
+   "de-de": "Pharaonengruft",
+   "id-id": "Ruang Mayat Firaun",
+   "ja-jp": "ファラオの墓室",
+   "ko-kr": "파라오의 묘실",
+   "pl-pl": "Krypta Faraona",
+   "pt-br": "Cripta do Faraó",
+   "ru-ru": "Склеп фараона",
+   "es-es": "Cripta del Faraón",
+   "th-th": "ห้องสุสานฟาโรห์",
+   "tr-tr": "Firavunun Mezarı",
+   "uk-ua": "Склеп фараона",
+   "vi-vn": "Hầm mộ Pharaoh"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 2,
+  "stageNo": 9,
+  "stageLevel": 69,
+  "nextStageKey": 3210,
+  "waveAmount": 26,
+  "waveMonsterAmount": 17,
+  "monsters": [
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20062",
+    "weight": 1000
+   },
+   {
+    "monster": "20091",
+    "weight": 1000
+   },
+   {
+    "monster": "20101",
+    "weight": 1000
+   },
+   {
+    "monster": "20111",
+    "weight": 1000
+   },
+   {
+    "monster": "20081",
+    "weight": 500
+   }
+  ],
+  "bossMonsterKey": 20111,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": 9200420,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 11755,
+   "hp": 189570,
+   "gold": 20030,
+   "exp": 390000
+  }
+ },
+ {
+  "key": 3210,
+  "name": "Pharaoh's Underchannel",
+  "names": {
+   "zh-hans": "法老地下水道",
+   "zh-hant": "法老地下水道",
+   "en-us": "Pharaoh's Underchannel",
+   "fr-fr": "Canal Souterrain du Pharaon",
+   "de-de": "Unterkanal des Pharaos",
+   "id-id": "Saluran Bawah Firaun",
+   "ja-jp": "ファラオの地下水路",
+   "ko-kr": "파라오의 지하수도",
+   "pl-pl": "Podziemny Kanał Faraona",
+   "pt-br": "Canal Subterrâneo do Faraó",
+   "ru-ru": "Подземный канал фараона",
+   "es-es": "Canal Subterráneo del Faraón",
+   "th-th": "ทางน้ำใต้ดินฟาโรห์",
+   "tr-tr": "Firavunun Yeraltı Kanalı",
+   "uk-ua": "Підземний канал фараона",
+   "vi-vn": "Cống Ngầm Pharaoh"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "HELL",
+  "act": 2,
+  "stageNo": 10,
+  "stageLevel": 69,
+  "nextStageKey": 3301,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 20903,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930651,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190003,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 11755,
+   "hp": 189570,
+   "gold": 20030,
+   "exp": 390000
+  }
+ },
+ {
+  "key": 3301,
+  "name": "Snowbound Outpost",
+  "names": {
+   "zh-hans": "雪原前哨",
+   "zh-hant": "雪原前哨",
+   "en-us": "Snowbound Outpost",
+   "fr-fr": "Avant-poste Enneigé",
+   "de-de": "Verschneiter Außenposten",
+   "id-id": "Pos Bersalju",
+   "ja-jp": "雪原の前哨地",
+   "ko-kr": "설원의 전초기지",
+   "pl-pl": "Zaśnieżona Placówka",
+   "pt-br": "Posto Avançado Nevado",
+   "ru-ru": "Заснеженный аванпост",
+   "es-es": "Puesto Cubierto de Nieve",
+   "th-th": "ด่านหน้าหิมะ",
+   "tr-tr": "Karlı İleri Karakol",
+   "uk-ua": "Засніжений форпост",
+   "vi-vn": "Tiền đồn Tuyết"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 3,
+  "stageNo": 1,
+  "stageLevel": 70,
+  "nextStageKey": 3302,
+  "waveAmount": 27,
+  "waveMonsterAmount": 17,
+  "monsters": [
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30012",
+    "weight": 700
+   },
+   {
+    "monster": "30013",
+    "weight": 500
+   }
+  ],
+  "bossMonsterKey": 20024,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 12635,
+   "hp": 195770,
+   "gold": 20660,
+   "exp": 402600
+  }
+ },
+ {
+  "key": 3302,
+  "name": "Frozen Battlefield",
+  "names": {
+   "zh-hans": "冰封战场",
+   "zh-hant": "冰封戰場",
+   "en-us": "Frozen Battlefield",
+   "fr-fr": "Champ de Bataille Gelé",
+   "de-de": "Gefrorenes Schlachtfeld",
+   "id-id": "Medan Beku",
+   "ja-jp": "凍結した戦場",
+   "ko-kr": "얼어붙은 전장",
+   "pl-pl": "Zamarznięte Pole Bitwy",
+   "pt-br": "Campo de Batalha Congelado",
+   "ru-ru": "Замёрзшее поле битвы",
+   "es-es": "Campo de Batalla Congelado",
+   "th-th": "สนามรบเยือกแข็ง",
+   "tr-tr": "Donmuş Savaş Alanı",
+   "uk-ua": "Замерзле поле битви",
+   "vi-vn": "Chiến trường Đóng băng"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 3,
+  "stageNo": 2,
+  "stageLevel": 71,
+  "nextStageKey": 3303,
+  "waveAmount": 27,
+  "waveMonsterAmount": 17,
+  "monsters": [
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30012",
+    "weight": 700
+   },
+   {
+    "monster": "30013",
+    "weight": 500
+   },
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30021",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20021,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 13565,
+   "hp": 202070,
+   "gold": 21300,
+   "exp": 415400
+  }
+ },
+ {
+  "key": 3303,
+  "name": "Glacial Cave Entrance",
+  "names": {
+   "zh-hans": "冰川洞窟入口",
+   "zh-hant": "冰川洞窟入口",
+   "en-us": "Glacial Cave Entrance",
+   "fr-fr": "Entrée de la Grotte Glaciaire",
+   "de-de": "Gletscherhöhleneingang",
+   "id-id": "Pintu Gua Gletser",
+   "ja-jp": "氷河洞窟の入口",
+   "ko-kr": "빙하 동굴 입구",
+   "pl-pl": "Wejście do Lodowcowej Jaskini",
+   "pt-br": "Entrada da Caverna Glacial",
+   "ru-ru": "Вход в ледниковую пещеру",
+   "es-es": "Entrada a la Cueva Glacial",
+   "th-th": "ทางเข้าถ้ำธารน้ำแข็ง",
+   "tr-tr": "Buzul Mağarası Girişi",
+   "uk-ua": "Вхід до льодовикової печери",
+   "vi-vn": "Lối vào Hang Băng"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 3,
+  "stageNo": 3,
+  "stageLevel": 72,
+  "nextStageKey": 3304,
+  "waveAmount": 27,
+  "waveMonsterAmount": 17,
+  "monsters": [
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30042",
+    "weight": 700
+   },
+   {
+    "monster": "30044",
+    "weight": 500
+   },
+   {
+    "monster": "30021",
+    "weight": 200
+   },
+   {
+    "monster": "30013",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20031,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 14545,
+   "hp": 208470,
+   "gold": 21950,
+   "exp": 428400
+  }
+ },
+ {
+  "key": 3304,
+  "name": "Frozen Glacier Cavern",
+  "names": {
+   "zh-hans": "冰川洞窟深处",
+   "zh-hant": "冰川洞窟深處",
+   "en-us": "Frozen Glacier Cavern",
+   "fr-fr": "Caverne Glaciaire Gelée",
+   "de-de": "Eisige Gletscherkammer",
+   "id-id": "Gua Gletser Beku",
+   "ja-jp": "凍りつく氷河洞窟",
+   "ko-kr": "빙하 동굴 심부",
+   "pl-pl": "Zamrożona Jaskinia Lodowca",
+   "pt-br": "Caverna Glacial Congelada",
+   "ru-ru": "Замёрзшая ледниковая пещера",
+   "es-es": "Caverna Glacial Congelada",
+   "th-th": "ถ้ำธารน้ำแข็งลึก",
+   "tr-tr": "Donmuş Buzul Mağarası",
+   "uk-ua": "Замерзла льодовикова печера",
+   "vi-vn": "Hang Sông Băng Sâu"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 3,
+  "stageNo": 4,
+  "stageLevel": 73,
+  "nextStageKey": 3305,
+  "waveAmount": 27,
+  "waveMonsterAmount": 17,
+  "monsters": [
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30042",
+    "weight": 700
+   },
+   {
+    "monster": "30044",
+    "weight": 500
+   },
+   {
+    "monster": "30021",
+    "weight": 400
+   },
+   {
+    "monster": "30051",
+    "weight": 1000
+   },
+   {
+    "monster": "30043",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20041,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 15625,
+   "hp": 214970,
+   "gold": 22610,
+   "exp": 441600
+  }
+ },
+ {
+  "key": 3305,
+  "name": "Hell Gate",
+  "names": {
+   "zh-hans": "地狱之门",
+   "zh-hant": "地獄之門",
+   "en-us": "Hell Gate",
+   "fr-fr": "Porte de l'Enfer",
+   "de-de": "Höllenpforte",
+   "id-id": "Gerbang Neraka",
+   "ja-jp": "地獄の関門",
+   "ko-kr": "지옥 관문",
+   "pl-pl": "Piekielna Brama",
+   "pt-br": "Portão do Inferno",
+   "ru-ru": "Врата ада",
+   "es-es": "Puerta del Infierno",
+   "th-th": "ประตูนรก",
+   "tr-tr": "Cehennem Kapısı",
+   "uk-ua": "Врата пекла",
+   "vi-vn": "Cổng Địa ngục"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 3,
+  "stageNo": 5,
+  "stageLevel": 74,
+  "nextStageKey": 3306,
+  "waveAmount": 27,
+  "waveMonsterAmount": 17,
+  "monsters": [
+   {
+    "monster": "30031",
+    "weight": 700
+   },
+   {
+    "monster": "30051",
+    "weight": 700
+   },
+   {
+    "monster": "30044",
+    "weight": 500
+   },
+   {
+    "monster": "30043",
+    "weight": 1000
+   },
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30012",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20071,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 16805,
+   "hp": 221570,
+   "gold": 23280,
+   "exp": 455000
+  }
+ },
+ {
+  "key": 3306,
+  "name": "Burning Ravine",
+  "names": {
+   "zh-hans": "燃烧峡谷",
+   "zh-hant": "燃燒峽谷",
+   "en-us": "Burning Ravine",
+   "fr-fr": "Ravin Brûlant",
+   "de-de": "Brennende Schlucht",
+   "id-id": "Jurang Membara",
+   "ja-jp": "燃える峡谷",
+   "ko-kr": "불타는 협곡",
+   "pl-pl": "Płonący Jar",
+   "pt-br": "Desfiladeiro Ardente",
+   "ru-ru": "Горящее ущелье",
+   "es-es": "Barranco Ardiente",
+   "th-th": "หุบเขาเพลิง",
+   "tr-tr": "Yanan Uçurum",
+   "uk-ua": "Палаюча ущелина",
+   "vi-vn": "Vực Cháy"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 3,
+  "stageNo": 6,
+  "stageLevel": 75,
+  "nextStageKey": 3307,
+  "waveAmount": 27,
+  "waveMonsterAmount": 17,
+  "monsters": [
+   {
+    "monster": "30061",
+    "weight": 1000
+   },
+   {
+    "monster": "30081",
+    "weight": 700
+   },
+   {
+    "monster": "30082",
+    "weight": 500
+   },
+   {
+    "monster": "30084",
+    "weight": 300
+   },
+   {
+    "monster": "30091",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20081,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 18085,
+   "hp": 228270,
+   "gold": 23960,
+   "exp": 468600
+  }
+ },
+ {
+  "key": 3307,
+  "name": "Plains of Torment",
+  "names": {
+   "zh-hans": "痛苦平原",
+   "zh-hant": "痛苦平原",
+   "en-us": "Plains of Torment",
+   "fr-fr": "Plaines du Tourment",
+   "de-de": "Ebenen der Qual",
+   "id-id": "Dataran Penderitaan",
+   "ja-jp": "苦痛の平原",
+   "ko-kr": "고통의 벌판",
+   "pl-pl": "Pola Udręki",
+   "pt-br": "Planícies do Tormento",
+   "ru-ru": "Равнины мучений",
+   "es-es": "Llanuras del Tormento",
+   "th-th": "ทุ่งทรมาน",
+   "tr-tr": "Azap Ovaları",
+   "uk-ua": "Рівнини мук",
+   "vi-vn": "Đồng bằng Đau khổ"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 3,
+  "stageNo": 7,
+  "stageLevel": 76,
+  "nextStageKey": 3308,
+  "waveAmount": 27,
+  "waveMonsterAmount": 18,
+  "monsters": [
+   {
+    "monster": "30081",
+    "weight": 1000
+   },
+   {
+    "monster": "30082",
+    "weight": 700
+   },
+   {
+    "monster": "30083",
+    "weight": 500
+   },
+   {
+    "monster": "30084",
+    "weight": 600
+   },
+   {
+    "monster": "30071",
+    "weight": 1000
+   },
+   {
+    "monster": "30031",
+    "weight": 700
+   }
+  ],
+  "bossMonsterKey": 20023,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 19465,
+   "hp": 235070,
+   "gold": 24650,
+   "exp": 482400
+  }
+ },
+ {
+  "key": 3308,
+  "name": "Citadel of Ruin",
+  "names": {
+   "zh-hans": "毁灭要塞",
+   "zh-hant": "毀滅要塞",
+   "en-us": "Citadel of Ruin",
+   "fr-fr": "Citadelle de la Ruine",
+   "de-de": "Zitadelle des Untergangs",
+   "id-id": "Benteng Kehancuran",
+   "ja-jp": "破滅の要塞",
+   "ko-kr": "파멸의 성채",
+   "pl-pl": "Cytadela Zguby",
+   "pt-br": "Cidadela da Ruína",
+   "ru-ru": "Цитадель гибели",
+   "es-es": "Ciudadela de la Ruina",
+   "th-th": "ป้อมปราการแห่งความหายนะ",
+   "tr-tr": "Yıkım Kalesi",
+   "uk-ua": "Цитадель загибелі",
+   "vi-vn": "Thành lũy Hủy diệt"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 3,
+  "stageNo": 8,
+  "stageLevel": 76,
+  "nextStageKey": 3309,
+  "waveAmount": 27,
+  "waveMonsterAmount": 18,
+  "monsters": [
+   {
+    "monster": "30083",
+    "weight": 1000
+   },
+   {
+    "monster": "30111",
+    "weight": 700
+   },
+   {
+    "monster": "30051",
+    "weight": 500
+   },
+   {
+    "monster": "30101",
+    "weight": 700
+   },
+   {
+    "monster": "30102",
+    "weight": 700
+   },
+   {
+    "monster": "30103",
+    "weight": 700
+   }
+  ],
+  "bossMonsterKey": 20061,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 19465,
+   "hp": 235070,
+   "gold": 24650,
+   "exp": 482400
+  }
+ },
+ {
+  "key": 3309,
+  "name": "Core of the Abyss",
+  "names": {
+   "zh-hans": "深渊之核",
+   "zh-hant": "深淵之核",
+   "en-us": "Core of the Abyss",
+   "fr-fr": "Cœur de l'Abîme",
+   "de-de": "Kern des Abgrunds",
+   "id-id": "Inti Jurang",
+   "ja-jp": "深淵の中心",
+   "ko-kr": "심연의 중심",
+   "pl-pl": "Rdzeń Otchłani",
+   "pt-br": "Núcleo do Abismo",
+   "ru-ru": "Ядро бездны",
+   "es-es": "Núcleo del Abismo",
+   "th-th": "แก่นกลางเหว",
+   "tr-tr": "Uçurumun Merkezi",
+   "uk-ua": "Ядро безодні",
+   "vi-vn": "Trung tâm Vực thẳm"
+  },
+  "type": "NORMAL",
+  "difficulty": "HELL",
+  "act": 3,
+  "stageNo": 9,
+  "stageLevel": 77,
+  "nextStageKey": 3310,
+  "waveAmount": 27,
+  "waveMonsterAmount": 18,
+  "monsters": [
+   {
+    "monster": "30111",
+    "weight": 1000
+   },
+   {
+    "monster": "30051",
+    "weight": 700
+   },
+   {
+    "monster": "30101",
+    "weight": 700
+   },
+   {
+    "monster": "30102",
+    "weight": 700
+   },
+   {
+    "monster": "30103",
+    "weight": 700
+   },
+   {
+    "monster": "30104",
+    "weight": 500
+   }
+  ],
+  "bossMonsterKey": 20111,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 10
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 100
+  },
+  "firstClearDropKey": 9200420,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 20945,
+   "hp": 241970,
+   "gold": 25350,
+   "exp": 496400
+  }
+ },
+ {
+  "key": 3310,
+  "name": "Hell Command Chamber",
+  "names": {
+   "zh-hans": "地狱指挥室",
+   "zh-hant": "地獄指揮室",
+   "en-us": "Hell Command Chamber",
+   "fr-fr": "Salle de Commandement Infernale",
+   "de-de": "Höllen-Kommandokammer",
+   "id-id": "Ruang Komando Neraka",
+   "ja-jp": "地獄の執務室",
+   "ko-kr": "지옥의 집무실",
+   "pl-pl": "Komnata Dowodzenia Piekła",
+   "pt-br": "Sala de Comando do Inferno",
+   "ru-ru": "Командный зал ада",
+   "es-es": "Cámara de Mando del Infierno",
+   "th-th": "ห้องบัญชาการนรก",
+   "tr-tr": "Cehennem Komuta Odası",
+   "uk-ua": "Командна зала пекла",
+   "vi-vn": "Phòng Chỉ huy Địa ngục"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "HELL",
+  "act": 3,
+  "stageNo": 10,
+  "stageLevel": 77,
+  "nextStageKey": 4101,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 30903,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930701,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190003,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 20945,
+   "hp": 241970,
+   "gold": 25350,
+   "exp": 496400
+  }
+ },
+ {
+  "key": 4101,
+  "name": "Pasture",
+  "names": {
+   "zh-hans": "牧场",
+   "zh-hant": "牧場",
+   "en-us": "Pasture",
+   "fr-fr": "Pâturage",
+   "de-de": "Weide",
+   "id-id": "Padang Rumput",
+   "ja-jp": "牧草地",
+   "ko-kr": "목초지",
+   "pl-pl": "Pastwisko",
+   "pt-br": "Pasto",
+   "ru-ru": "Пастбище",
+   "es-es": "Pasto",
+   "th-th": "ทุ่งหญ้า",
+   "tr-tr": "Otlak",
+   "uk-ua": "Пасовище",
+   "vi-vn": "Đồng cỏ"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 1,
+  "stageNo": 1,
+  "stageLevel": 78,
+  "nextStageKey": 4102,
+  "waveAmount": 29,
+  "waveMonsterAmount": 18,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20024,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 22525,
+   "hp": 248970,
+   "gold": 26060,
+   "exp": 510600
+  }
+ },
+ {
+  "key": 4102,
+  "name": "Shadow Meadow",
+  "names": {
+   "zh-hans": "阴影草原",
+   "zh-hant": "陰影草原",
+   "en-us": "Shadow Meadow",
+   "fr-fr": "Prairie d'Ombre",
+   "de-de": "Schattenwiese",
+   "id-id": "Padang Bayangan",
+   "ja-jp": "影の草原",
+   "ko-kr": "그림자 초원",
+   "pl-pl": "Łąka Cieni",
+   "pt-br": "Prado Sombrio",
+   "ru-ru": "Теневая поляна",
+   "es-es": "Prado Sombrío",
+   "th-th": "ทุ่งหญ้าเงา",
+   "tr-tr": "Gölge Çayırı",
+   "uk-ua": "Тінисті луки",
+   "vi-vn": "Đồng cỏ Bóng"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 1,
+  "stageNo": 2,
+  "stageLevel": 79,
+  "nextStageKey": 4103,
+  "waveAmount": 29,
+  "waveMonsterAmount": 18,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20021,
+  "monsterDrop": {
+   "itemKey": 910651,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920651,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 24205,
+   "hp": 256070,
+   "gold": 26780,
+   "exp": 525000
+  }
+ },
+ {
+  "key": 4103,
+  "name": "Wasteland",
+  "names": {
+   "zh-hans": "荒野",
+   "zh-hant": "荒野",
+   "en-us": "Wasteland",
+   "fr-fr": "Terre Désolée",
+   "de-de": "Ödland",
+   "id-id": "Tanah Tandus",
+   "ja-jp": "荒れ地",
+   "ko-kr": "황무지",
+   "pl-pl": "Pustkowia",
+   "pt-br": "Terra Devastada",
+   "ru-ru": "Пустошь",
+   "es-es": "Tierra Baldía",
+   "th-th": "ดินแดนเสื่อมโทรม",
+   "tr-tr": "Çorak Arazi",
+   "uk-ua": "Пустка",
+   "vi-vn": "Vùng đất hoang"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 1,
+  "stageNo": 3,
+  "stageLevel": 80,
+  "nextStageKey": 4104,
+  "waveAmount": 29,
+  "waveMonsterAmount": 18,
+  "monsters": [
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20031,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 26385,
+   "hp": 263270,
+   "gold": 27510,
+   "exp": 539600
+  }
+ },
+ {
+  "key": 4104,
+  "name": "Eerie Canyon",
+  "names": {
+   "zh-hans": "阴森峡谷",
+   "zh-hant": "陰森峽谷",
+   "en-us": "Eerie Canyon",
+   "fr-fr": "Canyon Sinistre",
+   "de-de": "Unheimliche Schlucht",
+   "id-id": "Ngarai Mengerikan",
+   "ja-jp": "不気味な峡谷",
+   "ko-kr": "으스스한 협곡",
+   "pl-pl": "Upiorna Dolina",
+   "pt-br": "Desfiladeiro Sinistro",
+   "ru-ru": "Жуткий каньон",
+   "es-es": "Cañón Escalofriante",
+   "th-th": "หุบเขาอ้าง",
+   "tr-tr": "Ürkütücü Kanyon",
+   "uk-ua": "Моторошний каньйон",
+   "vi-vn": "Hẻm núi rùng rợn"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 1,
+  "stageNo": 4,
+  "stageLevel": 81,
+  "nextStageKey": 4105,
+  "waveAmount": 29,
+  "waveMonsterAmount": 18,
+  "monsters": [
+   {
+    "monster": "10011",
+    "weight": 1000
+   },
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   },
+   {
+    "monster": "10041",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20041,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 29065,
+   "hp": 270570,
+   "gold": 28250,
+   "exp": 554400
+  }
+ },
+ {
+  "key": 4105,
+  "name": "Burning Village Entrance",
+  "names": {
+   "zh-hans": "燃烧村庄入口",
+   "zh-hant": "燃燒村莊入口",
+   "en-us": "Burning Village Entrance",
+   "fr-fr": "Entrée du Village en Flammes",
+   "de-de": "Brennender Dorfeingang",
+   "id-id": "Pintu Desa Terbakar",
+   "ja-jp": "燃える村の入口",
+   "ko-kr": "불타는 마을 입구",
+   "pl-pl": "Wejście do Płonącej Wioski",
+   "pt-br": "Entrada da Vila em Chamas",
+   "ru-ru": "Вход в горящую деревню",
+   "es-es": "Entrada del Pueblo Ardiente",
+   "th-th": "ทางเข้าหมู่บ้านเพลิง",
+   "tr-tr": "Yanan Köy Girişi",
+   "uk-ua": "Вхід до палаючого села",
+   "vi-vn": "Lối vào Làng Cháy"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 1,
+  "stageNo": 5,
+  "stageLevel": 82,
+  "nextStageKey": 4106,
+  "waveAmount": 29,
+  "waveMonsterAmount": 18,
+  "monsters": [
+   {
+    "monster": "10021",
+    "weight": 1000
+   },
+   {
+    "monster": "10022",
+    "weight": 1000
+   },
+   {
+    "monster": "10023",
+    "weight": 1000
+   },
+   {
+    "monster": "10041",
+    "weight": 1000
+   },
+   {
+    "monster": "10042",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20071,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 32245,
+   "hp": 277970,
+   "gold": 29000,
+   "exp": 569400
+  }
+ },
+ {
+  "key": 4106,
+  "name": "Rumstreet Square",
+  "names": {
+   "zh-hans": "朗姆街广场",
+   "zh-hant": "蘭姆街廣場",
+   "en-us": "Rumstreet Square",
+   "fr-fr": "Place de Rumstreet",
+   "de-de": "Rumstraßenplatz",
+   "id-id": "Alun-alun Rumstreet",
+   "ja-jp": "ラムストリート広場",
+   "ko-kr": "럼스트리트 광장",
+   "pl-pl": "Plac Rumstreet",
+   "pt-br": "Praça Rumstreet",
+   "ru-ru": "Площадь Рамстрит",
+   "es-es": "Plaza Rumstreet",
+   "th-th": "จัตุรัสรัมสตรีท",
+   "tr-tr": "Rumstreet Meydanı",
+   "uk-ua": "Площа Рамстріт",
+   "vi-vn": "Quảng trường Rumstreet"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 1,
+  "stageNo": 6,
+  "stageLevel": 83,
+  "nextStageKey": 4107,
+  "waveAmount": 29,
+  "waveMonsterAmount": 18,
+  "monsters": [
+   {
+    "monster": "10041",
+    "weight": 1000
+   },
+   {
+    "monster": "10042",
+    "weight": 1000
+   },
+   {
+    "monster": "10043",
+    "weight": 600
+   },
+   {
+    "monster": "10011",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20081,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 35925,
+   "hp": 285470,
+   "gold": 29760,
+   "exp": 584600
+  }
+ },
+ {
+  "key": 4107,
+  "name": "City Outskirts",
+  "names": {
+   "zh-hans": "城市外围",
+   "zh-hant": "城市外圍",
+   "en-us": "City Outskirts",
+   "fr-fr": "Périphérie de la Ville",
+   "de-de": "Stadtrand",
+   "id-id": "Pinggir Kota",
+   "ja-jp": "街の外れ",
+   "ko-kr": "도시 외곽",
+   "pl-pl": "Przedmieścia",
+   "pt-br": "Arredores da Cidade",
+   "ru-ru": "Окраины города",
+   "es-es": "Afueras de la Ciudad",
+   "th-th": "ชานเมือง",
+   "tr-tr": "Şehir Kenarı",
+   "uk-ua": "Околиці міста",
+   "vi-vn": "Ngoại ô"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 1,
+  "stageNo": 7,
+  "stageLevel": 84,
+  "nextStageKey": 4108,
+  "waveAmount": 29,
+  "waveMonsterAmount": 19,
+  "monsters": [
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20023,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 40105,
+   "hp": 293070,
+   "gold": 30530,
+   "exp": 600000
+  }
+ },
+ {
+  "key": 4108,
+  "name": "Cemetery",
+  "names": {
+   "zh-hans": "公墓",
+   "zh-hant": "公墓",
+   "en-us": "Cemetery",
+   "fr-fr": "Cimetière",
+   "de-de": "Friedhof",
+   "id-id": "Pemakaman",
+   "ja-jp": "墓地",
+   "ko-kr": "공동묘지",
+   "pl-pl": "Cmentarz",
+   "pt-br": "Cemitério",
+   "ru-ru": "Кладбище",
+   "es-es": "Cementerio",
+   "th-th": "สุสาน",
+   "tr-tr": "Mezarlık",
+   "uk-ua": "Кладовище",
+   "vi-vn": "Nghĩa trang"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 1,
+  "stageNo": 8,
+  "stageLevel": 84,
+  "nextStageKey": 4109,
+  "waveAmount": 29,
+  "waveMonsterAmount": 19,
+  "monsters": [
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10053",
+    "weight": 500
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20061,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 40105,
+   "hp": 293070,
+   "gold": 30530,
+   "exp": 600000
+  }
+ },
+ {
+  "key": 4109,
+  "name": "Cursed Land",
+  "names": {
+   "zh-hans": "诅咒之地",
+   "zh-hant": "詛咒之地",
+   "en-us": "Cursed Land",
+   "fr-fr": "Terre maudite",
+   "de-de": "Verfluchtes Land",
+   "id-id": "Tanah Terkutuk",
+   "ja-jp": "呪われた大地",
+   "ko-kr": "저주받은 대지",
+   "pl-pl": "Przeklęta kraina",
+   "pt-br": "Terra amaldiçoada",
+   "ru-ru": "Проклятая земля",
+   "es-es": "Tierra maldita",
+   "th-th": "ดินแดนต้องสาป",
+   "tr-tr": "Lanetli toprak",
+   "uk-ua": "Прокляті землі",
+   "vi-vn": "Vùng đất nguyền rủa"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 1,
+  "stageNo": 9,
+  "stageLevel": 85,
+  "nextStageKey": 4110,
+  "waveAmount": 29,
+  "waveMonsterAmount": 19,
+  "monsters": [
+   {
+    "monster": "10042",
+    "weight": 1000
+   },
+   {
+    "monster": "10043",
+    "weight": 600
+   },
+   {
+    "monster": "10051",
+    "weight": 1000
+   },
+   {
+    "monster": "10052",
+    "weight": 700
+   },
+   {
+    "monster": "10053",
+    "weight": 500
+   },
+   {
+    "monster": "10031",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20111,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": 9200520,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 44785,
+   "hp": 300770,
+   "gold": 31310,
+   "exp": 615600
+  }
+ },
+ {
+  "key": 4110,
+  "name": "Throne of Darkness",
+  "names": {
+   "zh-hans": "黑暗王座",
+   "zh-hant": "黑暗王座",
+   "en-us": "Throne of Darkness",
+   "fr-fr": "Trône des Ténèbres",
+   "de-de": "Thron der Finsternis",
+   "id-id": "Singgasana Kegelapan",
+   "ja-jp": "闇の玉座",
+   "ko-kr": "어둠의 왕좌",
+   "pl-pl": "Tron Ciemności",
+   "pt-br": "Trono das Trevas",
+   "ru-ru": "Трон тьмы",
+   "es-es": "Trono de la Oscuridad",
+   "th-th": "บัลลังก์แห่งความมืด",
+   "tr-tr": "Karanlığın Tahtı",
+   "uk-ua": "Трон темряви",
+   "vi-vn": "Ngai Bóng Tối"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "TORMENT",
+  "act": 1,
+  "stageNo": 10,
+  "stageLevel": 85,
+  "nextStageKey": 4201,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 10904,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930851,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190004,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 44785,
+   "hp": 300770,
+   "gold": 31310,
+   "exp": 615600
+  }
+ },
+ {
+  "key": 4201,
+  "name": "Oasis Road",
+  "names": {
+   "zh-hans": "绿洲路",
+   "zh-hant": "綠洲路",
+   "en-us": "Oasis Road",
+   "fr-fr": "Route de l'Oasis",
+   "de-de": "Oasisweg",
+   "id-id": "Jalan Oase",
+   "ja-jp": "オアシスの道",
+   "ko-kr": "오아시스 길목",
+   "pl-pl": "Droga Oazy",
+   "pt-br": "Caminho do Oásis",
+   "ru-ru": "Путь оазиса",
+   "es-es": "Camino del Oasis",
+   "th-th": "เส้นทางโอเอซิส",
+   "tr-tr": "Vaha Yolu",
+   "uk-ua": "Шлях оазису",
+   "vi-vn": "Đường Ốc đảo"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 2,
+  "stageNo": 1,
+  "stageLevel": 86,
+  "nextStageKey": 4202,
+  "waveAmount": 30,
+  "waveMonsterAmount": 19,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20024,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 50465,
+   "hp": 308570,
+   "gold": 32100,
+   "exp": 631400
+  }
+ },
+ {
+  "key": 4202,
+  "name": "Sandstorm Valley",
+  "names": {
+   "zh-hans": "沙风暴谷",
+   "zh-hant": "沙風暴谷",
+   "en-us": "Sandstorm Valley",
+   "fr-fr": "Vallée de la Tempête de Sable",
+   "de-de": "Sandsturmtal",
+   "id-id": "Lembah Badai Pasir",
+   "ja-jp": "砂嵐の谷",
+   "ko-kr": "모래바람 골짜기",
+   "pl-pl": "Dolina Burzy Piaskowej",
+   "pt-br": "Vale da Tempestade de Areia",
+   "ru-ru": "Долина песчаной бури",
+   "es-es": "Valle de la Tormenta de Arena",
+   "th-th": "หุบเขาพายุทราย",
+   "tr-tr": "Kum Fırtınası Vadisi",
+   "uk-ua": "Долина піщаної бурі",
+   "vi-vn": "Thung lũng Bão Cát"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 2,
+  "stageNo": 2,
+  "stageLevel": 86,
+  "nextStageKey": 4203,
+  "waveAmount": 30,
+  "waveMonsterAmount": 19,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   },
+   {
+    "monster": "20024",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20021,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 50465,
+   "hp": 308570,
+   "gold": 32100,
+   "exp": 631400
+  }
+ },
+ {
+  "key": 4203,
+  "name": "Desert Underground Cave",
+  "names": {
+   "zh-hans": "沙漠地下洞窟",
+   "zh-hant": "沙漠地下洞窟",
+   "en-us": "Desert Underground Cave",
+   "fr-fr": "Grotte Souterraine du Désert",
+   "de-de": "Wüsten-Untergrundhöhle",
+   "id-id": "Gua Bawah Padang Pasir",
+   "ja-jp": "砂漠地下洞窟",
+   "ko-kr": "사막 지하 동굴",
+   "pl-pl": "Pustynna Jaskinia Podziemna",
+   "pt-br": "Caverna Subterrânea do Deserto",
+   "ru-ru": "Пустынная подземная пещера",
+   "es-es": "Cueva Subterránea del Desierto",
+   "th-th": "ถ้ำใต้ดินทะเลทราย",
+   "tr-tr": "Çöl Yeraltı Mağarası",
+   "uk-ua": "Пустельна підземна печера",
+   "vi-vn": "Hang Ngầm Sa mạc"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 2,
+  "stageNo": 3,
+  "stageLevel": 87,
+  "nextStageKey": 4204,
+  "waveAmount": 30,
+  "waveMonsterAmount": 19,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20023",
+    "weight": 1000
+   },
+   {
+    "monster": "20041",
+    "weight": 1000
+   },
+   {
+    "monster": "10031",
+    "weight": 300
+   }
+  ],
+  "bossMonsterKey": 20031,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 57145,
+   "hp": 316470,
+   "gold": 32900,
+   "exp": 647400
+  }
+ },
+ {
+  "key": 4204,
+  "name": "Bug Nest",
+  "names": {
+   "zh-hans": "虫巢",
+   "zh-hant": "蟲巢",
+   "en-us": "Bug Nest",
+   "fr-fr": "Nid d'Insectes",
+   "de-de": "Insektennest",
+   "id-id": "Sarang Serangga",
+   "ja-jp": "虫の巣",
+   "ko-kr": "벌레 둥지",
+   "pl-pl": "Gniazdo Robactwa",
+   "pt-br": "Ninho de Insetos",
+   "ru-ru": "Гнездо жуков",
+   "es-es": "Nido de Insectos",
+   "th-th": "รังแมลง",
+   "tr-tr": "Böcek Yuvası",
+   "uk-ua": "Гніздо комах",
+   "vi-vn": "Tổ Bọ"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 2,
+  "stageNo": 4,
+  "stageLevel": 87,
+  "nextStageKey": 4205,
+  "waveAmount": 30,
+  "waveMonsterAmount": 19,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20023",
+    "weight": 1000
+   },
+   {
+    "monster": "20041",
+    "weight": 1000
+   },
+   {
+    "monster": "20042",
+    "weight": 500
+   },
+   {
+    "monster": "20051",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20041,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 57145,
+   "hp": 316470,
+   "gold": 32900,
+   "exp": 647400
+  }
+ },
+ {
+  "key": 4205,
+  "name": "Scorching Dunes",
+  "names": {
+   "zh-hans": "炽热沙丘",
+   "zh-hant": "熾熱沙丘",
+   "en-us": "Scorching Dunes",
+   "fr-fr": "Dunes Brûlantes",
+   "de-de": "Brennende Dünen",
+   "id-id": "Bukit Pasir Membara",
+   "ja-jp": "灼熱の砂丘",
+   "ko-kr": "작열의 사구",
+   "pl-pl": "Palące Wydmy",
+   "pt-br": "Dunas Escaldantes",
+   "ru-ru": "Обжигающие дюны",
+   "es-es": "Dunas Abrasadoras",
+   "th-th": "เนินทรายร้อน",
+   "tr-tr": "Yanan Kumullar",
+   "uk-ua": "Палючі дюни",
+   "vi-vn": "Đụn cát Cháy bỏng"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 2,
+  "stageNo": 5,
+  "stageLevel": 88,
+  "nextStageKey": 4206,
+  "waveAmount": 30,
+  "waveMonsterAmount": 19,
+  "monsters": [
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20021",
+    "weight": 1000
+   },
+   {
+    "monster": "20022",
+    "weight": 1000
+   },
+   {
+    "monster": "20051",
+    "weight": 2000
+   }
+  ],
+  "bossMonsterKey": 20071,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 64825,
+   "hp": 324470,
+   "gold": 33710,
+   "exp": 663600
+  }
+ },
+ {
+  "key": 4206,
+  "name": "Sunset Ruins",
+  "names": {
+   "zh-hans": "夕阳废墟",
+   "zh-hant": "夕陽廢墟",
+   "en-us": "Sunset Ruins",
+   "fr-fr": "Ruines du Crépuscule",
+   "de-de": "Sonnenuntergangsruinen",
+   "id-id": "Reruntuhan Senja",
+   "ja-jp": "夕暮れの廃墟",
+   "ko-kr": "석양의 폐허",
+   "pl-pl": "Ruiny Zachodu",
+   "pt-br": "Ruínas do Pôr do Sol",
+   "ru-ru": "Руины заката",
+   "es-es": "Ruinas del Crepúsculo",
+   "th-th": "ซากปรักหักพังยามอาทิตย์ตก",
+   "tr-tr": "Gün Batımı Harabeleri",
+   "uk-ua": "Руїни заходу",
+   "vi-vn": "Phế tích Hoàng hôn"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 2,
+  "stageNo": 6,
+  "stageLevel": 88,
+  "nextStageKey": 4207,
+  "waveAmount": 30,
+  "waveMonsterAmount": 19,
+  "monsters": [
+   {
+    "monster": "20031",
+    "weight": 1000
+   },
+   {
+    "monster": "20024",
+    "weight": 1000
+   },
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20081,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 64825,
+   "hp": 324470,
+   "gold": 33710,
+   "exp": 663600
+  }
+ },
+ {
+  "key": 4207,
+  "name": "Midnight Sands",
+  "names": {
+   "zh-hans": "午夜沙漠",
+   "zh-hant": "午夜沙漠",
+   "en-us": "Midnight Sands",
+   "fr-fr": "Sables de Minuit",
+   "de-de": "Mitternachtswüste",
+   "id-id": "Pasir Tengah Malam",
+   "ja-jp": "真夜中の砂漠",
+   "ko-kr": "한밤의 사막",
+   "pl-pl": "Piaski Północy",
+   "pt-br": "Areias da Meia-Noite",
+   "ru-ru": "Полуночные пески",
+   "es-es": "Arenas de Medianoche",
+   "th-th": "ทรายเที่ยงคืน",
+   "tr-tr": "Gece Yarısı Kumları",
+   "uk-ua": "Піски півночі",
+   "vi-vn": "Cát Nửa đêm"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 2,
+  "stageNo": 7,
+  "stageLevel": 89,
+  "nextStageKey": 4208,
+  "waveAmount": 30,
+  "waveMonsterAmount": 20,
+  "monsters": [
+   {
+    "monster": "20081",
+    "weight": 300
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   },
+   {
+    "monster": "20042",
+    "weight": 500
+   },
+   {
+    "monster": "20011",
+    "weight": 1000
+   },
+   {
+    "monster": "20023",
+    "weight": 700
+   },
+   {
+    "monster": "10052",
+    "weight": 550
+   }
+  ],
+  "bossMonsterKey": 20023,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 73505,
+   "hp": 332570,
+   "gold": 34530,
+   "exp": 680000
+  }
+ },
+ {
+  "key": 4208,
+  "name": "Sacred Tomb",
+  "names": {
+   "zh-hans": "神圣墓穴",
+   "zh-hant": "神聖墓穴",
+   "en-us": "Sacred Tomb",
+   "fr-fr": "Tombeau Sacré",
+   "de-de": "Heiliges Grab",
+   "id-id": "Makam Suci",
+   "ja-jp": "神聖なる墓",
+   "ko-kr": "신성한 무덤",
+   "pl-pl": "Święty Grób",
+   "pt-br": "Túmulo Sagrado",
+   "ru-ru": "Священная гробница",
+   "es-es": "Tumba Sagrada",
+   "th-th": "สุสานศักดิ์สิทธิ์",
+   "tr-tr": "Kutsal Mezar",
+   "uk-ua": "Священна гробниця",
+   "vi-vn": "Lăng Thần Thánh"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 2,
+  "stageNo": 8,
+  "stageLevel": 89,
+  "nextStageKey": 4209,
+  "waveAmount": 30,
+  "waveMonsterAmount": 20,
+  "monsters": [
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20062",
+    "weight": 1000
+   },
+   {
+    "monster": "20091",
+    "weight": 1000
+   },
+   {
+    "monster": "20101",
+    "weight": 1000
+   },
+   {
+    "monster": "20071",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20061,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 73505,
+   "hp": 332570,
+   "gold": 34530,
+   "exp": 680000
+  }
+ },
+ {
+  "key": 4209,
+  "name": "Pharaoh's Crypt",
+  "names": {
+   "zh-hans": "法老陵墓",
+   "zh-hant": "法老陵墓",
+   "en-us": "Pharaoh's Crypt",
+   "fr-fr": "Crypte du Pharaon",
+   "de-de": "Pharaonengruft",
+   "id-id": "Ruang Mayat Firaun",
+   "ja-jp": "ファラオの墓室",
+   "ko-kr": "파라오의 묘실",
+   "pl-pl": "Krypta Faraona",
+   "pt-br": "Cripta do Faraó",
+   "ru-ru": "Склеп фараона",
+   "es-es": "Cripta del Faraón",
+   "th-th": "ห้องสุสานฟาโรห์",
+   "tr-tr": "Firavunun Mezarı",
+   "uk-ua": "Склеп фараона",
+   "vi-vn": "Hầm mộ Pharaoh"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 2,
+  "stageNo": 9,
+  "stageLevel": 90,
+  "nextStageKey": 4210,
+  "waveAmount": 30,
+  "waveMonsterAmount": 20,
+  "monsters": [
+   {
+    "monster": "20061",
+    "weight": 1000
+   },
+   {
+    "monster": "20062",
+    "weight": 1000
+   },
+   {
+    "monster": "20091",
+    "weight": 1000
+   },
+   {
+    "monster": "20101",
+    "weight": 1000
+   },
+   {
+    "monster": "20111",
+    "weight": 1000
+   },
+   {
+    "monster": "20081",
+    "weight": 500
+   }
+  ],
+  "bossMonsterKey": 20111,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": 9200520,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 87185,
+   "hp": 340770,
+   "gold": 35360,
+   "exp": 696600
+  }
+ },
+ {
+  "key": 4210,
+  "name": "Pharaoh's Underchannel",
+  "names": {
+   "zh-hans": "法老地下水道",
+   "zh-hant": "法老地下水道",
+   "en-us": "Pharaoh's Underchannel",
+   "fr-fr": "Canal Souterrain du Pharaon",
+   "de-de": "Unterkanal des Pharaos",
+   "id-id": "Saluran Bawah Firaun",
+   "ja-jp": "ファラオの地下水路",
+   "ko-kr": "파라오의 지하수도",
+   "pl-pl": "Podziemny Kanał Faraona",
+   "pt-br": "Canal Subterrâneo do Faraó",
+   "ru-ru": "Подземный канал фараона",
+   "es-es": "Canal Subterráneo del Faraón",
+   "th-th": "ทางน้ำใต้ดินฟาโรห์",
+   "tr-tr": "Firavunun Yeraltı Kanalı",
+   "uk-ua": "Підземний канал фараона",
+   "vi-vn": "Cống Ngầm Pharaoh"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "TORMENT",
+  "act": 2,
+  "stageNo": 10,
+  "stageLevel": 90,
+  "nextStageKey": 4301,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 20904,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930901,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190004,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 87185,
+   "hp": 340770,
+   "gold": 35360,
+   "exp": 696600
+  }
+ },
+ {
+  "key": 4301,
+  "name": "Snowbound Outpost",
+  "names": {
+   "zh-hans": "雪原前哨",
+   "zh-hant": "雪原前哨",
+   "en-us": "Snowbound Outpost",
+   "fr-fr": "Avant-poste Enneigé",
+   "de-de": "Verschneiter Außenposten",
+   "id-id": "Pos Bersalju",
+   "ja-jp": "雪原の前哨地",
+   "ko-kr": "설원의 전초기지",
+   "pl-pl": "Zaśnieżona Placówka",
+   "pt-br": "Posto Avançado Nevado",
+   "ru-ru": "Заснеженный аванпост",
+   "es-es": "Puesto Cubierto de Nieve",
+   "th-th": "ด่านหน้าหิมะ",
+   "tr-tr": "Karlı İleri Karakol",
+   "uk-ua": "Засніжений форпост",
+   "vi-vn": "Tiền đồn Tuyết"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 3,
+  "stageNo": 1,
+  "stageLevel": 91,
+  "nextStageKey": 4302,
+  "waveAmount": 31,
+  "waveMonsterAmount": 20,
+  "monsters": [
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30012",
+    "weight": 700
+   },
+   {
+    "monster": "30013",
+    "weight": 500
+   }
+  ],
+  "bossMonsterKey": 20024,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 105865,
+   "hp": 349070,
+   "gold": 36200,
+   "exp": 713400
+  }
+ },
+ {
+  "key": 4302,
+  "name": "Frozen Battlefield",
+  "names": {
+   "zh-hans": "冰封战场",
+   "zh-hant": "冰封戰場",
+   "en-us": "Frozen Battlefield",
+   "fr-fr": "Champ de Bataille Gelé",
+   "de-de": "Gefrorenes Schlachtfeld",
+   "id-id": "Medan Beku",
+   "ja-jp": "凍結した戦場",
+   "ko-kr": "얼어붙은 전장",
+   "pl-pl": "Zamarznięte Pole Bitwy",
+   "pt-br": "Campo de Batalha Congelado",
+   "ru-ru": "Замёрзшее поле битвы",
+   "es-es": "Campo de Batalla Congelado",
+   "th-th": "สนามรบเยือกแข็ง",
+   "tr-tr": "Donmuş Savaş Alanı",
+   "uk-ua": "Замерзле поле битви",
+   "vi-vn": "Chiến trường Đóng băng"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 3,
+  "stageNo": 2,
+  "stageLevel": 91,
+  "nextStageKey": 4303,
+  "waveAmount": 31,
+  "waveMonsterAmount": 20,
+  "monsters": [
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30012",
+    "weight": 700
+   },
+   {
+    "monster": "30013",
+    "weight": 500
+   },
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30021",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20021,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 105865,
+   "hp": 349070,
+   "gold": 36200,
+   "exp": 713400
+  }
+ },
+ {
+  "key": 4303,
+  "name": "Glacial Cave Entrance",
+  "names": {
+   "zh-hans": "冰川洞窟入口",
+   "zh-hant": "冰川洞窟入口",
+   "en-us": "Glacial Cave Entrance",
+   "fr-fr": "Entrée de la Grotte Glaciaire",
+   "de-de": "Gletscherhöhleneingang",
+   "id-id": "Pintu Gua Gletser",
+   "ja-jp": "氷河洞窟の入口",
+   "ko-kr": "빙하 동굴 입구",
+   "pl-pl": "Wejście do Lodowcowej Jaskini",
+   "pt-br": "Entrada da Caverna Glacial",
+   "ru-ru": "Вход в ледниковую пещеру",
+   "es-es": "Entrada a la Cueva Glacial",
+   "th-th": "ทางเข้าถ้ำธารน้ำแข็ง",
+   "tr-tr": "Buzul Mağarası Girişi",
+   "uk-ua": "Вхід до льодовикової печери",
+   "vi-vn": "Lối vào Hang Băng"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 3,
+  "stageNo": 3,
+  "stageLevel": 92,
+  "nextStageKey": 4304,
+  "waveAmount": 31,
+  "waveMonsterAmount": 20,
+  "monsters": [
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30042",
+    "weight": 700
+   },
+   {
+    "monster": "30044",
+    "weight": 500
+   },
+   {
+    "monster": "30021",
+    "weight": 200
+   },
+   {
+    "monster": "30013",
+    "weight": 1000
+   },
+   {
+    "monster": "30102",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20031,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 129545,
+   "hp": 357470,
+   "gold": 37050,
+   "exp": 730400
+  }
+ },
+ {
+  "key": 4304,
+  "name": "Frozen Glacier Cavern",
+  "names": {
+   "zh-hans": "冰川洞窟深处",
+   "zh-hant": "冰川洞窟深處",
+   "en-us": "Frozen Glacier Cavern",
+   "fr-fr": "Caverne Glaciaire Gelée",
+   "de-de": "Eisige Gletscherkammer",
+   "id-id": "Gua Gletser Beku",
+   "ja-jp": "凍りつく氷河洞窟",
+   "ko-kr": "빙하 동굴 심부",
+   "pl-pl": "Zamrożona Jaskinia Lodowca",
+   "pt-br": "Caverna Glacial Congelada",
+   "ru-ru": "Замёрзшая ледниковая пещера",
+   "es-es": "Caverna Glacial Congelada",
+   "th-th": "ถ้ำธารน้ำแข็งลึก",
+   "tr-tr": "Donmuş Buzul Mağarası",
+   "uk-ua": "Замерзла льодовикова печера",
+   "vi-vn": "Hang Sông Băng Sâu"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 3,
+  "stageNo": 4,
+  "stageLevel": 92,
+  "nextStageKey": 4305,
+  "waveAmount": 31,
+  "waveMonsterAmount": 20,
+  "monsters": [
+   {
+    "monster": "30041",
+    "weight": 1000
+   },
+   {
+    "monster": "30042",
+    "weight": 700
+   },
+   {
+    "monster": "30044",
+    "weight": 500
+   },
+   {
+    "monster": "30021",
+    "weight": 400
+   },
+   {
+    "monster": "30051",
+    "weight": 1000
+   },
+   {
+    "monster": "30043",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20041,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 129545,
+   "hp": 357470,
+   "gold": 37050,
+   "exp": 730400
+  }
+ },
+ {
+  "key": 4305,
+  "name": "Hell Gate",
+  "names": {
+   "zh-hans": "地狱之门",
+   "zh-hant": "地獄之門",
+   "en-us": "Hell Gate",
+   "fr-fr": "Porte de l'Enfer",
+   "de-de": "Höllenpforte",
+   "id-id": "Gerbang Neraka",
+   "ja-jp": "地獄の関門",
+   "ko-kr": "지옥 관문",
+   "pl-pl": "Piekielna Brama",
+   "pt-br": "Portão do Inferno",
+   "ru-ru": "Врата ада",
+   "es-es": "Puerta del Infierno",
+   "th-th": "ประตูนรก",
+   "tr-tr": "Cehennem Kapısı",
+   "uk-ua": "Врата пекла",
+   "vi-vn": "Cổng Địa ngục"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 3,
+  "stageNo": 5,
+  "stageLevel": 93,
+  "nextStageKey": 4306,
+  "waveAmount": 31,
+  "waveMonsterAmount": 20,
+  "monsters": [
+   {
+    "monster": "30031",
+    "weight": 1000
+   },
+   {
+    "monster": "30051",
+    "weight": 700
+   },
+   {
+    "monster": "30044",
+    "weight": 500
+   },
+   {
+    "monster": "30043",
+    "weight": 1000
+   },
+   {
+    "monster": "30011",
+    "weight": 1000
+   },
+   {
+    "monster": "30103",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20071,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 158225,
+   "hp": 365970,
+   "gold": 37910,
+   "exp": 747600
+  }
+ },
+ {
+  "key": 4306,
+  "name": "Burning Ravine",
+  "names": {
+   "zh-hans": "燃烧峡谷",
+   "zh-hant": "燃燒峽谷",
+   "en-us": "Burning Ravine",
+   "fr-fr": "Ravin Brûlant",
+   "de-de": "Brennende Schlucht",
+   "id-id": "Jurang Membara",
+   "ja-jp": "燃える峡谷",
+   "ko-kr": "불타는 협곡",
+   "pl-pl": "Płonący Jar",
+   "pt-br": "Desfiladeiro Ardente",
+   "ru-ru": "Горящее ущелье",
+   "es-es": "Barranco Ardiente",
+   "th-th": "หุบเขาเพลิง",
+   "tr-tr": "Yanan Uçurum",
+   "uk-ua": "Палаюча ущелина",
+   "vi-vn": "Vực Cháy"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 3,
+  "stageNo": 6,
+  "stageLevel": 93,
+  "nextStageKey": 4307,
+  "waveAmount": 31,
+  "waveMonsterAmount": 20,
+  "monsters": [
+   {
+    "monster": "30061",
+    "weight": 1000
+   },
+   {
+    "monster": "30081",
+    "weight": 700
+   },
+   {
+    "monster": "30082",
+    "weight": 500
+   },
+   {
+    "monster": "30084",
+    "weight": 300
+   },
+   {
+    "monster": "30091",
+    "weight": 1000
+   },
+   {
+    "monster": "30103",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20081,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 158225,
+   "hp": 365970,
+   "gold": 37910,
+   "exp": 747600
+  }
+ },
+ {
+  "key": 4307,
+  "name": "Plains of Torment",
+  "names": {
+   "zh-hans": "痛苦平原",
+   "zh-hant": "痛苦平原",
+   "en-us": "Plains of Torment",
+   "fr-fr": "Plaines du Tourment",
+   "de-de": "Ebenen der Qual",
+   "id-id": "Dataran Penderitaan",
+   "ja-jp": "苦痛の平原",
+   "ko-kr": "고통의 벌판",
+   "pl-pl": "Pola Udręki",
+   "pt-br": "Planícies do Tormento",
+   "ru-ru": "Равнины мучений",
+   "es-es": "Llanuras del Tormento",
+   "th-th": "ทุ่งทรมาน",
+   "tr-tr": "Azap Ovaları",
+   "uk-ua": "Рівнини мук",
+   "vi-vn": "Đồng bằng Đau khổ"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 3,
+  "stageNo": 7,
+  "stageLevel": 94,
+  "nextStageKey": 4308,
+  "waveAmount": 31,
+  "waveMonsterAmount": 21,
+  "monsters": [
+   {
+    "monster": "30081",
+    "weight": 1000
+   },
+   {
+    "monster": "30082",
+    "weight": 700
+   },
+   {
+    "monster": "30083",
+    "weight": 500
+   },
+   {
+    "monster": "30084",
+    "weight": 600
+   },
+   {
+    "monster": "30071",
+    "weight": 1000
+   },
+   {
+    "monster": "30104",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20023,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 196905,
+   "hp": 374570,
+   "gold": 38780,
+   "exp": 765000
+  }
+ },
+ {
+  "key": 4308,
+  "name": "Citadel of Ruin",
+  "names": {
+   "zh-hans": "毁灭要塞",
+   "zh-hant": "毀滅要塞",
+   "en-us": "Citadel of Ruin",
+   "fr-fr": "Citadelle de la Ruine",
+   "de-de": "Zitadelle des Untergangs",
+   "id-id": "Benteng Kehancuran",
+   "ja-jp": "破滅の要塞",
+   "ko-kr": "파멸의 성채",
+   "pl-pl": "Cytadela Zguby",
+   "pt-br": "Cidadela da Ruína",
+   "ru-ru": "Цитадель гибели",
+   "es-es": "Ciudadela de la Ruina",
+   "th-th": "ป้อมปราการแห่งความหายนะ",
+   "tr-tr": "Yıkım Kalesi",
+   "uk-ua": "Цитадель загибелі",
+   "vi-vn": "Thành lũy Hủy diệt"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 3,
+  "stageNo": 8,
+  "stageLevel": 94,
+  "nextStageKey": 4309,
+  "waveAmount": 31,
+  "waveMonsterAmount": 21,
+  "monsters": [
+   {
+    "monster": "30083",
+    "weight": 1000
+   },
+   {
+    "monster": "30111",
+    "weight": 700
+   },
+   {
+    "monster": "30051",
+    "weight": 500
+   },
+   {
+    "monster": "30101",
+    "weight": 1000
+   },
+   {
+    "monster": "30102",
+    "weight": 1000
+   },
+   {
+    "monster": "30104",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20061,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": null,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 196905,
+   "hp": 374570,
+   "gold": 38780,
+   "exp": 765000
+  }
+ },
+ {
+  "key": 4309,
+  "name": "Core of the Abyss",
+  "names": {
+   "zh-hans": "深渊之核",
+   "zh-hant": "深淵之核",
+   "en-us": "Core of the Abyss",
+   "fr-fr": "Cœur de l'Abîme",
+   "de-de": "Kern des Abgrunds",
+   "id-id": "Inti Jurang",
+   "ja-jp": "深淵の中心",
+   "ko-kr": "심연의 중심",
+   "pl-pl": "Rdzeń Otchłani",
+   "pt-br": "Núcleo do Abismo",
+   "ru-ru": "Ядро бездны",
+   "es-es": "Núcleo del Abismo",
+   "th-th": "แก่นกลางเหว",
+   "tr-tr": "Uçurumun Merkezi",
+   "uk-ua": "Ядро безодні",
+   "vi-vn": "Trung tâm Vực thẳm"
+  },
+  "type": "NORMAL",
+  "difficulty": "TORMENT",
+  "act": 3,
+  "stageNo": 9,
+  "stageLevel": 95,
+  "nextStageKey": 4310,
+  "waveAmount": 31,
+  "waveMonsterAmount": 21,
+  "monsters": [
+   {
+    "monster": "30111",
+    "weight": 1000
+   },
+   {
+    "monster": "30051",
+    "weight": 700
+   },
+   {
+    "monster": "30101",
+    "weight": 500
+   },
+   {
+    "monster": "30102",
+    "weight": 1000
+   },
+   {
+    "monster": "30103",
+    "weight": 1000
+   },
+   {
+    "monster": "30104",
+    "weight": 1000
+   }
+  ],
+  "bossMonsterKey": 20111,
+  "monsterDrop": {
+   "itemKey": 910801,
+   "rate": 8
+  },
+  "bossDrop": {
+   "itemKey": 920801,
+   "rate": 80
+  },
+  "firstClearDropKey": 9200520,
+  "soulstone": null,
+  "bossMultipliers": {
+   "damage": 3000,
+   "hp": 6000,
+   "gold": 3000,
+   "exp": 6000
+  },
+  "levelScaling": {
+   "atk": 245585,
+   "hp": 383270,
+   "gold": 39660,
+   "exp": 782600
+  }
+ },
+ {
+  "key": 4310,
+  "name": "Hell Command Chamber",
+  "names": {
+   "zh-hans": "地狱指挥室",
+   "zh-hant": "地獄指揮室",
+   "en-us": "Hell Command Chamber",
+   "fr-fr": "Salle de Commandement Infernale",
+   "de-de": "Höllen-Kommandokammer",
+   "id-id": "Ruang Komando Neraka",
+   "ja-jp": "地獄の執務室",
+   "ko-kr": "지옥의 집무실",
+   "pl-pl": "Komnata Dowodzenia Piekła",
+   "pt-br": "Sala de Comando do Inferno",
+   "ru-ru": "Командный зал ада",
+   "es-es": "Cámara de Mando del Infierno",
+   "th-th": "ห้องบัญชาการนรก",
+   "tr-tr": "Cehennem Komuta Odası",
+   "uk-ua": "Командна зала пекла",
+   "vi-vn": "Phòng Chỉ huy Địa ngục"
+  },
+  "type": "ACTBOSS",
+  "difficulty": "TORMENT",
+  "act": 3,
+  "stageNo": 10,
+  "stageLevel": 95,
+  "nextStageKey": null,
+  "waveAmount": null,
+  "waveMonsterAmount": null,
+  "monsters": [],
+  "bossMonsterKey": 30904,
+  "monsterDrop": {
+   "itemKey": null,
+   "rate": null
+  },
+  "bossDrop": {
+   "itemKey": 930901,
+   "rate": null
+  },
+  "firstClearDropKey": null,
+  "soulstone": {
+   "itemKey": 190004,
+   "amount": 1
+  },
+  "bossMultipliers": {
+   "damage": null,
+   "hp": null,
+   "gold": null,
+   "exp": null
+  },
+  "levelScaling": {
+   "atk": 245585,
+   "hp": 383270,
+   "gold": 39660,
+   "exp": 782600
+  }
+ }
+]

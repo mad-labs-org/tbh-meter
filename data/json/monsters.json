@@ -1,0 +1,9257 @@
+[
+ {
+  "key": 10011,
+  "name": "Slime",
+  "names": {
+   "zh-hans": "史莱姆",
+   "zh-hant": "史萊姆",
+   "en-us": "Slime",
+   "fr-fr": "Slime",
+   "de-de": "Schleim",
+   "id-id": "Slime",
+   "ja-jp": "スライム",
+   "ko-kr": "슬라임",
+   "pl-pl": "Szlam",
+   "pt-br": "Slime",
+   "ru-ru": "Слизь",
+   "es-es": "Limo",
+   "th-th": "สไลม์",
+   "tr-tr": "Balçık",
+   "uk-ua": "Слиз",
+   "vi-vn": "Slime"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 10,
+  "rewardExp": 10,
+  "attackDamage": 10,
+  "attackSpeed": 40,
+  "maxLife": 50,
+  "movementSpeed": 110,
+  "skillKeys": [
+   "100111"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910011,
+    "rate": 160,
+    "stages": [
+     1101,
+     1102
+    ]
+   },
+   {
+    "itemKey": 910051,
+    "rate": 120,
+    "stages": [
+     1104,
+     1106
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 15,
+    "stages": [
+     2101,
+     2102,
+     2104,
+     2106
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3101,
+     3102,
+     3104,
+     3106
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 8,
+    "stages": [
+     4101,
+     4102
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4104,
+     4106
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 10021,
+  "name": "Goblin",
+  "names": {
+   "zh-hans": "哥布林",
+   "zh-hant": "哥布林",
+   "en-us": "Goblin",
+   "fr-fr": "Gobelin",
+   "de-de": "Goblin",
+   "id-id": "Goblin",
+   "ja-jp": "ゴブリン",
+   "ko-kr": "고블린",
+   "pl-pl": "Goblin",
+   "pt-br": "Goblin",
+   "ru-ru": "Гоблин",
+   "es-es": "Goblin",
+   "th-th": "ก็อบลิน",
+   "tr-tr": "Goblin",
+   "uk-ua": "Гоблін",
+   "vi-vn": "Goblin"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 12,
+  "rewardExp": 12,
+  "attackDamage": 15,
+  "attackSpeed": 50,
+  "maxLife": 35,
+  "movementSpeed": 170,
+  "skillKeys": [
+   "100211"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910011,
+    "rate": 160,
+    "stages": [
+     1101,
+     1102,
+     1103
+    ]
+   },
+   {
+    "itemKey": 910051,
+    "rate": 120,
+    "stages": [
+     1104,
+     1105
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 15,
+    "stages": [
+     2101,
+     2102,
+     2103,
+     2104,
+     2105
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3101,
+     3102,
+     3103,
+     3104,
+     3105
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 8,
+    "stages": [
+     4101,
+     4102
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4103,
+     4104,
+     4105
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 10022,
+  "name": "Goblin Thief",
+  "names": {
+   "zh-hans": "哥布林盗贼",
+   "zh-hant": "哥布林盜賊",
+   "en-us": "Goblin Thief",
+   "fr-fr": "Gobelin voleur",
+   "de-de": "Goblindieb",
+   "id-id": "Pencuri Goblin",
+   "ja-jp": "ゴブリンシーフ",
+   "ko-kr": "고블린 도적",
+   "pl-pl": "Gobliński złodziej",
+   "pt-br": "Ladrão goblin",
+   "ru-ru": "Гоблин-вор",
+   "es-es": "Ladrón goblin",
+   "th-th": "ก็อบลินโจร",
+   "tr-tr": "Goblin Hırsızı",
+   "uk-ua": "Гоблін-злодій",
+   "vi-vn": "Trộm Goblin"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 15,
+  "rewardExp": 15,
+  "attackDamage": 10,
+  "attackSpeed": 110,
+  "maxLife": 45,
+  "movementSpeed": 280,
+  "skillKeys": [
+   "100221"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 920011,
+    "rate": 1000,
+    "stages": [
+     1101
+    ]
+   },
+   {
+    "itemKey": 910011,
+    "rate": 160,
+    "stages": [
+     1102,
+     1103
+    ]
+   },
+   {
+    "itemKey": 910051,
+    "rate": 120,
+    "stages": [
+     1105
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 15,
+    "stages": [
+     2101,
+     2102,
+     2103,
+     2105
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3101,
+     3102,
+     3103,
+     3105
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 8,
+    "stages": [
+     4101,
+     4102
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4103,
+     4105
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 10023,
+  "name": "Goblin Shaman",
+  "names": {
+   "zh-hans": "哥布林萨满",
+   "zh-hant": "哥布林薩滿",
+   "en-us": "Goblin Shaman",
+   "fr-fr": "Chaman gobelin",
+   "de-de": "Goblinschamane",
+   "id-id": "Dukun Goblin",
+   "ja-jp": "ゴブリンシャーマン",
+   "ko-kr": "고블린 주술사",
+   "pl-pl": "Gobliński szaman",
+   "pt-br": "Xamã goblin",
+   "ru-ru": "Гоблин-шаман",
+   "es-es": "Chamán goblin",
+   "th-th": "ก็อบลินหมอผี",
+   "tr-tr": "Goblin Şamanı",
+   "uk-ua": "Гоблін-шаман",
+   "vi-vn": "Pháp sư Goblin"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 20,
+  "rewardExp": 20,
+  "attackDamage": 18,
+  "attackSpeed": 70,
+  "maxLife": 30,
+  "movementSpeed": 135,
+  "skillKeys": [
+   "100231"
+  ],
+  "attackTypes": [
+   "Fire"
+  ],
+  "drops": [
+   {
+    "itemKey": 920011,
+    "rate": 1000,
+    "stages": [
+     1102
+    ]
+   },
+   {
+    "itemKey": 910011,
+    "rate": 160,
+    "stages": [
+     1103
+    ]
+   },
+   {
+    "itemKey": 910051,
+    "rate": 120,
+    "stages": [
+     1104,
+     1105
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 15,
+    "stages": [
+     2102,
+     2103,
+     2104,
+     2105
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3102,
+     3103,
+     3104,
+     3105
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 8,
+    "stages": [
+     4102
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4103,
+     4104,
+     4105
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 10031,
+  "name": "Bat",
+  "names": {
+   "zh-hans": "蝙蝠",
+   "zh-hant": "蝙蝠",
+   "en-us": "Bat",
+   "fr-fr": "Chauve-souris",
+   "de-de": "Fledermaus",
+   "id-id": "Kelelawar",
+   "ja-jp": "コウモリ",
+   "ko-kr": "박쥐",
+   "pl-pl": "Nietoperz",
+   "pt-br": "Morcego",
+   "ru-ru": "Летучая мышь",
+   "es-es": "Murciélago",
+   "th-th": "ค้างคาว",
+   "tr-tr": "Yarasa",
+   "uk-ua": "Кажан",
+   "vi-vn": "Dơi"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 10,
+  "rewardExp": 5,
+  "attackDamage": 10,
+  "attackSpeed": 90,
+  "maxLife": 15,
+  "movementSpeed": 500,
+  "skillKeys": [
+   "100311"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910011,
+    "rate": 160,
+    "stages": [
+     1103
+    ]
+   },
+   {
+    "itemKey": 910051,
+    "rate": 80,
+    "stages": [
+     1107
+    ]
+   },
+   {
+    "itemKey": 910101,
+    "rate": 30,
+    "stages": [
+     1108,
+     1109
+    ]
+   },
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1203
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 15,
+    "stages": [
+     2103,
+     2107,
+     2108
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2109,
+     2203
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3103,
+     3107,
+     3108,
+     3109,
+     3203
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4103,
+     4107,
+     4108,
+     4109,
+     4203
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 10041,
+  "name": "Orc",
+  "names": {
+   "zh-hans": "兽人",
+   "zh-hant": "獸人",
+   "en-us": "Orc",
+   "fr-fr": "Orc",
+   "de-de": "Ork",
+   "id-id": "Orc",
+   "ja-jp": "オーク",
+   "ko-kr": "오크",
+   "pl-pl": "Ork",
+   "pt-br": "Orc",
+   "ru-ru": "Орк",
+   "es-es": "Orco",
+   "th-th": "ออร์ค",
+   "tr-tr": "Ork",
+   "uk-ua": "Орк",
+   "vi-vn": "Orc"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 15,
+  "rewardExp": 15,
+  "attackDamage": 14,
+  "attackSpeed": 80,
+  "maxLife": 65,
+  "movementSpeed": 185,
+  "skillKeys": [
+   "100411"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 920011,
+    "rate": 1000,
+    "stages": [
+     1103
+    ]
+   },
+   {
+    "itemKey": 910051,
+    "rate": 120,
+    "stages": [
+     1104,
+     1105,
+     1106
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 15,
+    "stages": [
+     2104,
+     2105,
+     2106
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3104,
+     3105,
+     3106
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4104,
+     4105,
+     4106
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 10042,
+  "name": "Orc Warrior",
+  "names": {
+   "zh-hans": "兽人战士",
+   "zh-hant": "獸人戰士",
+   "en-us": "Orc Warrior",
+   "fr-fr": "Guerrier orc",
+   "de-de": "Orkkrieger",
+   "id-id": "Pejuang Orc",
+   "ja-jp": "オークウォリアー",
+   "ko-kr": "오크 전사",
+   "pl-pl": "Ork wojownik",
+   "pt-br": "Guerreiro orc",
+   "ru-ru": "Орк-воин",
+   "es-es": "Guerrero orco",
+   "th-th": "ออร์คนักรบ",
+   "tr-tr": "Ork Savaşçısı",
+   "uk-ua": "Орк-воїн",
+   "vi-vn": "Chiến binh Orc"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 20,
+  "rewardExp": 20,
+  "attackDamage": 16,
+  "attackSpeed": 75,
+  "maxLife": 95,
+  "movementSpeed": 165,
+  "skillKeys": [
+   "100421"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 920051,
+    "rate": 1000,
+    "stages": [
+     1104
+    ]
+   },
+   {
+    "itemKey": 910051,
+    "rate": 120,
+    "stages": [
+     1105,
+     1106
+    ]
+   },
+   {
+    "itemKey": 910101,
+    "rate": 30,
+    "stages": [
+     1109
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 15,
+    "stages": [
+     2105,
+     2106
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2109
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3105,
+     3106,
+     3109
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4105,
+     4106,
+     4109
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 10043,
+  "name": "Elite Orc",
+  "names": {
+   "zh-hans": "精英兽人",
+   "zh-hant": "精英獸人",
+   "en-us": "Elite Orc",
+   "fr-fr": "Orc d'élite",
+   "de-de": "Elite-Ork",
+   "id-id": "Orc Elite",
+   "ja-jp": "エリートオーク",
+   "ko-kr": "정예 오크",
+   "pl-pl": "Elitarny ork",
+   "pt-br": "Orc de elite",
+   "ru-ru": "Элитный орк",
+   "es-es": "Orco élite",
+   "th-th": "ออร์คชั้นยอด",
+   "tr-tr": "Seçkin Ork",
+   "uk-ua": "Елітний орк",
+   "vi-vn": "Orc Tinh Nhuệ"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 35,
+  "rewardExp": 35,
+  "attackDamage": 17,
+  "attackSpeed": 65,
+  "maxLife": 185,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "100431"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 920051,
+    "rate": 800,
+    "stages": [
+     1105
+    ]
+   },
+   {
+    "itemKey": 910051,
+    "rate": 80,
+    "stages": [
+     1106
+    ]
+   },
+   {
+    "itemKey": 910101,
+    "rate": 30,
+    "stages": [
+     1109
+    ]
+   },
+   {
+    "itemKey": 920101,
+    "rate": 400,
+    "stages": [
+     1109
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 15,
+    "stages": [
+     2106
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2109
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3106,
+     3109
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4106,
+     4109
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 10051,
+  "name": "Skeleton",
+  "names": {
+   "zh-hans": "骷髅",
+   "zh-hant": "骷髏",
+   "en-us": "Skeleton",
+   "fr-fr": "Squelette",
+   "de-de": "Skelett",
+   "id-id": "Tengkorak",
+   "ja-jp": "スケルトン",
+   "ko-kr": "해골",
+   "pl-pl": "Szkielet",
+   "pt-br": "Esqueleto",
+   "ru-ru": "Скелет",
+   "es-es": "Esqueleto",
+   "th-th": "โครงกระดูก",
+   "tr-tr": "İskelet",
+   "uk-ua": "Скелет",
+   "vi-vn": "Bộ xương"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 10,
+  "rewardExp": 11,
+  "attackDamage": 20,
+  "attackSpeed": 80,
+  "maxLife": 50,
+  "movementSpeed": 220,
+  "skillKeys": [
+   "100511"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 920051,
+    "rate": 800,
+    "stages": [
+     1106
+    ]
+   },
+   {
+    "itemKey": 910051,
+    "rate": 80,
+    "stages": [
+     1107
+    ]
+   },
+   {
+    "itemKey": 910101,
+    "rate": 30,
+    "stages": [
+     1108,
+     1109
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 15,
+    "stages": [
+     2107,
+     2108
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2109
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3107,
+     3108,
+     3109
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4107,
+     4108,
+     4109
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 10052,
+  "name": "Skeleton Archer",
+  "names": {
+   "zh-hans": "骷髅弓箭手",
+   "zh-hant": "骷髏弓箭手",
+   "en-us": "Skeleton Archer",
+   "fr-fr": "Archer squelette",
+   "de-de": "Skelettbogenschütze",
+   "id-id": "Pemanah Tengkorak",
+   "ja-jp": "スケルトンアーチャー",
+   "ko-kr": "해골 궁수",
+   "pl-pl": "Szkieletowy łucznik",
+   "pt-br": "Arqueiro esqueleto",
+   "ru-ru": "Скелет-лучник",
+   "es-es": "Arquero esqueleto",
+   "th-th": "โครงกระดูกนักธนู",
+   "tr-tr": "İskelet Okçusu",
+   "uk-ua": "Скелет-лучник",
+   "vi-vn": "Cung thủ Bộ xương"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 10,
+  "rewardExp": 13,
+  "attackDamage": 20,
+  "attackSpeed": 80,
+  "maxLife": 35,
+  "movementSpeed": 150,
+  "skillKeys": [
+   "100521"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910051,
+    "rate": 80,
+    "stages": [
+     1107
+    ]
+   },
+   {
+    "itemKey": 910101,
+    "rate": 30,
+    "stages": [
+     1108,
+     1109
+    ]
+   },
+   {
+    "itemKey": 920101,
+    "rate": 400,
+    "stages": [
+     1108
+    ]
+   },
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1207
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 15,
+    "stages": [
+     2107,
+     2108
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2109,
+     2207
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3107,
+     3108,
+     3109
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3207
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4107,
+     4108,
+     4109,
+     4207
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 10053,
+  "name": "Skeleton Warrior",
+  "names": {
+   "zh-hans": "骷髅战士",
+   "zh-hant": "骷髏戰士",
+   "en-us": "Skeleton Warrior",
+   "fr-fr": "Guerrier squelette",
+   "de-de": "Skelettkrieger",
+   "id-id": "Pejuang Tengkorak",
+   "ja-jp": "スケルトンウォリアー",
+   "ko-kr": "해골 전사",
+   "pl-pl": "Szkieletowy wojownik",
+   "pt-br": "Guerreiro esqueleto",
+   "ru-ru": "Скелет-воин",
+   "es-es": "Guerrero esqueleto",
+   "th-th": "โครงกระดูกนักรบ",
+   "tr-tr": "İskelet Savaşçısı",
+   "uk-ua": "Скелет-воїн",
+   "vi-vn": "Chiến binh Bộ xương"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 30,
+  "rewardExp": 30,
+  "attackDamage": 20,
+  "attackSpeed": 80,
+  "maxLife": 90,
+  "movementSpeed": 160,
+  "skillKeys": [
+   "100531"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 920051,
+    "rate": 600,
+    "stages": [
+     1107
+    ]
+   },
+   {
+    "itemKey": 910101,
+    "rate": 30,
+    "stages": [
+     1108,
+     1109
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 15,
+    "stages": [
+     2108
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2109
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3108,
+     3109
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4108,
+     4109
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 10901,
+  "name": "Skeleton King",
+  "names": {
+   "zh-hans": "骷髅王",
+   "zh-hant": "骷髏王",
+   "en-us": "Skeleton King",
+   "fr-fr": "Roi squelette",
+   "de-de": "Skelettkönig",
+   "id-id": "Raja Tengkorak",
+   "ja-jp": "スケルトンキング",
+   "ko-kr": "해골왕",
+   "pl-pl": "Król szkieletów",
+   "pt-br": "Rei esqueleto",
+   "ru-ru": "Король скелетов",
+   "es-es": "Rey esqueleto",
+   "th-th": "ราชาโครงกระดูก",
+   "tr-tr": "İskelet Kralı",
+   "uk-ua": "Король скелетів",
+   "vi-vn": "Vua Bộ xương"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 36,
+  "attackDamage": 50,
+  "attackSpeed": 115,
+  "maxLife": 1050,
+  "movementSpeed": 110,
+  "skillKeys": [
+   "109011",
+   "109021"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 930101,
+    "rate": null,
+    "stages": [
+     1110
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1110,
+    "name": "Throne of Darkness",
+    "act": 1,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 10902,
+  "name": "Skeleton King",
+  "names": {
+   "zh-hans": "骷髅王",
+   "zh-hant": "骷髏王",
+   "en-us": "Skeleton King",
+   "fr-fr": "Roi squelette",
+   "de-de": "Skelettkönig",
+   "id-id": "Raja Tengkorak",
+   "ja-jp": "スケルトンキング",
+   "ko-kr": "해골왕",
+   "pl-pl": "Król szkieletów",
+   "pt-br": "Rei esqueleto",
+   "ru-ru": "Король скелетов",
+   "es-es": "Rey esqueleto",
+   "th-th": "ราชาโครงกระดูก",
+   "tr-tr": "İskelet Kralı",
+   "uk-ua": "Король скелетів",
+   "vi-vn": "Vua Bộ xương"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 12,
+  "attackDamage": 70,
+  "attackSpeed": 130,
+  "maxLife": 2350,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "109011",
+   "109021",
+   "109031"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 930401,
+    "rate": null,
+    "stages": [
+     2110
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 2110,
+    "name": "Throne of Darkness",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 10903,
+  "name": "Skeleton King",
+  "names": {
+   "zh-hans": "骷髅王",
+   "zh-hant": "骷髏王",
+   "en-us": "Skeleton King",
+   "fr-fr": "Roi squelette",
+   "de-de": "Skelettkönig",
+   "id-id": "Raja Tengkorak",
+   "ja-jp": "スケルトンキング",
+   "ko-kr": "해골왕",
+   "pl-pl": "Król szkieletów",
+   "pt-br": "Rei esqueleto",
+   "ru-ru": "Король скелетов",
+   "es-es": "Rey esqueleto",
+   "th-th": "ราชาโครงกระดูก",
+   "tr-tr": "İskelet Kralı",
+   "uk-ua": "Король скелетів",
+   "vi-vn": "Vua Bộ xương"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 18,
+  "attackDamage": 70,
+  "attackSpeed": 130,
+  "maxLife": 2350,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "109011",
+   "109021",
+   "109031",
+   "109041"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 930601,
+    "rate": null,
+    "stages": [
+     3110
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 3110,
+    "name": "Throne of Darkness",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 10904,
+  "name": "Skeleton King",
+  "names": {
+   "zh-hans": "骷髅王",
+   "zh-hant": "骷髏王",
+   "en-us": "Skeleton King",
+   "fr-fr": "Roi squelette",
+   "de-de": "Skelettkönig",
+   "id-id": "Raja Tengkorak",
+   "ja-jp": "スケルトンキング",
+   "ko-kr": "해골왕",
+   "pl-pl": "Król szkieletów",
+   "pt-br": "Rei esqueleto",
+   "ru-ru": "Король скелетов",
+   "es-es": "Rey esqueleto",
+   "th-th": "ราชาโครงกระดูก",
+   "tr-tr": "İskelet Kralı",
+   "uk-ua": "Король скелетів",
+   "vi-vn": "Vua Bộ xương"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 15,
+  "attackDamage": 70,
+  "attackSpeed": 130,
+  "maxLife": 2350,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "109011",
+   "109021",
+   "109031",
+   "109041",
+   "109051"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 930851,
+    "rate": null,
+    "stages": [
+     4110
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 4110,
+    "name": "Throne of Darkness",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20011,
+  "name": "Scorpion",
+  "names": {
+   "zh-hans": "蝎子",
+   "zh-hant": "蠍子",
+   "en-us": "Scorpion",
+   "fr-fr": "Scorpion",
+   "de-de": "Skorpion",
+   "id-id": "Kalajengking",
+   "ja-jp": "サソリ",
+   "ko-kr": "전갈",
+   "pl-pl": "Skorpion",
+   "pt-br": "Escorpião",
+   "ru-ru": "Скорпион",
+   "es-es": "Escorpión",
+   "th-th": "แมงป่อง",
+   "tr-tr": "Akrep",
+   "uk-ua": "Скорпіон",
+   "vi-vn": "Bọ Cạp"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 10,
+  "rewardExp": 10,
+  "attackDamage": 10,
+  "attackSpeed": 40,
+  "maxLife": 50,
+  "movementSpeed": 110,
+  "skillKeys": [
+   "200111"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910101,
+    "rate": 30,
+    "stages": [
+     1201,
+     1202
+    ]
+   },
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1203,
+     1204,
+     1205,
+     1207
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2201,
+     2202,
+     2203,
+     2204,
+     2205,
+     2207
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3201,
+     3202,
+     3203,
+     3204
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3205,
+     3207
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4201,
+     4202,
+     4203,
+     4204,
+     4205,
+     4207
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 20021,
+  "name": "Ratfolk Warrior",
+  "names": {
+   "zh-hans": "鼠族战士",
+   "zh-hant": "鼠族戰士",
+   "en-us": "Ratfolk Warrior",
+   "fr-fr": "Guerrier Ratte",
+   "de-de": "Rattenvolk-Krieger",
+   "id-id": "Prajurit Tikus",
+   "ja-jp": "ラット族戦士",
+   "ko-kr": "쥐족 전사",
+   "pl-pl": "Wojownik Szczurów",
+   "pt-br": "Guerreiro Ratuno",
+   "ru-ru": "Воин крысолюдов",
+   "es-es": "Guerrero Ratuno",
+   "th-th": "นักรบเผ่าหนู",
+   "tr-tr": "Sıçan Savaşçısı",
+   "uk-ua": "Воїн щуролюдів",
+   "vi-vn": "Chiến Binh Chuột"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 12,
+  "rewardExp": 12,
+  "attackDamage": 15,
+  "attackSpeed": 50,
+  "maxLife": 35,
+  "movementSpeed": 230,
+  "skillKeys": [
+   "200211"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910101,
+    "rate": 30,
+    "stages": [
+     1201,
+     1202
+    ]
+   },
+   {
+    "itemKey": 920101,
+    "rate": 400,
+    "stages": [
+     1202
+    ]
+   },
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1205
+    ]
+   },
+   {
+    "itemKey": 920201,
+    "rate": 200,
+    "stages": [
+     1302
+    ]
+   },
+   {
+    "itemKey": 920301,
+    "rate": 150,
+    "stages": [
+     2102
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2201,
+     2202,
+     2205
+    ]
+   },
+   {
+    "itemKey": 920401,
+    "rate": 150,
+    "stages": [
+     2202,
+     2302
+    ]
+   },
+   {
+    "itemKey": 920501,
+    "rate": 100,
+    "stages": [
+     3102,
+     3202
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3201,
+     3202
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3205
+    ]
+   },
+   {
+    "itemKey": 920651,
+    "rate": 100,
+    "stages": [
+     3302,
+     4102
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4201,
+     4202,
+     4205
+    ]
+   },
+   {
+    "itemKey": 920801,
+    "rate": 80,
+    "stages": [
+     4202,
+     4302
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4102,
+    "name": "Shadow Meadow",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20022,
+  "name": "Ratfolk Archer",
+  "names": {
+   "zh-hans": "鼠族弓手",
+   "zh-hant": "鼠族弓手",
+   "en-us": "Ratfolk Archer",
+   "fr-fr": "Archer Ratte",
+   "de-de": "Rattenvolk-Bogenschütze",
+   "id-id": "Pemanah Tikus",
+   "ja-jp": "ラット族弓兵",
+   "ko-kr": "쥐족 궁수",
+   "pl-pl": "Łucznik Szczurów",
+   "pt-br": "Arqueiro Ratuno",
+   "ru-ru": "Лучник крысолюдов",
+   "es-es": "Arquero Ratuno",
+   "th-th": "นักธนูเผ่าหนู",
+   "tr-tr": "Sıçan Okçusu",
+   "uk-ua": "Лучник щуролюдів",
+   "vi-vn": "Cung Thủ Chuột"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 15,
+  "rewardExp": 15,
+  "attackDamage": 10,
+  "attackSpeed": 110,
+  "maxLife": 45,
+  "movementSpeed": 280,
+  "skillKeys": [
+   "200221"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910101,
+    "rate": 30,
+    "stages": [
+     1201,
+     1202
+    ]
+   },
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1205
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2201,
+     2202,
+     2205
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3201,
+     3202
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3205
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4201,
+     4202,
+     4205
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 20023,
+  "name": "Plague Rat",
+  "names": {
+   "zh-hans": "瘟疫鼠",
+   "zh-hant": "瘟疫鼠",
+   "en-us": "Plague Rat",
+   "fr-fr": "Rat Pestiféré",
+   "de-de": "Pestratte",
+   "id-id": "Tikus Wabah",
+   "ja-jp": "疫病ネズミ",
+   "ko-kr": "역병쥐",
+   "pl-pl": "Szczur Zarazy",
+   "pt-br": "Rato da Peste",
+   "ru-ru": "Чумная крыса",
+   "es-es": "Rata Pestilente",
+   "th-th": "หนูโรคระบาด",
+   "tr-tr": "Veba Sıçanı",
+   "uk-ua": "Чумний щур",
+   "vi-vn": "Chuột Dịch"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 20,
+  "rewardExp": 20,
+  "attackDamage": 20,
+  "attackSpeed": 70,
+  "maxLife": 110,
+  "movementSpeed": 130,
+  "skillKeys": [
+   "200231"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1203,
+     1204,
+     1207
+    ]
+   },
+   {
+    "itemKey": 920151,
+    "rate": 300,
+    "stages": [
+     1207
+    ]
+   },
+   {
+    "itemKey": 920201,
+    "rate": 200,
+    "stages": [
+     1307
+    ]
+   },
+   {
+    "itemKey": 920301,
+    "rate": 150,
+    "stages": [
+     2107
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2203,
+     2204,
+     2207
+    ]
+   },
+   {
+    "itemKey": 920401,
+    "rate": 150,
+    "stages": [
+     2207
+    ]
+   },
+   {
+    "itemKey": 920501,
+    "rate": 150,
+    "stages": [
+     2307,
+     3107
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3203,
+     3204
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3207
+    ]
+   },
+   {
+    "itemKey": 920651,
+    "rate": 100,
+    "stages": [
+     3207,
+     3307
+    ]
+   },
+   {
+    "itemKey": 920801,
+    "rate": 80,
+    "stages": [
+     4107,
+     4207,
+     4307
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4203,
+     4204,
+     4207
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4107,
+    "name": "City Outskirts",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20024,
+  "name": "Ratfolk Berserker",
+  "names": {
+   "zh-hans": "鼠族狂战士",
+   "zh-hant": "鼠族狂戰士",
+   "en-us": "Ratfolk Berserker",
+   "fr-fr": "Berserker Ratte",
+   "de-de": "Rattenvolk-Berserker",
+   "id-id": "Berserker Tikus",
+   "ja-jp": "ラット族バーサーカー",
+   "ko-kr": "쥐족 광전사",
+   "pl-pl": "Berserker Szczurów",
+   "pt-br": "Berserker Ratuno",
+   "ru-ru": "Берсерк крысолюдов",
+   "es-es": "Berserker Ratuno",
+   "th-th": "เบอร์เซิร์กเกอร์เผ่าหนู",
+   "tr-tr": "Sıçan Berserker",
+   "uk-ua": "Берсерк щуролюдів",
+   "vi-vn": "Berserker Chuột"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 25,
+  "rewardExp": 25,
+  "attackDamage": 17,
+  "attackSpeed": 150,
+  "maxLife": 75,
+  "movementSpeed": 500,
+  "skillKeys": [
+   "200241"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 920101,
+    "rate": 400,
+    "stages": [
+     1201
+    ]
+   },
+   {
+    "itemKey": 910101,
+    "rate": 30,
+    "stages": [
+     1202
+    ]
+   },
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1206
+    ]
+   },
+   {
+    "itemKey": 920201,
+    "rate": 200,
+    "stages": [
+     1301
+    ]
+   },
+   {
+    "itemKey": 920301,
+    "rate": 150,
+    "stages": [
+     2101
+    ]
+   },
+   {
+    "itemKey": 920401,
+    "rate": 150,
+    "stages": [
+     2201,
+     2301
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2202,
+     2206
+    ]
+   },
+   {
+    "itemKey": 920501,
+    "rate": 100,
+    "stages": [
+     3101,
+     3201
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3202
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3206
+    ]
+   },
+   {
+    "itemKey": 920651,
+    "rate": 100,
+    "stages": [
+     3301,
+     4101
+    ]
+   },
+   {
+    "itemKey": 920801,
+    "rate": 80,
+    "stages": [
+     4201,
+     4301
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4202,
+     4206
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4101,
+    "name": "Pasture",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4201,
+    "name": "Oasis Road",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4202,
+    "name": "Sandstorm Valley",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20031,
+  "name": "Cobra",
+  "names": {
+   "zh-hans": "眼镜蛇",
+   "zh-hant": "眼鏡蛇",
+   "en-us": "Cobra",
+   "fr-fr": "Cobra",
+   "de-de": "Kobra",
+   "id-id": "Kobra",
+   "ja-jp": "コブラ",
+   "ko-kr": "코브라",
+   "pl-pl": "Kobra",
+   "pt-br": "Cobra",
+   "ru-ru": "Кобра",
+   "es-es": "Cobra",
+   "th-th": "งูเห่า",
+   "tr-tr": "Kobra",
+   "uk-ua": "Кобра",
+   "vi-vn": "Rắn Hổ Mang"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 15,
+  "rewardExp": 15,
+  "attackDamage": 18,
+  "attackSpeed": 115,
+  "maxLife": 55,
+  "movementSpeed": 165,
+  "skillKeys": [
+   "200311"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1203,
+     1204,
+     1206
+    ]
+   },
+   {
+    "itemKey": 920151,
+    "rate": 300,
+    "stages": [
+     1203
+    ]
+   },
+   {
+    "itemKey": 920201,
+    "rate": 200,
+    "stages": [
+     1303
+    ]
+   },
+   {
+    "itemKey": 920301,
+    "rate": 150,
+    "stages": [
+     2103
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2203,
+     2204,
+     2206
+    ]
+   },
+   {
+    "itemKey": 920401,
+    "rate": 150,
+    "stages": [
+     2203,
+     2303
+    ]
+   },
+   {
+    "itemKey": 920501,
+    "rate": 100,
+    "stages": [
+     3103,
+     3203
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3203,
+     3204
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3206
+    ]
+   },
+   {
+    "itemKey": 920651,
+    "rate": 100,
+    "stages": [
+     3303
+    ]
+   },
+   {
+    "itemKey": 920801,
+    "rate": 80,
+    "stages": [
+     4103,
+     4203,
+     4303
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4203,
+     4204,
+     4206
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4103,
+    "name": "Wasteland",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20041,
+  "name": "Venom Insect",
+  "names": {
+   "zh-hans": "毒虫",
+   "zh-hant": "毒蟲",
+   "en-us": "Venom Insect",
+   "fr-fr": "Insecte Venimeux",
+   "de-de": "Giftinsekt",
+   "id-id": "Serangga Racun",
+   "ja-jp": "毒虫",
+   "ko-kr": "독충",
+   "pl-pl": "Jadowity Owad",
+   "pt-br": "Inseto Venenoso",
+   "ru-ru": "Ядовитое насекомое",
+   "es-es": "Insecto Venenoso",
+   "th-th": "แมลงพิษ",
+   "tr-tr": "Zehirli Böcek",
+   "uk-ua": "Отруйна комаха",
+   "vi-vn": "Côn Trùng Độc"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 15,
+  "rewardExp": 15,
+  "attackDamage": 23,
+  "attackSpeed": 130,
+  "maxLife": 45,
+  "movementSpeed": 320,
+  "skillKeys": [
+   "200411"
+  ],
+  "attackTypes": [
+   "Chaos"
+  ],
+  "drops": [
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1203,
+     1204
+    ]
+   },
+   {
+    "itemKey": 920151,
+    "rate": 300,
+    "stages": [
+     1204
+    ]
+   },
+   {
+    "itemKey": 920201,
+    "rate": 200,
+    "stages": [
+     1304
+    ]
+   },
+   {
+    "itemKey": 920301,
+    "rate": 150,
+    "stages": [
+     2104
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2203,
+     2204
+    ]
+   },
+   {
+    "itemKey": 920401,
+    "rate": 150,
+    "stages": [
+     2204,
+     2304
+    ]
+   },
+   {
+    "itemKey": 920501,
+    "rate": 100,
+    "stages": [
+     3104,
+     3204
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3203,
+     3204
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3205,
+     3206
+    ]
+   },
+   {
+    "itemKey": 920651,
+    "rate": 100,
+    "stages": [
+     3304
+    ]
+   },
+   {
+    "itemKey": 920801,
+    "rate": 80,
+    "stages": [
+     4104,
+     4204,
+     4304
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4203,
+     4204
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4104,
+    "name": "Eerie Canyon",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4203,
+    "name": "Desert Underground Cave",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20042,
+  "name": "Venom Lord",
+  "names": {
+   "zh-hans": "剧毒领主",
+   "zh-hant": "劇毒領主",
+   "en-us": "Venom Lord",
+   "fr-fr": "Seigneur du Venin",
+   "de-de": "Giftlord",
+   "id-id": "Tuan Bisa",
+   "ja-jp": "猛毒の君主",
+   "ko-kr": "맹독 군주",
+   "pl-pl": "Pan Jadu",
+   "pt-br": "Senhor do Veneno",
+   "ru-ru": "Властелин яда",
+   "es-es": "Señor del Veneno",
+   "th-th": "จ้าวแห่งพิษ",
+   "tr-tr": "Zehir Lordu",
+   "uk-ua": "Володар отрути",
+   "vi-vn": "Chủ Tể Kịch Độc"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 35,
+  "rewardExp": 35,
+  "attackDamage": 15,
+  "attackSpeed": 55,
+  "maxLife": 75,
+  "movementSpeed": 220,
+  "skillKeys": [
+   "200421"
+  ],
+  "attackTypes": [
+   "Chaos"
+  ],
+  "drops": [
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3204
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3207,
+     3208
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4204,
+     4207
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 3204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 20051,
+  "name": "Giant Fly",
+  "names": {
+   "zh-hans": "巨蝇",
+   "zh-hant": "巨蠅",
+   "en-us": "Giant Fly",
+   "fr-fr": "Mouche Géante",
+   "de-de": "Riesenfliege",
+   "id-id": "Lalat Raksasa",
+   "ja-jp": "巨大バエ",
+   "ko-kr": "거대 파리",
+   "pl-pl": "Olbrzymia Mucha",
+   "pt-br": "Mosca Gigante",
+   "ru-ru": "Гигантская муха",
+   "es-es": "Mosca Gigante",
+   "th-th": "แมลงวันยักษ์",
+   "tr-tr": "Dev Sinek",
+   "uk-ua": "Велетенська муха",
+   "vi-vn": "Ruồi Khổng Lồ"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 11,
+  "rewardExp": 11,
+  "attackDamage": 20,
+  "attackSpeed": 120,
+  "maxLife": 45,
+  "movementSpeed": 440,
+  "skillKeys": [
+   "200511"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1204,
+     1205
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2204,
+     2205
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 10,
+    "stages": [
+     3204
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3205
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4204,
+     4205
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4204,
+    "name": "Bug Nest",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 20061,
+  "name": "Kobold Guard",
+  "names": {
+   "zh-hans": "狗头人卫兵",
+   "zh-hant": "狗頭人衛兵",
+   "en-us": "Kobold Guard",
+   "fr-fr": "Garde Kobold",
+   "de-de": "Kobold-Wache",
+   "id-id": "Penjaga Kobold",
+   "ja-jp": "コボルト衛兵",
+   "ko-kr": "코볼트 경비병",
+   "pl-pl": "Strażnik Kobold",
+   "pt-br": "Guarda Kobold",
+   "ru-ru": "Стражник кобольдов",
+   "es-es": "Guardia Kobold",
+   "th-th": "ทหารเฝ้าโคบอลด์",
+   "tr-tr": "Kobold Muhafız",
+   "uk-ua": "Охоронець кобольдів",
+   "vi-vn": "Lính Gác Kobold"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 17,
+  "rewardExp": 17,
+  "attackDamage": 20,
+  "attackSpeed": 80,
+  "maxLife": 90,
+  "movementSpeed": 250,
+  "skillKeys": [
+   "200611"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1206
+    ]
+   },
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1208,
+     1209
+    ]
+   },
+   {
+    "itemKey": 920201,
+    "rate": 200,
+    "stages": [
+     1208
+    ]
+   },
+   {
+    "itemKey": 920301,
+    "rate": 200,
+    "stages": [
+     1308,
+     2108
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2206,
+     2208,
+     2209
+    ]
+   },
+   {
+    "itemKey": 920401,
+    "rate": 150,
+    "stages": [
+     2208
+    ]
+   },
+   {
+    "itemKey": 920501,
+    "rate": 150,
+    "stages": [
+     2308,
+     3108
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3206,
+     3208,
+     3209
+    ]
+   },
+   {
+    "itemKey": 920651,
+    "rate": 100,
+    "stages": [
+     3208,
+     3308
+    ]
+   },
+   {
+    "itemKey": 920801,
+    "rate": 80,
+    "stages": [
+     4108,
+     4208,
+     4308
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4206,
+     4208,
+     4209
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4108,
+    "name": "Cemetery",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20062,
+  "name": "Kobold Slinger",
+  "names": {
+   "zh-hans": "狗头人投石手",
+   "zh-hant": "狗頭人投石手",
+   "en-us": "Kobold Slinger",
+   "fr-fr": "Frondeur Kobold",
+   "de-de": "Kobold-Schleuderer",
+   "id-id": "Kobold Pelempar",
+   "ja-jp": "コボルト投石兵",
+   "ko-kr": "코볼트 슬링어",
+   "pl-pl": "Procarz Kobold",
+   "pt-br": "Fundeiro Kobold",
+   "ru-ru": "Пращник кобольдов",
+   "es-es": "Hondero Kobold",
+   "th-th": "โคบอลด์สลิงเกอร์",
+   "tr-tr": "Kobold Sapan Kullanıcısı",
+   "uk-ua": "Пращник кобольдів",
+   "vi-vn": "Lính Ném Kobold"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 14,
+  "rewardExp": 14,
+  "attackDamage": 23,
+  "attackSpeed": 110,
+  "maxLife": 80,
+  "movementSpeed": 180,
+  "skillKeys": [
+   "200621"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1208,
+     1209
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2208,
+     2209
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3208,
+     3209
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4208,
+     4209
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 20071,
+  "name": "Homunculus",
+  "names": {
+   "zh-hans": "人造人",
+   "zh-hant": "人造人",
+   "en-us": "Homunculus",
+   "fr-fr": "Homonculus",
+   "de-de": "Homunculus",
+   "id-id": "Homunculus",
+   "ja-jp": "ホムンクルス",
+   "ko-kr": "호문클루스",
+   "pl-pl": "Homunkulus",
+   "pt-br": "Homúnculo",
+   "ru-ru": "Гомункул",
+   "es-es": "Homúnculo",
+   "th-th": "โฮมุนคูลุส",
+   "tr-tr": "Homunkulus",
+   "uk-ua": "Гомункул",
+   "vi-vn": "Homunculus"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 13,
+  "rewardExp": 13,
+  "attackDamage": 16,
+  "attackSpeed": 80,
+  "maxLife": 115,
+  "movementSpeed": 340,
+  "skillKeys": [
+   "200711"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 920151,
+    "rate": 300,
+    "stages": [
+     1205
+    ]
+   },
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1206,
+     1207
+    ]
+   },
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1208
+    ]
+   },
+   {
+    "itemKey": 920201,
+    "rate": 200,
+    "stages": [
+     1305
+    ]
+   },
+   {
+    "itemKey": 920301,
+    "rate": 150,
+    "stages": [
+     2105
+    ]
+   },
+   {
+    "itemKey": 920401,
+    "rate": 150,
+    "stages": [
+     2205
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2206,
+     2207,
+     2208
+    ]
+   },
+   {
+    "itemKey": 920501,
+    "rate": 150,
+    "stages": [
+     2305,
+     3105
+    ]
+   },
+   {
+    "itemKey": 920651,
+    "rate": 100,
+    "stages": [
+     3205,
+     3305
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3206,
+     3207,
+     3208
+    ]
+   },
+   {
+    "itemKey": 920801,
+    "rate": 80,
+    "stages": [
+     4105,
+     4205,
+     4305
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4206,
+     4207,
+     4208
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4105,
+    "name": "Burning Village Entrance",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4205,
+    "name": "Scorching Dunes",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20081,
+  "name": "Ghoul",
+  "names": {
+   "zh-hans": "食尸鬼",
+   "zh-hant": "食屍鬼",
+   "en-us": "Ghoul",
+   "fr-fr": "Goule",
+   "de-de": "Ghul",
+   "id-id": "Ghoul",
+   "ja-jp": "グール",
+   "ko-kr": "구울",
+   "pl-pl": "Ghul",
+   "pt-br": "Ghoul",
+   "ru-ru": "Гуль",
+   "es-es": "Ghoul",
+   "th-th": "กูล",
+   "tr-tr": "Gulyabani",
+   "uk-ua": "Гуль",
+   "vi-vn": "Xác Sống"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 45,
+  "rewardExp": 45,
+  "attackDamage": 20,
+  "attackSpeed": 60,
+  "maxLife": 225,
+  "movementSpeed": 110,
+  "skillKeys": [
+   "200811"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 920151,
+    "rate": 300,
+    "stages": [
+     1206
+    ]
+   },
+   {
+    "itemKey": 910151,
+    "rate": 25,
+    "stages": [
+     1207
+    ]
+   },
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1209
+    ]
+   },
+   {
+    "itemKey": 920201,
+    "rate": 200,
+    "stages": [
+     1306
+    ]
+   },
+   {
+    "itemKey": 920301,
+    "rate": 150,
+    "stages": [
+     2106
+    ]
+   },
+   {
+    "itemKey": 920401,
+    "rate": 150,
+    "stages": [
+     2206
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2207,
+     2209
+    ]
+   },
+   {
+    "itemKey": 920501,
+    "rate": 150,
+    "stages": [
+     2306,
+     3106
+    ]
+   },
+   {
+    "itemKey": 920651,
+    "rate": 100,
+    "stages": [
+     3206,
+     3306
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3207,
+     3209
+    ]
+   },
+   {
+    "itemKey": 920801,
+    "rate": 80,
+    "stages": [
+     4106,
+     4206,
+     4306
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4207,
+     4209
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4106,
+    "name": "Rumstreet Square",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4206,
+    "name": "Sunset Ruins",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4207,
+    "name": "Midnight Sands",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20091,
+  "name": "Fire Elemental",
+  "names": {
+   "zh-hans": "火元素",
+   "zh-hant": "火元素",
+   "en-us": "Fire Elemental",
+   "fr-fr": "Élémentaire de Feu",
+   "de-de": "Feuerelementar",
+   "id-id": "Elemental Api",
+   "ja-jp": "火の精霊",
+   "ko-kr": "불의 정령",
+   "pl-pl": "Żywiołak Ognia",
+   "pt-br": "Elemental de Fogo",
+   "ru-ru": "Огненный элементаль",
+   "es-es": "Elemental de Fuego",
+   "th-th": "ภูตไฟ",
+   "tr-tr": "Ateş Elementali",
+   "uk-ua": "Вогняний елементаль",
+   "vi-vn": "Tinh Linh Lửa"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 23,
+  "rewardExp": 23,
+  "attackDamage": 25,
+  "attackSpeed": 80,
+  "maxLife": 75,
+  "movementSpeed": 160,
+  "skillKeys": [
+   "200911"
+  ],
+  "attackTypes": [
+   "Fire"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1208,
+     1209
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2208,
+     2209
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3208,
+     3209
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4208,
+     4209
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4208,
+    "name": "Sacred Tomb",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 20111,
+  "name": "Mummy",
+  "names": {
+   "zh-hans": "木乃伊",
+   "zh-hant": "木乃伊",
+   "en-us": "Mummy",
+   "fr-fr": "Momie",
+   "de-de": "Mumie",
+   "id-id": "Mumi",
+   "ja-jp": "ミイラ",
+   "ko-kr": "미이라",
+   "pl-pl": "Mumia",
+   "pt-br": "Múmia",
+   "ru-ru": "Мумия",
+   "es-es": "Momia",
+   "th-th": "มัมมี่",
+   "tr-tr": "Mumya",
+   "uk-ua": "Мумія",
+   "vi-vn": "Xác Ướp"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 30,
+  "rewardExp": 30,
+  "attackDamage": 17,
+  "attackSpeed": 80,
+  "maxLife": 260,
+  "movementSpeed": 80,
+  "skillKeys": [
+   "201111"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1209
+    ]
+   },
+   {
+    "itemKey": 920201,
+    "rate": 200,
+    "stages": [
+     1209
+    ]
+   },
+   {
+    "itemKey": 920301,
+    "rate": 200,
+    "stages": [
+     1309
+    ]
+   },
+   {
+    "itemKey": 920401,
+    "rate": 150,
+    "stages": [
+     2109,
+     2209
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2209
+    ]
+   },
+   {
+    "itemKey": 920501,
+    "rate": 150,
+    "stages": [
+     2309,
+     3109
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3209
+    ]
+   },
+   {
+    "itemKey": 920651,
+    "rate": 100,
+    "stages": [
+     3209,
+     3309
+    ]
+   },
+   {
+    "itemKey": 920801,
+    "rate": 80,
+    "stages": [
+     4109,
+     4209,
+     4309
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4209
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 1309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 2309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 3309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4109,
+    "name": "Cursed Land",
+    "act": 1,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4209,
+    "name": "Pharaoh's Crypt",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   },
+   {
+    "stageKey": 4309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20121,
+  "name": "Tick",
+  "names": {
+   "zh-hans": "扁虱",
+   "zh-hant": "扁蝨",
+   "en-us": "Tick",
+   "fr-fr": "Tique",
+   "de-de": "Zecke",
+   "id-id": "Kutu",
+   "ja-jp": "ダニ",
+   "ko-kr": "진드기",
+   "pl-pl": "Kleszcz",
+   "pt-br": "Carrapato",
+   "ru-ru": "Клещ",
+   "es-es": "Garrapata",
+   "th-th": "เห็บ",
+   "tr-tr": "Kene",
+   "uk-ua": "Кліщ",
+   "vi-vn": "Bọ Ve"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 7,
+  "rewardExp": 7,
+  "attackDamage": 10,
+  "attackSpeed": 140,
+  "maxLife": 55,
+  "movementSpeed": 400,
+  "skillKeys": [
+   "201211"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [],
+  "stages": []
+ },
+ {
+  "key": 20901,
+  "name": "Desert Overlord",
+  "names": {
+   "zh-hans": "沙漠的支配者",
+   "zh-hant": "沙漠的支配者",
+   "en-us": "Desert Overlord",
+   "fr-fr": "Seigneur du Désert",
+   "de-de": "Herrscher der Wüste",
+   "id-id": "Penguasa Gurun",
+   "ja-jp": "砂漠の支配者",
+   "ko-kr": "사막의 지배자",
+   "pl-pl": "Władca Pustyni",
+   "pt-br": "Senhor do Deserto",
+   "ru-ru": "Властелин пустыни",
+   "es-es": "Señor del Desierto",
+   "th-th": "ผู้ครองทะเลทราย",
+   "tr-tr": "Çölün Hükümdarı",
+   "uk-ua": "Володар пустелі",
+   "vi-vn": "Kẻ Thống Trị Sa Mạc"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 12,
+  "attackDamage": 80,
+  "attackSpeed": 170,
+  "maxLife": 1850,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "209011",
+   "209021"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 930201,
+    "rate": null,
+    "stages": [
+     1210
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1210,
+    "name": "Pharaoh's Underchannel",
+    "act": 2,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20902,
+  "name": "Desert Overlord",
+  "names": {
+   "zh-hans": "沙漠的支配者",
+   "zh-hant": "沙漠的支配者",
+   "en-us": "Desert Overlord",
+   "fr-fr": "Seigneur du Désert",
+   "de-de": "Herrscher der Wüste",
+   "id-id": "Penguasa Gurun",
+   "ja-jp": "砂漠の支配者",
+   "ko-kr": "사막의 지배자",
+   "pl-pl": "Władca Pustyni",
+   "pt-br": "Senhor do Deserto",
+   "ru-ru": "Властелин пустыни",
+   "es-es": "Señor del Desierto",
+   "th-th": "ผู้ครองทะเลทราย",
+   "tr-tr": "Çölün Hükümdarı",
+   "uk-ua": "Володар пустелі",
+   "vi-vn": "Kẻ Thống Trị Sa Mạc"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 14,
+  "attackDamage": 100,
+  "attackSpeed": 170,
+  "maxLife": 1950,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "209011",
+   "209021",
+   "209031"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 930451,
+    "rate": null,
+    "stages": [
+     2210
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 2210,
+    "name": "Pharaoh's Underchannel",
+    "act": 2,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20903,
+  "name": "Desert Overlord",
+  "names": {
+   "zh-hans": "沙漠的支配者",
+   "zh-hant": "沙漠的支配者",
+   "en-us": "Desert Overlord",
+   "fr-fr": "Seigneur du Désert",
+   "de-de": "Herrscher der Wüste",
+   "id-id": "Penguasa Gurun",
+   "ja-jp": "砂漠の支配者",
+   "ko-kr": "사막의 지배자",
+   "pl-pl": "Władca Pustyni",
+   "pt-br": "Senhor do Deserto",
+   "ru-ru": "Властелин пустыни",
+   "es-es": "Señor del Desierto",
+   "th-th": "ผู้ครองทะเลทราย",
+   "tr-tr": "Çölün Hükümdarı",
+   "uk-ua": "Володар пустелі",
+   "vi-vn": "Kẻ Thống Trị Sa Mạc"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 31,
+  "attackDamage": 120,
+  "attackSpeed": 170,
+  "maxLife": 2050,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "209011",
+   "209021",
+   "209031",
+   "209041"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 930651,
+    "rate": null,
+    "stages": [
+     3210
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 3210,
+    "name": "Pharaoh's Underchannel",
+    "act": 2,
+    "difficulty": "HELL",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 20904,
+  "name": "Desert Overlord",
+  "names": {
+   "zh-hans": "沙漠的支配者",
+   "zh-hant": "沙漠的支配者",
+   "en-us": "Desert Overlord",
+   "fr-fr": "Seigneur du Désert",
+   "de-de": "Herrscher der Wüste",
+   "id-id": "Penguasa Gurun",
+   "ja-jp": "砂漠の支配者",
+   "ko-kr": "사막의 지배자",
+   "pl-pl": "Władca Pustyni",
+   "pt-br": "Senhor do Deserto",
+   "ru-ru": "Властелин пустыни",
+   "es-es": "Señor del Desierto",
+   "th-th": "ผู้ครองทะเลทราย",
+   "tr-tr": "Çölün Hükümdarı",
+   "uk-ua": "Володар пустелі",
+   "vi-vn": "Kẻ Thống Trị Sa Mạc"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 31,
+  "attackDamage": 140,
+  "attackSpeed": 170,
+  "maxLife": 2350,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "209011",
+   "209021",
+   "209031",
+   "209041",
+   "209051"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 930901,
+    "rate": null,
+    "stages": [
+     4210
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 4210,
+    "name": "Pharaoh's Underchannel",
+    "act": 2,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 30011,
+  "name": "Gremlin",
+  "names": {
+   "zh-hans": "小鬼",
+   "zh-hant": "小鬼",
+   "en-us": "Gremlin",
+   "fr-fr": "Gremlin",
+   "de-de": "Gremlin",
+   "id-id": "Gremlin",
+   "ja-jp": "グレムリン",
+   "ko-kr": "그렘린",
+   "pl-pl": "Gremlin",
+   "pt-br": "Gremlin",
+   "ru-ru": "Гремлин",
+   "es-es": "Gremlin",
+   "th-th": "เกรมลิน",
+   "tr-tr": "Gremlin",
+   "uk-ua": "Гремлін",
+   "vi-vn": "Gremlin"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 10,
+  "rewardExp": 10,
+  "attackDamage": 10,
+  "attackSpeed": 60,
+  "maxLife": 70,
+  "movementSpeed": 300,
+  "skillKeys": [
+   "300111"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1301,
+     1302,
+     1305
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2301,
+     2302
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2305
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3301,
+     3302,
+     3305
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4301,
+     4302,
+     4305
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30012,
+  "name": "Geonid",
+  "names": {
+   "zh-hans": "地精灵",
+   "zh-hant": "地精靈",
+   "en-us": "Geonid",
+   "fr-fr": "Géonide",
+   "de-de": "Geonid",
+   "id-id": "Geonid",
+   "ja-jp": "ジオニド",
+   "ko-kr": "지오니드",
+   "pl-pl": "Geonid",
+   "pt-br": "Geônide",
+   "ru-ru": "Геонид",
+   "es-es": "Geónido",
+   "th-th": "จีโอนิด",
+   "tr-tr": "Geonid",
+   "uk-ua": "Геонід",
+   "vi-vn": "Geonid"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 12,
+  "rewardExp": 12,
+  "attackDamage": 15,
+  "attackSpeed": 90,
+  "maxLife": 50,
+  "movementSpeed": 300,
+  "skillKeys": [
+   "300121"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1301,
+     1302,
+     1305
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2301,
+     2302
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2305
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3301,
+     3302,
+     3305
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4301,
+     4302
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30013,
+  "name": "Fallen Angel's Helm",
+  "names": {
+   "zh-hans": "堕落天使的头盔",
+   "zh-hant": "墮落天使的頭盔",
+   "en-us": "Fallen Angel's Helm",
+   "fr-fr": "Casque de l'Ange Déchu",
+   "de-de": "Helm des Gefallenen Engels",
+   "id-id": "Helm Malaikat Jatuh",
+   "ja-jp": "堕天使の兜",
+   "ko-kr": "타락한 천사의 투구",
+   "pl-pl": "Hełm Upadłego Anioła",
+   "pt-br": "Elmo do Anjo Caído",
+   "ru-ru": "Шлем падшего ангела",
+   "es-es": "Casco del Ángel Caído",
+   "th-th": "หมวกเทพตก",
+   "tr-tr": "Düşmüş Meleğin Miğferi",
+   "uk-ua": "Шолом занепалого ангела",
+   "vi-vn": "Mũ Thiên Thần Sa Ngã"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 15,
+  "rewardExp": 15,
+  "attackDamage": 25,
+  "attackSpeed": 110,
+  "maxLife": 40,
+  "movementSpeed": 450,
+  "skillKeys": [
+   "300131"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1301,
+     1302,
+     1303
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2301,
+     2302,
+     2303
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3301,
+     3302,
+     3303
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4301,
+     4302,
+     4303
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4301,
+    "name": "Snowbound Outpost",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30021,
+  "name": "Yeti",
+  "names": {
+   "zh-hans": "雪人",
+   "zh-hant": "雪人",
+   "en-us": "Yeti",
+   "fr-fr": "Yéti",
+   "de-de": "Yeti",
+   "id-id": "Yeti",
+   "ja-jp": "イエティ",
+   "ko-kr": "설인",
+   "pl-pl": "Yeti",
+   "pt-br": "Yeti",
+   "ru-ru": "Йети",
+   "es-es": "Yeti",
+   "th-th": "เยติ",
+   "tr-tr": "Yeti",
+   "uk-ua": "Єті",
+   "vi-vn": "Người Tuyết"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 20,
+  "rewardExp": 20,
+  "attackDamage": 12,
+  "attackSpeed": 70,
+  "maxLife": 320,
+  "movementSpeed": 105,
+  "skillKeys": [
+   "300211"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1302,
+     1303,
+     1304
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2302,
+     2303,
+     2304
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3302,
+     3303,
+     3304
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4302,
+     4303,
+     4304
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30031,
+  "name": "Dragon Hatchling",
+  "names": {
+   "zh-hans": "幼龙",
+   "zh-hant": "幼龍",
+   "en-us": "Dragon Hatchling",
+   "fr-fr": "Dragonnet",
+   "de-de": "Drachenbaby",
+   "id-id": "Anak Naga",
+   "ja-jp": "ドラゴンハッチリング",
+   "ko-kr": "드래곤 해츨링",
+   "pl-pl": "Młody Smok",
+   "pt-br": "Filhote de Dragão",
+   "ru-ru": "Дракончик",
+   "es-es": "Cría de Dragón",
+   "th-th": "ลูกมังกร",
+   "tr-tr": "Ejder Yavrusu",
+   "uk-ua": "Дракончик",
+   "vi-vn": "Rồng Con"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 10,
+  "rewardExp": 5,
+  "attackDamage": 30,
+  "attackSpeed": 70,
+  "maxLife": 175,
+  "movementSpeed": 195,
+  "skillKeys": [
+   "300311"
+  ],
+  "attackTypes": [
+   "Fire"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1305,
+     1307
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2305,
+     2307
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3305,
+     3307
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4305
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30041,
+  "name": "Snow Mountain Warrior",
+  "names": {
+   "zh-hans": "雪山战士",
+   "zh-hant": "雪山戰士",
+   "en-us": "Snow Mountain Warrior",
+   "fr-fr": "Guerrier des Montagnes Neigeuses",
+   "de-de": "Schneeberg-Krieger",
+   "id-id": "Prajurit Gunung Salju",
+   "ja-jp": "雪山戦士",
+   "ko-kr": "설산 전사",
+   "pl-pl": "Wojownik Śnieżnej Góry",
+   "pt-br": "Guerreiro da Montanha Nevada",
+   "ru-ru": "Воин снежной горы",
+   "es-es": "Guerrero de Montaña Nevada",
+   "th-th": "นักรบภูเขาหิมะ",
+   "tr-tr": "Kar Dağı Savaşçısı",
+   "uk-ua": "Воїн снігової гори",
+   "vi-vn": "Chiến Binh Núi Tuyết"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 10,
+  "rewardExp": 5,
+  "attackDamage": 15,
+  "attackSpeed": 70,
+  "maxLife": 90,
+  "movementSpeed": 330,
+  "skillKeys": [
+   "300411"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1302,
+     1303,
+     1304
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2302,
+     2303,
+     2304
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3302,
+     3303,
+     3304
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4302,
+     4303,
+     4304
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4302,
+    "name": "Frozen Battlefield",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30042,
+  "name": "Snow Mountain Archer",
+  "names": {
+   "zh-hans": "雪山弓手",
+   "zh-hant": "雪山弓手",
+   "en-us": "Snow Mountain Archer",
+   "fr-fr": "Archer des Montagnes Neigeuses",
+   "de-de": "Schneeberg-Bogenschütze",
+   "id-id": "Pemanah Gunung Salju",
+   "ja-jp": "雪山の弓兵",
+   "ko-kr": "설산 궁수",
+   "pl-pl": "Łucznik Śnieżnej Góry",
+   "pt-br": "Arqueiro da Montanha Nevada",
+   "ru-ru": "Лучник снежной горы",
+   "es-es": "Arquero de Montaña Nevada",
+   "th-th": "นักธนูภูเขาหิมะ",
+   "tr-tr": "Kar Dağı Okçusu",
+   "uk-ua": "Лучник снігової гори",
+   "vi-vn": "Cung Thủ Núi Tuyết"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 10,
+  "rewardExp": 5,
+  "attackDamage": 20,
+  "attackSpeed": 130,
+  "maxLife": 70,
+  "movementSpeed": 260,
+  "skillKeys": [
+   "300421"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1303,
+     1304
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2303,
+     2304
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3303,
+     3304
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4303,
+     4304
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30043,
+  "name": "Snow Mountain Guard",
+  "names": {
+   "zh-hans": "雪山卫兵",
+   "zh-hant": "雪山衛兵",
+   "en-us": "Snow Mountain Guard",
+   "fr-fr": "Garde des Montagnes Neigeuses",
+   "de-de": "Schneeberg-Wache",
+   "id-id": "Penjaga Gunung Salju",
+   "ja-jp": "雪山衛兵",
+   "ko-kr": "설산 경비병",
+   "pl-pl": "Strażnik Śnieżnej Góry",
+   "pt-br": "Guarda da Montanha Nevada",
+   "ru-ru": "Страж снежной горы",
+   "es-es": "Guardia de Montaña Nevada",
+   "th-th": "ทหารเฝ้าภูเขาหิมะ",
+   "tr-tr": "Kar Dağı Muhafızı",
+   "uk-ua": "Охоронець снігової гори",
+   "vi-vn": "Lính Gác Núi Tuyết"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 10,
+  "rewardExp": 5,
+  "attackDamage": 15,
+  "attackSpeed": 90,
+  "maxLife": 155,
+  "movementSpeed": 240,
+  "skillKeys": [
+   "300431"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1304,
+     1305
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2304
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2305
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3304,
+     3305
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4304,
+     4305
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30044,
+  "name": "Snow Mountain Mage",
+  "names": {
+   "zh-hans": "雪山法师",
+   "zh-hant": "雪山法師",
+   "en-us": "Snow Mountain Mage",
+   "fr-fr": "Mage des Montagnes Neigeuses",
+   "de-de": "Schneeberg-Magier",
+   "id-id": "Penyihir Gunung Salju",
+   "ja-jp": "雪山の魔法使い",
+   "ko-kr": "설산 마법사",
+   "pl-pl": "Mag Śnieżnej Góry",
+   "pt-br": "Mago da Montanha Nevada",
+   "ru-ru": "Маг снежной горы",
+   "es-es": "Mago de Montaña Nevada",
+   "th-th": "จอมเวทภูเขาหิมะ",
+   "tr-tr": "Kar Dağı Büyücüsü",
+   "uk-ua": "Маг снігової гори",
+   "vi-vn": "Pháp Sư Núi Tuyết"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 10,
+  "rewardExp": 5,
+  "attackDamage": 25,
+  "attackSpeed": 100,
+  "maxLife": 55,
+  "movementSpeed": 220,
+  "skillKeys": [
+   "300441"
+  ],
+  "attackTypes": [
+   "Cold"
+  ],
+  "drops": [
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2303,
+     2304
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2305
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3303,
+     3304,
+     3305
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4303,
+     4304,
+     4305
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 2303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30051,
+  "name": "Ghost",
+  "names": {
+   "zh-hans": "幽灵",
+   "zh-hant": "幽靈",
+   "en-us": "Ghost",
+   "fr-fr": "Fantôme",
+   "de-de": "Geist",
+   "id-id": "Hantu",
+   "ja-jp": "幽霊",
+   "ko-kr": "유령",
+   "pl-pl": "Duch",
+   "pt-br": "Fantasma",
+   "ru-ru": "Призрак",
+   "es-es": "Fantasma",
+   "th-th": "ผี",
+   "tr-tr": "Hayalet",
+   "uk-ua": "Привид",
+   "vi-vn": "Ma"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 15,
+  "rewardExp": 15,
+  "attackDamage": 10,
+  "attackSpeed": 180,
+  "maxLife": 65,
+  "movementSpeed": 570,
+  "skillKeys": [
+   "300511"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1304,
+     1305
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 20,
+    "stages": [
+     1308,
+     1309
+    ]
+   },
+   {
+    "itemKey": 910401,
+    "rate": 15,
+    "stages": [
+     2304
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2305,
+     2308,
+     2309
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3304,
+     3305,
+     3308,
+     3309
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4304,
+     4305,
+     4308,
+     4309
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4304,
+    "name": "Frozen Glacier Cavern",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30061,
+  "name": "Lava Being",
+  "names": {
+   "zh-hans": "熔岩人",
+   "zh-hant": "熔岩人",
+   "en-us": "Lava Being",
+   "fr-fr": "Être de Lave",
+   "de-de": "Lavawesen",
+   "id-id": "Makhluk Lava",
+   "ja-jp": "溶岩の化身",
+   "ko-kr": "용암 인간",
+   "pl-pl": "Istota Lawy",
+   "pt-br": "Ser de Lava",
+   "ru-ru": "Существо из лавы",
+   "es-es": "Ser de Lava",
+   "th-th": "ร่างลาวา",
+   "tr-tr": "Lav Varlığı",
+   "uk-ua": "Істота лави",
+   "vi-vn": "Sinh Vật Dung Nham"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 20,
+  "rewardExp": 20,
+  "attackDamage": 20,
+  "attackSpeed": 75,
+  "maxLife": 75,
+  "movementSpeed": 330,
+  "skillKeys": [
+   "300611"
+  ],
+  "attackTypes": [
+   "Fire"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1306
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2306
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3306
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4306
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30071,
+  "name": "Blood Priest",
+  "names": {
+   "zh-hans": "血之祭司",
+   "zh-hant": "血之祭司",
+   "en-us": "Blood Priest",
+   "fr-fr": "Prêtre du Sang",
+   "de-de": "Blutpriester",
+   "id-id": "Pendeta Darah",
+   "ja-jp": "血の聖職者",
+   "ko-kr": "피의 성직자",
+   "pl-pl": "Krwawy Kapłan",
+   "pt-br": "Sacerdote de Sangue",
+   "ru-ru": "Кровавый священник",
+   "es-es": "Sacerdote de Sangre",
+   "th-th": "นักบวชโลหิต",
+   "tr-tr": "Kan Rahibi",
+   "uk-ua": "Кривавий жрець",
+   "vi-vn": "Giáo Sĩ Huyết"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 35,
+  "rewardExp": 35,
+  "attackDamage": 16,
+  "attackSpeed": 65,
+  "maxLife": 125,
+  "movementSpeed": 180,
+  "skillKeys": [
+   "300711"
+  ],
+  "attackTypes": [
+   "Chaos"
+  ],
+  "drops": [
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3307
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4307
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 3307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30081,
+  "name": "Demon Soldier",
+  "names": {
+   "zh-hans": "恶魔士兵",
+   "zh-hant": "惡魔士兵",
+   "en-us": "Demon Soldier",
+   "fr-fr": "Soldat Démoniaque",
+   "de-de": "Dämonensoldat",
+   "id-id": "Prajurit Iblis",
+   "ja-jp": "デーモン兵",
+   "ko-kr": "악마 병사",
+   "pl-pl": "Demoniczny Żołnierz",
+   "pt-br": "Soldado Demônio",
+   "ru-ru": "Солдат-демон",
+   "es-es": "Soldado Demonio",
+   "th-th": "ทหารปีศาจ",
+   "tr-tr": "Şeytan Asker",
+   "uk-ua": "Солдат-демон",
+   "vi-vn": "Binh Ác Quỷ"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 10,
+  "rewardExp": 11,
+  "attackDamage": 20,
+  "attackSpeed": 80,
+  "maxLife": 70,
+  "movementSpeed": 260,
+  "skillKeys": [
+   "300811"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1306,
+     1307
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 20,
+    "stages": [
+     1309
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2306,
+     2307
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3306,
+     3307
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4306,
+     4307
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30082,
+  "name": "Demon Legion Commander",
+  "names": {
+   "zh-hans": "恶魔军团长",
+   "zh-hant": "惡魔軍團長",
+   "en-us": "Demon Legion Commander",
+   "fr-fr": "Commandant de Légion Démoniaque",
+   "de-de": "Dämonenlegionsführer",
+   "id-id": "Komandan Legiun Iblis",
+   "ja-jp": "デーモン軍団長",
+   "ko-kr": "악마 군단장",
+   "pl-pl": "Dowódca Legionu Demonów",
+   "pt-br": "Comandante de Legião Demônio",
+   "ru-ru": "Командир легиона демонов",
+   "es-es": "Comandante de Legión Demonio",
+   "th-th": "ผู้บัญชาการกองทัพปีศาจ",
+   "tr-tr": "Şeytan Lejyon Komutanı",
+   "uk-ua": "Командир легіону демонів",
+   "vi-vn": "Chỉ Huy Quân Đoàn Ác Quỷ"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 10,
+  "rewardExp": 13,
+  "attackDamage": 20,
+  "attackSpeed": 80,
+  "maxLife": 45,
+  "movementSpeed": 190,
+  "skillKeys": [
+   "300821"
+  ],
+  "attackTypes": [
+   "Fire"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1306,
+     1307
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2306,
+     2307
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3306,
+     3307
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4306,
+     4307
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30083,
+  "name": "Demon Shocktrooper",
+  "names": {
+   "zh-hans": "恶魔突击兵",
+   "zh-hant": "惡魔突擊兵",
+   "en-us": "Demon Shocktrooper",
+   "fr-fr": "Troupe de Choc Démoniaque",
+   "de-de": "Dämonensturmtruppler",
+   "id-id": "Penyerang Iblis",
+   "ja-jp": "デーモン突撃兵",
+   "ko-kr": "악마 돌격병",
+   "pl-pl": "Szturmowiec Demonów",
+   "pt-br": "Tropa de Choque Demônio",
+   "ru-ru": "Штурмовик-демон",
+   "es-es": "Tropas de Choque Demonio",
+   "th-th": "ทหารจู่โจมปีศาจ",
+   "tr-tr": "Şeytan Şok Birliği",
+   "uk-ua": "Штурмовик-демон",
+   "vi-vn": "Quân Xung Kích Ác Quỷ"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 30,
+  "rewardExp": 30,
+  "attackDamage": 20,
+  "attackSpeed": 80,
+  "maxLife": 90,
+  "movementSpeed": 280,
+  "skillKeys": [
+   "300831"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1307
+    ]
+   },
+   {
+    "itemKey": 910301,
+    "rate": 20,
+    "stages": [
+     1308,
+     1309
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2307,
+     2308
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3307,
+     3308
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4307,
+     4308
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30084,
+  "name": "Burning Piglet",
+  "names": {
+   "zh-hans": "燃烧小猪",
+   "zh-hant": "燃燒小豬",
+   "en-us": "Burning Piglet",
+   "fr-fr": "Marcassin Brûlant",
+   "de-de": "Brennendes Ferkel",
+   "id-id": "Babi Menyala",
+   "ja-jp": "燃える子豚",
+   "ko-kr": "불타는 피글렛",
+   "pl-pl": "Płonący Prosię",
+   "pt-br": "Leitão Ardente",
+   "ru-ru": "Горящий поросёнок",
+   "es-es": "Lechón Ardiente",
+   "th-th": "ลูกหมูไฟ",
+   "tr-tr": "Yanan Domuzcuk",
+   "uk-ua": "Палаючий порося",
+   "vi-vn": "Heo Con Lửa"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 30,
+  "rewardExp": 30,
+  "attackDamage": 30,
+  "attackSpeed": 80,
+  "maxLife": 110,
+  "movementSpeed": 470,
+  "skillKeys": [
+   "300841"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1306,
+     1307
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2306,
+     2307,
+     2309
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3306,
+     3307
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4306,
+     4307
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30091,
+  "name": "Hell Golem",
+  "names": {
+   "zh-hans": "地狱魔像",
+   "zh-hant": "地獄魔像",
+   "en-us": "Hell Golem",
+   "fr-fr": "Golem des Enfers",
+   "de-de": "Höllengolem",
+   "id-id": "Golem Neraka",
+   "ja-jp": "地獄のゴーレム",
+   "ko-kr": "지옥의 골렘",
+   "pl-pl": "Golem Piekieł",
+   "pt-br": "Golem do Inferno",
+   "ru-ru": "Голем ада",
+   "es-es": "Gólem del Infierno",
+   "th-th": "โกเลมนรก",
+   "tr-tr": "Cehennem Golemi",
+   "uk-ua": "Голем пекла",
+   "vi-vn": "Golem Địa Ngục"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 30,
+  "rewardExp": 30,
+  "attackDamage": 40,
+  "attackSpeed": 60,
+  "maxLife": 185,
+  "movementSpeed": 160,
+  "skillKeys": [
+   "300911"
+  ],
+  "attackTypes": [
+   "Fire"
+  ],
+  "drops": [
+   {
+    "itemKey": 910201,
+    "rate": 20,
+    "stages": [
+     1306
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2306
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3306
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4306
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30101,
+  "name": "Burning Hell Priest",
+  "names": {
+   "zh-hans": "燃烧的地狱祭司",
+   "zh-hant": "燃燒的地獄祭司",
+   "en-us": "Burning Hell Priest",
+   "fr-fr": "Prêtre Infernal Brûlant",
+   "de-de": "Brennender Höllenpriester",
+   "id-id": "Pendeta Neraka Berapi",
+   "ja-jp": "燃える地獄の神官",
+   "ko-kr": "불타는 지옥 신관",
+   "pl-pl": "Płonący Kapłan Piekieł",
+   "pt-br": "Sacerdote do Inferno Ardente",
+   "ru-ru": "Пылающий жрец ада",
+   "es-es": "Sacerdote del Infierno Ardiente",
+   "th-th": "นักบวชนรกแห่งไฟ",
+   "tr-tr": "Yanan Cehennem Rahibi",
+   "uk-ua": "Палаючий жрець пекла",
+   "vi-vn": "Giáo Sĩ Địa Ngục Lửa"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 30,
+  "rewardExp": 30,
+  "attackDamage": 30,
+  "attackSpeed": 100,
+  "maxLife": 95,
+  "movementSpeed": 230,
+  "skillKeys": [
+   "301015"
+  ],
+  "attackTypes": [
+   "Fire"
+  ],
+  "drops": [
+   {
+    "itemKey": 910301,
+    "rate": 20,
+    "stages": [
+     1308,
+     1309
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2308,
+     2309
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3308,
+     3309
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4308,
+     4309
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30102,
+  "name": "Frozen Hell Priest",
+  "names": {
+   "zh-hans": "冰冻的地狱祭司",
+   "zh-hant": "冰凍的地獄祭司",
+   "en-us": "Frozen Hell Priest",
+   "fr-fr": "Prêtre Infernal Gelé",
+   "de-de": "Gefrorener Höllenpriester",
+   "id-id": "Pendeta Neraka Beku",
+   "ja-jp": "凍る地獄の神官",
+   "ko-kr": "얼어붙는 지옥 신관",
+   "pl-pl": "Zamrożony Kapłan Piekieł",
+   "pt-br": "Sacerdote do Inferno Congelante",
+   "ru-ru": "Замёрзший жрец ада",
+   "es-es": "Sacerdote del Infierno Congelante",
+   "th-th": "นักบวชนรกแห่งน้ำแข็ง",
+   "tr-tr": "Donmuş Cehennem Rahibi",
+   "uk-ua": "Замерзлий жрець пекла",
+   "vi-vn": "Giáo Sĩ Địa Ngục Băng"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 30,
+  "rewardExp": 30,
+  "attackDamage": 30,
+  "attackSpeed": 100,
+  "maxLife": 95,
+  "movementSpeed": 230,
+  "skillKeys": [
+   "301025"
+  ],
+  "attackTypes": [
+   "Cold"
+  ],
+  "drops": [
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2308,
+     2309
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3308,
+     3309
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4303,
+     4308,
+     4309
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 2308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4303,
+    "name": "Glacial Cave Entrance",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30103,
+  "name": "Electric Hell Priest",
+  "names": {
+   "zh-hans": "电流的地狱祭司",
+   "zh-hant": "電流的地獄祭司",
+   "en-us": "Electric Hell Priest",
+   "fr-fr": "Prêtre Infernal Électrique",
+   "de-de": "Elektrischer Höllenpriester",
+   "id-id": "Pendeta Neraka Listrik",
+   "ja-jp": "雷電の地獄の神官",
+   "ko-kr": "전류의 지옥 신관",
+   "pl-pl": "Elektryczny Kapłan Piekieł",
+   "pt-br": "Sacerdote do Inferno Elétrico",
+   "ru-ru": "Электрический жрец ада",
+   "es-es": "Sacerdote del Infierno Eléctrico",
+   "th-th": "นักบวชนรกแห่งไฟฟ้า",
+   "tr-tr": "Elektrik Cehennem Rahibi",
+   "uk-ua": "Електричний жрець пекла",
+   "vi-vn": "Giáo Sĩ Địa Ngục Điện"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 30,
+  "rewardExp": 30,
+  "attackDamage": 30,
+  "attackSpeed": 100,
+  "maxLife": 95,
+  "movementSpeed": 230,
+  "skillKeys": [
+   "301035"
+  ],
+  "attackTypes": [
+   "Lightning"
+  ],
+  "drops": [
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2309
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3308,
+     3309
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4305,
+     4306,
+     4309
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 2309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4305,
+    "name": "Hell Gate",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4306,
+    "name": "Burning Ravine",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30104,
+  "name": "Chaos Hell Priest",
+  "names": {
+   "zh-hans": "混沌的地狱祭司",
+   "zh-hant": "混沌的地獄祭司",
+   "en-us": "Chaos Hell Priest",
+   "fr-fr": "Prêtre Infernal du Chaos",
+   "de-de": "Chaos-Höllenpriester",
+   "id-id": "Pendeta Neraka Chaos",
+   "ja-jp": "カオスの地獄の神官",
+   "ko-kr": "혼돈의 지옥 신관",
+   "pl-pl": "Kapłan Chaosu Piekieł",
+   "pt-br": "Sacerdote do Inferno do Caos",
+   "ru-ru": "Жрец хаоса ада",
+   "es-es": "Sacerdote del Infierno del Caos",
+   "th-th": "นักบวชนรกแห่งเคออส",
+   "tr-tr": "Kaos Cehennem Rahibi",
+   "uk-ua": "Жрець хаосу пекла",
+   "vi-vn": "Giáo Sĩ Địa Ngục Hỗn Loạn"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 30,
+  "rewardExp": 30,
+  "attackDamage": 30,
+  "attackSpeed": 100,
+  "maxLife": 75,
+  "movementSpeed": 230,
+  "skillKeys": [
+   "301045"
+  ],
+  "attackTypes": [
+   "Chaos"
+  ],
+  "drops": [
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3309
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4307,
+     4308,
+     4309
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 3309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4307,
+    "name": "Plains of Torment",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30111,
+  "name": "Finger of Death",
+  "names": {
+   "zh-hans": "死亡之指",
+   "zh-hant": "死亡之指",
+   "en-us": "Finger of Death",
+   "fr-fr": "Doigt de la Mort",
+   "de-de": "Todesfinger",
+   "id-id": "Jari Kematian",
+   "ja-jp": "死の指",
+   "ko-kr": "죽음의 손가락",
+   "pl-pl": "Palec Śmierci",
+   "pt-br": "Dedo da Morte",
+   "ru-ru": "Палец смерти",
+   "es-es": "Dedo de la Muerte",
+   "th-th": "นิ้วมรณะ",
+   "tr-tr": "Ölüm Parmağı",
+   "uk-ua": "Палець смерті",
+   "vi-vn": "Ngón Tay Tử Thần"
+  },
+  "type": "MONSTER",
+  "isBoss": false,
+  "rewardGold": 30,
+  "rewardExp": 30,
+  "attackDamage": 25,
+  "attackSpeed": 160,
+  "maxLife": 65,
+  "movementSpeed": 430,
+  "skillKeys": [
+   "301111"
+  ],
+  "attackTypes": [
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 910301,
+    "rate": 20,
+    "stages": [
+     1308,
+     1309
+    ]
+   },
+   {
+    "itemKey": 910501,
+    "rate": 15,
+    "stages": [
+     2308,
+     2309
+    ]
+   },
+   {
+    "itemKey": 910651,
+    "rate": 10,
+    "stages": [
+     3308,
+     3309
+    ]
+   },
+   {
+    "itemKey": 910801,
+    "rate": 8,
+    "stages": [
+     4308,
+     4309
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 1309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 2309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 3309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4308,
+    "name": "Citadel of Ruin",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   },
+   {
+    "stageKey": 4309,
+    "name": "Core of the Abyss",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "monster"
+   }
+  ]
+ },
+ {
+  "key": 30901,
+  "name": "Archon Morkar",
+  "names": {
+   "zh-hans": "执政官莫尔卡",
+   "zh-hant": "執政官莫爾卡",
+   "en-us": "Archon Morkar",
+   "fr-fr": "Archonte Morkar",
+   "de-de": "Archont Morkar",
+   "id-id": "Archon Morkar",
+   "ja-jp": "モルカル執政官",
+   "ko-kr": "집정관 모르카르",
+   "pl-pl": "Archon Morkar",
+   "pt-br": "Arconte Morkar",
+   "ru-ru": "Архонт Моркар",
+   "es-es": "Arconte Morkar",
+   "th-th": "อาร์คอน มอร์คาร์",
+   "tr-tr": "Arkhon Morkar",
+   "uk-ua": "Архонт Моркар",
+   "vi-vn": "Archon Morkar"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 1,
+  "attackDamage": 70,
+  "attackSpeed": 130,
+  "maxLife": 2550,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "309011",
+   "309021"
+  ],
+  "attackTypes": [
+   "Chaos"
+  ],
+  "drops": [
+   {
+    "itemKey": 930301,
+    "rate": null,
+    "stages": [
+     1310
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 1310,
+    "name": "Hell Command Chamber",
+    "act": 3,
+    "difficulty": "NORMAL",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 30902,
+  "name": "Archon Morkar",
+  "names": {
+   "zh-hans": "执政官莫尔卡",
+   "zh-hant": "執政官莫爾卡",
+   "en-us": "Archon Morkar",
+   "fr-fr": "Archonte Morkar",
+   "de-de": "Archont Morkar",
+   "id-id": "Archon Morkar",
+   "ja-jp": "モルカル執政官",
+   "ko-kr": "집정관 모르카르",
+   "pl-pl": "Archon Morkar",
+   "pt-br": "Arconte Morkar",
+   "ru-ru": "Архонт Моркар",
+   "es-es": "Arconte Morkar",
+   "th-th": "อาร์คอน มอร์คาร์",
+   "tr-tr": "Arkhon Morkar",
+   "uk-ua": "Архонт Моркар",
+   "vi-vn": "Archon Morkar"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 1,
+  "attackDamage": 80,
+  "attackSpeed": 150,
+  "maxLife": 2750,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "309011",
+   "309021",
+   "309031"
+  ],
+  "attackTypes": [
+   "Chaos",
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 930501,
+    "rate": null,
+    "stages": [
+     2310
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 2310,
+    "name": "Hell Command Chamber",
+    "act": 3,
+    "difficulty": "NIGHTMARE",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 30903,
+  "name": "Archon Morkar",
+  "names": {
+   "zh-hans": "执政官莫尔卡",
+   "zh-hant": "執政官莫爾卡",
+   "en-us": "Archon Morkar",
+   "fr-fr": "Archonte Morkar",
+   "de-de": "Archont Morkar",
+   "id-id": "Archon Morkar",
+   "ja-jp": "モルカル執政官",
+   "ko-kr": "집정관 모르카르",
+   "pl-pl": "Archon Morkar",
+   "pt-br": "Arconte Morkar",
+   "ru-ru": "Архонт Моркар",
+   "es-es": "Arconte Morkar",
+   "th-th": "อาร์คอน มอร์คาร์",
+   "tr-tr": "Arkhon Morkar",
+   "uk-ua": "Архонт Моркар",
+   "vi-vn": "Archon Morkar"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 1,
+  "attackDamage": 90,
+  "attackSpeed": 150,
+  "maxLife": 3050,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "309011",
+   "309021",
+   "309031",
+   "309041"
+  ],
+  "attackTypes": [
+   "Chaos",
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 930701,
+    "rate": null,
+    "stages": [
+     3310
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 3310,
+    "name": "Hell Command Chamber",
+    "act": 3,
+    "difficulty": "HELL",
+    "role": "boss"
+   }
+  ]
+ },
+ {
+  "key": 30904,
+  "name": "Archon Morkar",
+  "names": {
+   "zh-hans": "执政官莫尔卡",
+   "zh-hant": "執政官莫爾卡",
+   "en-us": "Archon Morkar",
+   "fr-fr": "Archonte Morkar",
+   "de-de": "Archont Morkar",
+   "id-id": "Archon Morkar",
+   "ja-jp": "モルカル執政官",
+   "ko-kr": "집정관 모르카르",
+   "pl-pl": "Archon Morkar",
+   "pt-br": "Arconte Morkar",
+   "ru-ru": "Архонт Моркар",
+   "es-es": "Arconte Morkar",
+   "th-th": "อาร์คอน มอร์คาร์",
+   "tr-tr": "Arkhon Morkar",
+   "uk-ua": "Архонт Моркар",
+   "vi-vn": "Archon Morkar"
+  },
+  "type": "MONSTER",
+  "isBoss": true,
+  "rewardGold": 500,
+  "rewardExp": 1,
+  "attackDamage": 100,
+  "attackSpeed": 150,
+  "maxLife": 3550,
+  "movementSpeed": 120,
+  "skillKeys": [
+   "309011",
+   "309021",
+   "309031",
+   "309041",
+   "309051"
+  ],
+  "attackTypes": [
+   "Chaos",
+   "Physical"
+  ],
+  "drops": [
+   {
+    "itemKey": 930901,
+    "rate": null,
+    "stages": [
+     4310
+    ]
+   }
+  ],
+  "stages": [
+   {
+    "stageKey": 4310,
+    "name": "Hell Command Chamber",
+    "act": 3,
+    "difficulty": "TORMENT",
+    "role": "boss"
+   }
+  ]
+ }
+]

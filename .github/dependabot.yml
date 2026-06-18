@@ -17,35 +17,31 @@ updates:
       prefix: "ci(deps)"
     labels: ["dependencies"]
 
-  # --- Uncomment when the source lands ---------------------------------------------------------
-  # app/ and reader/ don't exist yet, so Dependabot would report "manifest not found". Restore
-  # these two blocks in the PR that brings the code.
-  #
-  # # The Electron app (pnpm is read under the "npm" ecosystem). Minor/patch are grouped into one
-  # # weekly PR; majors come as individual PRs so a breaking Electron/React bump gets focused review.
-  # - package-ecosystem: "npm"
-  #   directory: "/app"
-  #   schedule:
-  #     interval: "weekly"
-  #   groups:
-  #     app:
-  #       patterns: ["*"]
-  #       update-types: ["minor", "patch"]
-  #   open-pull-requests-limit: 5
-  #   commit-message:
-  #     prefix: "chore(deps)"
-  #     prefix-development: "chore(deps-dev)"
-  #   labels: ["dependencies"]
-  #
-  # # The reader's dev tooling (pytest, etc.) — the shipped reader is pure stdlib, so these are
-  # # dev-only. Monthly: they move slowly, and any reader/ change stages a (harmless, unshipped) RC.
-  # - package-ecosystem: "pip"
-  #   directory: "/reader"
-  #   schedule:
-  #     interval: "monthly"
-  #   groups:
-  #     reader-dev:
-  #       patterns: ["*"]
-  #   commit-message:
-  #     prefix: "chore(deps-dev)"
-  #   labels: ["dependencies"]
+  # The Electron app (pnpm is read under the "npm" ecosystem). Minor/patch are grouped into one
+  # weekly PR; majors come as individual PRs so a breaking Electron/React bump gets focused review.
+  - package-ecosystem: "npm"
+    directory: "/app"
+    schedule:
+      interval: "weekly"
+    groups:
+      app:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    labels: ["dependencies"]
+
+  # The reader's dev tooling (pytest, etc.) — the shipped reader is pure stdlib, so these are
+  # dev-only. Monthly: they move slowly, and any reader/ change stages a (harmless, unshipped) RC.
+  - package-ecosystem: "pip"
+    directory: "/reader"
+    schedule:
+      interval: "monthly"
+    groups:
+      reader-dev:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore(deps-dev)"
+    labels: ["dependencies"]

@@ -1,0 +1,10 @@
+node_modules/
+out/
+dist/
+src/shared/data/
+src/renderer/public/heroes/
+src/renderer/public/sprites/
+# Reader exe is built by CI (release workflow) and bundled via extraResources.
+resources/reader/
+*.local
+.DS_Store

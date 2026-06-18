@@ -1,0 +1,27 @@
+# Repo-level ignores. The app and reader keep their own .gitignore for area-specific build
+# output (app/out, app/dist, app/src/shared/data, reader/output, reader/__pycache__, …).
+
+# OS / editor cruft
+.DS_Store
+*.local
+*.log
+
+# Secrets — never commit real env files (see SECURITY.md). Only *.env.example is tracked.
+.env
+.env.*
+!.env.example
+
+# TypeScript incremental build cache (machine-specific, regenerated)
+*.tsbuildinfo
+
+# Node (defensive — app/ has its own, but guard against a stray root install)
+node_modules/
+
+# Python (defensive — reader/ has its own)
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# The committed game-data snapshot in data/ is the source of truth — do NOT ignore it.

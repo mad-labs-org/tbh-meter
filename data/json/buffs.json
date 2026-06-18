@@ -1,0 +1,205 @@
+[
+ {
+  "key": 1011,
+  "type": "Debuff",
+  "statType": "AttackSpeed",
+  "modType": "MULTIPLICATIVE",
+  "value": 300
+ },
+ {
+  "key": 1012,
+  "type": "Debuff",
+  "statType": "MovementSpeed",
+  "modType": "MULTIPLICATIVE",
+  "value": 300
+ },
+ {
+  "key": 1031,
+  "type": "Debuff",
+  "statType": "FireDamageAddition",
+  "modType": "FLAT",
+  "value": 200
+ },
+ {
+  "key": 1041,
+  "type": "Debuff",
+  "statType": "LightningDamageAddition",
+  "modType": "FLAT",
+  "value": 200
+ },
+ {
+  "key": 1051,
+  "type": "Debuff",
+  "statType": "PhysicalDamageAddition",
+  "modType": "FLAT",
+  "value": 200
+ },
+ {
+  "key": 1061,
+  "type": "Debuff",
+  "statType": "DamageAddition",
+  "modType": "FLAT",
+  "value": 100
+ },
+ {
+  "key": 105011,
+  "type": "Buff",
+  "statType": "AttackDamage",
+  "modType": "ADDITIVE",
+  "value": 500
+ },
+ {
+  "key": 204011,
+  "type": "Buff",
+  "statType": "AttackSpeed",
+  "modType": "ADDITIVE",
+  "value": 500
+ },
+ {
+  "key": 402011,
+  "type": "Buff",
+  "statType": "AttackDamage",
+  "modType": "MULTIPLICATIVE",
+  "value": null
+ },
+ {
+  "key": 405011,
+  "type": "Buff",
+  "statType": "FireResistance",
+  "modType": "FLAT",
+  "value": null
+ },
+ {
+  "key": 405012,
+  "type": "Buff",
+  "statType": "ColdResistance",
+  "modType": "FLAT",
+  "value": null
+ },
+ {
+  "key": 405013,
+  "type": "Buff",
+  "statType": "LightningResistance",
+  "modType": "FLAT",
+  "value": null
+ },
+ {
+  "key": 503011,
+  "type": "Buff",
+  "statType": "AttackSpeed",
+  "modType": "MULTIPLICATIVE",
+  "value": 1000
+ },
+ {
+  "key": 603011,
+  "type": "Buff",
+  "statType": "CriticalChance",
+  "modType": "ADDITIVE",
+  "value": 300
+ },
+ {
+  "key": 605011,
+  "type": "Buff",
+  "statType": "MovementSpeed",
+  "modType": "MULTIPLICATIVE",
+  "value": 200
+ },
+ {
+  "key": 606011,
+  "type": "Buff",
+  "statType": "AttackDamage",
+  "modType": "MULTIPLICATIVE",
+  "value": 1000
+ },
+ {
+  "key": 2090211,
+  "type": "Buff",
+  "statType": "AttackSpeed",
+  "modType": "MULTIPLICATIVE",
+  "value": 1000
+ },
+ {
+  "key": 9100011,
+  "type": "Debuff",
+  "statType": "FireResistance",
+  "modType": "FLAT",
+  "value": 20
+ },
+ {
+  "key": 9100012,
+  "type": "Debuff",
+  "statType": "ColdResistance",
+  "modType": "FLAT",
+  "value": 20
+ },
+ {
+  "key": 9100013,
+  "type": "Debuff",
+  "statType": "LightningResistance",
+  "modType": "FLAT",
+  "value": 20
+ },
+ {
+  "key": 9100014,
+  "type": "Debuff",
+  "statType": "ChaosResistance",
+  "modType": "FLAT",
+  "value": 20
+ },
+ {
+  "key": 9100021,
+  "type": "Debuff",
+  "statType": "FireResistance",
+  "modType": "FLAT",
+  "value": 40
+ },
+ {
+  "key": 9100022,
+  "type": "Debuff",
+  "statType": "ColdResistance",
+  "modType": "FLAT",
+  "value": 40
+ },
+ {
+  "key": 9100023,
+  "type": "Debuff",
+  "statType": "LightningResistance",
+  "modType": "FLAT",
+  "value": 40
+ },
+ {
+  "key": 9100024,
+  "type": "Debuff",
+  "statType": "ChaosResistance",
+  "modType": "FLAT",
+  "value": 40
+ },
+ {
+  "key": 9100031,
+  "type": "Debuff",
+  "statType": "FireResistance",
+  "modType": "FLAT",
+  "value": 60
+ },
+ {
+  "key": 9100032,
+  "type": "Debuff",
+  "statType": "ColdResistance",
+  "modType": "FLAT",
+  "value": 60
+ },
+ {
+  "key": 9100033,
+  "type": "Debuff",
+  "statType": "LightningResistance",
+  "modType": "FLAT",
+  "value": 60
+ },
+ {
+  "key": 9100034,
+  "type": "Debuff",
+  "statType": "ChaosResistance",
+  "modType": "FLAT",
+  "value": 60
+ }
+]

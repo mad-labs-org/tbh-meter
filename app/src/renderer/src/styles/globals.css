@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-brand-50: #f0f4ff;
+  --color-brand-100: #dde6ff;
+  --color-brand-200: #c3d0ff;
+  --color-brand-300: #9db0ff;
+  --color-brand-400: #7485ff;
+  --color-brand-500: #4f5dff;
+  --color-brand-600: #3a3ff5;
+  --color-brand-700: #2f2fdb;
+  --color-brand-800: #2929b1;
+  --color-brand-900: #272a8c;
+  --color-brand-950: #181953;
+
+  --color-surface-900: #0d0e1a;
+  --color-surface-800: #12131f;
+  --color-surface-700: #1a1b2e;
+  --color-surface-600: #22233a;
+  --color-surface-500: #2a2b46;
+
+  --color-discord: #5865f2;
+  --color-discord-dark: #4752c4;
+  --color-discord-foreground: #c3cbff;
+}
+
+:root {
+  color-scheme: dark;
+  --radius: 0.5rem;
+  --background: #0d0e1a;
+  --foreground: #fafafa;
+  --muted: #1a1b2e;
+  --muted-foreground: #a1a1aa;
+  --border: #2a2b46;
+  --ring: #3a3ff5;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    @apply bg-transparent text-white;
+  }
+
+  body {
+    background: transparent;
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-surface-800);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-surface-500);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-brand-600);
+  }
+}
+
+/* Startup splash (SplashApp) — Discord-style loading screen animations. */
+@keyframes splash-indeterminate {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(420%);
+  }
+}
+.splash-indeterminate {
+  animation: splash-indeterminate 1.2s ease-in-out infinite;
+}
+
+/* Live "pulse" dot for the realtime meter header. */
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+.live-pulse {
+  animation: live-pulse 1.4s ease-in-out infinite;
+}

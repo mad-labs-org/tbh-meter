@@ -1,0 +1,13 @@
+# ruff.toml — lint do reader (Python · Windows). Ferramenta de DEV apenas:
+# o runtime segue ZERO-DEP (ctypes puro, sem pip) — ruff NÃO entra no reader.
+#   rodar sem instalar:  uvx ruff check .     (uv já está no ambiente)
+#   instalar permanente: brew install ruff
+target-version = "py311"
+line-length = 110
+
+[lint]
+# Bugs > estilo. F = pyflakes (nome indefinido / import|var morta — o que o refactor
+# mais arrisca); E9 = erros de sintaxe; B = flake8-bugbear (armadilhas reais).
+# Ordenação de import (I) e o `ruff format` ficam pra um passe próprio — geram churn
+# de estilo que não deve se misturar com refactor de lógica.
+select = ["F", "E9", "B"]

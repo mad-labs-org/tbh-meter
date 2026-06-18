@@ -1,0 +1,9 @@
+# O READER/METER (Windows, onde o jogo está) agora é ZERO-DEP: ctypes puro + stdlib.
+# Nada pra instalar pra coletar — basta `python` no Windows.
+# (pymem foi REMOVIDO; substituído por tbh_meter/memory/* em ctypes, validado.)
+#
+# Opcional, só pro painel ao vivo LEGADO (main.py v1; o produto não precisa):
+#   rich>=13.7.0
+#
+# Lado Mac/servidor (upload/análise/disasm — fora do reader) usa o que quiser
+# sem restrição (ex.: psycopg2 pro DB, capstone pra disassembly).

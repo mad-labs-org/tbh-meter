@@ -1,0 +1,97 @@
+appId: wiki.tbh.meter
+productName: tbh-meter
+copyright: Copyright © 2025-2026 TBH Wiki Contributors
+
+directories:
+  buildResources: resources
+  output: dist
+
+files:
+  - out/**/*
+  # App icon must live INSIDE the asar. The main process + tray load it at runtime
+  # via `icon.png?asset`, which electron-vite compiles to a path that resolves to
+  # <app.asar>/resources/icon.png. Without this line, `resources/` is never packaged,
+  # so nativeImage.createFromPath() returns an EMPTY image -> blank/transparent tray
+  # icon in the Windows notification area (and windows silently fall back to
+  # Electron's default icon, hiding the same breakage). The reader stays OUT of the
+  # asar via `extraResources` below — exes can't be exec'd from inside an asar.
+  - resources/icon.png
+  # Tray-specific mark, loaded at runtime via `icon-tray.png?asset` (tray.ts).
+  # Same asar requirement as icon.png above — without this the tray icon goes blank.
+  - resources/icon-tray.png
+  - "!**/*.map"
+  - "!**/*.d.ts"
+
+# Auto-update feed. electron-builder embeds this into the packaged app (app-update.yml)
+# so electron-updater knows where to look, and writes latest.yml referencing this repo's
+# Releases. CI builds with `--publish never` and uploads latest.yml + the NSIS installer's
+# .blockmap to the tbh-meter-v<version> release itself (see meter-3-ship.yml).
+# electron-updater resolves the newest build via GitHub's /releases/latest endpoint, so the
+# custom tbh-meter-v<version> tag prefix works as long as that release is flagged "Latest".
+#
+# PUBLIC repo on purpose: the source (tbh-wiki) is PRIVATE, and electron-updater on a user's
+# machine has no GitHub token — it would 404 on a private repo's release assets ("Update
+# check failed"). So releases live in a dedicated PUBLIC repo the app reads anonymously; CI
+# publishes there with a cross-repo token (RELEASES_TOKEN). See meter-3-ship.yml.
+publish:
+  provider: github
+  owner: mad-labs-org
+  repo: tbh-meter-releases
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: resources/icon.ico
+  # Bundle the CI-built Python reader OUTSIDE app.asar (asar contents can't be
+  # exec'd). `from` is relative to the app project dir; `to: reader` lands it at
+  # <resourcesPath>/reader/, where reader-process.ts resolves tbh-reader.exe. Only
+  # under `win:` because the reader is Windows-only; the folder is gitignored and
+  # produced by CI before electron-builder runs.
+  extraResources:
+    - from: resources/reader
+      to: reader
+      filter:
+        - "**/*"
+
+nsis:
+  # Space-free installer name. GitHub renames release assets (spaces -> dots) but
+  # electron-updater builds its download URL from latest.yml replacing spaces with
+  # hyphens — that mismatch 404s the update download. A name with no spaces keeps
+  # latest.yml, the uploaded GitHub asset, and the updater's URL byte-identical.
+  artifactName: tbh-meter-Setup-${version}.${ext}
+  # Assisted installer: visible multi-step UI + a finish page with a
+  # "Run tbh-meter" checkbox, so the user has a clear reopen affordance.
+  oneClick: false
+  # Per-user install -> no UAC/admin prompt -> highest chance the install
+  # completes, and the app runs as the REAL logged-in user so app.getPath("home")
+  # === C:\Users\<user> matches what the Python reader resolves.
+  perMachine: false
+  # Never silently escalate to admin: an elevated per-machine context would flip
+  # USERPROFILE/HKCU to the admin account and the reader (unelevated) would then
+  # look in the wrong home folder. Keep both processes on the same user home.
+  allowElevation: false
+  # "Just click to install": skip the install-directory page.
+  allowToChangeInstallationDirectory: false
+  # "always" -> the desktop shortcut is (re)created even on reinstall if the user
+  # deleted it (guarded against silent auto-updates), so reopening is reliable.
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  # Explicit, predictable .lnk name for BOTH desktop and Start Menu (avoids the
+  # sanitized-productName fallback mangling accents/punctuation).
+  shortcutName: "tbh-meter"
+  # false -> Start Menu entry sits at the top level (easiest to find via search).
+  menuCategory: false
+  # Finish page offers to launch immediately; later the user reopens from the
+  # desktop icon or Start Menu entry.
+  runAfterFinish: true
+  uninstallDisplayName: "tbh-meter"
+  # The meter folder lives outside the install dir (under the user home), so it is
+  # never auto-removed on uninstall...
+  deleteAppDataOnUninstall: false
+  # ...instead the uninstaller PROMPTS "keep or delete your runs/logs?" via this
+  # custom hook (build/uninstaller.nsh -> !macro customUnInstall).
+  include: build/uninstaller.nsh
+  installerIcon: resources/icon.ico
+  uninstallerIcon: resources/icon.ico

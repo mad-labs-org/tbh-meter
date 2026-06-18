@@ -1,0 +1,1466 @@
+[
+ {
+  "key": 101,
+  "name": "Knight",
+  "names": {
+   "zh-hans": "骑士",
+   "zh-hant": "騎士",
+   "en-us": "Knight",
+   "fr-fr": "Chevalier",
+   "de-de": "Ritter",
+   "id-id": "Knight",
+   "ja-jp": "ナイト",
+   "ko-kr": "기사",
+   "pl-pl": "Rycerz",
+   "pt-br": "Cavaleiro",
+   "ru-ru": "Рыцарь",
+   "es-es": "Caballero",
+   "th-th": "อัศวิน",
+   "tr-tr": "Şövalye",
+   "uk-ua": "Лицар",
+   "vi-vn": "Hiệp Sĩ"
+  },
+  "description": "A tanky melee fighter\nwith strong defense\nand shields equipment.",
+  "classType": "Knight",
+  "mainWeapon": "SWORD",
+  "subWeapon": "SHIELD",
+  "baseSkillKey": 10001,
+  "unlockCost": 500,
+  "isDLC": false,
+  "isAvailable": true,
+  "isFirstAvailable": true,
+  "hasDLCDrop": false,
+  "stats": {
+   "attackDamage": 2,
+   "attackSpeed": 90,
+   "castSpeed": 100,
+   "criticalChance": 25,
+   "criticalDamage": 1400,
+   "maxHp": 130,
+   "armor": 45,
+   "cooldownReduction": 0,
+   "movementSpeed": 950
+  },
+  "iconPath": "UI/Icon/Hero/Hero_101",
+  "skillTree": [
+   {
+    "attributeKey": 101001,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 101001,
+    "requiredPoint": 1,
+    "maxLevel": 3,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 101002,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 101002,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 101003,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 10101,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 101004,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 10201,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 101011,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 101011,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 101012,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 101012,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 101013,
+    "groupKey": 10002,
+    "type": "ACTIVESKILL",
+    "refKey": 10301,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 101021,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 101021,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 101022,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 101022,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 101023,
+    "groupKey": 10003,
+    "type": "ACTIVESKILL",
+    "refKey": 10401,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 101031,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 101031,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 101032,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 101032,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 101033,
+    "groupKey": 10004,
+    "type": "ACTIVESKILL",
+    "refKey": 10501,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 101041,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 101041,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 101042,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 101042,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 101043,
+    "groupKey": 10005,
+    "type": "ACTIVESKILL",
+    "refKey": 10601,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 101051,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 101051,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 101052,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 101052,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 101061,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 101061,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 101062,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 101062,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 101071,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 101071,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   },
+   {
+    "attributeKey": 101072,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 101072,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   }
+  ]
+ },
+ {
+  "key": 201,
+  "name": "Ranger",
+  "names": {
+   "zh-hans": "游侠",
+   "zh-hant": "遊俠",
+   "en-us": "Ranger",
+   "fr-fr": "Rôdeur",
+   "de-de": "Waldläufer",
+   "id-id": "Ranger",
+   "ja-jp": "レンジャー",
+   "ko-kr": "레인저",
+   "pl-pl": "Łucznik",
+   "pt-br": "Explorador",
+   "ru-ru": "Следопыт",
+   "es-es": "Explorador",
+   "th-th": "เรนเจอร์",
+   "tr-tr": "Korucu",
+   "uk-ua": "Рейнджер",
+   "vi-vn": "Xạ Thủ"
+  },
+  "description": "An agile archer specializing in precise\nranged attacks with bow.",
+  "classType": "Ranger",
+  "mainWeapon": "BOW",
+  "subWeapon": "ARROW",
+  "baseSkillKey": 20001,
+  "unlockCost": 500,
+  "isDLC": false,
+  "isAvailable": true,
+  "isFirstAvailable": true,
+  "hasDLCDrop": false,
+  "stats": {
+   "attackDamage": 1,
+   "attackSpeed": 100,
+   "castSpeed": 100,
+   "criticalChance": 40,
+   "criticalDamage": 1500,
+   "maxHp": 60,
+   "armor": 8,
+   "cooldownReduction": 0,
+   "movementSpeed": 850
+  },
+  "iconPath": "UI/Icon/Hero/Hero_201",
+  "skillTree": [
+   {
+    "attributeKey": 201001,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 201001,
+    "requiredPoint": 1,
+    "maxLevel": 3,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 201002,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 201002,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 201003,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 20101,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 201004,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 20201,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 201011,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 201011,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 201012,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 201012,
+    "requiredPoint": 1,
+    "maxLevel": 3,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 201013,
+    "groupKey": 10002,
+    "type": "ACTIVESKILL",
+    "refKey": 20301,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 201021,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 201021,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 201022,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 201022,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 201023,
+    "groupKey": 10003,
+    "type": "ACTIVESKILL",
+    "refKey": 20401,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 201031,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 201031,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 201032,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 201032,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 201033,
+    "groupKey": 10004,
+    "type": "ACTIVESKILL",
+    "refKey": 20501,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 201041,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 201041,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 201042,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 201042,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 201043,
+    "groupKey": 10005,
+    "type": "ACTIVESKILL",
+    "refKey": 20601,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 201051,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 201051,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 201052,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 201052,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 201061,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 201061,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 201062,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 201062,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 201071,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 201071,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   },
+   {
+    "attributeKey": 201072,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 201072,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   }
+  ]
+ },
+ {
+  "key": 301,
+  "name": "Sorcerer",
+  "names": {
+   "zh-hans": "法师",
+   "zh-hant": "法師",
+   "en-us": "Sorcerer",
+   "fr-fr": "Sorcier",
+   "de-de": "Zauberer",
+   "id-id": "Sorcerer",
+   "ja-jp": "ソーサラー",
+   "ko-kr": "마법사",
+   "pl-pl": "Czarodziej",
+   "pt-br": "Feiticeiro",
+   "ru-ru": "Колдун",
+   "es-es": "Hechicero",
+   "th-th": "จอมเวท",
+   "tr-tr": "Büyücü",
+   "uk-ua": "Чаклун",
+   "vi-vn": "Pháp Sư"
+  },
+  "description": "A powerful mage dealing\ndevastating area\nmagic damage.",
+  "classType": "Sorcerer",
+  "mainWeapon": "STAFF",
+  "subWeapon": "ORB",
+  "baseSkillKey": 30001,
+  "unlockCost": 500,
+  "isDLC": false,
+  "isAvailable": true,
+  "isFirstAvailable": true,
+  "hasDLCDrop": false,
+  "stats": {
+   "attackDamage": 2,
+   "attackSpeed": 55,
+   "castSpeed": 100,
+   "criticalChance": 50,
+   "criticalDamage": 1650,
+   "maxHp": 50,
+   "armor": 5,
+   "cooldownReduction": 0,
+   "movementSpeed": 770
+  },
+  "iconPath": "UI/Icon/Hero/Hero_301",
+  "skillTree": [
+   {
+    "attributeKey": 301001,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 301001,
+    "requiredPoint": 1,
+    "maxLevel": 3,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 301002,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 301002,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 301003,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 30101,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 301004,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 30201,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 301011,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 301011,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 301012,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 301012,
+    "requiredPoint": 1,
+    "maxLevel": 3,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 301013,
+    "groupKey": 10002,
+    "type": "ACTIVESKILL",
+    "refKey": 30301,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 301021,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 301021,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 301022,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 301022,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 301023,
+    "groupKey": 10003,
+    "type": "ACTIVESKILL",
+    "refKey": 30401,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 301031,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 301031,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 301032,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 301032,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 301033,
+    "groupKey": 10004,
+    "type": "ACTIVESKILL",
+    "refKey": 30501,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 301041,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 301041,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 301042,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 301042,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 301043,
+    "groupKey": 10005,
+    "type": "ACTIVESKILL",
+    "refKey": 30601,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 301051,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 301051,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 301052,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 301052,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 301061,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 301061,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 301062,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 301062,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 301071,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 301071,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   },
+   {
+    "attributeKey": 301072,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 301072,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   }
+  ]
+ },
+ {
+  "key": 401,
+  "name": "Priest",
+  "names": {
+   "zh-hans": "牧师",
+   "zh-hant": "牧師",
+   "en-us": "Priest",
+   "fr-fr": "Prêtre",
+   "de-de": "Priester",
+   "id-id": "Priest",
+   "ja-jp": "プリースト",
+   "ko-kr": "사제",
+   "pl-pl": "Kapłan",
+   "pt-br": "Sacerdote",
+   "ru-ru": "Жрец",
+   "es-es": "Sacerdote",
+   "th-th": "นักบวช",
+   "tr-tr": "Rahip",
+   "uk-ua": "Жрець",
+   "vi-vn": "Giáo Sĩ"
+  },
+  "description": "A holy healer who supports allies\nwith restoration magic.",
+  "classType": "Priest",
+  "mainWeapon": "SCEPTER",
+  "subWeapon": "TOME",
+  "baseSkillKey": 40001,
+  "unlockCost": 500,
+  "isDLC": true,
+  "isAvailable": true,
+  "isFirstAvailable": false,
+  "hasDLCDrop": false,
+  "stats": {
+   "attackDamage": 1,
+   "attackSpeed": 90,
+   "castSpeed": 100,
+   "criticalChance": 20,
+   "criticalDamage": 1400,
+   "maxHp": 95,
+   "armor": 30,
+   "cooldownReduction": 0,
+   "movementSpeed": 700
+  },
+  "iconPath": "UI/Icon/Hero/Hero_401",
+  "skillTree": [
+   {
+    "attributeKey": 401001,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 401001,
+    "requiredPoint": 1,
+    "maxLevel": 3,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 401002,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 401002,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 401003,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 40101,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 401004,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 40201,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 401011,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 401011,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 401012,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 401012,
+    "requiredPoint": 1,
+    "maxLevel": 3,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 401013,
+    "groupKey": 10002,
+    "type": "ACTIVESKILL",
+    "refKey": 40301,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 401021,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 401021,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 401022,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 401022,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 401023,
+    "groupKey": 10003,
+    "type": "ACTIVESKILL",
+    "refKey": 40401,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 401031,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 401031,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 401032,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 401032,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 401033,
+    "groupKey": 10004,
+    "type": "ACTIVESKILL",
+    "refKey": 40501,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 401041,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 401041,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 401042,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 401042,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 401043,
+    "groupKey": 10005,
+    "type": "ACTIVESKILL",
+    "refKey": 40601,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 401051,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 401051,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 401052,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 401052,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 401061,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 401061,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 401062,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 401062,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 401071,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 401071,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   },
+   {
+    "attributeKey": 401072,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 401072,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   }
+  ]
+ },
+ {
+  "key": 501,
+  "name": "Hunter",
+  "names": {
+   "zh-hans": "猎人",
+   "zh-hant": "獵人",
+   "en-us": "Hunter",
+   "fr-fr": "Chasseur",
+   "de-de": "Jäger",
+   "id-id": "Hunter",
+   "ja-jp": "ハンター",
+   "ko-kr": "헌터",
+   "pl-pl": "Łowca",
+   "pt-br": "Caçador",
+   "ru-ru": "Охотник",
+   "es-es": "Cazador",
+   "th-th": "นักล่า",
+   "tr-tr": "Avcı",
+   "uk-ua": "Мисливець",
+   "vi-vn": "Thợ Săn"
+  },
+  "description": "A tactical expert using traps\nand crossbow.",
+  "classType": "Hunter",
+  "mainWeapon": "CROSSBOW",
+  "subWeapon": "BOLT",
+  "baseSkillKey": 50001,
+  "unlockCost": 500,
+  "isDLC": true,
+  "isAvailable": true,
+  "isFirstAvailable": false,
+  "hasDLCDrop": true,
+  "stats": {
+   "attackDamage": 2,
+   "attackSpeed": 70,
+   "castSpeed": 100,
+   "criticalChance": 45,
+   "criticalDamage": 1550,
+   "maxHp": 70,
+   "armor": 15,
+   "cooldownReduction": 0,
+   "movementSpeed": 750
+  },
+  "iconPath": "UI/Icon/Hero/Hero_501",
+  "skillTree": [
+   {
+    "attributeKey": 501001,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 501001,
+    "requiredPoint": 1,
+    "maxLevel": 3,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 501002,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 501002,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 501003,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 50101,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 501004,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 50201,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 501011,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 501011,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 501012,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 501012,
+    "requiredPoint": 1,
+    "maxLevel": 3,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 501013,
+    "groupKey": 10002,
+    "type": "ACTIVESKILL",
+    "refKey": 50301,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 501021,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 501021,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 501022,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 501022,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 501023,
+    "groupKey": 10003,
+    "type": "ACTIVESKILL",
+    "refKey": 50401,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 501031,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 501031,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 501032,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 501032,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 501033,
+    "groupKey": 10004,
+    "type": "ACTIVESKILL",
+    "refKey": 50501,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 501041,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 501041,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 501042,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 501042,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 501043,
+    "groupKey": 10005,
+    "type": "ACTIVESKILL",
+    "refKey": 50601,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 501051,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 501051,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 501052,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 501052,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 501061,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 501061,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 501062,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 501062,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 501071,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 501071,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   },
+   {
+    "attributeKey": 501072,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 501072,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   }
+  ]
+ },
+ {
+  "key": 601,
+  "name": "Slayer",
+  "names": {
+   "zh-hans": "杀手",
+   "zh-hant": "殺手",
+   "en-us": "Slayer",
+   "fr-fr": "Tueur",
+   "de-de": "Schlächter",
+   "id-id": "Slayer",
+   "ja-jp": "スレイヤー",
+   "ko-kr": "슬레이어",
+   "pl-pl": "Zabójca",
+   "pt-br": "Matador",
+   "ru-ru": "Убийца",
+   "es-es": "Asesino",
+   "th-th": "สเลเยอร์",
+   "tr-tr": "Katil",
+   "uk-ua": "Вбивця",
+   "vi-vn": "Sát Thủ"
+  },
+  "description": "A wild berserker\ndealing devastating melee\ndamage through rage.",
+  "classType": "Slayer",
+  "mainWeapon": "AXE",
+  "subWeapon": "HATCHET",
+  "baseSkillKey": 60001,
+  "unlockCost": 500,
+  "isDLC": true,
+  "isAvailable": true,
+  "isFirstAvailable": false,
+  "hasDLCDrop": true,
+  "stats": {
+   "attackDamage": 2,
+   "attackSpeed": 70,
+   "castSpeed": 100,
+   "criticalChance": 25,
+   "criticalDamage": 1800,
+   "maxHp": 115,
+   "armor": 40,
+   "cooldownReduction": 0,
+   "movementSpeed": 850
+  },
+  "iconPath": "UI/Icon/Hero/Hero_601",
+  "skillTree": [
+   {
+    "attributeKey": 601001,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 601001,
+    "requiredPoint": 1,
+    "maxLevel": 3,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 601002,
+    "groupKey": 10001,
+    "type": "PASSIVESKILL",
+    "refKey": 601002,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 601003,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 60101,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 601004,
+    "groupKey": 10001,
+    "type": "ACTIVESKILL",
+    "refKey": 60201,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 0
+   },
+   {
+    "attributeKey": 601011,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 601011,
+    "requiredPoint": 1,
+    "maxLevel": 8,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 601012,
+    "groupKey": 10002,
+    "type": "PASSIVESKILL",
+    "refKey": 601012,
+    "requiredPoint": 1,
+    "maxLevel": 3,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 601013,
+    "groupKey": 10002,
+    "type": "ACTIVESKILL",
+    "refKey": 60301,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 10
+   },
+   {
+    "attributeKey": 601021,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 601021,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 601022,
+    "groupKey": 10003,
+    "type": "PASSIVESKILL",
+    "refKey": 601022,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 601023,
+    "groupKey": 10003,
+    "type": "ACTIVESKILL",
+    "refKey": 60401,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 20
+   },
+   {
+    "attributeKey": 601031,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 601031,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 601032,
+    "groupKey": 10004,
+    "type": "PASSIVESKILL",
+    "refKey": 601032,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 601033,
+    "groupKey": 10004,
+    "type": "ACTIVESKILL",
+    "refKey": 60501,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 30
+   },
+   {
+    "attributeKey": 601041,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 601041,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 601042,
+    "groupKey": 10005,
+    "type": "PASSIVESKILL",
+    "refKey": 601042,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 601043,
+    "groupKey": 10005,
+    "type": "ACTIVESKILL",
+    "refKey": 60601,
+    "requiredPoint": 1,
+    "maxLevel": 5,
+    "groupRequiredPoint": 40
+   },
+   {
+    "attributeKey": 601051,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 601051,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 601052,
+    "groupKey": 10006,
+    "type": "PASSIVESKILL",
+    "refKey": 601052,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 50
+   },
+   {
+    "attributeKey": 601061,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 601061,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 601062,
+    "groupKey": 10007,
+    "type": "PASSIVESKILL",
+    "refKey": 601062,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 60
+   },
+   {
+    "attributeKey": 601071,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 601071,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   },
+   {
+    "attributeKey": 601072,
+    "groupKey": 10008,
+    "type": "PASSIVESKILL",
+    "refKey": 601072,
+    "requiredPoint": 1,
+    "maxLevel": 10,
+    "groupRequiredPoint": 70
+   }
+  ]
+ }
+]
