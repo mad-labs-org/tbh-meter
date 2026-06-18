@@ -68,24 +68,43 @@ node scripts/refresh-game-data.mjs --wiki /path/to/tbh-wiki
 That rewrites `data/{json,sprites,heroes}`. Commit the result. (A game patch usually also needs the
 reader re-calibrated — see `reader/CLAUDE.md` / the reader docs.)
 
-## Branching model
+## How changes get in
 
 Trunk-based — there is no `dev` or `prod` branch. `main` is the single long-lived branch and is
-always releasable.
+always releasable. Everything lands through a pull request; nobody pushes to `main` directly.
 
-- **Branch off `main`** for every change (`fix/…`, `feat/…`); never commit to `main` directly.
-- **Open a PR.** CI (the app + reader gates and the gitleaks scan) and a maintainer review must pass
-  before it merges — that gate is what keeps `main` shippable.
+### Contributors — fork & PR
+
+You need **no access to this repo** to contribute — the standard open-source flow:
+
+1. **Fork** the repository (UI "Fork" button, or `gh repo fork mad-labs-org/tbh-meter-releases --clone`).
+2. In your fork, branch off `main` (`fix/…`, `feat/…`) and commit your work.
+3. **Open a pull request** against `main` here. Start every change from an issue and reference it
+   (`Closes #123` in the PR description).
+
+Because your branch lives in **your** fork, the main repo stays clean and you keep full control of
+your own work — you can update or close your PR, and close the issue you opened, any time. CI (the
+app + reader gates, the gitleaks scan, and the PR-hygiene checks) plus a maintainer's **code-owner
+review** must pass before it merges.
+
+### Maintainers — direct branch
+
+Maintainers (write access) skip the fork: clone the repo, branch off `main`, push, and open the PR
+the same way. **Write access is reserved for maintainers** — it carries trust over the release
+pipeline and repository secrets (a PR from an in-repo branch can read CI secrets; a fork PR can't),
+so everyone else uses the fork flow above. New maintainers are invited after a track record of solid
+contributions.
+
+### Notes
+
 - **Merging to `main` does not ship anything to players** (see *How releases work*, below). It lands
   the change and auto-stages a release *candidate* tag; nothing reaches users until a maintainer
   ships, deliberately.
 - **Unfinished or risky work goes behind a flag/config**, not a long-lived branch, so it can land on
   `main` without being switched on for users.
-
-"Production" is not a branch: it is whatever release is flagged **Latest** on this repository's
-[Releases](../../releases) — the feed the in-app updater follows. (A release branch would only make
-sense to maintain an *old* version line in parallel; auto-update means everyone moves forward
-together, so we don't keep one.)
+- **"Production" is not a branch:** it is whatever release is flagged **Latest** on this repository's
+  [Releases](../../releases) — the feed the in-app updater follows. (Auto-update means everyone moves
+  forward together, so we don't keep an old-version branch.)
 
 ## Maintainers & governance
 
