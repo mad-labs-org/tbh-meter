@@ -1,14 +1,14 @@
-"""resolver.py — acha classes IL2CPP e suas instâncias por VARREDURA (sem calibração).
+"""resolver.py — finds IL2CPP classes and their instances by SCANNING (no calibration).
 
-Método PROVADO (3 passadas), idêntico ao validado no monólito:
-  1) varre a STRING do nome ("StageManager\\0") nas regiões;
-  2) varre ponteiros 8-alinhados pra cada string -> K = ploc - Class.NAME; valida que
-     K é uma Il2CppClass (name volta == nome E element_class/cast_class == K);
-  3) varre ponteiros pra cada K -> instâncias (exclui self-refs [K, K+0x400)).
-Re-resolver a cada launch (ASLR). NÃO serve p/ nomes < 3 letras (use finder.py).
+PROVEN method (3 passes), identical to the one validated in the monolith:
+  1) scan the name STRING ("StageManager\\0") across the regions;
+  2) scan 8-aligned pointers to each string -> K = ploc - Class.NAME; validate that
+     K is an Il2CppClass (name round-trips == name AND element_class/cast_class == K);
+  3) scan pointers to each K -> instances (excluding self-refs [K, K+0x400)).
+Re-resolve on every launch (ASLR). Does NOT work for names < 3 letters (use finder.py).
 
-resolve_via_rva() é o PRIMÁRIO no fast path (índice + bbwf, ~ms); resolve() (scan) é o
-FALLBACK permanente. Qualquer sanity-fail no rva → None → o caller cai no scan."""
+resolve_via_rva() is the PRIMARY in the fast path (index + bbwf, ~ms); resolve() (scan) is the
+permanent FALLBACK. Any sanity-fail in rva → None → the caller falls back to the scan."""
 
 import struct
 import time
@@ -18,20 +18,20 @@ from il2cpp import typeinfo
 from il2cpp.finder import bbwf_from_klass
 from shared.memory import scan
 
-# Singletons resolvidos por bbwf no fast path. Gold (AggregateManager, nome ofuscado `uu`) é
-# tratado em gold.py por ESTRUTURA (deliverable 04), NÃO aqui — §3 name-free.
+# Singletons resolved by bbwf in the fast path. Gold (AggregateManager, obfuscated name `uu`) is
+# handled in gold.py by STRUCTURE (deliverable 04), NOT here — §3 name-free.
 SINGLETONS = {"MonsterSpawnManager", "LogManager", "StageManager"}
 
 
 def _manager_inst_ok(reader, name, inst):
-    """Valida a INSTÂNCIA singleton por SIZE da lista (espelha meter_windows.py:211-216 /
-    _managers_ok). O round-trip de class_name valida a CLASSE; isto valida que a INSTÂNCIA é
-    a viva e não lixo de menu (listas não alocadas → bbwf não-nulo, mas size absurdo).
-      MonsterSpawnManager → MONSTER_LIST size em [0, 2000)
-      LogManager          → LOG_LIST size em [0, 100000)   (LOG_LIST cresce a sessão inteira)
-      StageManager        → bbwf aceito como está; a verificação party-bearing (live/combate)
-                            é deferida pra deliverable 06 — NÃO falhar aqui por party ausente.
-    Retorna True/False (False = sanity-fail → caller devolve None)."""
+    """Validates the singleton INSTANCE by list SIZE (mirrors meter_windows.py:211-216 /
+    _managers_ok). The class_name round-trip validates the CLASS; this validates that the INSTANCE
+    is the live one and not menu garbage (unallocated lists → non-null bbwf, but an absurd size).
+      MonsterSpawnManager → MONSTER_LIST size in [0, 2000)
+      LogManager          → LOG_LIST size in [0, 100000)   (LOG_LIST grows for the whole session)
+      StageManager        → bbwf accepted as-is; the party-bearing check (live/combat) is
+                            deferred to deliverable 06 — do NOT fail here on a missing party.
+    Returns True/False (False = sanity-fail → caller returns None)."""
     if not inst:
         return False
     if name == "MonsterSpawnManager":
@@ -40,24 +40,24 @@ def _manager_inst_ok(reader, name, inst):
     if name == "LogManager":
         s = reader.ri32((reader.rptr(inst + LogManager.LOG_LIST) or 0) + List.SIZE)
         return s is not None and 0 <= s < 100000
-    # StageManager (e qualquer outro singleton): aceita a instância bbwf não-nula.
+    # StageManager (and any other singleton): accept the non-null bbwf instance.
     return True
 
 
 def resolve_via_rva(reader, tbase, indices, targets, singletons=SINGLETONS):
-    """Resolução por ÍNDICE (sem scan), no MESMO shape de resolve() — (classes, instances):
-    classes = {nome: {K}}, instances = {nome: [endereços]}. Retorna None em QUALQUER
-    sanity-fail (nome ou size de instância) → o caller cai no scan; NUNCA dados parciais.
+    """Resolution by INDEX (no scan), in the SAME shape as resolve() — (classes, instances):
+    classes = {name: {K}}, instances = {name: [addresses]}. Returns None on ANY
+    sanity-fail (name or instance size) → the caller falls back to the scan; NEVER partial data.
 
-      tbase     — base viva da TypeInfoTable (typeinfo.table_base).
-      indices   — {nome: TypeDefIndex} aprendidos na calibração (deliverable 02).
-      targets   — nomes de classe a resolver (>= 3 letras, estáveis; o gold ofuscado NÃO entra).
-      singletons— nomes cuja instância vem por bbwf + validação de size.
+      tbase     — live base of the TypeInfoTable (typeinfo.table_base).
+      indices   — {name: TypeDefIndex} learned during calibration (deliverable 02).
+      targets   — class names to resolve (>= 3 letters, stable; the obfuscated gold is NOT included).
+      singletons— names whose instance comes from bbwf + size validation.
 
-    Gate anti-envenenamento (§6 fallback / cache-correctness):
-      • CLASSE: class_by_index(idx[nome]) e exige class_name == nome (round-trip). Mismatch → None.
-      • INSTÂNCIA singleton: bbwf_from_klass(K) + _manager_inst_ok. Falha → None.
-    §10: K e inst null-guarded; bbwf pode devolver None."""
+    Anti-poisoning gate (§6 fallback / cache-correctness):
+      • CLASS: class_by_index(idx[name]) and require class_name == name (round-trip). Mismatch → None.
+      • singleton INSTANCE: bbwf_from_klass(K) + _manager_inst_ok. Failure → None.
+    §10: K and inst null-guarded; bbwf may return None."""
     classes = {}
     instances = {}
     for name in targets:
@@ -74,32 +74,32 @@ def resolve_via_rva(reader, tbase, indices, targets, singletons=SINGLETONS):
                 return None
             instances[name] = [inst]
         else:
-            # Só-classe (logs, CurrencySaveData, HeroSaveData) e PSD/CSD/catálogos: o caller
-            # (deliverable 05) trata as instâncias desses separadamente.
+            # Class-only (logs, CurrencySaveData, HeroSaveData) and PSD/CSD/catalogs: the caller
+            # (deliverable 05) handles those instances separately.
             instances[name] = []
     return classes, instances
 
 
 def instances_of(reader, regions, k_by_name, cap=4000):
-    """Acha as INSTÂNCIAS de classes JÁ resolvidas (K conhecido) por UM scan direcionado de
-    ponteiros 8-alinhados — a pass3 do resolve(), isolada. Usado pelo fast path (deliverable
-    05/02) p/ resolver não-singletons (PlayerSaveData/CommonSaveData) e a LISTA do StageManager
-    SEM o scan completo: o K já veio por índice, falta só achar quem aponta pra ele.
+    """Finds the INSTANCES of ALREADY-resolved classes (K known) via ONE targeted scan of
+    8-aligned pointers — pass3 of resolve(), isolated. Used by the fast path (deliverable
+    05/02) to resolve non-singletons (PlayerSaveData/CommonSaveData) and the StageManager LIST
+    WITHOUT the full scan: K already came from the index, all that's left is finding who points to it.
 
-      k_by_name — {nome: K}  (K = endereço da Il2CppClass, já resolvido por índice).
-      regions   — regiões READABLE (mesmas que o scan usa).
-      cap       — teto de instâncias por classe (§10: evita iteração descontrolada).
+      k_by_name — {name: K}  (K = address of the Il2CppClass, already resolved by index).
+      regions   — READABLE regions (the same ones the scan uses).
+      cap       — instance ceiling per class (§10: avoids unbounded iteration).
 
-    Retorna {nome: [endereços de instância]}, EXCLUINDO self-refs [K, K+0x400) — idêntico à
-    pass3 (a própria Il2CppClass contém ponteiros pra si mesma). Custo INDEPENDENTE do nº de
-    needles (single-sweep, #110): 3 K's ≈ 1 K. §10: K null-guardado; o scan é read-only."""
+    Returns {name: [instance addresses]}, EXCLUDING self-refs [K, K+0x400) — identical to
+    pass3 (the Il2CppClass itself contains pointers to itself). Cost INDEPENDENT of the number of
+    needles (single-sweep, #110): 3 K's ≈ 1 K. §10: K null-guarded; the scan is read-only."""
     targets = {name: K for name, K in (k_by_name or {}).items() if K}
     needles = {struct.pack("<Q", K): K for K in set(targets.values())}
     res = scan(reader, regions, list(needles.keys()), aligned=True) if needles else {}
     out = {name: [] for name in targets}
     for name, K in targets.items():
         for a in res.get(struct.pack("<Q", K), []):
-            if not (K <= a < K + 0x400):              # exclui self-refs dentro da própria classe
+            if not (K <= a < K + 0x400):              # exclude self-refs within the class itself
                 out[name].append(a)
                 if len(out[name]) >= cap:
                     break
@@ -107,8 +107,8 @@ def instances_of(reader, regions, k_by_name, cap=4000):
 
 
 def resolve(reader, regions, targets):
-    """targets = lista de nomes de classe (>= 3 letras). Retorna (classes, instances):
-    classes = {nome: set(K)}, instances = {nome: [endereços de instância]}."""
+    """targets = list of class names (>= 3 letters). Returns (classes, instances):
+    classes = {name: set(K)}, instances = {name: [instance addresses]}."""
     _t0 = time.time()
     _mb = sum(s for _, s in regions) / (1024 * 1024)
     print(f"[resolve] scanning {len(regions)} readable regions (~{_mb:.0f} MB) for {len(targets)} classes")
@@ -145,7 +145,7 @@ def resolve(reader, regions, targets):
         owner = next((t for t in targets if kval in classes[t]), None)
         if owner:
             for a in res3.get(nd, []):
-                if not (kval <= a < kval + 0x400):   # exclui self-refs dentro da própria classe
+                if not (kval <= a < kval + 0x400):   # exclude self-refs within the class itself
                     instances[owner].append(a)
     _t3 = time.time()
     print(f"[resolve] pass3 ptr->class: {len(needles3)} needles -> "

@@ -1,8 +1,8 @@
-"""Testes para metrics/gold.py.
+"""Tests for metrics/gold.py.
 
-Cobre:
-  run_gain       — função pura, zero dependências
-  combat_gold_save — lê do MockReader (fallback do save defasado)
+Covers:
+  run_gain       — pure function, zero dependencies
+  combat_gold_save — reads from MockReader (stale-save fallback)
 """
 
 import pytest
@@ -19,19 +19,19 @@ from metrics.gold import (
 from tests.conftest import MockReader
 
 # ---------------------------------------------------------------------------
-# Endereços fictícios para o layout de memória do PlayerSaveData
+# Fake addresses for the PlayerSaveData memory layout
 # ---------------------------------------------------------------------------
 PSD = 0x1000
 AGG_LIST = 0x2000
-E0 = 0x3000   # primeiro entry
-E1 = 0x3100   # segundo entry
-E2 = 0x3200   # terceiro entry
+E0 = 0x3000   # first entry
+E1 = 0x3100   # second entry
+E2 = 0x3200   # third entry
 
 
 def _make_save_reader(*entries):
-    """Monta um MockReader com um PlayerSaveData contendo as entries fornecidas.
+    """Build a MockReader with a PlayerSaveData holding the given entries.
 
-    entries: sequência de (EAggregateType, subkey, value).
+    entries: sequence of (EAggregateType, subkey, value).
     """
     mem = {PSD + PlayerSaveData.AGGREGATES: AGG_LIST}
     entry_bases = [E0, E1, E2]
@@ -47,7 +47,7 @@ def _make_save_reader(*entries):
 
 
 # ---------------------------------------------------------------------------
-# run_gain — função pura
+# run_gain — pure function
 # ---------------------------------------------------------------------------
 
 class TestRunGain:
@@ -55,14 +55,14 @@ class TestRunGain:
         assert run_gain(100, 500) == 400
 
     def test_zero_gain_is_valid(self):
-        """Rodada sem ganho de gold ainda é uma rodada válida."""
+        """A run with no gold gain is still a valid run."""
         assert run_gain(100, 100) == 0
 
     def test_large_values(self):
         assert run_gain(999_000_000, 1_100_000_000) == 101_000_000
 
     def test_none_start_returns_none(self):
-        """Baseline não lida → não reportar delta falso."""
+        """Baseline not read → don't report a bogus delta."""
         assert run_gain(None, 500) is None
 
     def test_none_end_returns_none(self):
@@ -72,7 +72,7 @@ class TestRunGain:
         assert run_gain(None, None) is None
 
     def test_non_monotonic_returns_none(self):
-        """Cumulativo CAIU → leitura corrompida (GC moveu objeto). Não inventar gold."""
+        """Cumulative DROPPED → corrupted read (GC moved the object). Don't invent gold."""
         assert run_gain(500, 100) is None
 
     @pytest.mark.parametrize("start,end", [
@@ -93,30 +93,30 @@ class TestRunGain:
 
 
 # ---------------------------------------------------------------------------
-# combat_gold_save — leitura do save defasado (fallback)
+# combat_gold_save — reads the stale save (fallback)
 # ---------------------------------------------------------------------------
 
 class TestCombatGoldSave:
     def test_finds_correct_subkey(self):
-        """Deve retornar o valor do SubKey 1 (COMBATE), não o 0 (total)."""
+        """Must return the value of SubKey 1 (COMBAT), not 0 (total)."""
         reader = _make_save_reader(
             (EAggregateType.GoldEarn, COMBAT_SUBKEY, 5_000_000),
         )
         assert combat_gold_save(reader, PSD) == 5_000_000
 
     def test_ignores_total_subkey_zero(self):
-        """SubKey 0 é o rollup total (inclui venda/idle). NUNCA usar como gold por run.
+        """SubKey 0 is the total rollup (includes sell/idle). NEVER use it as per-run gold.
 
-        Garante que mesmo que o SubKey 0 apareça ANTES do SubKey 1, retorna o 1.
+        Ensures that even if SubKey 0 appears BEFORE SubKey 1, it returns the 1.
         """
         reader = _make_save_reader(
-            (EAggregateType.GoldEarn, TOTAL_SUBKEY, 99_999_999),  # total — errado
-            (EAggregateType.GoldEarn, COMBAT_SUBKEY, 5_000_000),  # combate — certo
+            (EAggregateType.GoldEarn, TOTAL_SUBKEY, 99_999_999),  # total — wrong
+            (EAggregateType.GoldEarn, COMBAT_SUBKEY, 5_000_000),  # combat — right
         )
         assert combat_gold_save(reader, PSD) == 5_000_000
 
     def test_ignores_other_aggregate_types(self):
-        """MonsterKill, HeroDeath etc. com SubKey 1 não devem ser confundidos com gold."""
+        """MonsterKill, HeroDeath etc. with SubKey 1 must not be mistaken for gold."""
         reader = _make_save_reader(
             (EAggregateType.MonsterKill, COMBAT_SUBKEY, 300),
             (EAggregateType.GoldEarn, COMBAT_SUBKEY, 7_500_000),
@@ -144,38 +144,38 @@ class TestCombatGoldSave:
 
 
 # ---------------------------------------------------------------------------
-# resolve_combat_gold_klass_by_index — fast path por TypeDefIndex (RVA)
+# resolve_combat_gold_klass_by_index — fast path via TypeDefIndex (RVA)
 # ---------------------------------------------------------------------------
 
-TBASE = 0x50000          # base fictícia da TypeInfoTable
-IDX_UT = 2744            # TypeDefIndex provado (v1.00.07) do AggregateManager de gold
-GOLD_KLASS = 0xABCDE0    # klass que table[IDX_UT] resolve
+TBASE = 0x50000          # fake TypeInfoTable base
+IDX_UT = 2744            # proven TypeDefIndex (v1.00.07) of the gold AggregateManager
+GOLD_KLASS = 0xABCDE0    # klass that table[IDX_UT] resolves to
 
 
 def _table_reader(*, entries):
-    """MockReader cuja .mem expõe uma TypeInfoTable: entries = {idx: klass}.
-    typeinfo.class_by_index lê rptr(tbase + idx*8)."""
+    """MockReader whose .mem exposes a TypeInfoTable: entries = {idx: klass}.
+    typeinfo.class_by_index reads rptr(tbase + idx*8)."""
     mem = {TBASE + idx * 8: klass for idx, klass in entries.items()}
     return MockReader(mem=mem)
 
 
 class TestResolveCombatGoldKlassByIndex:
     def test_returns_klass_when_gate_ok(self, monkeypatch):
-        """idx correto → table[idx] = klass vivo → gate ok → devolve o klass."""
+        """correct idx → table[idx] = live klass → gate ok → returns the klass."""
         reader = _table_reader(entries={IDX_UT: GOLD_KLASS})
         monkeypatch.setattr(gold_mod, "combat_gold_klass_ok",
                             lambda r, k: k == GOLD_KLASS)
         assert resolve_combat_gold_klass_by_index(reader, TBASE, IDX_UT) == GOLD_KLASS
 
     def test_returns_none_when_gate_rejects_klass(self, monkeypatch):
-        """idx ruim (calib velha/build trocou) → klass não resolve AggregateManager vivo →
-        gate falha → None → caller cai no value-scan."""
+        """bad idx (stale calib / build changed) → klass doesn't resolve a live AggregateManager →
+        gate fails → None → caller falls back to the value-scan."""
         reader = _table_reader(entries={IDX_UT: 0xBADBAD0})
         monkeypatch.setattr(gold_mod, "combat_gold_klass_ok", lambda r, k: False)
         assert resolve_combat_gold_klass_by_index(reader, TBASE, IDX_UT) is None
 
     def test_returns_none_when_table_slot_empty(self, monkeypatch):
-        """table[idx] nulo (índice fora ou anchor não inicializado) → None sem chamar o gate."""
+        """table[idx] null (index out of range or anchor uninitialized) → None without calling the gate."""
         reader = _table_reader(entries={})
         called = {"gate": False}
 
@@ -185,7 +185,7 @@ class TestResolveCombatGoldKlassByIndex:
 
         monkeypatch.setattr(gold_mod, "combat_gold_klass_ok", _gate)
         assert resolve_combat_gold_klass_by_index(reader, TBASE, IDX_UT) is None
-        assert called["gate"] is False    # K falsy → curto-circuito, gate não roda
+        assert called["gate"] is False    # K falsy → short-circuit, gate doesn't run
 
     def test_returns_none_for_null_tbase(self, monkeypatch):
         monkeypatch.setattr(gold_mod, "combat_gold_klass_ok", lambda r, k: True)
@@ -193,40 +193,40 @@ class TestResolveCombatGoldKlassByIndex:
 
 
 # ---------------------------------------------------------------------------
-# find_gold_index — calibração 1×/build (value-scan → localiza o índice na tabela)
+# find_gold_index — calibration 1×/build (value-scan → locates the index in the table)
 # ---------------------------------------------------------------------------
 
 class TestFindGoldIndex:
     def test_locates_known_klass_index(self, monkeypatch):
-        """value-scan acha o klass vivo; find_gold_index localiza seu TypeDefIndex na tabela."""
+        """value-scan finds the live klass; find_gold_index locates its TypeDefIndex in the table."""
         reader = _table_reader(entries={100: 0x111, IDX_UT: GOLD_KLASS, 5000: 0x222})
         monkeypatch.setattr(gold_mod, "resolve_combat_gold_klass",
                             lambda r, psd_list: GOLD_KLASS)
         assert find_gold_index(reader, TBASE, psd_list=["psd"]) == IDX_UT
 
     def test_returns_first_matching_index(self, monkeypatch):
-        """Klass duplicado na tabela → devolve o MENOR índice (varredura crescente)."""
+        """Klass duplicated in the table → returns the SMALLEST index (ascending scan)."""
         reader = _table_reader(entries={50: GOLD_KLASS, IDX_UT: GOLD_KLASS})
         monkeypatch.setattr(gold_mod, "resolve_combat_gold_klass",
                             lambda r, psd_list: GOLD_KLASS)
         assert find_gold_index(reader, TBASE, psd_list=["psd"]) == 50
 
     def test_returns_none_when_value_scan_fails(self, monkeypatch):
-        """value-scan não convergiu → sem klass p/ localizar → None (caller mantém o scan)."""
+        """value-scan didn't converge → no klass to locate → None (caller keeps scanning)."""
         reader = _table_reader(entries={IDX_UT: GOLD_KLASS})
         monkeypatch.setattr(gold_mod, "resolve_combat_gold_klass",
                             lambda r, psd_list: None)
         assert find_gold_index(reader, TBASE, psd_list=["psd"]) is None
 
     def test_returns_none_when_klass_absent_from_table(self, monkeypatch):
-        """Klass vivo achado mas não está na tabela varrida → None, sem crash."""
+        """Live klass found but not in the scanned table → None, no crash."""
         reader = _table_reader(entries={100: 0x111, 5000: 0x222})
         monkeypatch.setattr(gold_mod, "resolve_combat_gold_klass",
                             lambda r, psd_list: GOLD_KLASS)
         assert find_gold_index(reader, TBASE, psd_list=["psd"]) is None
 
     def test_returns_none_for_null_tbase(self, monkeypatch):
-        """Sem table_base (anchor não resolveu) → None sem rodar o value-scan."""
+        """No table_base (anchor didn't resolve) → None without running the value-scan."""
         called = {"scan": False}
 
         def _scan(r, psd_list):
@@ -238,7 +238,7 @@ class TestFindGoldIndex:
         assert called["scan"] is False
 
     def test_respects_table_cap(self, monkeypatch):
-        """O klass mora além do cap _MAX_TABLE_ENTRIES → não é alcançado → None."""
+        """The klass lives beyond the _MAX_TABLE_ENTRIES cap → not reached → None."""
         beyond = typeinfo._MAX_TABLE_ENTRIES + 10
         reader = _table_reader(entries={beyond: GOLD_KLASS})
         monkeypatch.setattr(gold_mod, "resolve_combat_gold_klass",
@@ -247,33 +247,33 @@ class TestFindGoldIndex:
 
 
 # ---------------------------------------------------------------------------
-# gold_index_by_structure — idx_ut por ESTRUTURA, SEM value-scan (destravou o 1.00.11)
+# gold_index_by_structure — idx_ut by STRUCTURE, NO value-scan (unblocked 1.00.11)
 # ---------------------------------------------------------------------------
 
 class TestGoldIndexByStructure:
-    """idx_ut pelo walk estrutural (name-free): o MENOR idx cujo table[idx] passa
-    combat_gold_klass_ok. Independe do value-scan (que devolvia gold_klass None no 1.00.11)."""
+    """idx_ut via the structural walk (name-free): the SMALLEST idx whose table[idx] passes
+    combat_gold_klass_ok. Independent of the value-scan (which returned gold_klass None on 1.00.11)."""
 
     def test_finds_index_passing_gate(self, monkeypatch):
-        """Acha o índice cujo table[idx] passa o gate — sem tocar no nome ofuscado."""
+        """Finds the index whose table[idx] passes the gate — without touching the obfuscated name."""
         reader = _table_reader(entries={100: 0x111, IDX_UT: GOLD_KLASS})
         monkeypatch.setattr(gold_mod, "combat_gold_klass_ok", lambda r, k: k == GOLD_KLASS)
         assert gold_index_by_structure(reader, TBASE) == IDX_UT
 
     def test_returns_first_matching_index(self, monkeypatch):
-        """Empate (gate passa em dois) → devolve o MENOR índice (varredura crescente)."""
+        """Tie (gate passes for two) → returns the SMALLEST index (ascending scan)."""
         reader = _table_reader(entries={50: GOLD_KLASS, IDX_UT: GOLD_KLASS})
         monkeypatch.setattr(gold_mod, "combat_gold_klass_ok", lambda r, k: k == GOLD_KLASS)
         assert gold_index_by_structure(reader, TBASE) == 50
 
     def test_returns_none_when_no_index_passes(self, monkeypatch):
-        """Nenhum slot passa o gate (ex.: rodou fora de combate) → None → caller mantém o scan."""
+        """No slot passes the gate (e.g. ran outside combat) → None → caller keeps scanning."""
         reader = _table_reader(entries={100: 0x111, IDX_UT: 0x222})
         monkeypatch.setattr(gold_mod, "combat_gold_klass_ok", lambda r, k: False)
         assert gold_index_by_structure(reader, TBASE) is None
 
     def test_returns_none_for_null_tbase(self, monkeypatch):
-        """Sem table_base (anchor não resolveu) → None sem rodar o gate."""
+        """No table_base (anchor didn't resolve) → None without running the gate."""
         called = {"gate": False}
         monkeypatch.setattr(gold_mod, "combat_gold_klass_ok",
                             lambda r, k: called.__setitem__("gate", True) or True)
@@ -281,7 +281,7 @@ class TestGoldIndexByStructure:
         assert called["gate"] is False
 
     def test_respects_table_cap(self, monkeypatch):
-        """Gold mora além do cap _MAX_TABLE_ENTRIES → não é alcançado → None."""
+        """Gold lives beyond the _MAX_TABLE_ENTRIES cap → not reached → None."""
         beyond = typeinfo._MAX_TABLE_ENTRIES + 10
         reader = _table_reader(entries={beyond: GOLD_KLASS})
         monkeypatch.setattr(gold_mod, "combat_gold_klass_ok", lambda r, k: k == GOLD_KLASS)

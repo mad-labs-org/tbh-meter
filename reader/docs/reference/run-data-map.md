@@ -1,13 +1,12 @@
 ---
 type: reference
-description: "O que o reader LÊ por run hoje (durante o tick + no fechamento): cada datum mapeado ao SÍMBOLO de config/offsets.py e ao módulo que o lê. O RE não-lido (debuffs, drop tables, catálogos ausentes) vive no snapshot docs/run-data-map.md antigo, não aqui."
+description: "What the reader READS per run today (during the tick + at close): each datum mapped to the SYMBOL in config/offsets.py and the module that reads it. The un-read RE (debuffs, drop tables, missing catalogs) lives in the old docs/run-data-map.md snapshot, not here."
 symptoms:
-  - "o que o reader lê por run"
   - "what the reader reads per run"
-  - "de onde vem o gold/xp/dps"
-  - "qual campo do runs.jsonl"
-  - "onde o reader lê os heróis"
-  - "que offset alimenta o overlay"
+  - "where gold/xp/dps comes from"
+  - "which runs.jsonl field"
+  - "where the reader reads the heroes"
+  - "which offset feeds the overlay"
 code_anchors:
   - config/offsets.py
   - meter_windows.py::close_run
@@ -25,78 +24,78 @@ asserts:
   - config.offsets.EAggregateType.GoldEarn == 2
 ---
 
-# Mapa de dados por run (o que o reader LÊ hoje)
+# Run data map (what the reader READS today)
 
-Este é o **subconjunto LIDO** do mapa cru de RE: só os data que o reader extrai por run hoje —
-durante o tick (10Hz / 1Hz) e no fechamento (`close_run`). Cada linha cita o **símbolo de
-`config/offsets.py`** (a bíblia; nunca o literal cru) e o **módulo que faz a leitura**. A
-verdade é o código: se um número aqui parecer errado, o offset mora em `offsets.py` e a leitura
-no módulo citado.
+This is the **READ subset** of the raw RE map: only the data the reader extracts per run today —
+during the tick (10Hz / 1Hz) and at close (`close_run`). Each row cites the **symbol in
+`config/offsets.py`** (the bible; never the raw literal) and the **module that does the read**. The
+truth is the code: if a number here looks wrong, the offset lives in `offsets.py` and the read in
+the cited module.
 
-O RE **não-lido** (state/attackState da unidade, buffs/debuffs elementais, dano-por-elemento,
-12 core stats Obscured, drop tables, catálogos de monstro/stage não usados, wallets crus) **não
-entra aqui**. Ele vive no snapshot bruto — o `docs/run-data-map.md` antigo (a tabela completa de
-9 agentes sobre o dump), destinado a `archive/`. Aquilo é "o que DÁ pra ler"; isto é "o que o
-reader lê" — o índice completo do que dá e do que não dá pra ler é a [[reference/value-inventory]].
+The **un-read** RE (the unit's state/attackState, elemental buffs/debuffs, per-element damage,
+the 12 Obscured core stats, drop tables, unused monster/stage catalogs, raw wallets) **does not
+belong here**. It lives in the raw snapshot — the old `docs/run-data-map.md` (the full 9-agent table
+over the dump), bound for `archive/`. That one is "what CAN be read"; this is "what the reader
+reads" — the full index of what can and can't be read is [[reference/value-inventory]].
 
 ---
 
-## DURANTE a run (lido no loop)
+## DURING the run (read in the loop)
 
-| Datum | Símbolo (offsets.py) | Módulo que lê | Obs |
+| Datum | Symbol (offsets.py) | Module that reads it | Notes |
 |---|---|---|---|
-| HP atual/max de cada mob vivo + invocado | `UnitHealthController.HP_CURRENT` / `HP_MAX`, via `Unit.HEALTH_CONTROLLER` e `MonsterSpawnManager.MONSTER_LIST` / `SUMMONED_LIST` | `game/models.py::live_monsters` | float PURO. Núcleo do meter: dano = Σ queda de HP entre ticks |
-| DPS / dano total / dano final do mob | (deriva do HP acima) | `metrics/dps.py::DpsTracker` | janela de 5s; mob que some da lista = golpe final pelo HP que restava. `total_damage` + `dps` vão pro record |
-| Nº de mobs mortos (p/ kills) | `MonsterSpawnManager.DEAD_MONSTER_LIST` → `List.SIZE` | `metrics/progress.py::ProgressTracker`, e o loop p/ `R["mobs"]` | delta cumulativo = kills; cai no reload do MESMO stage (sinal de run abandonada) |
-| stageKey VIVO | `Monster.STAGE_KEY` (moda das primeiras leituras) | `game/models.py::live_stage_key` | preferido sobre `CommonSaveData.CURRENT_STAGE_KEY` (o do save congela na troca) |
-| Gold de COMBATE cumulativo VIVO | `AggregateManager.AGGREGATES` → `EAggregateType.GoldEarn` → SubKey 1 (geometria `Dict8B`) | `metrics/gold.py::combat_gold_live` | PRIMÁRIO. Baseline no `new_run`, delta no close. `COMBAT_SUBKEY=1` é regra de negócio (mora em gold.py, não em offsets) |
-| XP VIVA dentro-do-nível por herói + nível | `HeroRuntime.EXP_FAKE` / `LEVEL_FAKE` (fakeValue PLANO), via `StageManager.HERO_LIST` → `Unit.CACHE` | `game/build.py::read_live_party` → `metrics/xp.py::PartyXpAccumulator` | ACTk fakeValue (PLANO, não o XOR). ACUMULADO tick-a-tick por heroKey (1º avistamento semeia o baseline; level-up pela curva); morte/dropout mantêm o banked |
-| Identidade do herói deployado (heroKey) | `HeroInfoData.HERO_KEY`, via `HeroRuntime.INFO` | `game/build.py::read_live_party` | `party_seen` acumula quem foi visto em campo (cobre `sm` que resolve tarde) |
-| Eventos novos do tick (qual log) | `LogManager.LOG_LIST` → `List.SIZE`/`List.ITEMS`; tipo via `Obj.KLASS` da entry | loop de `meter_windows.py` | classifica por ponteiro-de-classe (ELogType não é campo legível) |
-| StageClear: act / stage / clear_time | `StageClearLog.ACT` / `STAGE` / `CLEAR_TIME` | `meter_windows.py::close_run` | dispara fechamento "success"; `CLEAR_TIME` = duração oficial em segundos |
-| StageFailed: act / stage / wave atual / total | `StageFailedLog.ACT` / `STAGE` / `NOW_WAVE` / `TOTAL_WAVE` | `meter_windows.py::close_run` | dispara fechamento "fail"; revela até onde a run chegou |
-| Drop de baú (tier) | `GetBoxLog.MONSTER_TYPE` (`EMonsterLogType`) → `BOX_KEY_BY_TIER` | loop de `meter_windows.py` | `GetBoxLog.BOX_KEY` é o TIPO ("TreasureChest_…"), NÃO item key; o tier autoritativo é o `MONSTER_TYPE`. Gray (mob) acumula em `R["drops"]`; boss box (logado ~0.6s APÓS o clear) é absorvido no record do success PENDENTE — ver [[invariants/run-lifecycle]] |
-| Morte de herói: vítima + quem matou | `HeroDieLog.VICTIM_HERO` / `KILLER_MONSTER` (strings "Nome_<key>") | loop de `meter_windows.py` | LIVE-CRACKED: vítima e matador estavam TROCADOS no RE antigo. Conta `deaths`/`killers` por heroKey |
-| Revive de herói | `ResurrectionLog.HERO` (string "Nome_<key>") | loop de `meter_windows.py` | conta `revives` por heroKey |
+| Current/max HP of each live mob + summoned | `UnitHealthController.HP_CURRENT` / `HP_MAX`, via `Unit.HEALTH_CONTROLLER` and `MonsterSpawnManager.MONSTER_LIST` / `SUMMONED_LIST` | `game/models.py::live_monsters` | PURE float. Heart of the meter: damage = Σ HP drop between ticks |
+| DPS / total damage / final blow on the mob | (derived from HP above) | `metrics/dps.py::DpsTracker` | 5s window; a mob that vanishes from the list = final blow for the HP it had left. `total_damage` + `dps` go into the record |
+| Number of mobs killed (for kills) | `MonsterSpawnManager.DEAD_MONSTER_LIST` → `List.SIZE` | `metrics/progress.py::ProgressTracker`, and the loop for `R["mobs"]` | cumulative delta = kills; drops on a reload of the SAME stage (signal of an abandoned run) |
+| LIVE stageKey | `Monster.STAGE_KEY` (mode of the first reads) | `game/models.py::live_stage_key` | preferred over `CommonSaveData.CURRENT_STAGE_KEY` (the save's freezes on the swap) |
+| LIVE cumulative COMBAT gold | `AggregateManager.AGGREGATES` → `EAggregateType.GoldEarn` → SubKey 1 (`Dict8B` geometry) | `metrics/gold.py::combat_gold_live` | PRIMARY. Baseline at `new_run`, delta at close. `COMBAT_SUBKEY=1` is a business rule (lives in gold.py, not in offsets) |
+| LIVE within-level XP per hero + level | `HeroRuntime.EXP_FAKE` / `LEVEL_FAKE` (FLAT fakeValue), via `StageManager.HERO_LIST` → `Unit.CACHE` | `game/build.py::read_live_party` → `metrics/xp.py::PartyXpAccumulator` | ACTk fakeValue (FLAT, not the XOR). ACCUMULATED tick-by-tick per heroKey (first sighting seeds the baseline; level-up via the curve); death/dropout keep the banked value |
+| Identity of the deployed hero (heroKey) | `HeroInfoData.HERO_KEY`, via `HeroRuntime.INFO` | `game/build.py::read_live_party` | `party_seen` accumulates who was seen in the field (covers `sm` that resolves late) |
+| New events this tick (which log) | `LogManager.LOG_LIST` → `List.SIZE`/`List.ITEMS`; type via the entry's `Obj.KLASS` | the `meter_windows.py` loop | classifies by class-pointer (ELogType is not a readable field) |
+| StageClear: act / stage / clear_time | `StageClearLog.ACT` / `STAGE` / `CLEAR_TIME` | `meter_windows.py::close_run` | triggers a "success" close; `CLEAR_TIME` = official duration in seconds |
+| StageFailed: act / stage / current wave / total | `StageFailedLog.ACT` / `STAGE` / `NOW_WAVE` / `TOTAL_WAVE` | `meter_windows.py::close_run` | triggers a "fail" close; reveals how far the run got |
+| Chest drop (tier) | `GetBoxLog.MONSTER_TYPE` (`EMonsterLogType`) → `BOX_KEY_BY_TIER` | the `meter_windows.py` loop | `GetBoxLog.BOX_KEY` is the TYPE ("TreasureChest_…"), NOT an item key; the authoritative tier is `MONSTER_TYPE`. Gray (mob) accumulates in `R["drops"]`; the boss box (logged ~0.6s AFTER the clear) is absorbed into the PENDING success record — see [[invariants/run-lifecycle]] |
+| Hero death: victim + killer | `HeroDieLog.VICTIM_HERO` / `KILLER_MONSTER` (strings "Name_<key>") | the `meter_windows.py` loop | LIVE-CRACKED: victim and killer were SWAPPED in the old RE. Counts `deaths`/`killers` per heroKey |
+| Hero revive | `ResurrectionLog.HERO` (string "Name_<key>") | the `meter_windows.py` loop | counts `revives` per heroKey |
 
 ---
 
-## NO FECHAMENTO (close_run) — fontes-snapshot do save
+## AT CLOSE (close_run) — save snapshot sources
 
-Lido uma vez em `close_run` (e baselines no `new_run`), via a instância VIVA do `PlayerSaveData`
-escolhida por MAIOR ouro (`game/save.py::pick_live_psd`):
+Read once in `close_run` (and baselined at `new_run`), via the LIVE `PlayerSaveData` instance
+chosen by HIGHEST gold (`game/save.py::pick_live_psd`):
 
-| Datum | Símbolo (offsets.py) | Módulo que lê | Obs |
+| Datum | Symbol (offsets.py) | Module that reads it | Notes |
 |---|---|---|---|
-| Saldo de ouro (fallback do gold-por-run) | `CurrencySaveData.KEY` (== `GOLD_KEY`) / `QUANTITY`, via `PlayerSaveData.CURRENCIES` | `game/save.py::read_gold` | só baseline + fallback. O gold-por-run real é o delta VIVO acima |
-| Gold de combate cumulativo do SAVE (fallback) | `PlayerSaveData.AGGREGATES` → `AggregateSaveData.TYPE`==`GoldEarn` & `SUB_KEY`==1 → `VALUE` | `metrics/gold.py::combat_gold_save` | espelho em disco do vivo; atualiza em SALTOS → só fallback quando o vivo não resolve |
-| XP/nível por herói do save (fallback) | `HeroSaveData.HERO_KEY` / `LEVEL` / `EXP`, via `PlayerSaveData.HEROES` | `game/save.py::read_heroes` | `EXP` zera no level-up (defasado); usado só se a XP viva não rolou |
-| XP por-run (acumulador vivo, tratado por curva) | (deriva da XP viva/save acima) | `metrics/xp.py::PartyXpAccumulator` (ponte de level-up via `per_hero_gain`) | level-up "dá a volta" pela curva (`config/level_curve.json`); morto/deploy-tardio mantêm o acumulado banked (sem re-read de `uf`) |
-| Build por herói: classe / nível / exp | `HeroSaveData.LEVEL`/`EXP` + `HeroInfoData.CLASS_TYPE` (catálogo `hero_cat`) | `game/build.py::read_build` | só os heróis REALMENTE deployados (filtro por `live_keys`) |
-| Itens equipados + raridade/slot/nível | `HeroSaveData.EQUIPPED_ITEMS` → `ItemSaveData.ITEM_KEY`/`UNIQUE_ID` → `ItemInfoData.GRADE`/`PARTS`/`LEVEL` | `game/build.py::read_build` | catálogo `item_cat` keyed por itemKey; casa por `UNIQUE_ID` |
-| Mods rolados do item (enchants/decoration/…) | `ItemSaveData.ENCHANT_DATA` → `ItemEnchant.STAT_TYPE`/`VALUE`/`TIER`/`RECIPE` (struct PLAIN, `STRIDE`) | `game/build.py::read_mods` | a versão-SAVE é PLAIN; o espelho runtime (`te`) é Obscured → preferir o save |
-| Skills equipadas + níveis (ativas + passivas) | `HeroSaveData.EQUIPPED_SKILLS` + `PlayerSaveData.ATTRIBUTES` → `AttributeSaveData.KEY`/`LEVEL` | `game/build.py::read_build` / `read_attribute_levels` | nível da skill vem do nó da árvore (`attributeKey`); passivas só moram na árvore |
-| Snapshot da conta: runas + inventário + stash | `PlayerSaveData.RUNES` → `RuneSaveData.KEY`/`LEVEL`; `PlayerSaveData.INVENTORY_SLOTS`/`STASH` → `InventorySaveData.UNIQUE_ID`/`StashSaveData.UNIQUE_ID` → join em `PlayerSaveData.ITEMS` | `game/build.py::read_account_snapshot` | account-wide, 1x no close; entra no raw em envelope ok/err (NÃO-LI → `err`; `[]` = vazio genuíno). Itens id-only; o wiki deriva drop-rate real / correção de wave |
-| 64 stats FINAIS vivos por herói | `StatsHolder.FINAL_STATS` (`Dict<StatType,float>`, geometria `DictFloat`), via `HeroRuntime.STATS_HOLDER` | `game/build.py::read_live_stats_by_hero` | id-only (statId→valor); o front resolve o nome. Os 12 core stats Obscured NÃO se leem |
+| Gold balance (fallback for gold-per-run) | `CurrencySaveData.KEY` (== `GOLD_KEY`) / `QUANTITY`, via `PlayerSaveData.CURRENCIES` | `game/save.py::read_gold` | baseline + fallback only. The real gold-per-run is the LIVE delta above |
+| Cumulative combat gold from the SAVE (fallback) | `PlayerSaveData.AGGREGATES` → `AggregateSaveData.TYPE`==`GoldEarn` & `SUB_KEY`==1 → `VALUE` | `metrics/gold.py::combat_gold_save` | on-disk mirror of the live one; updates in JUMPS → fallback only when the live one doesn't resolve |
+| XP/level per hero from the save (fallback) | `HeroSaveData.HERO_KEY` / `LEVEL` / `EXP`, via `PlayerSaveData.HEROES` | `game/save.py::read_heroes` | `EXP` resets on level-up (lagging); used only if the live XP didn't run |
+| Per-run XP (live accumulator, curve-handled) | (derived from the live/save XP above) | `metrics/xp.py::PartyXpAccumulator` (level-up bridge via `per_hero_gain`) | level-up "wraps around" via the curve (`config/level_curve.json`); dead/late-deploy keep the accumulated banked value (no re-read of `uf`) |
+| Per-hero build: class / level / exp | `HeroSaveData.LEVEL`/`EXP` + `HeroInfoData.CLASS_TYPE` (catalog `hero_cat`) | `game/build.py::read_build` | only the heroes REALLY deployed (filtered by `live_keys`) |
+| Equipped items + rarity/slot/level | `HeroSaveData.EQUIPPED_ITEMS` → `ItemSaveData.ITEM_KEY`/`UNIQUE_ID` → `ItemInfoData.GRADE`/`PARTS`/`LEVEL` | `game/build.py::read_build` | catalog `item_cat` keyed by itemKey; matched by `UNIQUE_ID` |
+| Rolled item mods (enchants/decoration/…) | `ItemSaveData.ENCHANT_DATA` → `ItemEnchant.STAT_TYPE`/`VALUE`/`TIER`/`RECIPE` (PLAIN struct, `STRIDE`) | `game/build.py::read_mods` | the SAVE version is PLAIN; the runtime mirror (`te`) is Obscured → prefer the save |
+| Equipped skills + levels (actives + passives) | `HeroSaveData.EQUIPPED_SKILLS` + `PlayerSaveData.ATTRIBUTES` → `AttributeSaveData.KEY`/`LEVEL` | `game/build.py::read_build` / `read_attribute_levels` | the skill level comes from the tree node (`attributeKey`); passives live only in the tree |
+| Account snapshot: runes + inventory + stash | `PlayerSaveData.RUNES` → `RuneSaveData.KEY`/`LEVEL`; `PlayerSaveData.INVENTORY_SLOTS`/`STASH` → `InventorySaveData.UNIQUE_ID`/`StashSaveData.UNIQUE_ID` → join on `PlayerSaveData.ITEMS` | `game/build.py::read_account_snapshot` | account-wide, once at close; goes into the raw in an ok/err envelope (UN-READ → `err`; `[]` = genuinely empty). Items id-only; the wiki derives real drop-rate / wave correction |
+| 64 LIVE FINAL stats per hero | `StatsHolder.FINAL_STATS` (`Dict<StatType,float>`, `DictFloat` geometry), via `HeroRuntime.STATS_HOLDER` | `game/build.py::read_live_stats_by_hero` | id-only (statId→value); the front resolves the name. The 12 Obscured core stats are NOT read |
 
-O record final montado por `close_run` é o **`raw/<id>.json`** (carimbado com `RAW_SCHEMA_VERSION`;
-campo de dado em envelope ok/err, meta crua, `id` = horário de fim em ms) — `status`/`stage`/`mode`/
-`dps`/`partial` são DERIVADOS pelo conversor do app, não saem do reader. O shape e a receita de
-bump são invariante à parte (ver Related).
+The final record assembled by `close_run` is the **`raw/<id>.json`** (stamped with `RAW_SCHEMA_VERSION`;
+data field in an ok/err envelope, raw meta, `id` = end time in ms) — `status`/`stage`/`mode`/
+`dps`/`partial` are DERIVED by the app's converter, they don't come out of the reader. The shape and the
+bump recipe are a separate invariant (see Related).
 
 ---
 
-**Notas.**
-- `EAggregateType.GoldEarn == 2` e o `COMBAT_SUBKEY == 1` são a chave do gold-por-run; trocar a
-  geometria `Dict8B` (valor de 8B) por `DictFloat` (valor de 4B) ao andar o AGGREGATES corrompe
-  o gold sem erro (ver Related).
-- DANO/CRIT/ELEMENTO por hit NÃO são lidos (transientes / Obscured); o meter os deriva só como
-  queda de HP. A modelagem do que dá/não dá ler está nas references de Related.
+**Notes.**
+- `EAggregateType.GoldEarn == 2` and `COMBAT_SUBKEY == 1` are the key to gold-per-run; swapping the
+  `Dict8B` geometry (8B value) for `DictFloat` (4B value) when walking AGGREGATES corrupts the gold
+  silently (see Related).
+- Per-hit DAMAGE/CRIT/ELEMENT are NOT read (transient / Obscured); the meter derives them only as
+  HP drop. The modeling of what can/can't be read is in the Related references.
 
 ## Related
-- [[invariants/dict-strides]] — `DictFloat` (4B, gold de stats) vs `Dict8B` (8B, gold cumulativo): qual usar em cada Dict deste mapa
-- [[invariants/gold-singleton-resolution]] — como `AggregateManager.AGGREGATES` é alcançado (singleton ofuscado resolvido por estrutura)
-- [[invariants/metric-fallback-chains]] — a cadeia LIVE→SAVE de gold/xp que estas linhas alimentam
-- [[invariants/schema-versioning]] — o shape do record que `close_run` serializa, e como bumpar
-- [[invariants/log-event-detection]] — como os `*Log` (StageClear/Fail/GetBox/HeroDie/Resurrection) viram fechamento/drop/morte
-Veja também: [[reference/damage-model]] (o fold dos stats / por que dano não é lido) · [[reference/extraction-viability]] + [[reference/value-inventory]] (o RE cru não-lido, destino do run-data-map antigo) · [[invariants/obscured-data-offlimits]] (core stats / te / wallets Obscured que NÃO se leem)
+- [[invariants/dict-strides]] — `DictFloat` (4B, stats gold) vs `Dict8B` (8B, cumulative gold): which to use for each Dict in this map
+- [[invariants/gold-singleton-resolution]] — how `AggregateManager.AGGREGATES` is reached (obfuscated singleton resolved by structure)
+- [[invariants/metric-fallback-chains]] — the LIVE→SAVE gold/xp chain these rows feed
+- [[invariants/schema-versioning]] — the shape of the record `close_run` serializes, and how to bump it
+- [[invariants/log-event-detection]] — how the `*Log` (StageClear/Fail/GetBox/HeroDie/Resurrection) become close/drop/death
+See also: [[reference/damage-model]] (the stats fold / why damage isn't read) · [[reference/extraction-viability]] + [[reference/value-inventory]] (the un-read raw RE, destination of the old run-data-map) · [[invariants/obscured-data-offlimits]] (Obscured core stats / te / wallets that are NOT read)

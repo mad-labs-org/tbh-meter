@@ -1,18 +1,18 @@
-"""Fixtures compartilhadas para todos os testes do reader.
+"""Shared fixtures for all reader tests.
 
-MockReader: implementa a mesma interface que shared/memory.py::Reader, mas lê
-de dicionários em memória. Permite montar layouts falsos de memória sem anexar
-a um processo real.
+MockReader: implements the same interface as shared/memory.py::Reader, but reads
+from in-memory dicts. Lets you build fake memory layouts without attaching to a
+real process.
 """
 
 import pytest
 
 
 class MockReader:
-    """Implementa a interface mínima do Reader usada pelos módulos de métrica.
+    """Implements the minimal Reader interface used by the metric modules.
 
-    mem: {addr: valor} — ri32/ri64/rptr retornam mem.get(addr).
-    lists: {list_ptr: [entry_addr, ...]} — list_iter itera sobre essa lista.
+    mem: {addr: value} — ri32/ri64/rptr return mem.get(addr).
+    lists: {list_ptr: [entry_addr, ...]} — list_iter iterates over that list.
     """
 
     def __init__(self, mem=None, lists=None):
@@ -50,8 +50,8 @@ def mock_reader():
 
 @pytest.fixture
 def fake_curve(monkeypatch):
-    """Substitui metrics.xp._CURVE por uma curva mínima (níveis 1–5) para
-    isolar os testes de qualquer leitura de arquivo."""
+    """Replaces metrics.xp._CURVE with a minimal curve (levels 1–5) to
+    isolate the tests from any file reads."""
     import metrics.xp as xp_mod
     curve = {1: 30, 2: 150, 3: 500, 4: 1000, 5: 2600}
     monkeypatch.setattr(xp_mod, "_CURVE", curve)
@@ -60,9 +60,9 @@ def fake_curve(monkeypatch):
 
 @pytest.fixture
 def real_curve(monkeypatch):
-    """Força a curva REAL (recarrega de config/level_curve.json) p/ os testes de borda do cap,
-    e RESTAURA _CURVE no teardown (monkeypatch) — sem isso a curva real ficava cacheada global
-    e vazava p/ testes order-dependentes. Devolve a curva carregada."""
+    """Forces the REAL curve (reloads from config/level_curve.json) for the cap edge tests,
+    and RESTORES _CURVE on teardown (monkeypatch) — without that the real curve stayed cached
+    globally and leaked into order-dependent tests. Returns the loaded curve."""
     import metrics.xp as xp_mod
-    monkeypatch.setattr(xp_mod, "_CURVE", None)   # força reload; monkeypatch restaura o original depois
+    monkeypatch.setattr(xp_mod, "_CURVE", None)   # force reload; monkeypatch restores the original afterward
     return xp_mod.curve()

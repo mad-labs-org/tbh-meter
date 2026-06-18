@@ -1,19 +1,17 @@
 ---
 type: guide
-description: "O jogo atualizou? Playbook pra reconsertar o reader: diagnosticar pelo fingerprint PE (patch de conteúdo vs recompile), confirmar que nada que o offsets.py rastreia deslocou (dump IL2CPP + diff), re-seedar pro novo build, bumpar GAME_VERSION e validar ao vivo. Na maioria dos updates o reader NÃO está quebrado — só perdeu o fast path; o conserto é re-seedar, não editar offsets."
+description: "Game updated? Playbook for fixing the reader: diagnose via the PE fingerprint (content patch vs recompile), confirm nothing offsets.py tracks shifted (IL2CPP dump + diff), re-seed for the new build, bump GAME_VERSION and validate live. In most updates the reader is NOT broken — it just lost the fast path; the fix is to re-seed, not to edit offsets."
 symptoms:
-  - "jogo atualizou"
-  - "nova versão"
   - "game updated"
   - "new version"
-  - "gold 0 depois de atualizar"
-  - "stage ? depois de update"
-  - "mode ? pós-update"
+  - "gold 0 after update"
+  - "stage ? after update"
+  - "mode ? after update"
   - "GAME_VERSION"
   - "Version.txt"
   - "1.00.x"
   - "recompile"
-  - "fingerprint mudou"
+  - "fingerprint changed"
   - "re-seed"
   - "reseed"
 code_anchors:
@@ -26,81 +24,81 @@ code_anchors:
   - meter_windows.py::CACHE_FMT
 ---
 
-# Guia — atualização do jogo (re-seed + verificação de offsets)
+# Guide — game update (re-seed + offset verification)
 
-Todo update do TBH rebuilda o `GameAssembly.dll` → o **fingerprint de build muda** → o seed
-embarcado (`config/calib_seed.json`) dá **miss** → o cliente cai no **cold scan**, que é o caminho
-frágil (catálogo + value-scan do gold dependem do estado/timing do jogo). Sintoma clássico no
-jogador: **dano/dps/xp funcionam** (managers sempre na memória) mas **gold = 0** e **stage com modo
-"?"**. Na esmagadora maioria das vezes **nada que o reader lê mudou de offset** — o conserto é
-**re-seedar**, não mexer no `offsets.py`. Este guia diz como ter CERTEZA disso (e o que fazer no
-caso raro em que algo deslocou).
+Every TBH update rebuilds `GameAssembly.dll` → the **build fingerprint changes** → the embedded
+seed (`config/calib_seed.json`) **misses** → the client falls into the **cold scan**, which is the
+fragile path (catalog + gold value-scan depend on game state/timing). Classic player symptom:
+**damage/dps/xp work** (managers are always in memory) but **gold = 0** and **stage shows mode
+"?"**. In the overwhelming majority of cases **nothing the reader reads has shifted offset** — the
+fix is to **re-seed**, not to touch `offsets.py`. This guide tells you how to be CERTAIN of that
+(and what to do in the rare case something did shift).
 
-## Três baldes (o que muda num update)
+## Three buckets (what changes in an update)
 
-1. **Nunca muda** — formato PE/OS e a **ABI do IL2CPP/Unity** (`String`/`Array`/`List`/`Dict`/
-   `Class`): só mudam num upgrade de **engine** (`UnityPlayer.dll`), não num patch do jogo.
-2. **Auto-cura** — `fingerprint`, `anchor_rva`, `indices`, `idx_ut`, catálogos: mudam **todo**
-   update, mas o scan redescobre e o re-seed recaptura. **Zero edição de código** — só re-seedar.
-   Ver [[invariants/cache-management]] e [[invariants/rva-index-resolution]].
-3. **Quebra silenciosa** — offsets de campo + enums em `config/offsets.py`: mudam **raramente**
-   (só quando os devs add/reordenam campos/membros nessas classes), mas quando mudam o reader lê
-   **lixo/vazio SEM erro**. É o único balde que precisa de olho — e o passo 3 abaixo é o tripwire.
+1. **Never changes** — the PE/OS format and the **IL2CPP/Unity ABI** (`String`/`Array`/`List`/`Dict`/
+   `Class`): these only change on an **engine** upgrade (`UnityPlayer.dll`), not on a game patch.
+2. **Self-heals** — `fingerprint`, `anchor_rva`, `indices`, `idx_ut`, catalogs: change on **every**
+   update, but the scan rediscovers and the re-seed recaptures. **Zero code edits** — just re-seed.
+   See [[invariants/cache-management]] and [[invariants/rva-index-resolution]].
+3. **Breaks silently** — field offsets + enums in `config/offsets.py`: change **rarely**
+   (only when the devs add/reorder fields/members in those classes), but when they do the reader reads
+   **garbage/empty WITHOUT an error**. It's the only bucket that needs watching — and step 3 below is the tripwire.
 
-## Checklist (na ordem)
+## Checklist (in order)
 
-1. **Fingerprint — recompile ou só conteúdo?** Leia o header PE do `GameAssembly.dll` novo
-   (`TimeDateStamp` + `SizeOfImage`) com a mesma fórmula de `il2cpp/typeinfo.py::build_fingerprint`,
-   e a versão instalada do `Version.txt` ao lado do `.exe`. Compare a parte nativa com a chave do
-   seed commitado:
-   - **Igual** → patch só de **conteúdo**: offsets/índices intactos por construção; só a string de
-     versão mudou. Vá direto ao passo 4 (re-seed).
-   - **Diferente** → **recompile** do nativo: offsets/índices PODEM ter deslocado. Faça o passo 2+3
-     antes de confiar.
-2. **Dump IL2CPP do build novo.** `global-metadata.dat` do TBH é desencriptado (magic `af1bb1fa`);
-   rode o Il2CppDumper (via `dotnet`) sobre `GameAssembly.dll` + `global-metadata.dat` → `dump.cs`
-   (com offsets de campo + `TypeDefIndex`). É leitura estática, não precisa do jogo rodando.
-3. **Preflight estático — UM COMANDO** (ruff + pytest + o tripwire código↔jogo). Rode
-   `scripts/preflight_calib.py --dump <out/dump.cs> --seed config/calib_seed.json`: ele roda o
-   `ruff`, a suíte `pytest` (regressão — inclui o drift-test docs↔código e os offsets pinados do
-   `PlayerSaveData`) e então o `scripts/diff_offsets_vs_dump.py` (que importa o `config/offsets.py`
-   AO VIVO e confere cada offset+NOME de campo de classe nomeada, cada enum por VALOR, e os
-   `TypeDefIndex`/`idx_ut` do seed), e no fim IMPRIME o comando do `validate_live.py` (a camada ao
-   vivo do passo 6, que ele NÃO consegue rodar). **Passe sempre `--seed config/calib_seed.json`** —
-   sem ele, drift de índice/`idx_ut` fica invisível até você re-seedar.
-   - **Exit 0** → toda camada estática passou; nada que o reader rastreia deslocou. Pode seguir pro re-seed.
-   - **Não-zero** → PARE. `✗` no diff = atualize o símbolo deslocado em `config/offsets.py` (a fonte
-     única — [[invariants/offsets-single-source]]) a partir do `dump.cs` e rode de novo até zerar;
-     falha de ruff/pytest = regressão de código. Dump ausente FALHA de propósito (não diffar = não
-     saber — a armadilha do 1.00.12). **Olhe o dump por-classe do diff** p/ uma classe cujos offsets
-     não mudaram mas cujos NOMES de campo deslocaram (o único caso silencioso residual).
-   - Classes de **nome ofuscado** (drifta por build: `UnitHealthController`/`HeroRuntime`/
-     `StatsHolder`/`AggregateManager`/`StatModifier`) saem como "não-verificáveis" — o diff não as
-     acha por nome; quem as valida é o run ao vivo do passo 6.
-   - (Quer só o tripwire? Rode `scripts/diff_offsets_vs_dump.py` direto; o preflight só embrulha
-     ruff+pytest em volta dele pra um re-seed nunca pular a regressão.)
-4. **Re-seede pro novo build.** Com o jogo **aberto e em combate** (ouro subindo — o value-scan do
-   gold e os catálogos precisam disso), rode `scripts/seed_calib_capture.py`: força um scan completo,
-   descobre `anchor_rva`/`indices`/`idx_ut`, captura os catálogos e grava um `calib_seed.json` FRESCO
-   no `CACHE_FMT` atual, keyed pelo fingerprint novo. (Se um bump de `CACHE_FMT` é parte do trabalho,
-   o re-seed é OBRIGATÓRIO no mesmo PR — ver [[invariants/cache-management]].)
-5. **Bumpe o `meter_windows.py::GAME_VERSION`** (o fallback) pra a versão nova. É só fallback (a
-   versão viva vem do `Version.txt`), mas mantém a fonte única honesta — é a ÚNICA definição
+1. **Fingerprint — recompile or content only?** Read the new `GameAssembly.dll`'s PE header
+   (`TimeDateStamp` + `SizeOfImage`) with the same formula as `il2cpp/typeinfo.py::build_fingerprint`,
+   and the installed version from the `Version.txt` next to the `.exe`. Compare the native part against
+   the committed seed's key:
+   - **Same** → **content**-only patch: offsets/indices intact by construction; only the version
+     string changed. Skip straight to step 4 (re-seed).
+   - **Different** → native **recompile**: offsets/indices MAY have shifted. Do steps 2+3
+     before trusting it.
+2. **IL2CPP dump of the new build.** TBH's `global-metadata.dat` is unencrypted (magic `af1bb1fa`);
+   run Il2CppDumper (via `dotnet`) over `GameAssembly.dll` + `global-metadata.dat` → `dump.cs`
+   (with field offsets + `TypeDefIndex`). It's a static read, no need for the game to be running.
+3. **Static preflight — ONE COMMAND** (ruff + pytest + the code↔game tripwire). Run
+   `scripts/preflight_calib.py --dump <out/dump.cs> --seed config/calib_seed.json`: it runs
+   `ruff`, the `pytest` suite (regression — includes the docs↔code drift-test and the pinned
+   `PlayerSaveData` offsets), and then `scripts/diff_offsets_vs_dump.py` (which imports
+   `config/offsets.py` LIVE and checks every offset+field NAME of each named class, every enum by
+   VALUE, and the seed's `TypeDefIndex`/`idx_ut`), and at the end PRINTS the `validate_live.py`
+   command (the live layer of step 6, which it CANNOT run). **Always pass `--seed config/calib_seed.json`** —
+   without it, index/`idx_ut` drift stays invisible until you re-seed.
+   - **Exit 0** → every static layer passed; nothing the reader tracks has shifted. You can proceed to the re-seed.
+   - **Non-zero** → STOP. A `✗` in the diff = update the shifted symbol in `config/offsets.py` (the
+     single source — [[invariants/offsets-single-source]]) from `dump.cs` and re-run until it's clean;
+     a ruff/pytest failure = a code regression. A missing dump FAILS on purpose (no diff = no
+     knowing — the 1.00.12 trap). **Look at the diff's per-class dump** for a class whose offsets
+     didn't change but whose field NAMES shifted (the only residual silent case).
+   - **Obfuscated-name** classes (drift per build: `UnitHealthController`/`HeroRuntime`/
+     `StatsHolder`/`AggregateManager`/`StatModifier`) come out as "unverifiable" — the diff can't
+     find them by name; what validates them is the live run in step 6.
+   - (Want just the tripwire? Run `scripts/diff_offsets_vs_dump.py` directly; the preflight just wraps
+     ruff+pytest around it so a re-seed never skips the regression.)
+4. **Re-seed for the new build.** With the game **open and in combat** (gold rising — the gold
+   value-scan and the catalogs need this), run `scripts/seed_calib_capture.py`: it forces a full scan,
+   discovers `anchor_rva`/`indices`/`idx_ut`, captures the catalogs and writes a FRESH `calib_seed.json`
+   in the current `CACHE_FMT`, keyed by the new fingerprint. (If a `CACHE_FMT` bump is part of the work,
+   the re-seed is MANDATORY in the same PR — see [[invariants/cache-management]].)
+5. **Bump `meter_windows.py::GAME_VERSION`** (the fallback) to the new version. It's only a fallback (the
+   live version comes from `Version.txt`), but it keeps the single source honest — it's the ONLY definition
    ([[invariants/offsets-single-source]]).
-6. **Valide ao vivo — GATE OBRIGATÓRIO, TODAS as métricas.** Rode `--selftest` (shape do seed:
-   `fmt == CACHE_FMT` + calib não-vazio) e então, com o jogo EM COMBATE numa fase, rode
-   **`scripts/validate_live.py`**: ele resolve pelo seed (igual ao 1º launch do RC) e exige **PASS
-   em TODAS** — `calib/seed`, `gold`, `party-viva`, `xp-viva`, `stage`, `catálogos`. Exit != 0 = NÃO
-   shipe. Isto cobre as classes OFUSCADAS que o diff do passo 3 NÃO vê (gold = `AggregateManager`;
-   party+xp = `HeroRuntime`; stats = `StatsHolder`) — o ponto cego onde bugs passaram batidos.
-   **NUNCA valide só o campo que você consertou** ([[process/live-validation-gate]]): no 1.00.11 o
-   gold foi conferido e a party (do `HeroRuntime` ofuscado) saiu quebrada porque ninguém olhou o resto.
-7. **Ship.** Commite o `calib_seed.json` novo + o bump; o seed vai embutido no `.exe` (`--add-data`),
-   então o fix só chega nos players via release promovido — ver [[invariants/cache-management]].
+6. **Validate live — MANDATORY GATE, ALL metrics.** Run `--selftest` (seed shape:
+   `fmt == CACHE_FMT` + non-empty calib) and then, with the game IN COMBAT on a stage, run
+   **`scripts/validate_live.py`**: it resolves from the seed (just like the RC's 1st launch) and requires **PASS
+   on ALL** — `calib/seed`, `gold`, live party, live xp, `stage`, catalogs. Exit != 0 = do NOT
+   ship. This covers the OBFUSCATED classes the step 3 diff does NOT see (gold = `AggregateManager`;
+   party+xp = `HeroRuntime`; stats = `StatsHolder`) — the blind spot where bugs slipped through.
+   **NEVER validate only the field you fixed** ([[process/live-validation-gate]]): in 1.00.11 the
+   gold was checked and the party (from the obfuscated `HeroRuntime`) came out broken because nobody looked at the rest.
+7. **Ship.** Commit the new `calib_seed.json` + the bump; the seed ships embedded in the `.exe` (`--add-data`),
+   so the fix only reaches players via a promoted release — see [[invariants/cache-management]].
 
 ## Related
-- [[process/live-validation-gate]] — o GATE ao vivo obrigatório do passo 6 (todas as métricas, não só a consertada)
-- [[invariants/party-live-resolution]] — a party viva/degradação honesta que o gate confirma
+- [[process/live-validation-gate]] — the mandatory live GATE from step 6 (all metrics, not just the fixed one)
+- [[invariants/party-live-resolution]] — the live party / honest degradation that the gate confirms
 - [[invariants/cache-management]]
 - [[invariants/rva-index-resolution]]
 - [[invariants/gold-singleton-resolution]]

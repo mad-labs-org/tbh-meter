@@ -1,18 +1,18 @@
-"""Regressão do TRIPWIRE estático código↔jogo (scripts/diff_offsets_vs_dump.py).
+"""Regression for the static code-vs-game TRIPWIRE (scripts/diff_offsets_vs_dump.py).
 
-POR QUÊ existe: o tripwire é o gate que deveria ter pego o 1.00.12 ANTES do ship — o bucket-box
-inseriu campos no `PlayerSaveData` e deslocou as listas do save (+0x10), e o check ANTIGO (só
-PRESENÇA de offset + uma lista curada de ~20 nomes) passou verde porque outro campo caiu no offset
-velho. Estes testes provam que o tripwire endurecido:
-  1. fica VERDE (exit 0) num layout correto;
-  2. fica VERMELHO (exit != 0) quando uma INSERÇÃO desloca uma lista do save (a classe de bug do
-     1.00.12), com uma linha `CAMPO ERRADO` E o relatório de inserção apontando o campo intruso;
-  3. deriva o nome esperado por fuzzy (sem lista que apodrece) e PULA nomes ofuscados (que driftam
-     por build — os `*Log`), sem falsos positivos.
+WHY it exists: the tripwire is the gate that should have caught 1.00.12 BEFORE ship — the bucket-box
+inserted fields into `PlayerSaveData` and shifted the save lists (+0x10), and the OLD check (offset
+PRESENCE only + a curated list of ~20 names) went green because another field landed on the old
+offset. These tests prove the hardened tripwire:
+  1. stays GREEN (exit 0) on a correct layout;
+  2. goes RED (exit != 0) when an INSERTION shifts a save list (the 1.00.12 class of bug), with a
+     `CAMPO ERRADO` line AND the insertion report pointing at the intruding field;
+  3. derives the expected name by fuzzy match (no list that rots) and SKIPS obfuscated names (which
+     drift per build — the `*Log`), with no false positives.
 
-NÃO depende do dump.cs real (que vive fora do repo, na máquina do mantenedor): monta um dump.cs
-SINTÉTICO inline. A completude vs. o build real é trabalho do próprio script rodado na skill
-meter-game-update; aqui garantimos a LÓGICA do gate por regressão de unidade.
+Does NOT depend on the real dump.cs (which lives outside the repo, on the maintainer's machine): it
+builds a SYNTHETIC dump.cs inline. Completeness vs. the real build is the job of the script itself
+run in the meter-game-update skill; here we guard the gate's LOGIC via unit regression.
 """
 
 import importlib.util
@@ -27,7 +27,7 @@ _SCRIPT = os.path.normpath(os.path.join(_HERE, "..", "scripts", "diff_offsets_vs
 
 
 def _load_script():
-    """Importa o script como módulo (ele põe a raiz do reader no path no import)."""
+    """Import the script as a module (it puts the reader root on the path at import)."""
     spec = importlib.util.spec_from_file_location("diff_offsets_vs_dump", _SCRIPT)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
@@ -38,10 +38,10 @@ D = _load_script()
 
 
 # --------------------------------------------------------------------------- #
-# Helpers puros (sem I/O) — o coração da derivação de nome anti-rot
+# Pure helpers (no I/O) — the heart of the anti-rot name derivation
 # --------------------------------------------------------------------------- #
 class TestObfuscationDetector:
-    """`_is_obf_field` separa nome REAL (verificável) de nome OFUSCADO (drifta por build)."""
+    """`_is_obf_field` separates a REAL name (verifiable) from an OBFUSCATED name (drifts per build)."""
 
     @pytest.mark.parametrize("obf", ["bfge", "bffo", "ph", "bcqv", "uu", "ut", "bfgm"])
     def test_obfuscated_names_detected(self, obf):
@@ -60,7 +60,7 @@ class TestObfuscationDetector:
 
 
 class TestFuzzyNameMatch:
-    """`_name_matches` liga o ATTR de offsets.py ao nome do dump por substring normalizada."""
+    """`_name_matches` ties the offsets.py ATTR to the dump name via normalized substring."""
 
     @pytest.mark.parametrize("attr,dump", [
         ("HERO_KEY", "heroKey"), ("STAGE_KEY", "StageKey"), ("KEY", "Key"),
@@ -79,35 +79,35 @@ class TestFuzzyNameMatch:
 
 
 class TestExpectedFieldName:
-    """`_expected_field_name`: override > fuzzy > None(ofuscado). É a derivação anti-rot."""
+    """`_expected_field_name`: override > fuzzy > None (obfuscated). The anti-rot derivation."""
 
     def test_override_wins(self):
-        # HEROES↔heroSaveDatas só liga pelo override (fuzzy não liga "heroes" a "herosavedatas"? liga,
-        # mas o override é a fonte canônica) — o override deve devolver o nome exato do dump.
+        # HEROES↔heroSaveDatas only ties via the override (does fuzzy tie "heroes" to "herosavedatas"?
+        # it does, but the override is the canonical source) — the override must return the exact dump name.
         assert D._expected_field_name("PlayerSaveData", "CURRENCIES", "currenySaveDatas") == "currenySaveDatas"
 
     def test_fuzzy_ok_returns_empty_sentinel(self):
-        # "" = casou por fuzzy, sem precisar de override nem de assert por nome.
+        # "" = matched by fuzzy, no override or by-name assert needed.
         assert D._expected_field_name("HeroInfoData", "HERO_KEY", "HeroKey") == ""
 
     def test_fuzzy_mismatch_demands_attr(self):
-        # nome do dump REAL mas não casa o ATTR → exige (devolve o ATTR p/ a comparação falhar).
+        # a REAL dump name that does not match the ATTR → demand it (return the ATTR so the comparison fails).
         got = D._expected_field_name("PlayerSaveData", "ATTRIBUTES", "heroSaveDatas")
         assert got == "ATTRIBUTES"
 
     def test_obfuscated_returns_none(self):
-        # nome ofuscado no dump (os *Log) → None = não-verificável por nome (live-gate cobre).
+        # obfuscated name in the dump (the *Log) → None = not verifiable by name (the live-gate covers it).
         assert D._expected_field_name("StageClearLog", "ACT", "bfge") is None
 
 
 class TestInsertionReport:
-    """`_insertion_report` lista campos do dump na janela rastreada que offsets.py NÃO conhece —
-    o sinal direto de uma INSERÇÃO (a classe de bug do bucket-box)."""
+    """`_insertion_report` lists dump fields in the tracked window that offsets.py does NOT know —
+    the direct signal of an INSERTION (the bucket-box class of bug)."""
 
     def test_flags_unexpected_field_in_window(self):
         own = {0x10: ("commonSaveData", "X"), 0x28: ("BoxBucketUseBoxList", "Y"),
                0x38: ("currenySaveDatas", "List")}
-        # offsets.py rastreia 0x10 e 0x38; 0x28 (o intruso) está na janela e não é rastreado.
+        # offsets.py tracks 0x10 and 0x38; 0x28 (the intruder) is in the window and is not tracked.
         ins = D._insertion_report(own, [0x10, 0x38])
         offs = [o for o, _ in ins]
         assert 0x28 in offs
@@ -122,21 +122,21 @@ class TestInsertionReport:
 
 
 # --------------------------------------------------------------------------- #
-# End-to-end: dump.cs SINTÉTICO → main() (exit 0 limpo, exit 1 com inserção)
+# End-to-end: SYNTHETIC dump.cs → main() (clean exit 0, exit 1 with an insertion)
 # --------------------------------------------------------------------------- #
 def _field(jsonp, cstype, name, off):
     return f'\t[JsonProperty("{jsonp}")]\n\tpublic {cstype} {name}; // 0x{off:X}\n'
 
 
 def _synth_dump(player_save_lines):
-    """Monta um dump.cs mínimo: só as classes que o tripwire confere por nome de campo +
-    a prova de gold (idx_ut). `player_save_lines` = corpo de PlayerSaveData (varia por cenário)."""
+    """Build a minimal dump.cs: only the classes the tripwire checks by field name + the gold
+    proof (idx_ut). `player_save_lines` = the PlayerSaveData body (varies per scenario)."""
     parts = []
     parts.append("// Namespace: TaskbarHero.EasySaveData\npublic class PlayerSaveData // TypeDefIndex: 2675\n{\n\t// Fields\n")
     parts.append(player_save_lines)
     parts.append("\n}\n")
 
-    # CurrencySaveData / HeroSaveData / AggregateSaveData — campos NOMEADOS que o gate confere.
+    # CurrencySaveData / HeroSaveData / AggregateSaveData — NAMED fields the gate checks.
     parts.append("public class CurrencySaveData // TypeDefIndex: 3056\n{\n\t// Fields\n")
     parts.append(_field("Key", "int", "Key", 0x10))
     parts.append(_field("Quantity", "long", "Quantity", 0x18))
@@ -158,7 +158,7 @@ def _synth_dump(player_save_lines):
     return "".join(parts)
 
 
-# Corpo CORRETO do PlayerSaveData (offsets 1.00.12 = os que offsets.py tem hoje).
+# CORRECT PlayerSaveData body (1.00.12 offsets = the ones offsets.py has today).
 _PSD_OK = "".join([
     _field("commonSaveData", "CommonSaveData", "commonSaveData", 0x10),
     _field("currenySaveDatas", "List<CurrencySaveData>", "currenySaveDatas", 0x38),
@@ -171,16 +171,16 @@ _PSD_OK = "".join([
     _field("aggregateSaveDatas", "List<AggregateSaveData>", "aggregateSaveDatas", 0x98),
 ])
 
-# Corpo de um build com a INSERÇÃO do bucket-box NÃO acomodada por offsets.py: no offset que o
-# offsets.py rastreia como CURRENCIES (0x38) o dump tem o campo INTRUSO `BoxBucketUseBoxList`, e a
-# lista de currency real deslocou p/ 0x48 (não-rastreado). É a classe de bug EXATA do 1.00.12 — um
-# campo presente no offset velho deixou o check de só-presença passar verde. Os demais offsets
-# rastreados continuam com o campo certo (só CURRENCIES trips → prova o name-check, não um shift geral).
+# Body of a build with the bucket-box INSERTION NOT accommodated by offsets.py: at the offset
+# offsets.py tracks as CURRENCIES (0x38) the dump has the INTRUDING field `BoxBucketUseBoxList`, and
+# the real currency list shifted to 0x48 (untracked). It is the EXACT 1.00.12 class of bug — a field
+# present at the old offset let the presence-only check go green. The other tracked offsets still hold
+# the right field (only CURRENCIES trips → proves the name-check, not a wholesale shift).
 _PSD_SHIFTED = "".join([
     _field("commonSaveData", "CommonSaveData", "commonSaveData", 0x10),
-    _field("BoxBucketUseBoxList", "List<int>", "BoxBucketUseBoxList", 0x38),  # intruso onde vai CURRENCIES
+    _field("BoxBucketUseBoxList", "List<int>", "BoxBucketUseBoxList", 0x38),  # intruder where CURRENCIES goes
     _field("heroSaveDatas", "List<HeroSaveData>", "heroSaveDatas", 0x40),
-    _field("currenySaveDatas", "List<CurrencySaveData>", "currenySaveDatas", 0x48),  # currency real, deslocada
+    _field("currenySaveDatas", "List<CurrencySaveData>", "currenySaveDatas", 0x48),  # real currency, shifted
     _field("attributeSaveDatas", "List<AttributeSaveData>", "attributeSaveDatas", 0x50),
     _field("RuneSaveData", "List<RuneSaveData>", "RuneSaveData", 0x60),
     _field("inventorySaveDatas", "List<InventorySaveData>", "inventorySaveDatas", 0x68),
@@ -218,23 +218,23 @@ class TestEndToEndSyntheticDump:
     def test_clean_layout_exits_zero(self, tmp_path):
         rc, out = _run_main(tmp_path, _PSD_OK)
         assert rc == 0, out
-        # As três classes nomeadas batem (sem ✗).
+        # All three named classes match (no ✗).
         assert "✗" not in out
         assert "PlayerSaveData" in out and "CurrencySaveData" in out
 
     def test_bucketbox_insertion_exits_nonzero(self, tmp_path):
-        # A regressão do 1.00.12: deve FALHAR (rc=1) com CAMPO ERRADO E o relatório de inserção.
+        # The 1.00.12 regression: must FAIL (rc=1) with WRONG FIELD AND the insertion report.
         rc, out = _run_main(tmp_path, _PSD_SHIFTED)
         assert rc == 1, out
-        assert "CAMPO ERRADO" in out
+        assert "WRONG FIELD" in out
         assert "CURRENCIES" in out
-        # O relatório de inserção tem que nomear o campo intruso do bucket-box.
-        assert "INSERÇÃO" in out
+        # The insertion report must name the bucket-box intruding field.
+        assert "INSERTION" in out
         assert "BoxBucketUseBoxList" in out
 
     def test_seed_idx_ut_must_hold_gold_dict(self, tmp_path):
-        # No dump sintético NENHUMA classe tem Dictionary<EAggregateType,…> → idx_ut não prova gold
-        # → o gate de seed FALHA (a classe de bug "gold reindexou / value-scan pegou frozen=0").
+        # In the synthetic dump NO class has Dictionary<EAggregateType,…> → idx_ut does not prove gold
+        # → the seed gate FAILS (the "gold reindexed / value-scan grabbed frozen=0" class of bug).
         rc, out = _run_main(tmp_path, _PSD_OK, with_seed=True)
         assert rc == 1, out
         assert "idx_ut" in out

@@ -1,28 +1,28 @@
 ---
 type: invariant
-description: "CACHE_FMT bumpa quando a FORMA do bloco calib muda; todo bump EXIGE recapturar config/calib_seed.json (seed.fmt tem que == CACHE_FMT) — senão o --selftest da RC falha e o runtime rejeita o seed por fmt e cai no cold scan. Validação de VALOR do catálogo (stage_info via _stage_info_ok, nos gates de save E load) NÃO bumpa fmt — rejeita o calib e degrada pela escada (seed → scan), auto-curando cache envenenado (modo \"?\" persistente). Completude-vs-seed (_covers_seed_keys, também nos dois gates): catálogo com BURACO — sem alguma key que o seed do MESMO fp tem — nunca persiste nem sombreia o seed."
+description: "CACHE_FMT bumps when the SHAPE of the calib block changes; every bump REQUIRES recapturing config/calib_seed.json (seed.fmt must == CACHE_FMT) — otherwise the RC's --selftest fails and the runtime rejects the seed by fmt and falls to a cold scan. Catalog VALUE validation (stage_info via _stage_info_ok, on both the save AND load gates) does NOT bump fmt — it rejects the calib and degrades down the ladder (seed → scan), self-healing a poisoned cache (persistent \"?\" mode). Completeness-vs-seed (_covers_seed_keys, also on both gates): a HOLEY catalog — missing some key the SAME fp's seed has — never persists nor shadows the seed."
 symptoms:
   - "cache stale"
   - "stale cache"
-  - "calib_seed desatualizado"
+  - "calib_seed outdated"
   - "seed fmt mismatch"
   - "CACHE_FMT"
   - "calib_seed"
   - "cold scan"
-  - "scan toda vez"
+  - "scan every time"
   - "scan every launch"
-  - "fast path não ativa"
+  - "fast path not activating"
   - "fmt"
   - "selftest FAILED calib_seed"
-  - "modo ? persistente"
-  - "stage mode ? em toda run"
-  - "catálogo envenenado"
+  - "persistent ? mode"
+  - "stage mode ? every run"
+  - "poisoned catalog"
   - "poisoned cache"
-  - "diff -1 no stage_info"
-  - "buraco no catálogo"
-  - "stage sumiu do catálogo"
-  - "stage ? só num stage específico"
-  - "cache com menos stages que o seed"
+  - "diff -1 in stage_info"
+  - "hole in catalog"
+  - "stage missing from catalog"
+  - "stage ? only on a specific stage"
+  - "cache with fewer stages than seed"
 code_anchors:
   - meter_windows.py::CACHE_FMT
   - meter_windows.py::_stage_info_ok
@@ -45,91 +45,91 @@ guarded_by:
   - tests/test_meter_windows.py::test_bundled_seed_passes_load_validation
 ---
 
-# Gerenciamento de cache (CACHE_FMT + calib_seed)
+# Cache management (CACHE_FMT + calib_seed)
 
-O reader não guarda mais endereços absolutos. O único artefato persistido é o **bloco
-`calib[fp]`** — um par `{anchor_rva, indices{nome:idx}, idx_ut, stage_info, item_cat, hero_cat}`
-**build-estável**, gravado no `resolve_cache.json` do usuário (aprendido ao final de um scan, em
-`save_calib`) e no **seed embarcado** `config/calib_seed.json` (capturado offline, commitado, e
-incluído no `.exe` via `--add-data`). É isso que faz o PRIMEIRO launch num build shipado pular o
-scan de ~70s (vira ~ms).
+The reader no longer stores absolute addresses. The only persisted artifact is the **`calib[fp]`
+block** — a **build-stable** pair `{anchor_rva, indices{name:idx}, idx_ut, stage_info, item_cat,
+hero_cat}`, written to the user's `resolve_cache.json` (learned at the end of a scan, in
+`save_calib`) and to the **bundled seed** `config/calib_seed.json` (captured offline, committed, and
+shipped inside the `.exe` via `--add-data`). This is what lets the FIRST launch on a shipped build
+skip the ~70s scan (it becomes ~ms).
 
-**A regra dura.** `CACHE_FMT` (a única definição viva mora em `meter_windows.py`) bumpa **sempre
-que a FORMA do bloco calib muda** — uma chave nova, uma forma diferente de um catálogo, uma
-semântica nova de um campo. A `9` atual, por exemplo, passou a incluir os stages ACTBOSS (x-10)
-no `stage_info`; calibs gravados sob a forma anterior não têm essas keys, e como o fast path os
-reusaria pra sempre, o bump força UM re-scan. **Mas bumpar `CACHE_FMT` SOZINHO é um meio-bump que
-quebra o seed:** o `calib_seed.json` commitado ainda carrega o `fmt` velho, e em DUAS frentes:
+**The hard rule.** `CACHE_FMT` (the only live definition lives in `meter_windows.py`) bumps
+**whenever the SHAPE of the calib block changes** — a new key, a different shape for a catalog, new
+semantics for a field. The current `9`, for instance, started including the ACTBOSS stages (x-10)
+in `stage_info`; calibs written under the previous shape lack those keys, and since the fast path
+would reuse them forever, the bump forces ONE re-scan. **But bumping `CACHE_FMT` ALONE is a
+half-bump that breaks the seed:** the committed `calib_seed.json` still carries the old `fmt`, on
+TWO fronts:
 
-1. **Build-time** — o `--selftest` (rodado na CI da RC) lê o seed e exige `seed.fmt == CACHE_FMT`;
-   na divergência ele imprime `selftest FAILED: calib_seed.json bundled but malformed` e sai com
-   código 1 → **a RC nem builda**.
-2. **Runtime** — mesmo que passasse, `_read_calib` rejeita qualquer arquivo cujo `fmt` não bate
-   com `CACHE_FMT` (devolve `None`), então `load_calib` ignora o seed defasado e o run() degrada
-   pro scan garantido → **cold scan em TODA primeira inicialização do build** (exatamente a
-   classe de bug "scan toda vez / cache stale").
+1. **Build-time** — `--selftest` (run in the RC's CI) reads the seed and requires `seed.fmt ==
+   CACHE_FMT`; on a mismatch it prints `selftest FAILED: calib_seed.json bundled but malformed` and
+   exits with code 1 → **the RC won't even build**.
+2. **Runtime** — even if it got through, `_read_calib` rejects any file whose `fmt` doesn't match
+   `CACHE_FMT` (returns `None`), so `load_calib` ignores the stale seed and run() degrades to the
+   guaranteed scan → **a cold scan on EVERY first launch of the build** (exactly the bug class
+   "scan every time / cache stale").
 
-**A receita ao bumpar `CACHE_FMT`:** rode o capturador (`scripts/seed_calib_capture.py` — zero-arg,
-faz um scan vivo e carimba o `fmt` corrente) para **recapturar** `config/calib_seed.json` no novo
-formato, e atualize esta nota + o `assert` (`meter_windows.CACHE_FMT == 9`). O share/`reader/` pode
-estar num fmt antigo → sincronize o HEAD antes de capturar, ou o seed sai estampado errado.
+**The recipe when bumping `CACHE_FMT`:** run the capturer (`scripts/seed_calib_capture.py` —
+zero-arg, does a live scan and stamps the current `fmt`) to **recapture**
+`config/calib_seed.json` in the new format, and update this note + the `assert`
+(`meter_windows.CACHE_FMT == 9`). The shared `reader/` may be on an old fmt → sync HEAD before
+capturing, or the seed comes out stamped wrong.
 
-**Por que isso é SEGURO mesmo se o seed estiver velho/de outro build.** O calib é
-**build-keyed por fingerprint** (`fp` = versão + hashes do módulo, computado vivo no run()): um
-seed que não cobre o `fp` corrente é um simples MISS (`load_calib → None` → scan), nunca
-envenena. O **cache do usuário tem prioridade** sobre o seed (`load_calib` tenta o
-`resolve_cache.json` primeiro, depois o seed embarcado) — prioridade CONDICIONADA à
-completude-vs-seed: um cache cujos catálogos não cobrem toda key do seed do mesmo `fp` é
-um catálogo com buraco e o seed é servido no lugar (ver a seção do buraco abaixo). E o
-seed é **zero confiança nova**: o
-fast path (`_resolve_fast` → `resolve_via_rva`) **revalida vivo a cada launch** — round-trip de
-nome de classe (`class_name(K) == nome`) + sanidade de `size` da instância (e round-trip do
-gold) — e degrada pro scan em QUALQUER mismatch. Por isso `_read_calib` carrega o bloco como
-"dado bruto, validado pelo caller": não guarda nenhum endereço absoluto (o `anchor_rva` é
-RELATIVO ao `ga_base`, que é relido por ASLR a cada start), então não há "endereço stale" a
-revalidar — só round-trip semântico, sempre.
+**Why this is SAFE even if the seed is old/from another build.** The calib is **build-keyed by
+fingerprint** (`fp` = version + module hashes, computed live in run()): a seed that doesn't cover
+the current `fp` is a plain MISS (`load_calib → None` → scan), never poisons. The **user cache
+takes priority** over the seed (`load_calib` tries `resolve_cache.json` first, then the bundled
+seed) — priority CONDITIONED on completeness-vs-seed: a cache whose catalogs don't cover every key
+of the same `fp`'s seed is a holey catalog, and the seed is served instead (see the hole section
+below). And the seed is **zero new trust**: the fast path (`_resolve_fast` → `resolve_via_rva`)
+**revalidates live on every launch** — class-name round-trip (`class_name(K) == name`) + instance
+`size` sanity (plus the gold round-trip) — and degrades to the scan on ANY mismatch. That's why
+`_read_calib` loads the block as "raw data, validated by the caller": it stores no absolute address
+(the `anchor_rva` is RELATIVE to `ga_base`, re-read per ASLR on every start), so there's no "stale
+address" to revalidate — only semantic round-trip, always.
 
-**Higiene de escrita.** `save_calib` só persiste com **persist-gate de completude** (os três
-catálogos com `len > 0`, o `stage_info` com toda row VÁLIDA, e os catálogos cobrindo toda key
-do seed do mesmo `fp` quando ele existe — ver as duas seções abaixo) — um scan rodado
-FORA de stage gravaria catálogo vazio e o fast path o serviria degradado pra sempre nesse `fp`.
-E grava **atomicamente** (`.tmp` + `fsync` + `os.replace`), então um kill no meio nunca deixa o
-cache truncado/envenenado.
+**Write hygiene.** `save_calib` only persists through a **completeness persist-gate** (all three
+catalogs with `len > 0`, `stage_info` with every row VALID, and the catalogs covering every key of
+the same `fp`'s seed when it exists — see the two sections below) — a scan run OUTSIDE a stage
+would write an empty catalog, and the fast path would serve it degraded forever for that `fp`. And
+it writes **atomically** (`.tmp` + `fsync` + `os.replace`), so a kill mid-write never leaves the
+cache truncated/poisoned.
 
-**Sanidade de VALOR do catálogo (sem bump de fmt).** Diferente do anchor/índices, os
-**catálogos não têm round-trip vivo** no fast path — o que está no calib é servido como está.
-Por isso o `stage_info` passa pelo gate `_stage_info_ok` (toda row no shape de 4 ints com
-`diff` dentro do `EStageDifficulty`, as keys de `DIFF_NAMES`) em **dois pontos**: no
-**persist** (`save_calib` recusa um catálogo com row suspeita — um misread do scan nunca vira
-calibração) e no **load** (`_read_calib` rejeita o bloco → `load_calib` cai pro seed → scan).
-O caso real: o `_read_catalogs` antigo catalogava linha de horda com `DIFFICULTY` ilegível
-como diff `-1` → `DIFF_NAMES.get(-1)` = modo `"?"` em TODA run, persistido no
-`resolve_cache.json` e sobrevivendo a restarts. O load-gate **auto-cura** esse cache: o bloco
-envenenado é rejeitado, o seed (ou o scan, que re-calibra e sobrescreve o `calib[fp]`) serve o
-catálogo são — sem o usuário deletar nada. Isso é validação de VALOR, não mudança de FORMA:
-**não** bumpa `CACHE_FMT` (e o `--selftest` roda cada fp do seed pelo mesmo `_read_calib`, pra
-um seed que o runtime rejeitaria falhar no CI, não em produção).
+**Catalog VALUE sanity (no fmt bump).** Unlike the anchor/indices, the **catalogs have no live
+round-trip** in the fast path — what's in the calib is served as-is. So `stage_info` passes through
+the `_stage_info_ok` gate (every row in the 4-int shape with `diff` inside `EStageDifficulty`, the
+keys from `DIFF_NAMES`) at **two points**: on **persist** (`save_calib` rejects a catalog with a
+suspect row — a scan misread never becomes calibration) and on **load** (`_read_calib` rejects the
+block → `load_calib` falls to the seed → scan). The real case: the old `_read_catalogs` catalogued
+a horde row with an unreadable `DIFFICULTY` as diff `-1` → `DIFF_NAMES.get(-1)` = mode `"?"` on
+EVERY run, persisted to `resolve_cache.json` and surviving restarts. The load-gate **self-heals**
+that cache: the poisoned block is rejected, and the seed (or the scan, which re-calibrates and
+overwrites `calib[fp]`) serves the sound catalog — without the user deleting anything. This is
+VALUE validation, not a SHAPE change: it does **not** bump `CACHE_FMT` (and `--selftest` runs every
+fp of the seed through the same `_read_calib`, so a seed the runtime would reject fails in CI, not
+in production).
 
-**Catálogo com BURACO nunca sombreia o seed (completude-vs-seed, sem bump de fmt).** O gate
-de linha do `_read_catalogs` DROPA a linha misread em vez de catalogá-la com lixo — o que
-troca o veneno por um **buraco**: um catálogo a que falta um stage passa em TODOS os gates de
-VALOR (`_stage_info_ok` não sabe quais keys deveriam existir) e, servido/persistido, vira
-"stage sumiu do catálogo" — modo `"?"` só num stage específico + adoção/troca de stage cegas
-no loop pra esse stage — persistido no `calib[fp]` e **sombreando o seed bom PRA SEMPRE**
-(nada re-dispara scan; antes deste gate, só deletar o cache na mão curava). A regra:
-**catálogos são CONSTANTES do build** — pro MESMO `fp`, o seed shipado (validado ao vivo na
-captura) é ground truth de QUAIS keys existem, então um cache com menos stages que o seed é
-provadamente pior. O gate `_covers_seed_keys` exige que o candidato cubra TODA key de cada
-catálogo do seed do mesmo `fp`, nos MESMOS dois pontos do gate de valor: no **persist**
-(`save_calib` recusa o catálogo com buraco; o seed segue servindo nos próximos launches) e no
-**load** (`load_calib` serve o SEED no lugar do cache com buraco, com log `[calib] user cache
-... missing seed keys: stage_info=N ...` nomeando cada catálogo com buraco — triagem remota
-via meter.log). **SÓ PRESENÇA de key, nunca comparação de valor**: key
-extra local sempre passa e o valor local vence quando presente (protege contra um seed
-hipoteticamente stale sob o mesmo fp); sem seed cobrindo o `fp` não há referência → tudo se
-comporta como antes. Custo aceito: `load_calib` parseia o seed mesmo em cache-hit (~ms).
+**A HOLEY catalog never shadows the seed (completeness-vs-seed, no fmt bump).** The
+`_read_catalogs` row gate DROPS the misread row instead of cataloguing it with garbage — which
+trades the poison for a **hole**: a catalog missing a stage passes ALL the VALUE gates
+(`_stage_info_ok` doesn't know which keys should exist) and, once served/persisted, becomes "stage
+missing from catalog" — mode `"?"` on just a specific stage + blind stage adoption/switch in the
+loop for that stage — persisted to `calib[fp]` and **shadowing the good seed FOREVER** (nothing
+re-triggers a scan; before this gate, only deleting the cache by hand healed it). The rule:
+**catalogs are build CONSTANTS** — for the SAME `fp`, the shipped seed (validated live at capture)
+is ground truth for WHICH keys exist, so a cache with fewer stages than the seed is provably worse.
+The `_covers_seed_keys` gate requires the candidate to cover EVERY key of each catalog of the same
+`fp`'s seed, at the SAME two points as the value gate: on **persist** (`save_calib` rejects the
+holey catalog; the seed keeps serving on the next launches) and on **load** (`load_calib` serves
+the SEED instead of the holey cache, with log `[calib] user cache ... missing seed keys:
+stage_info=N ...` naming each holey catalog — remote triage via meter.log). **PRESENCE of key only,
+never value comparison**: a local extra key always passes and the local value wins when present
+(protects against a hypothetically stale seed under the same fp); with no seed covering the `fp`
+there's no reference → everything behaves as before. Accepted cost: `load_calib` parses the seed
+even on a cache-hit (~ms).
 
 ## Related
-- [[invariants/rva-index-resolution]] — o fast path que consome os índices da calib; o seed só acelera, nunca é confiado sem o round-trip vivo.
-- [[invariants/gold-singleton-resolution]] — o `idx_ut` da calib alimenta o fast path do gold.
-- [[invariants/metric-fallback-chains]] — calib→scan é a cadeia de fallback da resolução.
+- [[invariants/rva-index-resolution]] — the fast path that consumes the calib's indices; the seed only speeds things up, never trusted without the live round-trip.
+- [[invariants/gold-singleton-resolution]] — the calib's `idx_ut` feeds the gold fast path.
+- [[invariants/metric-fallback-chains]] — calib→scan is the resolution's fallback chain.

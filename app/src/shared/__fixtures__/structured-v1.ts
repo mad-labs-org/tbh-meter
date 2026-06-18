@@ -8,8 +8,8 @@ export const STRUCTURED_V1_EXAMPLE: RunRecord = {
   id: "1717799000-12345:7",
   ts: 1717800000,
   // Reader-owned session id, passed THROUGH by the converter verbatim (the reader is the session
-  // authority — see progress.md "Identidade & sessão", which corrected the original "converter
-  // mints session_id" idea). `id === sessionId:run` holds because both come from the raw unchanged.
+  // authority — identity & session, which corrected the original "converter mints session_id" idea).
+  // `id === sessionId:run` holds because both come from the raw unchanged.
   sessionId: "1717799000-12345",
   schemaVersion: 1, // the RAW/reader schema version this was converted from
   structuredSchemaVersion: 1, // the converter's own output version

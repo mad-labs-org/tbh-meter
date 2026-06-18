@@ -1,38 +1,38 @@
 """
-offsets.py — A BÍBLIA DE OFFSETS do TBH, num lugar só (fonte única de verdade).
+offsets.py — the TBH OFFSET BIBLE, all in one place (single source of truth).
 
-De onde veio: dump IL2CPP (re/dump/dump.cs) do GameAssembly.dll v1.00.07, Unity
-6000.0.72f1, estúdio TesseractStudio. TODOS os valores aqui são VALIDADOS ao vivo
-(o meter rodou com eles; gold/xp cravados ±0.1%, stats batem com o save .es3).
+Where it came from: IL2CPP dump (re/dump/dump.cs) of GameAssembly.dll v1.00.07, Unity
+6000.0.72f1, TesseractStudio. EVERY value here is VALIDATED live (the meter ran with
+them; gold/xp nailed to ±0.1%, stats match the .es3 save).
 
-Reconstruído de docs/run-data-map.md + tools/meter_windows.py + docs/damage-model.md.
-NÃO há "calibração" (sem Cheat Engine): os managers são singletons achados em runtime
-por um auto-resolver (scan de string-de-classe → Il2CppClass → instâncias; ver
-il2cpp/resolver). Singletons de nome curto (ut/yp) via find_class_by_name + nn<T>.
+Reconstructed from docs/run-data-map.md + tools/meter_windows.py + docs/damage-model.md.
+There is NO "calibration" (no Cheat Engine): the managers are singletons found at runtime
+by an auto-resolver (class-string scan → Il2CppClass → instances; see
+il2cpp/resolver). Short-named singletons (ut/yp) via find_class_by_name + nn<T>.
 
-⚠ NUNCA confundir as DUAS geometrias de entry de Dictionary (ver DictFloat vs Dict8B).
-⚠ As constantes de regra de negócio (curva, filtros) NÃO moram aqui — só offsets/enums.
+⚠ NEVER confuse the TWO Dictionary entry geometries (see DictFloat vs Dict8B).
+⚠ Business-rule constants (curve, filters) do NOT live here — offsets/enums only.
 """
 
 from enum import IntEnum, IntFlag
 
 # --------------------------------------------------------------------------- #
-# Processo / build
+# Process / build
 # --------------------------------------------------------------------------- #
 PROCESS_NAME = "TaskBarHero.exe"
-MODULE_NAME = "GameAssembly.dll"      # toda a lógica IL2CPP vive aqui
-POINTER_SIZE = 8                      # processo x64
-# GAME_VERSION e SCHEMA_VERSION moram em meter_windows.py (fonte ÚNICA do runs.jsonl) — NÃO aqui.
-# Tinham cópias mortas e defasadas (=5 enquanto o runtime emitia 11); o drift-test
-# (test_docs_consistency::test_version_constants_unique) agora falha se reaparecerem.
-GOLD_KEY = 100001                     # CurrencySaveData.Key do ouro
+MODULE_NAME = "GameAssembly.dll"      # all the IL2CPP logic lives here
+POINTER_SIZE = 8                      # x64 process
+# GAME_VERSION and SCHEMA_VERSION live in meter_windows.py (the SINGLE source for runs.jsonl) — NOT here.
+# They used to have dead, stale copies (=5 while the runtime emitted 11); the drift-test
+# (test_docs_consistency::test_version_constants_unique) now fails if they reappear.
+GOLD_KEY = 100001                     # CurrencySaveData.Key of gold
 
 
 # --------------------------------------------------------------------------- #
-# Layout de runtime IL2CPP (x64)
+# IL2CPP runtime layout (x64)
 # --------------------------------------------------------------------------- #
 class Obj:
-    KLASS = 0x0                        # todo objeto gerenciado: ponteiro p/ Il2CppClass
+    KLASS = 0x0                        # every managed object: pointer to Il2CppClass
 
 
 class String:
@@ -42,112 +42,112 @@ class String:
 
 class Array:                           # Il2CppArray (T[])
     MAX_LENGTH = 0x18
-    DATA = 0x20                        # elementos começam aqui (8B/ptr no x64)
+    DATA = 0x20                        # elements start here (8B/ptr on x64)
 
 
 class List:                            # System.Collections.Generic.List<T>
-    ITEMS = 0x10                       # ponteiro p/ array interno
+    ITEMS = 0x10                       # pointer to the backing array
     SIZE = 0x18
 
 
-class Dict:                            # Dictionary<K,V>: campos comuns
+class Dict:                            # Dictionary<K,V>: common fields
     ENTRIES = 0x18                     # _entries (Entry[])
     COUNT = 0x20                       # _count
-    DATA = 0x20                        # início dos dados do array de entries
+    DATA = 0x20                        # start of the entries-array data
 
 
 class DictFloat:
-    """Entry de Dict com VALOR de 4 bytes (ex.: Dict<StatType,float> = 64 stats)."""
+    """Dict entry with a 4-byte VALUE (e.g. Dict<StatType,float> = 64 stats)."""
     STRIDE = 0x10
-    HASH = 0x0                         # skip se < 0 (tombstone)
+    HASH = 0x0                         # skip if < 0 (tombstone)
     NEXT = 0x4
     KEY = 0x8                          # int32
     VALUE = 0xC                        # float32
 
 
 class Dict8B:
-    """Entry de Dict com VALOR de 8 bytes — long OU ponteiro (ex.: Dict<int,long>
-    do gold; Dict<EAggregateType,Dict> externo). value@0x10 por alinhamento de 8.
-    *** NÃO confundir com DictFloat (stride 0x10/val 0xC) — corromperia gold/stats. ***"""
+    """Dict entry with an 8-byte VALUE — long OR pointer (e.g. the gold Dict<int,long>;
+    outer Dict<EAggregateType,Dict>). value@0x10 due to 8-byte alignment.
+    *** Do NOT confuse with DictFloat (stride 0x10/val 0xC) — would corrupt gold/stats. ***"""
     STRIDE = 0x18
     HASH = 0x0
     NEXT = 0x4
     KEY = 0x8                          # int32
-    VALUE = 0x10                       # int64 OU ponteiro
+    VALUE = 0x10                       # int64 OR pointer
 
 
 class Class:                           # Il2CppClass (il2cpp.h)
-    NAME = 0x10                        # const char* (nome da classe)
-    ELEMENT_CLASS = 0x40               # == K p/ classe normal (validação do resolver)
-    CAST_CLASS = 0x48                  # == K idem
-    PARENT = 0x58                      # superclasse (p/ chegar em nn<T>)
-    STATIC_FIELDS = 0xB8               # bloco de campos estáticos (sizeof Il2CppClass_1)
+    NAME = 0x10                        # const char* (class name)
+    ELEMENT_CLASS = 0x40               # == K for a normal class (resolver validation)
+    CAST_CLASS = 0x48                  # == K likewise
+    PARENT = 0x58                      # superclass (to reach nn<T>)
+    STATIC_FIELDS = 0xB8               # static-fields block (sizeof Il2CppClass_1)
 
 
 class Singleton:
-    """nn<a> : MonoBehaviour (TypeDefIndex 2350) — base de singleton genérico.
-    A instância viva mora em `static a bbwf` @ STATIC_FIELDS + INSTANCE.
-    Pra Foo:nn<Foo> -> klass(Foo).PARENT (= nn<Foo>) -> STATIC_FIELDS -> INSTANCE."""
-    INSTANCE = 0x0                     # bbwf (o singleton)
+    """nn<a> : MonoBehaviour (TypeDefIndex 2350) — generic singleton base.
+    The live instance lives in `static a bbwf` @ STATIC_FIELDS + INSTANCE.
+    For Foo:nn<Foo> -> klass(Foo).PARENT (= nn<Foo>) -> STATIC_FIELDS -> INSTANCE."""
+    INSTANCE = 0x0                     # bbwf (the singleton)
 
 
-# ACTk Obscured (esta build): o valor REAL é o `fakeValue` PLANO em base+0xC
-# (ObscuredInt/Float). hidden^key dá LIXO. ObscuredLong: fake provavelmente @+0x18.
+# ACTk Obscured (this build): the REAL value is the PLAIN `fakeValue` at base+0xC
+# (ObscuredInt/Float). hidden^key gives GARBAGE. ObscuredLong: fake probably @+0x18.
 ACTK_FAKE = 0xC
 
 
 # --------------------------------------------------------------------------- #
-# Offsets de campos por classe (dump.cs) — todos VALIDADOS ao vivo
+# Per-class field offsets (dump.cs) — all VALIDATED live
 # --------------------------------------------------------------------------- #
-class Unit:                            # base de Hero/Monster (dump.cs ~319277)
+class Unit:                            # base of Hero/Monster (dump.cs ~319277)
     HEALTH_CONTROLLER = 0xB0           # -> UnitHealthController
     IS_HERO = 0x100                    # bool b_isHero
-    CACHE = 0x3A8                      # Hero.cache -> uf (wrapper de progressão). 1.00.14 inseriu
-                                       # `Action OnCrowdControlAppliedAction` @0x3A0 no FIM de Unit
-                                       # (base cresceu +0x8) -> Hero.cache 0x3A0->0x3A8; TODO campo de
-                                       # subclasse de Unit deslocou +0x8 (Monster idem, abaixo).
-    CORE_STATS_OBSCURED = 0x104        # 12 stats core: ObscuredFloat (XOR) — NÃO LER (lixo); use
-                                       # xd.FINAL_STATS (Dict<StatType,float> PLAIN). Marcador p/
+    CACHE = 0x3A8                      # Hero.cache -> uf (progression wrapper). 1.00.14 inserted
+                                       # `Action OnCrowdControlAppliedAction` @0x3A0 at the END of Unit
+                                       # (base grew +0x8) -> Hero.cache 0x3A0->0x3A8; EVERY Unit
+                                       # subclass field shifted +0x8 (Monster likewise, below).
+    CORE_STATS_OBSCURED = 0x104        # 12 core stats: ObscuredFloat (XOR) — DO NOT READ (garbage); use
+                                       # xd.FINAL_STATS (Dict<StatType,float> PLAIN). Marker for
                                        # docs/invariants/obscured-data-offlimits (test_obscured_markers).
 
 
-class UnitHealthController:            # HP em float PURO (dump.cs ~319894)
-    HP_CURRENT = 0x40                  # VALIDADO (cai ao tomar dano); dano = Σ quedas
+class UnitHealthController:            # HP in PURE float (dump.cs ~319894)
+    HP_CURRENT = 0x40                  # VALIDATED (drops when taking damage); damage = Σ drops
     HP_MAX = 0x4C
 
 
-class Monster:                         # extends Unit -> herdou o +0x8 do 1.00.14 (ver Unit.CACHE)
-    STAGE_KEY = 0x3D4                  # stageKey VIVO (o do save congela na troca). 1.00.14: 0x3CC->0x3D4.
-                                       # ⚠ diff_offsets deu FALSO-OK (campo nome-ofuscado, só checa
-                                       # adjacência -> deslocamento +0x8 uniforme passa) — pego no dump.cs
-                                       # vs baseline 1.00.13; confirmar no validate_live (stage).
-    CACHE_OBSCURED = 0x3B8             # cache Obscured — NÃO LER; use os campos PLAIN do Monster.
-                                       # 1.00.14: 0x3B0->0x3B8. Marcador p/ docs/invariants/obscured-data-offlimits.
+class Monster:                         # extends Unit -> inherited the 1.00.14 +0x8 (see Unit.CACHE)
+    STAGE_KEY = 0x3D4                  # LIVE stageKey (the save's freezes on a stage change). 1.00.14: 0x3CC->0x3D4.
+                                       # ⚠ diff_offsets gave a FALSE-OK (obfuscated-name field, only checks
+                                       # adjacency -> a uniform +0x8 shift passes) — caught in dump.cs
+                                       # vs the 1.00.13 baseline; confirm in validate_live (stage).
+    CACHE_OBSCURED = 0x3B8             # Obscured cache — DO NOT READ; use the Monster PLAIN fields.
+                                       # 1.00.14: 0x3B0->0x3B8. Marker for docs/invariants/obscured-data-offlimits.
 
 
 class StageManager:                    # singleton (dump.cs ~327247)
-    HERO_LIST = 0x30                   # Hero[] = party deployada ao vivo
+    HERO_LIST = 0x30                   # Hero[] = the live deployed party
 
 
 class MonsterSpawnManager:             # singleton (dump.cs ~343052)
-    MONSTER_LIST = 0x28               # List<Unit> vivos
-    DEAD_MONSTER_LIST = 0x30          # List<Unit> mortos (cai no reload do mesmo stage)
+    MONSTER_LIST = 0x28               # List<Unit> alive
+    DEAD_MONSTER_LIST = 0x30          # List<Unit> dead (clears on a reload of the same stage)
     SUMMONED_LIST = 0x38
 
 
 class LogManager:                      # singleton (dump.cs ~339652)
-    LOG_LIST = 0x20                    # List<LogData> (boundary de run = size cresce)
+    LOG_LIST = 0x20                    # List<LogData> (run boundary = size grows)
     LOG_BY_TYPE = 0x28                 # Dictionary<ELogType, List<LogData>>
 
 
-class StageClearLog:                   # sucesso
+class StageClearLog:                   # success
     ACT = 0x40
     STAGE = 0x44
-    CLEAR_TIME = 0x48                  # int (segundos oficiais)
+    CLEAR_TIME = 0x48                  # int (official seconds)
     IS_BOSS = 0x4C
 
 
-class StageFailedLog:                  # falha
+class StageFailedLog:                  # failure
     ACT = 0x40
     STAGE = 0x44
     NOW_WAVE = 0x48
@@ -155,91 +155,91 @@ class StageFailedLog:                  # falha
     IS_ACT_BOSS = 0x50
 
 
-class GetBoxLog:                       # drop de baú (ELogType=3). LIVE-CRACKED 2026-06-06.
-    BOX_KEY      = 0x40               # System.String* do TIPO: "TreasureChest_Monster|StageBoss|
-                                       # ActBoss" (NÃO é item key!). Classifique o tier por MONSTER_TYPE.
-    MONSTER_KEY  = 0x48               # System.String* "MonsterName_<key>" (bicho que dropou)
-    MONSTER_TYPE = 0x50               # int (EMonsterLogType: Monster=0, Boss=1, ActBoss=2) = tier do baú
+class GetBoxLog:                       # chest drop (ELogType=3). LIVE-CRACKED 2026-06-06.
+    BOX_KEY      = 0x40               # System.String* of the TYPE: "TreasureChest_Monster|StageBoss|
+                                       # ActBoss" (NOT an item key!). Classify the tier by MONSTER_TYPE.
+    MONSTER_KEY  = 0x48               # System.String* "MonsterName_<key>" (the mob that dropped it)
+    MONSTER_TYPE = 0x50               # int (EMonsterLogType: Monster=0, Boss=1, ActBoss=2) = chest tier
 
 
-class HeroDieLog:                      # morte de herói (ELogType=4). Campos LIVE-CRACKED 2026-06-06:
-                                       # a doc (run-data-map.md:145-146) os tinha TROCADOS. Confirmado
-                                       # em 32 eventos ao vivo. Strings no formato "Nome_<key>".
-    KILLER_MONSTER = 0x40            # System.String* "MonsterName_<monsterKey>" (quem MATOU)
-    VICTIM_HERO    = 0x48            # System.String* "HeroName_<heroKey>" (quem MORREU)
+class HeroDieLog:                      # hero death (ELogType=4). Fields LIVE-CRACKED 2026-06-06:
+                                       # the doc (run-data-map.md:145-146) had them SWAPPED. Confirmed
+                                       # over 32 live events. Strings in the "Name_<key>" format.
+    KILLER_MONSTER = 0x40            # System.String* "MonsterName_<monsterKey>" (who KILLED)
+    VICTIM_HERO    = 0x48            # System.String* "HeroName_<heroKey>" (who DIED)
 
 
-class ResurrectionLog:                 # revive de herói (ELogType=5). LIVE-CRACKED: @0x40 = revivido
-                                       # (5 eventos confirmados; @0x48/@0x50 vazios). Auto-revive ~115s
-                                       # se houver outro herói vivo; Priest tb tem skill de ress.
-    HERO = 0x40                      # System.String* "HeroName_<heroKey>" (revivido)
+class ResurrectionLog:                 # hero revive (ELogType=5). LIVE-CRACKED: @0x40 = the revived hero
+                                       # (5 events confirmed; @0x48/@0x50 empty). Auto-revive ~115s
+                                       # if another hero is alive; Priest also has a res skill.
+    HERO = 0x40                      # System.String* "HeroName_<heroKey>" (the revived hero)
 
 
 class CommonSaveData:
     PLAYTIME = 0x20                    # float
-    CURRENT_STAGE_KEY = 0x58          # DEFASADO/snapshot (preferir Monster.STAGE_KEY)
+    CURRENT_STAGE_KEY = 0x58          # STALE/snapshot (prefer Monster.STAGE_KEY)
     CURRENT_STAGE_WAVE = 0x5C
 
 
-class PlayerSaveData:                  # save plaintext, snapshot (NÃO vivo)
-    # 1.00.12 inseriu BoxBucketUseBoxList/BoxBucketGetBoxList (feature bucket-box, IsBucketBox)
-    # entre settingSaveData e currenySaveDatas → TODAS as listas do save deslocaram +0x10. Sem isto
-    # read_gold/read_heroes liam a lista ERRADA → pick_live_psd None → run com heroes=[] → não subia
-    # (confirmado vivo + dump 1.00.12; ver offsets do dump).
+class PlayerSaveData:                  # plaintext save, snapshot (NOT live)
+    # 1.00.12 inserted BoxBucketUseBoxList/BoxBucketGetBoxList (bucket-box feature, IsBucketBox)
+    # between settingSaveData and currenySaveDatas → ALL save lists shifted +0x10. Without this,
+    # read_gold/read_heroes read the WRONG list → pick_live_psd None → run with heroes=[] → never closed
+    # (confirmed live + dump 1.00.12; see the dump offsets).
     CURRENCIES = 0x38                  # List<CurrencySaveData>   (currenySaveDatas)
     HEROES = 0x40                      # List<HeroSaveData>       (heroSaveDatas)
-    ATTRIBUTES = 0x50                  # List<AttributeSaveData> (árvore de skills/passivas investida)
-    RUNES = 0x60                       # List<RuneSaveData> — runas account-wide (LIVE-CRACKED 2026-06-09)
-    INVENTORY_SLOTS = 0x68             # List<InventorySaveData> — slot do inventário -> item uniqueId
-    STASH = 0x70                       # List<StashSaveData> — slot do stash -> item uniqueId (separado do inv)
-    ITEMS = 0x90                       # List<ItemSaveData> (dados dos itens; slots acima referenciam por uniqueId)
-    AGGREGATES = 0x98                  # List<AggregateSaveData> (oráculo gold/xp, defasado)
+    ATTRIBUTES = 0x50                  # List<AttributeSaveData> (invested skill/passive tree)
+    RUNES = 0x60                       # List<RuneSaveData> — account-wide runes (LIVE-CRACKED 2026-06-09)
+    INVENTORY_SLOTS = 0x68             # List<InventorySaveData> — inventory slot -> item uniqueId
+    STASH = 0x70                       # List<StashSaveData> — stash slot -> item uniqueId (separate from the inv)
+    ITEMS = 0x90                       # List<ItemSaveData> (item data; the slots above reference by uniqueId)
+    AGGREGATES = 0x98                  # List<AggregateSaveData> (gold/xp oracle, stale)
 
 
-class RuneSaveData:                    # nó de runa investido (account-wide). Classe NAME-legível no save.
-    KEY = 0x10                         # int runeKey (casa com data/runes.json -> efeito/statType por nível)
-    LEVEL = 0x14                       # int nível investido
+class RuneSaveData:                    # invested rune node (account-wide). NAME-readable class in the save.
+    KEY = 0x10                         # int runeKey (matches data/runes.json -> effect/statType per level)
+    LEVEL = 0x14                       # int invested level
 
 
-class InventorySaveData:               # slot do inventário -> item (muitos slots vazios = uniqueId 0)
-    UNIQUE_ID = 0x18                   # ulong: aponta pro ItemSaveData.UNIQUE_ID em PlayerSaveData.ITEMS
+class InventorySaveData:               # inventory slot -> item (many empty slots = uniqueId 0)
+    UNIQUE_ID = 0x18                   # ulong: points to ItemSaveData.UNIQUE_ID in PlayerSaveData.ITEMS
 
 
-class StashSaveData:                   # slot do stash -> item (mesma geometria do InventorySaveData)
+class StashSaveData:                   # stash slot -> item (same geometry as InventorySaveData)
     UNIQUE_ID = 0x18
 
 
-class AttributeSaveData:               # nó investido da árvore (run-data-map.md: @0x40, account-wide)
-    KEY = 0x10                         # int attributeKey (casa com a skill via skill-tree refKey)
-    LEVEL = 0x14                       # int nível investido = nível da skill/passiva
+class AttributeSaveData:               # invested tree node (run-data-map.md: @0x40, account-wide)
+    KEY = 0x10                         # int attributeKey (matches the skill via skill-tree refKey)
+    LEVEL = 0x14                       # int invested level = skill/passive level
 
 
 class CurrencySaveData:
-    KEY = 0x10                         # int (OURO = GOLD_KEY)
+    KEY = 0x10                         # int (GOLD = GOLD_KEY)
     QUANTITY = 0x18                    # long
 
 
 class AggregateSaveData:               # dump.cs:342642
     TYPE = 0x10                        # int (EAggregateType; GoldEarn=2)
     SUB_KEY = 0x14
-    VALUE = 0x18                       # long (cumulativo)
+    VALUE = 0x18                       # long (cumulative)
 
 
 class HeroSaveData:
     HERO_KEY = 0x10
     LEVEL = 0x14
-    EXP = 0x1C                         # float (zera no level-up; defasado)
-    EQUIPPED_ITEMS = 0x28             # ulong[] de UniqueIds
-    EQUIPPED_SKILLS = 0x30           # int[] de SkillKeys (dump:342747)
+    EXP = 0x1C                         # float (resets on level-up; stale)
+    EQUIPPED_ITEMS = 0x28             # ulong[] of UniqueIds
+    EQUIPPED_SKILLS = 0x30           # int[] of SkillKeys (dump:342747)
 
 
 class ItemSaveData:
     ITEM_KEY = 0x10
     UNIQUE_ID = 0x18
-    ENCHANT_DATA = 0x30              # ItemEnchantSaveData[] (struct, ver ItemEnchant)
+    ENCHANT_DATA = 0x30              # ItemEnchantSaveData[] (struct, see ItemEnchant)
 
 
-class ItemEnchant:                     # struct dentro de ItemSaveData.ENCHANT_DATA
+class ItemEnchant:                     # struct inside ItemSaveData.ENCHANT_DATA
     STRIDE = 0x1C
     TIER = 0x4
     VALUE = 0x8
@@ -247,7 +247,7 @@ class ItemEnchant:                     # struct dentro de ItemSaveData.ENCHANT_D
     STAT_TYPE = 0x18                   # StatType
 
 
-class ItemInfoData:                    # catálogo
+class ItemInfoData:                    # catalog
     ITEM_KEY = 0x30
     ITEM_TYPE = 0x34
     GRADE = 0x38                       # EGradeType
@@ -255,54 +255,54 @@ class ItemInfoData:                    # catálogo
     LEVEL = 0x6C
 
 
-class HeroInfoData:                    # catálogo
+class HeroInfoData:                    # catalog
     HERO_KEY = 0x30
     CLASS_TYPE = 0x48                  # EEquipClassType
 
 
-class StageInfoData:                   # catálogo (currentStageKey codifica o modo)
+class StageInfoData:                   # catalog (currentStageKey encodes the mode)
     STAGE_KEY = 0x30
-    STAGE_TYPE = 0x40                  # EStageType (x-10 = ACTBOSS, sem waves de horda)
-    DIFFICULTY = 0x44                  # EStageDifficulty (modo)
+    STAGE_TYPE = 0x40                  # EStageType (x-10 = ACTBOSS, no horde waves)
+    DIFFICULTY = 0x44                  # EStageDifficulty (mode)
     ACT = 0x48
     STAGE_NO = 0x4C
     WAVE_AMOUNT = 0x54
     WAVE_MOB_AMOUNT = 0x58
 
 
-# ----- runtime de progressão do herói (chegado via Unit.CACHE) -----
+# ----- hero progression runtime (reached via Unit.CACHE) -----
 class HeroRuntime:                     # `uf` (uf : uo)
-    INFO = 0x30                        # beew -> HeroInfoData (p/ HeroKey/classe)
-    STATS_HOLDER = 0x10                # behg -> xd (holder dos 64 stats)
-    LEVEL_FAKE = 0xD8                  # befp.fakeValue = HeroLevel VIVO (PLANO)
-    EXP_FAKE = 0x118                   # beft.fakeValue = HeroExp dentro do nível (VIVO)
+    INFO = 0x30                        # beew -> HeroInfoData (for HeroKey/class)
+    STATS_HOLDER = 0x10                # behg -> xd (holder of the 64 stats)
+    LEVEL_FAKE = 0xD8                  # befp.fakeValue = LIVE HeroLevel (PLAIN)
+    EXP_FAKE = 0x118                   # beft.fakeValue = HeroExp within the level (LIVE)
 
 
 class StatsHolder:                     # `xd` (dump.cs:342026)
-    MODIFIER_MGR = 0x10                # betr -> uq (lista crua de modificadores)
-    FINAL_STATS = 0x18                # bets -> Dict<StatType,float> (64 stats FINAIS; DictFloat)
-    SECOND = 0x20                      # bett -> 2º cache
+    MODIFIER_MGR = 0x10                # betr -> uq (raw list of modifiers)
+    FINAL_STATS = 0x18                # bets -> Dict<StatType,float> (64 FINAL stats; DictFloat)
+    SECOND = 0x20                      # bett -> 2nd cache
 
 
-class AggregateManager:                # GOLD VIVO. dump.cs:336558 nomeava `ut`; o nome ofuscado
-                                       # DRIFTA por build (cravado: virou `uu`, e `ut` agora é outra
-                                       # classe) -> NÃO resolver por nome. metrics/gold.py acha por
-                                       # ESTRUTURA (name-free); este OFFSET é estável. Ver docs/value-mapping-plan.md.
+class AggregateManager:                # LIVE GOLD. dump.cs:336558 named it `ut`; the obfuscated name
+                                       # DRIFTS per build (nailed: became `uu`, and `ut` is now a different
+                                       # class) -> do NOT resolve by name. metrics/gold.py finds it by
+                                       # STRUCTURE (name-free); this OFFSET is stable. See docs/value-mapping-plan.md.
     AGGREGATES = 0x20                  # beid -> Dict<EAggregateType, Dict<SubKey,long>> (Dict8B)
-    # GoldEarn[SubKey 1] = gold de COMBATE (cumulativo). NÃO somar os SubKeys: o SubKey 0 é o
-    # TOTAL (rollup = 1+2+3) e 2/3 são ruído (venda/idle/quest). Lógica em metrics/gold.py.
+    # GoldEarn[SubKey 1] = COMBAT gold (cumulative). Do NOT sum the SubKeys: SubKey 0 is the
+    # TOTAL (rollup = 1+2+3) and 2/3 are noise (sale/idle/quest). Logic in metrics/gold.py.
 
 
-# ----- sistema de modificadores de stat (docs/damage-model.md) -----
+# ----- stat-modifier system (docs/damage-model.md) -----
 class StatModifier:                    # `up` (dump.cs:336258)
     STAT_TYPE = 0x10
     MOD_TYPE = 0x14                    # MODTYPE (FLAT/ADDITIVE/MULTIPLICATIVE)
     VALUE = 0x18                       # float
     MOD_SOURCE = 0x1C                  # MODSOURCE
-    # fold (gbm @RVA 0x936E20): stat = (base+Σflat) × (1+Σaditivo) × Π(multiplicativo)
+    # fold (gbm @RVA 0x936E20): stat = (base+Σflat) × (1+Σadditive) × Π(multiplicative)
 
 
-class DamageInfo:                      # struct (dump.cs:319209) — dano por hit (transiente)
+class DamageInfo:                      # struct (dump.cs:319209) — per-hit damage (transient)
     ATTACKER = 0x0
     ORIGIN_DAMAGE = 0x8
     IS_CRITICAL = 0xC
@@ -312,7 +312,7 @@ class DamageInfo:                      # struct (dump.cs:319209) — dano por hi
 
 
 # --------------------------------------------------------------------------- #
-# Enums (verbatim do dump.cs)
+# Enums (verbatim from dump.cs)
 # --------------------------------------------------------------------------- #
 class StatType(IntEnum):
     NONE = 0; AttackDamage = 1; AttackSpeed = 2; CriticalChance = 3; CriticalDamage = 4
@@ -348,7 +348,7 @@ class ELogType(IntEnum):
     ExtractionResult = 15
 
 
-class EMonsterLogType(IntEnum):         # dump.cs — quem dropou o baú (GetBoxLog.beox @0x50)
+class EMonsterLogType(IntEnum):         # dump.cs — who dropped the chest (GetBoxLog.beox @0x50)
     Monster = 0; Boss = 1; ActBoss = 2
 
 
@@ -387,7 +387,7 @@ class EStageType(IntEnum):             # StageInfoData.STAGE_TYPE (run-data-map.
     NORMAL = 0; ACTBOSS = 1
 
 
-class MODTYPE(IntEnum):                # dump.cs:336237 — como o modificador entra no fold
+class MODTYPE(IntEnum):                # dump.cs:336237 — how the modifier enters the fold
     FLAT = 0; ADDITIVE = 1; MULTIPLICATIVE = 2
 
 
@@ -397,5 +397,5 @@ class MODSOURCE(IntEnum):              # dump.cs:336246
 
 
 def name_map(enum_cls):
-    """{valor: nome} de um IntEnum — pra exportar catálogos pro front (--dump-catalogs)."""
+    """{value: name} of an IntEnum — for exporting catalogs to the front (--dump-catalogs)."""
     return {m.value: m.name for m in enum_cls}

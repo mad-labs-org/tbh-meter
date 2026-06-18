@@ -1,6 +1,6 @@
 ---
 type: process
-description: "O contrato id-based do raw/<id>.json: o reader emite IDs estáveis (itemKey, statId, heroKey, stageKey, uniqueId, box_key, monsterKey) e o front resolve display-names via web/src/data/*.json. Nenhum nome de display é a IDENTIDADE; labels que ainda saem são redundância transitória. A identidade da RUN é o horário de fim (raw v2; sem session_id/run — Redesign 2)."
+description: "The id-based contract of raw/<id>.json: the reader emits stable IDs (itemKey, statId, heroKey, stageKey, uniqueId, box_key, monsterKey) and the front resolves display-names via web/src/data/*.json. No display name is the IDENTITY; labels that still ship are transitional redundancy. The RUN identity is its end timestamp (raw v2; no session_id/run — Redesign 2)."
 code_anchors:
   - meter_windows.py::close_run
   - meter_windows.py::run
@@ -12,66 +12,66 @@ asserts:
   - meter_windows.SCHEMA_VERSION == 11
 ---
 
-# Contrato de dados id-based (raw/<id>.json)
+# id-based data contract (raw/<id>.json)
 
-O output do reader — hoje **`raw/<id>.json`** (1 arquivo por run; antes `runs.jsonl`, agora legado) —
-é **id-based**: a identidade de cada coisa é um **int estável do jogo** — `itemKey`, `statId`,
-`heroKey`, `stageKey`, `classId`, `gradeId`, `slotId`, `recipeId`, `uniqueId` (chave natural
-por-instância do item, emitida como STRING lossless), `box_key`/`monster_type` (drops), `monsterKey`
-(quem matou um herói). A IDENTIDADE da run é o horário de fim dela (raw v2; ver invariantes abaixo). O **front** (`web/src/data/*.json` — `items.json`,
-`heroes.json`, `stages.json`, etc., resolvidos por `web/src/lib/data.ts`) é quem traduz id →
-display-name. Origem do contrato: `docs/refactor-roadmap.md`, seção "DATA CONTRACT" ("server NEVER
+The reader output — today **`raw/<id>.json`** (1 file per run; formerly `runs.jsonl`, now legacy) —
+is **id-based**: the identity of each thing is a **stable game int** — `itemKey`, `statId`,
+`heroKey`, `stageKey`, `classId`, `gradeId`, `slotId`, `recipeId`, `uniqueId` (the item's natural
+per-instance key, emitted as a lossless STRING), `box_key`/`monster_type` (drops), `monsterKey`
+(who killed a hero). The run IDENTITY is its end timestamp (raw v2; see invariants below). The **front** (`web/src/data/*.json` — `items.json`,
+`heroes.json`, `stages.json`, etc., resolved by `web/src/lib/data.ts`) is what translates id →
+display-name. Contract origin: `docs/refactor-roadmap.md`, "DATA CONTRACT" section ("server NEVER
 stores/returns display names; front resolves names from catalogs").
 
-**Por que id, não nome.** Nomes de display são labels do front (enums localizáveis, renomeáveis a
-cada patch); o id é a chave de junção/agregação no DB e o que sobrevive a um rename do jogo. Guardar
-o nome no record (a) duplica dado mutável, (b) quebra o join quando o front re-localiza, (c) infla o
-JSON. O DB ingere os ids e projeta — agregação por `stage_key`/`class_id`/`hero_key`, catálogos
-(`catalog_*`) à parte. Os 64 stats foram o caso-piloto: passaram a sair **só** como `{statId:
-valor}` (id-only), o que de quebra fechou o gap do label `STATN` que parava em 59 (stats 60-63 viravam
-`stat60..63` genéricos).
+**Why id, not name.** Display names are front labels (localizable enums, renameable every
+patch); the id is the join/aggregation key in the DB and what survives a game rename. Storing
+the name in the record (a) duplicates mutable data, (b) breaks the join when the front re-localizes, (c) bloats the
+JSON. The DB ingests the ids and projects — aggregation by `stage_key`/`class_id`/`hero_key`, catalogs
+(`catalog_*`) on the side. The 64 stats were the pilot case: they now ship **only** as `{statId:
+value}` (id-only), which incidentally closed the `STATN` label gap that stopped at 59 (stats 60-63 turned into
+generic `stat60..63`).
 
-## O estado REAL é HÍBRIDO (leia antes de "limpar")
+## The REAL state is HYBRID (read before you "clean up")
 
-A regra é id-based, mas o output de HOJE ainda **emite alguns labels ao lado do id** — não confunda
-"o contrato" com "o que o reader já parou de mandar":
+The rule is id-based, but TODAY's output still **emits some labels alongside the id** — don't confuse
+"the contract" with "what the reader has already stopped sending":
 
-- **id-only de verdade:** `stats` (`{statId: valor}`, em `read_stats_dict`).
-- **id + label redundante:** o item carrega `slotId`+`slot`, `gradeId`+`grade`; o mod carrega
-  `recipeId`+`recipe`, `statId`+`stat`; o herói carrega `classId`+`class` (montados em `read_build`).
+- **truly id-only:** `stats` (`{statId: value}`, in `read_stats_dict`).
+- **id + redundant label:** the item carries `slotId`+`slot`, `gradeId`+`grade`; the mod carries
+  `recipeId`+`recipe`, `statId`+`stat`; the hero carries `classId`+`class` (assembled in `read_build`).
 
-O docstring de `game/build.py` é explícito: esses labels seguem preenchidos para a saída **bater
-byte-a-byte com o monólito no cutover**, e **dropá-los é um schema-bump futuro**. Ou seja: o id é a
-identidade (sempre presente, sempre a chave); o label é vestígio transitório. Um agent que **adicione**
-campo deve emitir o **id** como verdade — não inventar um novo campo de nome-de-display. Quem **remover**
-os labels existentes está fazendo uma mudança de contrato → bump `SCHEMA_VERSION` + coordenar o front.
+The `game/build.py` docstring is explicit: these labels stay populated so the output **matches the
+monolith byte-for-byte at cutover**, and **dropping them is a future schema-bump**. In other words: the id is the
+identity (always present, always the key); the label is a transitional remnant. An agent that **adds** a
+field must emit the **id** as the truth — don't invent a new display-name field. Whoever **removes**
+the existing labels is making a contract change → bump `SCHEMA_VERSION` + coordinate with the front.
 
-## Invariantes deste contrato (o que NÃO pode quebrar)
+## Invariants of this contract (what must NOT break)
 
-- **O record nunca é a fonte do nome.** Campo novo = id (ou número). Resolução de nome mora no front.
-- **`uniqueId` é a identidade por-instância do item** (chave natural do DB); `itemKey` é o tipo. Não
-  troque um pelo outro.
-- **A IDENTIDADE da run é o HORÁRIO de fim dela (raw v2: `id = str(ts_ms)`).** Sequencial por máquina →
-  nunca colide, sem session nem contador. (ANTES: `session_id:run` cunhado pelo reader — reciclava no
-  restart e sumia a run; removido no Redesign 2.) **Session NÃO é mais do reader** — o app a DERIVA das
-  runs (gap 6h + cortes). Upload: `external_id = device:ts` (único global). Ver `progress.md` "Redesign 2".
-- **Ids têm faixa de sanidade** na fonte (`heroKey`/`itemKey` em `0 < k < 10_000_000`, ver
-  `_read_catalogs`/`read_live_stats_by_hero`) — lixo de memória não vira id.
-- **Casing**: o JSON usa as chaves originais (`heroKey`, `stageKey`); a normalização snake_case
-  (`heroKey→hero_key`) é no boundary de ingest do DB, não no reader. No app, o mapeamento
-  snake_case→camelCase é parte da normalização defensiva.
+- **The record is never the source of the name.** New field = id (or number). Name resolution lives in the front.
+- **`uniqueId` is the item's per-instance identity** (the DB's natural key); `itemKey` is the type. Don't
+  swap one for the other.
+- **The run IDENTITY is its end TIMESTAMP (raw v2: `id = str(ts_ms)`).** Sequential per machine →
+  never collides, no session, no counter. (BEFORE: `session_id:run` minted by the reader — it recycled on
+  restart and made runs vanish; removed in Redesign 2.) **Session is NO longer the reader's** — the app DERIVES it from the
+  runs (6h gap + cuts). Upload: `external_id = device:ts` (globally unique).
+- **Ids have a sanity range** at the source (`heroKey`/`itemKey` in `0 < k < 10_000_000`, see
+  `_read_catalogs`/`read_live_stats_by_hero`) — memory garbage doesn't become an id.
+- **Casing**: the JSON uses the original keys (`heroKey`, `stageKey`); the snake_case normalization
+  (`heroKey→hero_key`) happens at the DB ingest boundary, not in the reader. In the app, the
+  snake_case→camelCase mapping is part of the defensive normalization.
 
-## Como agir sob este contrato
+## How to act under this contract
 
-- **Adicionou um datum que tem id no jogo?** Emita o id (e, se útil hoje, o label ao lado como os
-  outros — mas o id é obrigatório). Siga a receita de [[guides/add-runs-field]] e o bump de
-  [[invariants/schema-versioning]]; tipe/normalize defensivo no app ([[invariants/app-normalization]]).
-- **Vai exibir o nome?** Resolva no front via `web/src/data/*.json`; não peça ao reader pra mandar o
-  nome. O reader, no máximo, exporta os **catálogos** (id→atributos) — é o `--dump-catalogs` planejado,
-  cuja matéria-prima já existe em `meter_windows.py` (`_read_catalogs`, que deriva stage_info/item_cat/hero_cat)
-  e nos enums de `config/offsets.py`.
+- **Added a datum that has an id in the game?** Emit the id (and, if useful today, the label alongside like the
+  others — but the id is mandatory). Follow the recipe in [[guides/add-runs-field]] and the bump in
+  [[invariants/schema-versioning]]; type/normalize defensively in the app ([[invariants/app-normalization]]).
+- **Going to display the name?** Resolve it in the front via `web/src/data/*.json`; don't ask the reader to send the
+  name. The reader, at most, exports the **catalogs** (id→attributes) — that's the planned `--dump-catalogs`,
+  whose raw material already exists in `meter_windows.py` (`_read_catalogs`, which derives stage_info/item_cat/hero_cat)
+  and in the enums of `config/offsets.py`.
 
 ## Related
 - [[invariants/schema-versioning]]
 - [[invariants/app-normalization]]
-Veja também: [[guides/add-runs-field]] (a receita ponta-a-ponta) · [[reference/run-data-map]] (o mapa id→leitor)
+See also: [[guides/add-runs-field]] (the end-to-end recipe) · [[reference/run-data-map]] (the id→reader map)

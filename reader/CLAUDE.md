@@ -1,14 +1,14 @@
-# Reader — leia antes de mexer
+# reader/ — read before you touch it
 
-Vai alterar **qualquer coisa em `tbh-meter/reader/`**? A base de conhecimento que evita os
-bugs históricos (dict stride trocado, nome ofuscado, schema não bumpado, runs que não fecham,
-ObscuredFloat, cache stale) vive em **`docs/_index.md`** — comece por lá (tem um bloco
-"por sintoma/tarefa"), ache a nota pelo sintoma, e siga os `code_anchors` até o código (a verdade).
+Changing **anything under `tbh-meter/reader/`?** The knowledge base that prevents the historical bugs
+(swapped dict stride, obfuscated name, un-bumped schema, runs that never close, ObscuredFloat, stale
+cache) lives in **`docs/_index.md`** — start there (it has a "by symptom/task" block), find the note by
+symptom, and follow its `code_anchors` to the code (the truth).
 
-- O conhecimento é **drift-tested**: rode `pytest tests/` depois de qualquer mudança
-  (`tests/test_docs_consistency.py` falha se uma nota mentir sobre o código).
-- Antes de abrir um PR, **varra o diff contra `docs/reference/anti-patterns.md`** — o checklist
-  de smells conhecidos, cada um ligado à nota-invariant que ele viola.
-- Ao adicionar uma nota ou mudar uma regra: a verdade é o CÓDIGO. Offset/enum/stride →
-  `config/offsets.py`; regra de negócio → o módulo da lógica. Nunca duplique o valor numa nota —
-  cite o símbolo (`code_anchors` + `asserts`), pra o drift-test te guardar. Convenções: `docs/README.md`.
+- The knowledge is **drift-tested**: run `pytest tests/` after any change
+  (`tests/test_docs_consistency.py` fails when a note lies about the code).
+- Before opening a PR, **sweep the diff against `docs/reference/anti-patterns.md`** — the checklist of
+  known smells, each linked to the invariant note it violates.
+- Adding a note or changing a rule: the truth is the CODE. Offset/enum/stride → `config/offsets.py`;
+  business rule → the logic module. Never duplicate the value in a note — cite the symbol
+  (`code_anchors` + `asserts`) so the drift-test guards you. Conventions: `docs/README.md`.

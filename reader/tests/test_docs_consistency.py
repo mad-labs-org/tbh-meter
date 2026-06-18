@@ -1,29 +1,28 @@
 """
-test_docs_consistency.py — o GUARD anti-drift da base de conhecimento (docs/).
+test_docs_consistency.py — the anti-drift GUARD for the knowledge base (docs/).
 
-A base do reader é um skill-graph: um índice (docs/_index.md) → notas pequenas
-(docs/<tipo>/*.md) → o código (a verdade executável). Uma nota só vale se continuar
-VERDADEIRA conforme o reader muda a cada PR. Este teste é o que impede a base de
-apodrecer em silêncio (o caso `ficha.py`→`build.py`: o módulo foi renomeado e 5 docs
-ficaram mentindo). Mas existência de símbolo NÃO basta — o pior drift é o texto que
-ficou falso com o símbolo intacto. Então aqui validamos VALOR e COMPORTAMENTO, não só
-"o símbolo existe":
+The reader's KB is a skill-graph: an index (docs/_index.md) → small notes
+(docs/<type>/*.md) → the code (the executable truth). A note is only worth keeping if it
+stays TRUE as the reader changes every PR. This test is what stops the KB from rotting
+in silence (the `ficha.py`→`build.py` case: the module was renamed and 5 docs were left
+lying). But symbol existence is NOT enough — the worst drift is text that went false with
+the symbol intact. So here we validate VALUE and BEHAVIOR, not just "the symbol exists":
 
-  • frontmatter válido (type na taxonomia, description, campos obrigatórios por tipo)
-  • code_anchors RESOLVEM por AST (Classe.attr / def / class), não por substring
-    (substring daria falso-verde num comentário)
-  • `asserts:` ("modulo.SIMBOLO == valor") batem com o literal real no código
-  • `guarded_by:` nomeia um teste de comportamento que EXISTE e é coletável
-  • `symptoms:` não-vazio nos invariants (a recuperação é lexical → o sintoma que o
-    agent grepa tem que estar escrito)
-  • PROIBIDO número-de-linha (arquivo.py:NN) no corpo — eles rotam; use code_anchors
-  • PROIBIDO @0x cru em notas `reference` — cite o SÍMBOLO de offsets.py, não o literal
-  • wikilinks em forma de caminho ([[invariants/foo]]) resolvem (dangling no namespace = falha)
-  • _index lista toda nota e todo link do _index resolve (bidirecional)
-  • SCHEMA_VERSION/GAME_VERSION definidos em UM só módulo (sem segunda-fonte contraditória)
+  • valid frontmatter (type in the taxonomy, description, required fields per type)
+  • code_anchors RESOLVE via AST (Class.attr / def / class), not via substring
+    (substring would give a false-green on a comment)
+  • `asserts:` ("module.SYMBOL == value") match the real literal in the code
+  • `guarded_by:` names a behavior test that EXISTS and is collectable
+  • `symptoms:` non-empty on invariants (recovery is lexical → the symptom the
+    agent greps for has to be written down)
+  • FORBIDDEN line numbers (file.py:NN) in the body — they rot; use code_anchors
+  • FORBIDDEN raw @0x in `reference` notes — cite the SYMBOL from offsets.py, not the literal
+  • path-form wikilinks ([[invariants/foo]]) resolve (dangling in the namespace = failure)
+  • _index lists every note and every _index link resolves (bidirectional)
+  • SCHEMA_VERSION/GAME_VERSION defined in ONE module only (no contradictory second source)
 
-Notas `archive/` são SNAPSHOTS: isentas dos checks de código (só frontmatter), porque
-descrevem um estado passado. Só-stdlib + pytest (roda no Mac, não toca a memória do jogo).
+`archive/` notes are SNAPSHOTS: exempt from the code checks (frontmatter only), because
+they describe a past state. Stdlib-only + pytest (runs on Mac, never touches game memory).
 """
 import ast
 import re
@@ -31,7 +30,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent          # tbh-meter/reader/
 DOCS = ROOT / "docs"
-REPO = ROOT.parent                                       # tbh-meter/  (app/ é irmão de reader/)
+REPO = ROOT.parent                                       # tbh-meter/  (app/ is a sibling of reader/)
 NOTE_DIRS = ("invariants", "reference", "guides", "process", "archive")
 
 VALID_TYPES = {"invariant", "reference", "guide", "process", "archive"}
@@ -53,13 +52,13 @@ _MISSING = object()
 
 
 def strip_comments(text):
-    """Conteúdo em <!-- --> é scaffolding não-renderizado (ex.: exemplos num template);
-    os checks de corpo só valem para o conteúdo vivo."""
+    """Content inside <!-- --> is non-rendered scaffolding (e.g. examples in a template);
+    the body checks only apply to the live content."""
     return HTML_COMMENT_RE.sub("", text)
 
 
 # --------------------------------------------------------------------------- #
-# Parsing de notas (frontmatter YAML simples: escalares + listas)
+# Note parsing (simple YAML frontmatter: scalars + lists)
 # --------------------------------------------------------------------------- #
 def parse_note(path):
     text = path.read_text(encoding="utf-8")
@@ -89,7 +88,7 @@ def parse_note(path):
 
 
 def live_notes():
-    """(path, fm, body) de toda nota nos subdiretórios de tipo. _index/README ficam fora."""
+    """(path, fm, body) for every note in the type subdirectories. _index/README excluded."""
     out = []
     for d in NOTE_DIRS:
         for p in sorted((DOCS / d).rglob("*.md")):
@@ -105,7 +104,7 @@ def as_list(v):
 
 
 # --------------------------------------------------------------------------- #
-# Resolução por AST (código = verdade)
+# AST resolution (code = truth)
 # --------------------------------------------------------------------------- #
 def _module_file(modpath):
     return ROOT / Path(*modpath.split(".")).with_suffix(".py")
@@ -125,7 +124,7 @@ def _tree(path):
 
 
 def _defines(tree, symbol):
-    """symbol = 'Name' (def/class/assign em qualquer nível, inclui closures) ou 'Classe.attr'."""
+    """symbol = 'Name' (def/class/assign at any level, includes closures) or 'Class.attr'."""
     if "." in symbol:
         cls, attr = symbol.split(".", 1)
         for node in ast.walk(tree):
@@ -148,7 +147,7 @@ def _defines(tree, symbol):
 
 
 def _literal(modpath_symbol):
-    """Valor literal de 'modulo.SIMBOLO' ou 'modulo.Classe.ATTR' via AST. _MISSING se não achar."""
+    """Literal value of 'module.SYMBOL' or 'module.Class.ATTR' via AST. _MISSING if not found."""
     parts = modpath_symbol.split(".")
     for i in range(len(parts) - 1, 0, -1):
         f = _module_file(".".join(parts[:i]))
@@ -191,7 +190,7 @@ def _parse_rhs(s):
 
 
 def _test_defined(test_anchor):
-    """'tests/test_x.py::Klass::test_y' ou 'tests/test_x.py::test_y' -> existe e é coletável?"""
+    """'tests/test_x.py::Klass::test_y' or 'tests/test_x.py::test_y' -> exists and collectable?"""
     filerel, _, path = test_anchor.partition("::")
     f = ROOT / filerel.strip()
     if not f.exists() or not path:
@@ -215,23 +214,23 @@ def test_frontmatter_valid():
     errs = []
     for p, fm, _ in NOTES:
         if fm is None:
-            errs.append(f"{_rel(p)}: sem frontmatter YAML")
+            errs.append(f"{_rel(p)}: no YAML frontmatter")
             continue
         t = fm.get("type")
         if t not in VALID_TYPES:
-            errs.append(f"{_rel(p)}: type inválido: {t!r}")
+            errs.append(f"{_rel(p)}: invalid type: {t!r}")
             continue
         for field in REQUIRED[t]:
             if not fm.get(field):
-                errs.append(f"{_rel(p)}: campo obrigatório ausente p/ '{t}': {field}")
+                errs.append(f"{_rel(p)}: required field missing for '{t}': {field}")
         d = fm.get("description")
         if isinstance(d, str) and len(d) < MIN_DESC:
-            errs.append(f"{_rel(p)}: description curta ({len(d)} < {MIN_DESC})")
+            errs.append(f"{_rel(p)}: description too short ({len(d)} < {MIN_DESC})")
     assert not errs, "\n".join(errs)
 
 
 def test_code_anchors_resolve():
-    """Arquivo existe + (reader .py) símbolo achável por AST. archive isento; app = só arquivo."""
+    """File exists + (reader .py) symbol findable via AST. archive exempt; app = file only."""
     errs = []
     for p, fm, _ in NOTES:
         if not fm or fm.get("type") == "archive":
@@ -239,17 +238,17 @@ def test_code_anchors_resolve():
         for anchor in as_list(fm.get("code_anchors")):
             target, kind, sym = _anchor_target(anchor)
             if kind == "app":
-                continue  # cross-repo: tolerante a checkout reader-only (não falha se ausente)
+                continue  # cross-repo: tolerant of a reader-only checkout (no failure if absent)
             if not target.exists():
-                errs.append(f"{_rel(p)}: code_anchor inexistente: {anchor}")
+                errs.append(f"{_rel(p)}: code_anchor does not exist: {anchor}")
                 continue
             if sym and not _defines(_tree(target), sym):
-                errs.append(f"{_rel(p)}: símbolo não encontrado: {anchor}")
+                errs.append(f"{_rel(p)}: symbol not found: {anchor}")
     assert not errs, "\n".join(errs)
 
 
 def test_asserts_hold():
-    """Cada 'modulo.SIMBOLO == valor' bate com o literal real no código."""
+    """Each 'module.SYMBOL == value' matches the real literal in the code."""
     errs = []
     for p, fm, _ in NOTES:
         if not fm or fm.get("type") == "archive":
@@ -257,14 +256,14 @@ def test_asserts_hold():
         for a in as_list(fm.get("asserts")):
             m = ASSERT_RE.match(a)
             if not m:
-                errs.append(f"{_rel(p)}: assert malformado (esperado 'lhs == rhs'): {a!r}")
+                errs.append(f"{_rel(p)}: malformed assert (expected 'lhs == rhs'): {a!r}")
                 continue
             lhs, expected = m.group(1).strip(), _parse_rhs(m.group(2))
             actual = _literal(lhs)
             if actual is _MISSING:
-                errs.append(f"{_rel(p)}: assert não resolve no código: {lhs}")
+                errs.append(f"{_rel(p)}: assert does not resolve in the code: {lhs}")
             elif actual != expected:
-                errs.append(f"{_rel(p)}: assert FALHOU: {lhs} é {actual!r}, nota diz {expected!r}")
+                errs.append(f"{_rel(p)}: assert FAILED: {lhs} is {actual!r}, note says {expected!r}")
     assert not errs, "\n".join(errs)
 
 
@@ -275,7 +274,7 @@ def test_guarded_by_collectable():
             continue
         for g in as_list(fm.get("guarded_by")):
             if not _test_defined(g):
-                errs.append(f"{_rel(p)}: guarded_by não coletável: {g}")
+                errs.append(f"{_rel(p)}: guarded_by not collectable: {g}")
     assert not errs, "\n".join(errs)
 
 
@@ -283,44 +282,44 @@ def test_invariants_have_symptoms():
     errs = []
     for p, fm, _ in NOTES:
         if fm and fm.get("type") == "invariant" and not as_list(fm.get("symptoms")):
-            errs.append(f"{_rel(p)}: invariant sem 'symptoms' (a busca é lexical)")
+            errs.append(f"{_rel(p)}: invariant without 'symptoms' (the search is lexical)")
     assert not errs, "\n".join(errs)
 
 
 def test_no_line_numbers_in_body():
-    """Número-de-linha rota; o agent é mandado pro código errado. Use code_anchors."""
+    """Line numbers rot; the agent gets sent to the wrong code. Use code_anchors."""
     errs = []
     for p, fm, body in NOTES:
         if not fm or fm.get("type") == "archive":
             continue
         b = strip_comments(body)
         for m in LINE_REF_RE.finditer(b):
-            errs.append(f"{_rel(p)}: ref de linha proibida (use code_anchors): {m.group(0)}")
+            errs.append(f"{_rel(p)}: forbidden line ref (use code_anchors): {m.group(0)}")
         if MD_LINE_REF_RE.search(b):
-            errs.append(f"{_rel(p)}: ref de linha .md proibida")
+            errs.append(f"{_rel(p)}: forbidden .md line ref")
     assert not errs, "\n".join(errs)
 
 
 def test_no_raw_offsets_in_reference():
-    """reference cita o SÍMBOLO de offsets.py, nunca o literal @0x (que dessincroniza)."""
+    """reference cites the SYMBOL from offsets.py, never the literal @0x (which desyncs)."""
     errs = []
     for p, fm, body in NOTES:
         if fm and fm.get("type") == "reference" and RAW_OFFSET_RE.search(strip_comments(body)):
-            errs.append(f"{_rel(p)}: @0x cru numa reference — cite o símbolo de offsets.py")
+            errs.append(f"{_rel(p)}: raw @0x in a reference — cite the symbol from offsets.py")
     assert not errs, "\n".join(errs)
 
 
 def test_wikilinks_resolve():
-    """Links em forma de caminho ([[invariants/foo]]) resolvem; [[OUTRA-COISA]] é texto literal."""
+    """Path-form links ([[invariants/foo]]) resolve; [[SOMETHING-ELSE]] is literal text."""
     existing = {str(p.relative_to(DOCS)).removesuffix(".md") for p, _, _ in NOTES}
     errs = []
     for p, _fm, body in NOTES:
         for tgt in WIKILINK_RE.findall(strip_comments(body)):
             tgt = tgt.strip()
             if "/" not in tgt:
-                continue  # não é referência a nota (ex.: [[STATUS]] = marcador literal)
+                continue  # not a note reference (e.g. [[STATUS]] = literal marker)
             if tgt.removesuffix(".md") not in existing:
-                errs.append(f"{_rel(p)}: wikilink dangling: [[{tgt}]]")
+                errs.append(f"{_rel(p)}: dangling wikilink: [[{tgt}]]")
     assert not errs, "\n".join(errs)
 
 
@@ -333,14 +332,14 @@ def test_index_coverage_bidirectional():
     existing = {str(p.relative_to(DOCS)).removesuffix(".md") for p, _, _ in NOTES}
     errs = []
     for note in sorted(existing - linked):
-        errs.append(f"_index.md não lista a nota: {note}")
+        errs.append(f"_index.md does not list the note: {note}")
     for dead in sorted(linked - existing):
-        errs.append(f"_index.md aponta p/ nota inexistente: {dead}")
+        errs.append(f"_index.md points to a non-existent note: {dead}")
     assert not errs, "\n".join(errs)
 
 
 def test_version_constants_unique():
-    """SCHEMA_VERSION/GAME_VERSION em UM só módulo (sem segunda-fonte contraditória)."""
+    """SCHEMA_VERSION/GAME_VERSION in ONE module only (no contradictory second source)."""
     defs = {"SCHEMA_VERSION": [], "GAME_VERSION": []}
     pat = re.compile(r"^(SCHEMA_VERSION|GAME_VERSION)\s*=", re.MULTILINE)
     for f in ROOT.rglob("*.py"):
@@ -348,14 +347,14 @@ def test_version_constants_unique():
             continue
         for name in pat.findall(f.read_text(encoding="utf-8")):
             defs[name].append(str(f.relative_to(ROOT)))
-    errs = [f"{name} definido em {len(files)} módulos: {files}"
+    errs = [f"{name} defined in {len(files)} modules: {files}"
             for name, files in defs.items() if len(files) > 1]
     assert not errs, "\n".join(errs)
 
 
 def test_reverse_coverage_metrics_game():
-    """Todo módulo de domínio (metrics/, game/) é code_anchor de >=1 nota viva — senão a base
-    tem buraco invisível: um agent que abre o módulo não acha invariante e acha que "não há regra"."""
+    """Every domain module (metrics/, game/) is a code_anchor of >=1 live note — otherwise the KB
+    has an invisible hole: an agent that opens the module finds no invariant and assumes "no rule"."""
     anchored = set()
     for _p, fm, _b in NOTES:
         if not fm or fm.get("type") == "archive":
@@ -369,9 +368,9 @@ def test_reverse_coverage_metrics_game():
         for f in sorted((ROOT / sub).glob("*.py")):
             if f.name == "__init__.py":
                 continue
-            # Módulo sem class/def top-level (re-export shim, ex.: game/enums.py reexporta os
-            # enums de offsets.py) não tem lógica própria p/ ancorar — a verdade mora no
-            # módulo reexportado, que é coberto por outra nota. Auto-exclui shims.
+            # A module with no top-level class/def (re-export shim, e.g. game/enums.py re-exports
+            # the enums from offsets.py) has no logic of its own to anchor — the truth lives in
+            # the re-exported module, which is covered by another note. Auto-excludes shims.
             tree = ast.parse(f.read_text(encoding="utf-8"))
             if not any(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
                        for n in tree.body):
@@ -379,4 +378,4 @@ def test_reverse_coverage_metrics_game():
             rel = str(f.relative_to(ROOT))
             if rel not in anchored:
                 orphans.append(rel)
-    assert not orphans, f"módulos sem nota (cobertura-reversa): {orphans}"
+    assert not orphans, f"modules without a note (reverse coverage): {orphans}"

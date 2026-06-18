@@ -1,7 +1,7 @@
 ---
 type: archive
 status: superseded
-description: "SNAPSHOT histórico (RE cru ou plano entregue) — nomes/offsets/linhas podem estar obsoletos; a verdade atual está nas notas vivas (ver _index). Isento do drift-test de código."
+description: "Historical SNAPSHOT (raw RE or delivered plan) — names/offsets/lines may be stale; the current truth lives in the live notes (see _index). Exempt from the code drift-test."
 ---
 
 # TBH Meter — Refactor + Optimization Roadmap (2026-06-03)
@@ -12,17 +12,17 @@ refactor the meter toward a clean package, a **database + front-end + (maybe) AP
 
 > **STATUS (2026-06-06): the refactor SHIPPED.** The cutover happened — `meter_windows.py` imports the package (`game.build`/`game.save`/`metrics.*`/`il2cpp.*`) and runs live; `game/ficha.py` became **`game/build.py`** (`read_build`); schema is now **v11** (not 5); the agent (`agent_windows.py`) and entry points live at the reader ROOT, not under `tools/`. Resolution gained an RVA + seed-calib fast path (see `startup-optimization-plan.md`). The DB/API design below is partly realized in the repo's `api/` + `packages/shared`. Treat the rest as the historical 2026-06-03 plan + rationale (kept for the design decisions, not as a live checklist).
 
-## Progresso (faxina incremental — módulos escritos + unit-testados no Mac; cutover ao vivo no FIM, de uma vez)
-- ✅ **S0** — `config/offsets.py` reconstruído + cross-validado (28 offsets vs monólito, 4 enums, curva 100). `LEVEL_CURVE` → `config/level_curve.json`. Morto removido.
-- ✅ **S1** — `memory/{structs,process,reader,scanner}.py` (13 testes de decode; `Reader` com handle próprio; reads em lote; **pymem removido → zero-dep**).
-- ✅ **S2** — `il2cpp/{resolver,finder}.py` (resolver 3-passadas + finder de 2-letras + mecanismo `nn<T>`; testado em memória de classe simulada).
+## Progress (incremental cleanup — modules written + unit-tested on the Mac; live cutover at the END, all at once)
+- ✅ **S0** — `config/offsets.py` rebuilt + cross-validated (28 offsets vs monolith, 4 enums, 100-entry curve). `LEVEL_CURVE` → `config/level_curve.json`. Dead code removed.
+- ✅ **S1** — `memory/{structs,process,reader,scanner}.py` (13 decode tests; `Reader` with its own handle; batched reads; **pymem removed → zero-dep**).
+- ✅ **S2** — `il2cpp/{resolver,finder}.py` (3-pass resolver + 2-letter finder + `nn<T>` mechanism; tested against simulated class memory).
 - ✅ **S3** — `game/save.py` (read_gold/goldearn/heroes + pick_live_psd/sm/csd).
-- ✅ **S4** — `metrics/gold.py` (Dict8B + resolve_ut_class) + `metrics/xp.py` (curva, diff-0) + `game/catalog.py` (stage/item/hero).
-- ✅ **S5** — `game/build.py` (renomeado de `ficha.py`: itens/mods/skills+passivas + 64 stats id-only + xp/nível vivos).
-- ✅ **S6** — `game/models.py` (monstros vivos pro DPS + stageKey runtime).
-- ◐ **S7–S12** — cutover + entry points (`meter_windows.py`/`agent_windows.py` no ROOT) + agente: **SHIPPED**. O RunRecord tipado (S7) virou contrato do **app** (`run-types.ts`), não do reader; lifecycle/attach + helpers (S8/S9) ficaram inline no `meter_windows.py` (orquestrador), não extraídos; probes vivem em `tbh-meter-dev/`, não `tools/probes/`.
-- ✅ **Cutover** — DONE (o meter importa o pacote e roda ao vivo; runs.jsonl conferido).
-- ✅ Quick wins (id-only / session_id / schema_version / uniqueId; matou stage_debug) — ao vivo (schema agora **11**).
+- ✅ **S4** — `metrics/gold.py` (Dict8B + resolve_ut_class) + `metrics/xp.py` (curve, diff-0) + `game/catalog.py` (stage/item/hero).
+- ✅ **S5** — `game/build.py` (renamed from `ficha.py`: items/mods/skills+passives + 64 id-only stats + live xp/level).
+- ✅ **S6** — `game/models.py` (live monsters for DPS + runtime stageKey).
+- ◐ **S7–S12** — cutover + entry points (`meter_windows.py`/`agent_windows.py` at ROOT) + agent: **SHIPPED**. The typed RunRecord (S7) became the **app**'s contract (`run-types.ts`), not the reader's; lifecycle/attach + helpers (S8/S9) stayed inline in `meter_windows.py` (the orchestrator), not extracted; probes live in `tbh-meter-dev/`, not `tools/probes/`.
+- ✅ **Cutover** — DONE (the meter imports the package and runs live; runs.jsonl checked).
+- ✅ Quick wins (id-only / session_id / schema_version / uniqueId; killed stage_debug) — live (schema now **11**).
 
 ## Decision (evidence-driven): monolith is the source of truth; the package is REBUILT from it
 

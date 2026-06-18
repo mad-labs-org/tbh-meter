@@ -1,18 +1,15 @@
 ---
 type: invariant
-description: "O AggregateManager (gold vivo) é um singleton de NOME OFUSCADO de 2 letras que DRIFTA por build (ut→uu) — resolva-o por ESTRUTURA (assinatura de 2 valores + backrefs + round-trip bbwf), NUNCA por nome. Achar por nome pega a classe errada e o gold sai 0 ou lixo (1.97T)."
+description: "The AggregateManager (live gold) is a 2-letter OBFUSCATED-NAME singleton that DRIFTS across builds (ut→uu) — resolve it by STRUCTURE (2-value signature + backrefs + bbwf round-trip), NEVER by name. Finding by name grabs the wrong class and gold comes out 0 or garbage (1.97T)."
 symptoms:
   - "gold"
-  - "gold por run"
-  - "gold dobrado"
+  - "gold per run"
+  - "doubled gold"
   - "gold 0"
   - "1.97T"
-  - "1.97 trilhão"
-  - "singleton ofuscado"
+  - "1.97 trillion"
   - "obfuscated singleton"
-  - "nome de 2 letras"
   - "2-letter name"
-  - "nome driftou"
   - "name drift"
   - "AggregateManager"
   - "find_class_by_name"
@@ -34,57 +31,57 @@ guarded_by:
   - tests/test_gold.py::TestGoldIndexByStructure::test_finds_index_passing_gate
 ---
 
-# Resolução do singleton de gold (nome ofuscado)
+# Gold singleton resolution (obfuscated name)
 
-O gold-por-run vivo mora em `AggregateManager.AGGREGATES[GoldEarn][SubKey1]` (combate puro, exclui
-venda). O **offset** sempre esteve certo — o difícil é achar o **objeto vivo**. A classe é um
-singleton `X : nn<X>` cujo nome é um identificador OFUSCADO de **2 letras**, e esse nome **DRIFTA
-entre builds** (cravado: era `ut`, virou `uu`, e `ut` passou a ser outra classe). Está documentado no
-próprio `AggregateManager` em `offsets.py`.
+The live gold-per-run lives in `AggregateManager.AGGREGATES[GoldEarn][SubKey1]` (pure combat, excludes
+selling). The **offset** was always right — the hard part is finding the **live object**. The class is a
+singleton `X : nn<X>` whose name is a 2-letter OBFUSCATED identifier, and that name **DRIFTS across
+builds** (confirmed: it was `ut`, became `uu`, and `ut` turned into a different class). It's documented
+in `AggregateManager` itself in `offsets.py`.
 
-**A regra:** singleton de nome ofuscado **NÃO se resolve por nome**. `find_class_by_name("ut")` (ou
-qualquer nome de 2 letras) pega a classe ERRADA no build seguinte → o singleton não resolve. As
-versões antigas então caíam num scan-por-valor que CHUTAVA a célula, e o chute errava sempre: maior
-valor pegava a cópia congelada (gold **0**); maior crescimento pegava lixo de heap (gold **1.97T**).
-A resolução tem que ser por **ESTRUTURA** (name-free), padrão cravado em
+**The rule:** an obfuscated-name singleton **is NOT resolved by name**. `find_class_by_name("ut")` (or
+any 2-letter name) grabs the WRONG class in the next build → the singleton doesn't resolve. The old
+versions then fell back to a value-scan that GUESSED the cell, and the guess always missed: largest
+value grabbed the frozen copy (gold **0**); largest growth grabbed heap garbage (gold **1.97T**).
+Resolution has to be by **STRUCTURE** (name-free), the pattern locked into
 `resolve_combat_gold_klass` → `_resolve_aggregate_singleton`:
 
-1. **Assinatura de 2 valores.** Acha o inner-dict GoldEarn vivo pela co-ocorrência de uma entry
-   `KEY == COMBAT_SUBKEY` (=1) com valor na faixa estreita do save E uma entry irmã
-   `KEY == TOTAL_SUBKEY` (=0) com valor `>=` ela. Dois números na casa do bilhão, juntos, não
-   acontecem por acaso → assinatura determinística, ~zero falso-positivo.
-2. **Sobe os backrefs.** inner-dict → outer-dict que o referencia na chave `GoldEarn` → o objeto que
-   possui o outer-dict.
-3. **Round-trip do singleton.** Confirma que esse objeto é o singleton ENRAIZADO: o campo estático
-   `bbwf` da classe aponta de volta pra ele (`bbwf_from_klass(reader, klass) == inst`). Cópia
-   congelada (sobra de autosave/GC) não é enraizada → não passa. É POSSE, não chute.
+1. **2-value signature.** Find the live GoldEarn inner-dict by the co-occurrence of an entry
+   `KEY == COMBAT_SUBKEY` (=1) with a value in the save's narrow band AND a sibling entry
+   `KEY == TOTAL_SUBKEY` (=0) with a value `>=` it. Two billion-scale numbers, side by side, don't
+   happen by chance → deterministic signature, ~zero false positives.
+2. **Climb the backrefs.** inner-dict → outer-dict that references it under the `GoldEarn` key → the
+   object that owns the outer-dict.
+3. **Singleton round-trip.** Confirm that object is the ROOTED singleton: the class's static field
+   `bbwf` points back to it (`bbwf_from_klass(reader, klass) == inst`). A frozen copy (autosave/GC
+   leftover) isn't rooted → doesn't pass. It's OWNERSHIP, not a guess.
 
-Cacheia-se o **KLASS** (estável na sessão; classes não movem). A cada leitura re-deref pelo `bbwf`
-(robusto ao GC mover a instância) e anda o dict — e toda a caminhada usa a geometria `Dict8B`
-(`STRIDE`/`KEY`/`VALUE`), nunca a do `DictFloat`; trocar isso corromperia o valor (ver
+We cache the **KLASS** (stable within a session; classes don't move). On each read we re-deref via
+`bbwf` (robust to the GC moving the instance) and walk the dict — and the entire walk uses the `Dict8B`
+geometry (`STRIDE`/`KEY`/`VALUE`), never the `DictFloat` one; swapping that would corrupt the value (see
 [[invariants/dict-strides]]).
 
-**Este é o caminho OFUSCADO (fallback hoje).** O caminho PRIMÁRIO é por ÍNDICE
-(`resolve_combat_gold_klass_by_index`, TypeDefIndex via RVA), também name-free por construção — ver
-[[invariants/rva-index-resolution]]. O `combat_gold_klass_ok` é o GATE comum: confirma que um klass
-(do cache, do índice ou do scan) resolve um AggregateManager vivo com GoldEarn (= o round-trip). Klass
-errado → gate falha → cai pra esta resolução estrutural.
+**This is the OBFUSCATED path (today's fallback).** The PRIMARY path is by INDEX
+(`resolve_combat_gold_klass_by_index`, TypeDefIndex via RVA), also name-free by construction — see
+[[invariants/rva-index-resolution]]. `combat_gold_klass_ok` is the common GATE: it confirms a klass
+(from the cache, the index, or the scan) resolves a live AggregateManager with GoldEarn (= the
+round-trip). Wrong klass → gate fails → falls back to this structural resolution.
 
-**Descobrir o `idx_ut` na CALIBRAÇÃO — também por estrutura, não pelo value-scan.** O índice do gold
-é aprendido 1×/build e persistido no seed. Antes saía só do value-scan
-(`gold_index_of_klass(gold_klass)`), mas o value-scan é FRÁGIL: bootstrapa o klass por VALOR numa
-faixa estreita em torno do `combat_gold_save`, e se o save defasou do vivo (farm entre save-writes)
-devolve `gold_klass=None` → a calibração morria em `[calib] FAILED to locate gold idx` (cravado no
-1.00.11). O caminho robusto é **`gold_index_by_structure`**: varre a `s_TypeInfoTable` já descoberta e
-devolve o MENOR índice cujo `table[idx]` passa o MESMO `combat_gold_klass_ok` — o gate aplicado sobre
-os índices em vez de confiar no valor. Name-free, sem value-scan, <1s (prova ao vivo no 1.00.11: hit
-único idx=2744). `_calibrate` usa o atalho `gold_index_of_klass` quando o scan já tem o `gold_klass`,
-e cai pra este walk estrutural quando não tem.
+**Discovering `idx_ut` during CALIBRATION — also by structure, not by value-scan.** The gold index
+is learned once per build and persisted in the seed. It used to come only from the value-scan
+(`gold_index_of_klass(gold_klass)`), but the value-scan is FRAGILE: it bootstraps the klass by VALUE in
+a narrow band around `combat_gold_save`, and if the save lagged behind the live value (farming between
+save-writes) it returns `gold_klass=None` → calibration died with `[calib] FAILED to locate gold idx`
+(confirmed in 1.00.11). The robust path is **`gold_index_by_structure`**: it scans the already-discovered
+`s_TypeInfoTable` and returns the SMALLEST index whose `table[idx]` passes the SAME `combat_gold_klass_ok`
+— the gate applied over the indices instead of trusting the value. Name-free, no value-scan, <1s (proven
+live in 1.00.11: single hit idx=2744). `_calibrate` uses the `gold_index_of_klass` shortcut when the scan
+already has the `gold_klass`, and falls back to this structural walk when it doesn't.
 
-**Aplica-se a QUALQUER singleton ofuscado de 2 letras** (`ut`, `uu`, `yp`, …), não só ao gold: se um
-novo métrico precisar de um, resolva-o por estrutura como aqui — nunca por nome. (Distinto de
-[[invariants/instance-selection]]: lá o NOME é estável — `LogManager` —, o problema é escolher a
-instância viva entre falsos-positivos do scan da MESMA classe.)
+**Applies to ANY 2-letter obfuscated singleton** (`ut`, `uu`, `yp`, …), not just gold: if a new metric
+needs one, resolve it by structure like here — never by name. (Distinct from
+[[invariants/instance-selection]]: there the NAME is stable — `LogManager` — and the problem is picking
+the live instance among false positives from the scan of the SAME class.)
 
 ## Related
 - [[invariants/rva-index-resolution]]

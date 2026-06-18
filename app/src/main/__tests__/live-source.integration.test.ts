@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 // Integration test of the PR5 LiveSource liveness path: poll <dir>/live.json over a REAL temp file
-// and assert the OFFLINE/STALE behavior the spec names (progress.md PR5 "Testes": offline/staleness).
+// and assert the OFFLINE/STALE behavior the spec names (offline/staleness).
 // The cooking itself (cookLive/parseLiveJson) is unit-tested in live-source.test.ts; here we exercise
 // the class — the change-detection liveness (mtime-advance vs our own monotonic clock, SMB-skew
 // immune) and the emitNull/emitSnap de-dup — using fake timers to drive the 700ms poll.

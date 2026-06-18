@@ -1,13 +1,13 @@
-# ruff.toml — lint do reader (Python · Windows). Ferramenta de DEV apenas:
-# o runtime segue ZERO-DEP (ctypes puro, sem pip) — ruff NÃO entra no reader.
-#   rodar sem instalar:  uvx ruff check .     (uv já está no ambiente)
-#   instalar permanente: brew install ruff
+# ruff.toml — reader lint (Python · Windows). DEV tool only:
+# the runtime stays ZERO-DEP (pure ctypes, no pip) — ruff does NOT ship in the reader.
+#   run without installing:  uvx ruff check .     (uv is already in the environment)
+#   install permanently:     brew install ruff
 target-version = "py311"
 line-length = 110
 
 [lint]
-# Bugs > estilo. F = pyflakes (nome indefinido / import|var morta — o que o refactor
-# mais arrisca); E9 = erros de sintaxe; B = flake8-bugbear (armadilhas reais).
-# Ordenação de import (I) e o `ruff format` ficam pra um passe próprio — geram churn
-# de estilo que não deve se misturar com refactor de lógica.
+# Bugs > style. F = pyflakes (undefined name / dead import|var — what refactors
+# most often break); E9 = syntax errors; B = flake8-bugbear (real traps).
+# Import sorting (I) and `ruff format` are left to their own pass — they generate
+# style churn that shouldn't be mixed with logic refactors.
 select = ["F", "E9", "B"]

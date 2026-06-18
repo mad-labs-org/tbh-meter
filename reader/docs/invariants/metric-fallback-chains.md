@@ -1,20 +1,19 @@
 ---
 type: invariant
-description: "Toda métrica viva tem cadeia LIVE (exato) → SAVE (defasado, fallback) → NUNCA carteira/total. run_gain devolve None em leitura não-monotônica (não emite negativo), e o source tag (gold_source/xp_source) preserva a degradação — o fallback nunca vira primário em silêncio."
+description: "Every live metric has the chain LIVE (exact) → SAVE (lagged, fallback) → NEVER wallet/total. run_gain returns None on a non-monotonic read (never emits negative), and the source tag (gold_source/xp_source) preserves the degradation — the fallback never silently becomes primary."
 symptoms:
-  - "gold dobrado"
-  - "gold 2x"
   - "gold doubled"
-  - "venda contada no gold"
+  - "gold 2x"
+  - "sale counted in gold"
   - "wallet delta"
-  - "carteira no gold"
+  - "wallet in gold"
   - "1.97T"
   - "gold 0"
-  - "gold zerado"
-  - "xp errado por run"
-  - "xp fantasma no cap"
-  - "herói no cap ganha xp"
-  - "xp no nível máximo"
+  - "gold zeroed"
+  - "wrong xp per run"
+  - "phantom xp at cap"
+  - "capped hero gains xp"
+  - "xp at max level"
   - "gold_source save"
 code_anchors:
   - metrics/gold.py::run_gain
@@ -36,80 +35,81 @@ guarded_by:
   - tests/test_xp.py::TestPartyXpAccumulator::test_party_with_capped_hero_counts_only_uncapped
 ---
 
-# Cadeias de fallback de métrica
+# Metric fallback chains
 
-Toda métrica por-run (gold, xp) é um **delta de um cumulativo** lido de DUAS fontes do MESMO
-número, numa cadeia de prioridade fixa. A forma é canônica — o gold é o protótipo e xp segue o
-mesmo padrão:
+Every per-run metric (gold, xp) is a **delta of a cumulative** read from TWO sources of the SAME
+number, on a fixed priority chain. The shape is canonical — gold is the prototype and xp follows the
+same pattern:
 
 ```
-1. LIVE  (exato, lag-zero, exclui venda/idle)  → PRIMÁRIO
-2. SAVE  (defasado, em saltos no autosave)     → fallback
-3. NUNCA carteira/total (inclui venda + idle)  → reintroduz o bug
+1. LIVE  (exact, zero-lag, excludes sale/idle)  → PRIMARY
+2. SAVE  (lagged, in jumps at autosave)         → fallback
+3. NEVER wallet/total (includes sale + idle)    → reintroduces the bug
 ```
 
-**Gold.** LIVE = `AggregateManager.AGGREGATES[GoldEarn][SubKey1]` (combate puro) em
-`combat_gold_live`; SAVE = `PlayerSaveData.AGGREGATES` com `Type==GoldEarn` E `SubKey==1` em
-`combat_gold_save`. `COMBAT_SUBKEY` (=1) é o gold-por-run; `TOTAL_SUBKEY` (=0) é o rollup
-(combate + venda + idle + quest) — **nunca** é a fonte. A 3ª linha proibida é o delta do saldo
-da carteira (`CurrencySaveData.QUANTITY`): inclui venda e idle, então `gold_end − gold_start`
-**conta venda** → over-count por-run. Os value-scans antigos que CHUTAVAM a célula deram os
-sintomas históricos: célula congelada → **gold 0**; lixo de heap → **1.97T**.
+**Gold.** LIVE = `AggregateManager.AGGREGATES[GoldEarn][SubKey1]` (pure combat) in
+`combat_gold_live`; SAVE = `PlayerSaveData.AGGREGATES` with `Type==GoldEarn` AND `SubKey==1` in
+`combat_gold_save`. `COMBAT_SUBKEY` (=1) is the gold-per-run; `TOTAL_SUBKEY` (=0) is the rollup
+(combat + sale + idle + quest) — **never** the source. The forbidden 3rd line is the wallet-balance
+delta (`CurrencySaveData.QUANTITY`): it includes sale and idle, so `gold_end − gold_start`
+**counts sale** → per-run over-count. The old value-scans that GUESSED the cell gave the historical
+symptoms: frozen cell → **gold 0**; heap garbage → **1.97T**.
 
-**XP.** LIVE = o **ACUMULADOR por-herói** (`PartyXpAccumulator` em `metrics/xp.py`): integra os
-incrementos do within-level (`HeroRuntime.EXP_FAKE`) **tick-a-tick** (snapshot ~1s + um tick
-final no close), keyed por IDENTIDADE (heroKey) — o 1º avistamento semeia o baseline, o level-up
-faz a ponte pela curva (`per_hero_gain`), e deploy-tardio/morte/dropout **não perdem o
-acumulado** (banked; morto acumula 0 enquanto morto — comportamento real do jogo, preservado).
-Substituiu o delta de endpoints (baseline t=0 → leitura no close), que dava **+0** a herói FORA
-do baseline (deploy tardio, ou morto da run ANTERIOR ainda em revive: `gain=None` → +0 — cravado
-ao vivo: 30–45% das runs com morte zeravam um herói). SAVE = delta do `HeroExp` por-herói
-(defasado, e zera no level-up). A escolha mora no orquestrador (`close_run` em
-`meter_windows.py`): `total()`/`record()` devolvem `None` quando a fonte viva nunca viu o
-herói/ninguém → cai pro SAVE, nunca pra um 0 mudo.
+**XP.** LIVE = the **per-hero ACCUMULATOR** (`PartyXpAccumulator` in `metrics/xp.py`): it integrates
+the within-level increments (`HeroRuntime.EXP_FAKE`) **tick-by-tick** (snapshot ~1s + a final tick
+at close), keyed by IDENTITY (heroKey) — the 1st sighting seeds the baseline, the level-up bridges
+across the curve (`per_hero_gain`), and late-deploy/death/dropout **do not lose the accumulated
+total** (banked; a dead hero accumulates 0 while dead — real game behavior, preserved). It replaced
+the endpoint delta (baseline t=0 → read at close), which gave **+0** to a hero OUTSIDE the baseline
+(late deploy, or dead from the PREVIOUS run still reviving: `gain=None` → +0 — confirmed live:
+30–45% of runs with a death zeroed a hero). SAVE = per-hero `HeroExp` delta (lagged, and resets at
+level-up). The choice lives in the orchestrator (`close_run` in `meter_windows.py`):
+`total()`/`record()` return `None` when the live source never saw the hero/anyone → falls back to
+SAVE, never to a silent 0.
 
-**XP no cap.** A curva DEFINE o cap: nível sem entrada não tem progressão (`level_capped`) — mas
-o jogo segue incrementando `EXP_FAKE` (e o `HeroExp` do save) num herói NO cap, sem level-up pra
-consumir/zerar → o delta same-level é **XP FANTASMA**. Herói no cap ganha **0** (ganho zero
-VÁLIDO em `per_hero_gain`, nunca `None` — `None` degradaria em silêncio pro SAVE, que tem o MESMO
-buraco e por isso o `close_run` também zera o delta save-side de herói capado); cruzar PRA DENTRO
-do cap banka só até o limiar (`xp_through_levelup` só conta `exp1` se o nível final está na
-curva); `exp_start`/`exp_end` seguem a observação CRUA (o baseline avança no ganho 0 — só o ganho
-é suprimido). Assimetria save-side: quem cruza PRA DENTRO do cap NO MEIO da run tem o delta do
-save TODO zerado (o vivo banka até o limiar) — consistente com a limitação já documentada do save
-subestimar quem sobe de nível. Cravado em produção: runs SOLO de uma Ranger lv101 subiam ~39M de
-xpGained cada, e uma party com herói capado creditava 20% do total a quem não pode ganhar nada.
+**XP at cap.** The curve DEFINES the cap: a level with no entry has no progression (`level_capped`) —
+but the game keeps incrementing `EXP_FAKE` (and the save's `HeroExp`) on a hero AT cap, with no
+level-up to consume/reset → the same-level delta is **PHANTOM XP**. A hero at cap gains **0** (a VALID
+zero gain in `per_hero_gain`, never `None` — `None` would silently degrade to SAVE, which has the SAME
+hole, so `close_run` also zeroes the save-side delta of a capped hero); crossing INTO the cap banks
+only up to the threshold (`xp_through_levelup` counts `exp1` only if the final level is on the curve);
+`exp_start`/`exp_end` follow the RAW observation (the baseline advances on a 0 gain — only the gain is
+suppressed). Save-side asymmetry: a hero crossing INTO the cap MID-run has its entire save delta
+zeroed (the live side banks up to the threshold) — consistent with the already-documented limitation
+of the save underestimating a hero who levels up. Confirmed in production: SOLO runs of a lv101 Ranger
+each gained ~39M xpGained, and a party with a capped hero credited 20% of the total to someone who
+can gain nothing.
 
-## A regra (3 partes, todas necessárias)
+## The rule (3 parts, all required)
 
-1. **Delta só por `run_gain(start, end)`.** Devolve `None` se faltar leitura (`start`/`end`
-   `None`) OU se o cumulativo **caiu** (`end < start`, leitura corrompida / GC moveu o objeto).
-   **Nunca emite negativo.** Cuidado com o drift da skill: ganho **zero é válido** (`run_gain(100,100)==0`,
-   uma run sem gold ainda é uma run) — a guarda é contra **não-monotônico**, não contra zero. A
-   xp viva tem a mesma disciplina: o acumulador só soma incrementos `g > 0` de `per_hero_gain`, e
-   num dip same-level (leitura suja) **não avança o baseline** — a recuperação telescopa sem
-   double-count nem negativo.
-2. **Fallback nunca vira primário em silêncio.** Em `close_run` o gold tenta o LIVE primeiro;
-   só cai pro SAVE se `run_gain(live)` for `None`. O `gold_source` (`"live"`/`"save"`) e o
-   `xp_source` são **serializados no record** pro app sinalizar leitura degradada. Se LIVE e
-   SAVE falharem, emite **`0`** com source `"save"` — **nunca dropa em silêncio nem deixa `None`
-   virar default errado**.
-3. **Source `save` num success com dano > 0 dispara self-heal**, não é aceito como normal: o
-   orquestrador re-resolve o klass do `AggregateManager` (índice RVA primeiro, value-scan
-   fallback — ver [[invariants/gold-singleton-resolution]]) pra próxima run voltar ao LIVE.
+1. **Delta only via `run_gain(start, end)`.** Returns `None` if a read is missing (`start`/`end`
+   `None`) OR if the cumulative **dropped** (`end < start`, corrupted read / GC moved the object).
+   **Never emits negative.** Watch out for skill drift: a **zero gain is valid** (`run_gain(100,100)==0`,
+   a run with no gold is still a run) — the guard is against **non-monotonic**, not against zero. Live
+   xp has the same discipline: the accumulator only sums increments `g > 0` from `per_hero_gain`, and
+   on a same-level dip (dirty read) it **does not advance the baseline** — the recovery telescopes with
+   no double-count and no negative.
+2. **The fallback never silently becomes primary.** In `close_run` gold tries LIVE first; it falls
+   back to SAVE only if `run_gain(live)` is `None`. The `gold_source` (`"live"`/`"save"`) and the
+   `xp_source` are **serialized into the record** so the app can flag a degraded read. If LIVE and
+   SAVE both fail, it emits **`0`** with source `"save"` — **never silently drops nor lets `None`
+   become a wrong default**.
+3. **Source `save` on a success with damage > 0 triggers self-heal**, it is not accepted as normal: the
+   orchestrator re-resolves the `AggregateManager` klass (RVA index first, value-scan fallback — see
+   [[invariants/gold-singleton-resolution]]) so the next run returns to LIVE.
 
-**Por que o SAVE é só fallback:** ele atualiza em SALTOS (só no save-write, ~100s), então o
-delta por-run é não-confiável — **0** se a run cai entre dois writes, **~2x (gold dobrado)** se
-um write pega duas runs. Cravado ao vivo: o save errou +25k numa run e +1.18M em outra enquanto
-o vivo bateu na unidade.
+**Why SAVE is only a fallback:** it updates in JUMPS (only on the save-write, ~100s), so the
+per-run delta is unreliable — **0** if the run falls between two writes, **~2x (gold doubled)** if
+one write catches two runs. Confirmed live: the save was off by +25k on one run and +1.18M on another
+while the live side matched to the unit.
 
-## Ao adicionar uma métrica nova
+## When adding a new metric
 
-Siga a MESMA cadeia: ache a fonte VIVA exata (estrutura, não nome — ver
-[[invariants/gold-singleton-resolution]]), tenha um SAVE como fallback, use `run_gain` (ou
-equivalente que devolva `None` no não-monotônico), preserve um `*_source` tag, e **jamais**
-derive de saldo de carteira/total. A leitura do dict cumulativo usa os strides corretos
-([[invariants/dict-strides]]); o klass vivo é cacheado e revalidado ([[invariants/cache-management]]).
+Follow the SAME chain: find the exact LIVE source (structure, not name — see
+[[invariants/gold-singleton-resolution]]), have a SAVE as fallback, use `run_gain` (or an equivalent
+that returns `None` on non-monotonic), preserve a `*_source` tag, and **never** derive it from a
+wallet/total balance. Reading the cumulative dict uses the correct strides
+([[invariants/dict-strides]]); the live klass is cached and revalidated ([[invariants/cache-management]]).
 
 ## Related
 - [[invariants/gold-singleton-resolution]]

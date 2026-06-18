@@ -1,70 +1,70 @@
-# docs/ — base de conhecimento do reader (como usar e manter)
+# docs/ — reader knowledge base (how to use and maintain)
 
-Esta pasta é um **skill-graph**: um índice → notas pequenas interligadas → o código.
-O objetivo é que qualquer agent que vá mexer no reader ache **o invariante certo, na
-hora certa**, e não repita os bugs que já nos pegaram (dict stride trocado, nome
-ofuscado, schema não bumpado, runs que não fecham, ObscuredInt, cache stale).
+This folder is a **skill-graph**: an index → small interlinked notes → the code.
+The goal is that any agent about to touch the reader finds **the right invariant, at the
+right time**, and doesn't repeat the bugs that already bit us (swapped dict stride, obfuscated
+name, un-bumped schema, runs that never close, ObscuredInt, stale cache).
 
-## Como um agent acha o que precisa (progressive disclosure)
+## How an agent finds what it needs (progressive disclosure)
 
-Três níveis — você carrega só o que precisa, nunca a base inteira:
+Three levels — you load only what you need, never the whole base:
 
-1. **Índice** (`_index.md`) — lido primeiro. Catálogo por tipo **+ um bloco "Por
-   sintoma/tarefa"** no topo. A recuperação é **lexical** (o `grep`/`Read` do agent —
-   igual à busca do Obsidian, sem embeddings), então o índice e cada nota carregam o
-   **vocabulário do sintoma** (`runs não fecham`, `gold dobrado`, `1.97T`), não só o nome
-   do domínio. `grep -ri "<sintoma ou símbolo>" docs/` cai direto na nota.
-2. **Nota** — uma por invariante/fato. Lê só a do que vai tocar; segue `## Related`
-   pra vizinhança co-obrigatória (ex.: mexer no gold puxa stride + fallback + cache).
-3. **Código** — a nota aponta `code_anchors` (arquivo::símbolo). **A verdade mora no
-   código** (`config/offsets.py` + os `tests/`). A nota é um ponteiro, nunca a fonte.
+1. **Index** (`_index.md`) — read first. Catalog by type **+ a "By
+   symptom/task" block** at the top. Retrieval is **lexical** (the agent's `grep`/`Read` —
+   like Obsidian's search, no embeddings), so the index and each note carry the
+   **symptom vocabulary** (`runs not closing`, `doubled gold`, `1.97T`), not just the domain
+   name. `grep -ri "<symptom or symbol>" docs/` lands straight on the note.
+2. **Note** — one per invariant/fact. Read only the one you're about to touch; follow `## Related`
+   for the co-required neighborhood (e.g. touching gold pulls in stride + fallback + cache).
+3. **Code** — the note points to `code_anchors` (file::symbol). **The truth lives in the
+   code** (`config/offsets.py` + the `tests/`). The note is a pointer, never the source.
 
-## Tipos de nota (`type` no frontmatter)
+## Note types (`type` in the frontmatter)
 
-| tipo | papel | obrigatórios | drift-tested? |
-|------|-------|--------------|---------------|
-| `invariant` | regra dura (quebrou = dado errado/crash) | `description`, `code_anchors`, `symptoms` | ✅ |
-| `reference` | fatos: offsets, mapa de campos, modelo de dano | `description`, `code_anchors` | ✅ |
-| `guide` | como fazer uma mudança recorrente | `description` | ✅ |
-| `process` | metodologia (mapear/validar um valor) | `description` | parcial |
-| `archive` | histórico: planos entregues, RE cru | `description`, `status` | ❌ (snapshot) |
+| type | role | required | drift-tested? |
+|------|------|----------|---------------|
+| `invariant` | hard rule (broken = wrong data/crash) | `description`, `code_anchors`, `symptoms` | ✅ |
+| `reference` | facts: offsets, field map, damage model | `description`, `code_anchors` | ✅ |
+| `guide` | how to make a recurring change | `description` | ✅ |
+| `process` | methodology (map/validate a value) | `description` | partial |
+| `archive` | history: shipped plans, raw RE | `description`, `status` | ❌ (snapshot) |
 
 ## Frontmatter
 
 ```yaml
 ---
 type: invariant
-description: "Uma linha rica — o que é + por que importa (>= 20 chars)."
-symptoms: ["runs não fecham", "not closing", "gold dobrado"]   # PT+EN, o que o agent grepa
-code_anchors:                       # arquivo::símbolo — resolvido por AST contra o código
+description: "A rich one-liner — what it is + why it matters (>= 20 chars)."
+symptoms: ["runs not closing", "dead list", "doubled gold"]   # the vocabulary the agent greps
+code_anchors:                       # file::symbol — resolved by AST against the code
   - meter_windows.py::_pick_list_singleton
-  - config.offsets::Dict8B.STRIDE   # ::Classe.ATTR também resolve
-asserts:                            # valores load-bearing checados contra o código real
+  - config.offsets::Dict8B.STRIDE   # ::Class.ATTR also resolves
+asserts:                            # load-bearing values checked against the real code
   - meter_windows.SCHEMA_VERSION == 11
   - config.offsets.DictFloat.STRIDE == 0x10
-guarded_by:                         # teste de comportamento que prova a regra (tem que existir)
+guarded_by:                         # behavior test that proves the rule (must exist)
   - tests/test_meter_windows.py::TestPickListSingleton::test_picks_largest_valid
 related: ["[[invariants/dict-strides]]", "[[invariants/metric-fallback-chains]]"]
 ---
 ```
 
-## Regras (impostas por `tests/test_docs_consistency.py`)
+## Rules (enforced by `tests/test_docs_consistency.py`)
 
-- **A verdade é o código.** `code_anchors` resolvem por **AST** (não substring →
-  comentário não dá falso-verde). `asserts` comparam o **valor** com o literal real.
-  Regra comportamental → aponte um teste em `guarded_by`.
-- **Nunca copie a skill nem outra nota** ao migrar: a skill já drifou
-  (`partial` era `== 0`, o código é `<= 0`; "X-10" era flag, o código é `stage != 10`).
-  Re-verifique cada regra **contra o código**.
-- **Sem número-de-linha no corpo** (`arquivo.py:NN` rota) — use `code_anchors`.
-- **`reference` cita o SÍMBOLO de `offsets.py`, nunca o literal `@0x`** (dessincroniza).
-- **`invariant` só existe com `code_anchors` que resolvem a símbolo presente** — senão
-  é `process`/`archive`, não invariant.
-- **Cross-repo (app):** anchors `app/...` (TS) são checados só como "arquivo existe",
-  tolerantes a checkout só-do-reader.
-- **`archive/`:** SNAPSHOT — nomes podem estar obsoletos; isento dos checks de código.
-  Use um header avisando e remeta à nota viva equivalente.
+- **The truth is the code.** `code_anchors` resolve by **AST** (not substring →
+  a comment won't give a false-green). `asserts` compare the **value** against the real literal.
+  Behavioral rule → point to a test in `guarded_by`.
+- **Never copy the skill or another note** when migrating: the skill has already drifted
+  (`partial` was `== 0`, the code is `<= 0`; "X-10" was a flag, the code is `stage != 10`).
+  Re-verify every rule **against the code**.
+- **No line numbers in the body** (`file.py:NN` route) — use `code_anchors`.
+- **`reference` cites the SYMBOL from `offsets.py`, never the `@0x` literal** (it desyncs).
+- **`invariant` exists only with `code_anchors` that resolve to a present symbol** — otherwise
+  it's `process`/`archive`, not an invariant.
+- **Cross-repo (app):** `app/...` (TS) anchors are checked only as "file exists",
+  tolerant of a reader-only checkout.
+- **`archive/`:** SNAPSHOT — names may be stale; exempt from the code checks.
+  Use a header warning and point back to the equivalent live note.
 
-> A skill `/tbh-meter-review` é o **portão**: ela manda ler `docs/_index.md` + a(s)
-> nota(s) do que vai mudar, e rodar os testes de código + este `test_docs_consistency`.
-> O detalhe dos invariantes mora aqui (fonte única), não duplicado na skill.
+> The `/tbh-meter-review` skill is the **gate**: it tells you to read `docs/_index.md` + the
+> note(s) for what you're about to change, and to run the code tests + this `test_docs_consistency`.
+> The invariant detail lives here (single source), not duplicated in the skill.

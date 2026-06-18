@@ -1,16 +1,16 @@
 ---
 type: invariant
-description: "meter_windows.py é um ORQUESTRADOR fino: não lê memória inline fora do scaffolding (loop de log-event, validação de manager, re-attach); métrica/captura nova mora em metrics/ ou game/, offset só em config.offsets. agent_windows.py é o entry-point IRMÃO de debug, self-contained."
+description: "meter_windows.py is a thin ORCHESTRATOR: no inline memory reads outside the scaffolding (log-event loop, manager validation, re-attach); a new metric/capture lives in metrics/ or game/, offsets only in config.offsets. agent_windows.py is the SIBLING debug entry-point, self-contained."
 symptoms:
-  - "onde colocar nova métrica"
-  - "onde adicionar captura nova"
+  - "where to put a new metric"
+  - "where to add a new capture"
   - "where to add a new metric"
-  - "leitura inline no orquestrador"
+  - "inline read in the orchestrator"
   - "inline memory read in orchestrator"
-  - "reader.ri32 no meter_windows"
-  - "rptr/ri64/read_string solto no meter_windows"
-  - "magic number no meter_windows"
-  - "qual é o entry-point de produção"
+  - "reader.ri32 in meter_windows"
+  - "stray rptr/ri64/read_string in meter_windows"
+  - "magic number in meter_windows"
+  - "which is the production entry-point"
   - "meter_windows vs agent_windows"
 code_anchors:
   - meter_windows.py
@@ -22,71 +22,71 @@ guarded_by:
   - tests/test_run_lifecycle_predicates.py::TestIsPartial::test_zero_damage_success_is_always_partial
 ---
 
-# Pureza do orquestrador (meter_windows.py é fino)
+# Orchestrator purity (meter_windows.py is thin)
 
-O reader tem **dois entry-points na raiz**, e eles têm papéis OPOSTOS — não confunda:
+The reader has **two entry-points at the root**, and they have OPPOSITE roles — don't confuse them:
 
-- **`meter_windows.py` — PRODUÇÃO.** É o que o CI congela em `tbh-reader.exe` e o app Electron
-  spawna como sidecar. Escreve `raw/<id>.json` (record CRU por run → o conversor do app vira
-  `logs/<id>.json`) + `live.json` (snapshot CRU da run atual, sobrescrito ~1x/s → o app cozinha o
-  overlay) + `meter.log`. Emite **CRU pros dois fluxos**; toda derivação (dps/label/format) é do app
-  ([[invariants/metric-fallback-chains]] + progress.md "Live-meter"). **É um orquestrador FINO** (o
-  próprio docstring do módulo: *"Orquestrador FINO: ZERO leitura de memória inline"*).
-- **`agent_windows.py` — DEBUG/inspeção, self-contained.** Você roda UMA vez à mão, com o jogo
-  aberto, e ele fica escutando `output/agent_cmd.json` → executa um `op_*` → responde em
-  `output/agent_resp.json`. É um inspetor de memória (caçar offset, decodificar ObscuredX, achar
-  carteira). NÃO entra em build nenhum. Mexer aqui não muda o produto.
+- **`meter_windows.py` — PRODUCTION.** This is what CI freezes into `tbh-reader.exe` and the Electron
+  app spawns as a sidecar. Writes `raw/<id>.json` (RAW record per run → the app's converter turns it
+  into `logs/<id>.json`) + `live.json` (RAW snapshot of the current run, overwritten ~1x/s → the app
+  cooks the overlay) + `meter.log`. Emits **RAW for both streams**; all derivation (dps/label/format)
+  belongs to the app ([[invariants/metric-fallback-chains]] + the live-meter pipeline). **It's a THIN
+  orchestrator** — zero inline memory reads; every read goes through the metric/game modules.
+- **`agent_windows.py` — DEBUG/inspection, self-contained.** You run it ONCE by hand, with the game
+  open, and it sits listening to `output/agent_cmd.json` → runs an `op_*` → replies in
+  `output/agent_resp.json`. It's a memory inspector (hunt an offset, decode ObscuredX, find the
+  wallet). It ships in NO build. Touching it changes nothing about the product.
 
-**A regra (vale só pro produção, `meter_windows.py`):** o orquestrador monta UM `shared.memory.Reader`
-e **delega** tudo às lógicas isoladas — `shared.memory` (anexar/regiões/scan), `il2cpp` (resolver
-classes), `game.*` (domínio: save/build/models), `metrics.*` (gold/xp/dps/events). Os offsets vêm
-**só** de `config.offsets` (a "bíblia"). Logo: **métrica ou captura NOVA mora em `metrics/` ou
-`game/`, NUNCA inline no `run()`.** E **nenhum offset literal** (`0x…`) no `meter_windows.py` — ele
-importa o símbolo de `config.offsets`.
+**The rule (production only, `meter_windows.py`):** the orchestrator builds ONE `shared.memory.Reader`
+and **delegates** everything to the isolated logic — `shared.memory` (attach/regions/scan), `il2cpp`
+(resolve classes), `game.*` (domain: save/build/models), `metrics.*` (gold/xp/dps/events). Offsets
+come **only** from `config.offsets` (the "bible"). Therefore: **a NEW metric or capture lives in
+`metrics/` or `game/`, NEVER inline in `run()`.** And **no literal offset** (`0x…`) in
+`meter_windows.py` — it imports the symbol from `config.offsets`.
 
-## O que é "scaffolding" (a exceção legítima)
+## What "scaffolding" is (the legitimate exception)
 
-Leitura inline de memória (`reader.rptr`/`ri32`/`ri64`/`read_string`) NO `meter_windows.py` só é
-aceitável no **andaime do ciclo de vida da run**, que é responsabilidade do orquestrador e de
-ninguém mais:
+Inline memory reads (`reader.rptr`/`ri32`/`ri64`/`read_string`) IN `meter_windows.py` are only
+acceptable in the **run-lifecycle scaffolding**, which is the orchestrator's responsibility and
+no one else's:
 
-- **Loop de detecção de log-event** (no `run()`): varre o `LogManager.LOG_LIST` novo a cada tick e
-  classifica cada entry pela classe-K (`StageClearLog`/`StageFailedLog`/`GetBoxLog`/`HeroDieLog`/
-  `ResurrectionLog`) p/ disparar `close_run`/drops/mortes/revives. Isso É orquestração de ciclo de
-  vida — ver [[invariants/run-lifecycle]] (e a detecção de log-event).
-- **Validação estrutural de manager** (`_pick_list_singleton`/`_valid_list_size`): escolher a
-  instância viva do `LogManager`/`MonsterSpawnManager` entre os falsos-positivos do scan — ver
+- **Log-event detection loop** (in `run()`): scans the new `LogManager.LOG_LIST` each tick and
+  classifies every entry by its K-class (`StageClearLog`/`StageFailedLog`/`GetBoxLog`/`HeroDieLog`/
+  `ResurrectionLog`) to fire `close_run`/drops/deaths/revives. This IS lifecycle orchestration —
+  see [[invariants/run-lifecycle]] (and log-event detection).
+- **Structural manager validation** (`_pick_list_singleton`/`_valid_list_size`): pick the live
+  `LogManager`/`MonsterSpawnManager` instance out of the scan's false positives — see
   [[invariants/instance-selection]].
-- **Detecção de re-attach / reload de stage**: ler o `LOG_LIST`/`DeadMonsterUnit` p/ saber que o
-  jogo fechou (reads falhando) ou que o stage recarregou.
+- **Re-attach / stage-reload detection**: read `LOG_LIST`/`DeadMonsterUnit` to learn that the game
+  closed (reads failing) or the stage reloaded.
 
-Repare que mesmo esse andaime **NÃO inventa offset**: usa `List.SIZE`/`List.ITEMS`/`Array.DATA` etc.
-de `config.offsets` ([[invariants/offsets-single-source]]).
+Note that even this scaffolding **does NOT invent an offset**: it uses `List.SIZE`/`List.ITEMS`/`Array.DATA`
+etc. from `config.offsets` ([[invariants/offsets-single-source]]).
 
-## Por que isto é um invariante (não só estilo)
+## Why this is an invariant (not just style)
 
-Sintoma do anti-padrão: você precisa de um valor novo (ex.: um novo agregado, um novo stat por
-herói) e **coloca a leitura inline no `run()`** — ou cravando um `@0x` literal, ou misturando o
-parse com o loop. Resultado: a lógica fica **não-testável** (presa num `while True` que toca a
-memória do jogo, que não roda no Mac), o offset **dessincroniza** de `config.offsets`, e o
-orquestrador incha até o ponto em que ninguém mais entende o ciclo de vida.
+Symptom of the anti-pattern: you need a new value (e.g. a new aggregate, a new per-hero stat) and
+**put the read inline in `run()`** — either by hardcoding a literal `@0x`, or by mixing the parse
+into the loop. Result: the logic becomes **untestable** (trapped in a `while True` that touches the
+game's memory, which doesn't run on Mac), the offset **drifts out of sync** with `config.offsets`,
+and the orchestrator bloats to the point where nobody understands the lifecycle anymore.
 
-A prova de que a fronteira funciona: **as decisões puras que o orquestrador legitimamente possui
-são extraídas como funções puras e testadas em isolamento** — `_should_skip_run`, `_is_partial`,
-`_pick_list_singleton`, `_read_catalogs` (sem tocar processo nenhum, rodam no Mac via `MockReader`).
-Foi exatamente assim que o drift do `_is_partial` (a skill dizia `== 0`, o código é
-`total_damage <= 0`) ficou **coberto por teste** em vez de virar bug silencioso. Se uma "métrica"
-sua não dá pra testar assim, ela está no lugar errado — vai pra `metrics/` ou `game/`.
+Proof the boundary works: **the pure decisions the orchestrator legitimately owns are extracted as
+pure functions and tested in isolation** — `_should_skip_run`, `_is_partial`, `_pick_list_singleton`,
+`_read_catalogs` (touching no process at all, they run on Mac via `MockReader`). That's exactly how
+the `_is_partial` drift (the note said `== 0`, the code is `total_damage <= 0`) got **covered by a
+test** instead of becoming a silent bug. If a "metric" of yours can't be tested this way, it's in the
+wrong place — move it to `metrics/` or `game/`.
 
-**Onde colocar a coisa nova:**
-- nova métrica derivada (dano/dps/xp/gold/progress) → `metrics/` (ela recebe o `reader` e lê lá).
-- novo dado de domínio (save/party/build/monstros/stage-key) → `game/`.
-- nova classe/instância a resolver → `il2cpp/resolver` (e o `TARGETS`/fast-path do orquestrador).
-- novo offset → **só** `config.offsets`; o `meter_windows.py` importa o símbolo.
-- o `meter_windows.py` então **chama** a função nova e costura o resultado no `rec`/overlay.
+**Where to put the new thing:**
+- new derived metric (damage/dps/xp/gold/progress) → `metrics/` (it receives the `reader` and reads there).
+- new domain data (save/party/build/monsters/stage-key) → `game/`.
+- new class/instance to resolve → `il2cpp/resolver` (and the orchestrator's `TARGETS`/fast-path).
+- new offset → **only** `config.offsets`; `meter_windows.py` imports the symbol.
+- `meter_windows.py` then **calls** the new function and stitches the result into the `rec`/overlay.
 
 ## Related
-- [[invariants/offsets-single-source]] — o orquestrador importa offset, nunca crava `0x…`.
-- [[invariants/instance-selection]] — a validação de manager é o scaffolding legítimo.
-- [[invariants/run-lifecycle]] — o loop de log-event é orquestração de ciclo de vida.
-Veja também: [[invariants/log-event-detection]] (como o loop classifica cada entry por classe-K) · [[invariants/metric-fallback-chains]] (a métrica nova entra com sua cadeia de fallback) · [[invariants/memory-safety]] (o reader nunca-raises que o andaime assume) · [[guides/map-new-value]]/[[guides/add-runs-field]] (a receita ponta-a-ponta de "valor novo") · [[invariants/obscured-data-offlimits]] (o agent_windows op_obs é o único lugar que decodifica ObscuredX)
+- [[invariants/offsets-single-source]] — the orchestrator imports an offset, never hardcodes `0x…`.
+- [[invariants/instance-selection]] — manager validation is the legitimate scaffolding.
+- [[invariants/run-lifecycle]] — the log-event loop is lifecycle orchestration.
+See also: [[invariants/log-event-detection]] (how the loop classifies each entry by K-class) · [[invariants/metric-fallback-chains]] (the new metric comes in with its fallback chain) · [[invariants/memory-safety]] (the never-raises reader the scaffolding assumes) · [[guides/map-new-value]]/[[guides/add-runs-field]] (the end-to-end recipe for a "new value") · [[invariants/obscured-data-offlimits]] (agent_windows op_obs is the only place that decodes ObscuredX)

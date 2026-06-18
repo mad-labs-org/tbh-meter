@@ -1,6 +1,6 @@
 ---
 type: guide
-description: "Receita pra capturar um evento NOVO do LogManager: pôr a classe em TARGETS → pegar o klass resolvido (round-trip-validado) → detectar por igualdade de klass-pointer no loop → ler os campos por constante de offsets.py com leitura defensiva. Detecção é por klass, NUNCA por um campo ELogType (foi stripado do dump)."
+description: "Recipe for capturing a NEW LogManager event: put the class in TARGETS → grab the resolved klass (round-trip-validated) → detect by klass-pointer equality in the loop → read the fields by offsets.py constant with defensive reads. Detection is by klass, NEVER by an ELogType field (it was stripped from the dump)."
 code_anchors:
   - meter_windows.py::TARGETS
   - meter_windows.py::run
@@ -15,104 +15,104 @@ guarded_by:
   - tests/test_meter_windows.py::TestSuffixInt::test_no_numeric_suffix
 ---
 
-# Guia: capturar um evento de log novo
+# Guide: capturing a new log event
 
-O `LogManager` mantém **um** `List<LogData>` plano (offset `LogManager.LOG_LIST`) onde o jogo
-empurra uma entry por evento — fim de stage, drop de baú, morte/revive de herói. O loop em `run`
-lê as entries que surgiram **do `size` anterior até o atual** a cada tick. Cada `LogData` é um
-objeto gerenciado, então seu **primeiro campo (offset 0) é o ponteiro pra Il2CppClass** — é por
-ESSE ponteiro que se descobre QUE evento é (ver [[invariants/log-event-detection]]). Capturar um
-evento novo toca **4 lugares em ordem**; pule um e ou o klass nunca casa, ou o reader lê lixo, ou
-um campo malformado derruba a sessão. Faça nesta sequência.
+The `LogManager` keeps **one** flat `List<LogData>` (offset `LogManager.LOG_LIST`) where the game
+pushes one entry per event — stage end, box drop, hero death/revive. The loop in `run` reads the
+entries that appeared **from the previous `size` to the current one** each tick. Each `LogData` is a
+managed object, so its **first field (offset 0) is the pointer to the Il2CppClass** — it's by THAT
+pointer that you find out WHICH event it is (see [[invariants/log-event-detection]]). Capturing a
+new event touches **4 places in order**; skip one and either the klass never matches, or the reader
+reads garbage, or a malformed field takes down the session. Do it in this sequence.
 
-## 0. Confirme que existe um log dedicado (e descubra os campos)
+## 0. Confirm a dedicated log exists (and discover the fields)
 
-A detecção precisa de uma **classe-K própria** pro evento (`StageClearLog`, `GetBoxLog`,
-`HeroDieLog`…). Se o jogo não emite um `*Log` distinto pro que você quer, não há klass pra casar —
-isso é trabalho de RE (achar a classe e os offsets dos campos ao vivo), não desta receita. Os
-campos de um log são name-keys ou ints crus; mapeie-os ao vivo antes (o método de gating de um
-valor mapeado está em [[process/value-mapping-method]]).
+Detection needs a **K-class of its own** for the event (`StageClearLog`, `GetBoxLog`,
+`HeroDieLog`…). If the game doesn't emit a distinct `*Log` for what you want, there's no klass to
+match — that's RE work (finding the class and the field offsets live), not part of this recipe. A
+log's fields are name-keys or raw ints; map them live first (the gating method for a mapped value is
+in [[process/value-mapping-method]]).
 
-## 1. Ponha a classe em `TARGETS`
+## 1. Put the class in `TARGETS`
 
-`TARGETS` (em `meter_windows.py`) é a lista de nomes de classe que o resolver **aprende** o K —
-por índice RVA no fast-path e por scan no fallback. **Sem o nome aqui, o resolver nunca resolve
-aquele K**, e o `kl ==` do passo 3 nunca casa: o evento passa despercebido pra sempre. O nome da
-classe do log tem que ser **estável** (>= 3 letras, não-ofuscado) — `StageClearLog` e cia são; um
-singleton ofuscado de 2 letras NÃO entra em `TARGETS` (esse resolve por estrutura, outro caminho —
-ver [[invariants/gold-singleton-resolution]]).
+`TARGETS` (in `meter_windows.py`) is the list of class names whose K the resolver **learns** —
+by RVA index in the fast-path and by scan in the fallback. **Without the name here, the resolver
+never resolves that K**, and the `kl ==` of step 3 never matches: the event goes unnoticed forever.
+The log's class name has to be **stable** (>= 3 letters, non-obfuscated) — `StageClearLog` and co.
+are; an obfuscated 2-letter singleton does NOT go in `TARGETS` (that one resolves by structure, a
+different path — see [[invariants/gold-singleton-resolution]]).
 
-## 2. Pegue o klass resolvido (já validado por round-trip)
+## 2. Grab the resolved klass (already round-trip-validated)
 
-O resolver devolve `classes = {nome: {K}}`. Extraia o seu K igual aos vizinhos
-(`sc_class`/`gb_class`/`die_class`/`res_class` saem de `next(iter(classes["<Nome>"]))` no
-fast-path, ou `next(iter(classes.get("<Nome>", [])), None)` no scan — tolerante a ausência). **Não
-precisa de validação extra de instância**: logs são só-classe (o resolver não procura instância
-deles), e o fast-path por índice já **valida cada K por round-trip de nome** em `resolve_via_rva`
-(`class_name(K) != nome` → devolve `None` → cai no scan; NUNCA serve um K errado). Então o klass
-que chega ao loop é confiável. (A sanidade de **instância** por `_manager_inst_ok` é dos
-*singletons* — `LogManager`/`MonsterSpawnManager` — não dos logs; ver [[invariants/instance-selection]].)
+The resolver returns `classes = {name: {K}}`. Extract your K like the neighbors do
+(`sc_class`/`gb_class`/`die_class`/`res_class` come from `next(iter(classes["<Name>"]))` in the
+fast-path, or `next(iter(classes.get("<Name>", [])), None)` in the scan — tolerant of absence). **No
+extra instance validation needed**: logs are class-only (the resolver doesn't look for an instance
+of them), and the index fast-path already **validates each K by name round-trip** in `resolve_via_rva`
+(`class_name(K) != name` → returns `None` → falls to the scan; NEVER serves a wrong K). So the klass
+that reaches the loop is trustworthy. (The **instance** sanity check via `_manager_inst_ok` is for
+*singletons* — `LogManager`/`MonsterSpawnManager` — not for logs; see [[invariants/instance-selection]].)
 
-> Se o evento novo entra no record da run, esse K também passa a fazer parte da forma calibrada
-> → leia [[invariants/cache-management]] antes de mexer no shape do cache (bump de `CACHE_FMT`
-> exige recapturar o `calib_seed`).
+> If the new event enters the run record, that K also becomes part of the calibrated shape
+> → read [[invariants/cache-management]] before touching the cache shape (a `CACHE_FMT` bump
+> requires re-capturing the `calib_seed`).
 
-## 3. Detecte por igualdade de KLASS-POINTER no loop
+## 3. Detect by KLASS-POINTER equality in the loop
 
-Dentro do bloco que varre as entries novas em `run`, adicione um ramo `elif`:
+Inside the block that scans the new entries in `run`, add an `elif` branch:
 
-- lê o klass da entry com `reader.rptr(e)` (o primeiro campo);
-- compara por **igualdade** com o seu `*_class` (`elif <novo>_class and kl == <novo>_class:`),
-  guardando o `and <novo>_class` pra não casar contra `None` quando o resolver não achou aquela
-  classe (degrada limpo num build sem ela).
+- read the entry's klass with `reader.rptr(e)` (the first field);
+- compare by **equality** with your `*_class` (`elif <new>_class and kl == <new>_class:`),
+  keeping the `and <new>_class` guard so it doesn't match against `None` when the resolver didn't
+  find that class (degrades cleanly on a build without it).
 
-**Nunca leia um campo de tipo na entry pra rotular o evento.** O campo `ELogType` foi **stripado**
-do dump IL2CPP desta build (o enum `ELogType` segue em `offsets.py` como catálogo de valores, mas
-não há offset pro *campo* dentro de `LogData`), e o `Dictionary<ELogType, List<LogData>>` também
-não é usado — só o `LOG_LIST` plano. Igualdade de klass-pointer é o que torna a detecção imune ao
-campo de tipo ausente.
+**Never read a type field on the entry to label the event.** The `ELogType` field was **stripped**
+from this build's IL2CPP dump (the `ELogType` enum stays in `offsets.py` as a value catalog, but
+there's no offset for the *field* inside `LogData`), and the `Dictionary<ELogType, List<LogData>>`
+isn't used either — only the flat `LOG_LIST`. Klass-pointer equality is what makes detection immune
+to the absent type field.
 
-## 4. Leia os campos por CONSTANTE de `offsets.py`, com leitura defensiva
+## 4. Read the fields by `offsets.py` CONSTANT, with defensive reads
 
-Defina uma classe de offsets no estilo `GetBoxLog`/`HeroDieLog`/`ResurrectionLog` em
-`config/offsets.py` (a fonte única — ver [[invariants/offsets-single-source]]) e leia os campos
-**pelo símbolo**, nunca por um literal `@0x` cravado na lógica:
+Define an offsets class in the style of `GetBoxLog`/`HeroDieLog`/`ResurrectionLog` in
+`config/offsets.py` (the single source — see [[invariants/offsets-single-source]]) and read the
+fields **by symbol**, never by an `@0x` literal hardcoded into the logic:
 
-- **int cru** → `reader.ri32(e + <Classe>.<CAMPO>)` (ex.: o tier do baú vem de
-  `GetBoxLog.MONSTER_TYPE`, depois mapeado por `BOX_KEY_BY_TIER` — o número solto `int(bk_str)`
-  antigo engolia todo drop; o `assert` deste guia ancora `MONSTER_TYPE == 0x50`);
+- **raw int** → `reader.ri32(e + <Class>.<FIELD>)` (e.g. the box tier comes from
+  `GetBoxLog.MONSTER_TYPE`, then mapped by `BOX_KEY_BY_TIER` — the old loose `int(bk_str)` number
+  swallowed every drop; this guide's `assert` anchors `MONSTER_TYPE == 0x50`);
 - **name-key string** (`"HeroName_<heroKey>"`, `"MonsterName_<monsterKey>"`) →
-  `_suffix_int(reader.read_string(reader.rptr(e + <Classe>.<CAMPO>)))`. **Use o parser de sufixo,
-  nunca `int()` no string inteiro** — ele faz `rsplit("_", 1)` e só converte se o tail for dígito,
-  devolvendo `None` em qualquer formato inesperado (vide os campos de `HeroDieLog`/`ResurrectionLog`).
+  `_suffix_int(reader.read_string(reader.rptr(e + <Class>.<FIELD>)))`. **Use the suffix parser,
+  never `int()` on the whole string** — it does `rsplit("_", 1)` and only converts if the tail is a
+  digit, returning `None` for any unexpected format (see the `HeroDieLog`/`ResurrectionLog` fields).
 
-**Por que isto não derruba a sessão:** os primitivos do `Reader` (`rptr`/`ri32`/`read_string`)
-**nunca levantam** — devolvem `None` em memória ilegível (um endereço pode liberar no meio da
-luta). O loop já tem `if not e: continue` por entry, e `_suffix_int` devolve `None` em entrada
-inválida. **Mantenha esse contrato no campo novo**: leia defensivo e trate `None` como "sem dado",
-nunca como `0`/default mentiroso. (O `try/except` externo do loop só pega `KeyboardInterrupt`/morte
-do jogo — **não** é uma rede que engole exceções por-tick. A segurança vem das leituras
-never-raise + os guards por entry, não de um catch genérico; ver [[invariants/memory-safety]].)
-Lixo numa entry vira no-op silencioso, não um crash que mata a sessão inteira.
+**Why this doesn't take down the session:** the `Reader` primitives (`rptr`/`ri32`/`read_string`)
+**never raise** — they return `None` on unreadable memory (an address can free mid-fight). The loop
+already has `if not e: continue` per entry, and `_suffix_int` returns `None` on invalid input.
+**Keep that contract on the new field**: read defensively and treat `None` as "no data", never as a
+lying `0`/default. (The loop's outer `try/except` only catches `KeyboardInterrupt`/game death — it's
+**not** a net that swallows per-tick exceptions. The safety comes from the never-raise reads + the
+per-entry guards, not from a generic catch; see [[invariants/memory-safety]].)
+Garbage in an entry becomes a silent no-op, not a crash that kills the whole session.
 
-## Mudou o record da run? É schema.
+## Changed the run record? That's schema.
 
-Se o evento novo acrescenta dado ao `runs.jsonl` (um campo no `rec`/`heroes_out` de `close_run`,
-ou um acumulador iniciado em `new_run`), isso é **mudança de forma** → bumpe `SCHEMA_VERSION` e
-normalize defensivo no app. A receita ponta-a-ponta de campo está em [[guides/add-runs-field]]; o
-porquê do bump em [[invariants/schema-versioning]].
+If the new event adds data to `runs.jsonl` (a field in `close_run`'s `rec`/`heroes_out`, or an
+accumulator started in `new_run`), that's a **shape change** → bump `SCHEMA_VERSION` and normalize
+defensively in the app. The end-to-end field recipe is in [[guides/add-runs-field]]; the why of the
+bump in [[invariants/schema-versioning]].
 
-## `metrics/events.py` é só CONTAGEM — não confunda
+## `metrics/events.py` is COUNTING only — don't confuse it
 
-`metrics.events.EventFeed` é um **contador** independente: ele só mede **quantas** entries novas
-surgiram (delta de `size`, re-ancorando quando a lista trunca), sem olhar tipo nenhum. **Não é o
-caminho de detecção** — rotular QUE evento é exige o klass-pointer (passo 3). O TODO de "ler o tipo
-de cada evento" no header de `events.py` já foi resolvido no loop de `run` justamente por
-klass-pointer, não por dumpar o campo `ELogType`. Não tente reabrir essa porta.
+`metrics.events.EventFeed` is an independent **counter**: it only measures **how many** new entries
+appeared (the `size` delta, re-anchoring when the list truncates), without looking at any type. **It
+is not the detection path** — labeling WHICH event it is requires the klass-pointer (step 3). The
+TODO of "read each event's type" in the header of `events.py` was already solved in the `run` loop
+precisely by klass-pointer, not by dumping the `ELogType` field. Don't try to reopen that door.
 
 ## Related
-- [[invariants/log-event-detection]] — o invariante: por que klass-pointer e não `ELogType`.
-- [[invariants/offsets-single-source]] — onde a classe de offsets do log novo mora (fonte única).
-- [[invariants/memory-safety]] — o contrato never-raise das leituras e os guards por entry.
-- [[invariants/schema-versioning]] — se o evento entra no record: por que bumpar o `SCHEMA_VERSION`.
-Veja também: [[reference/run-data-map]] (os campos de cada *Log mapeados por símbolo) · [[invariants/run-lifecycle]] (StageClear/Failed fecham a run a partir desta detecção)
+- [[invariants/log-event-detection]] — the invariant: why klass-pointer and not `ELogType`.
+- [[invariants/offsets-single-source]] — where the new log's offsets class lives (single source).
+- [[invariants/memory-safety]] — the never-raise read contract and the per-entry guards.
+- [[invariants/schema-versioning]] — if the event enters the record: why bump `SCHEMA_VERSION`.
+See also: [[reference/run-data-map]] (each *Log's fields mapped by symbol) · [[invariants/run-lifecycle]] (StageClear/Failed close the run off this detection)

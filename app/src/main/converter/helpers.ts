@@ -15,8 +15,8 @@ export { COUNT_FLOOR_SEC, ACT_BOSS_STAGE_NO };
 /** Difficulty enum int -> the display "mode" name. Mirrors the reader's EStageDifficulty
  *  (`config/offsets.py`: Normal=0, Nightmare=1, Hell=2, Torment=3) and DIFF_NAMES. The localized
  *  name is a TRANSITIONAL label the structured record still carries (the renderer reads
- *  `RunRecord.mode` today); resolving it from the id at render is a future schema bump (see
- *  progress.md "O que sai do reader" + data-contract-id-based). `null`/unknown -> "?". */
+ *  `RunRecord.mode` today); resolving it from the id at render is a future schema bump
+ *  (data-contract-id-based). `null`/unknown -> "?". */
 const MODE_NAMES: Record<number, string> = {
   0: "Normal",
   1: "Nightmare",
@@ -30,8 +30,8 @@ export function modeName(difficulty: number | null): string {
 }
 
 /** Stage label "act-stageNo" (e.g. "3-9"). This is TRIVIAL display formatting of two raw
- *  numbers — NOT a catalog name — so it lives here, not at render (progress.md: `stage` "3-9"
- *  = `${act}-${stageNo}`). "?" for either side missing, so the UI never shows "null-null". */
+ *  numbers — NOT a catalog name — so it lives here, not at render. "?" for either side missing,
+ *  so the UI never shows "null-null". */
 export function resolveStage(act: number | null, stageNo: number | null): string {
   if (act == null || stageNo == null) return "?";
   return `${act}-${stageNo}`;
@@ -71,7 +71,7 @@ export function round(value: number, digits = 2): number {
 // Quality verdict — the SYSTEM rule (not a user setting) that decides whether a run counts.
 // Shared by convert() (new raws) and convertLegacy() (migrated runs.jsonl) so both seal a run by
 // the SAME rule. A non-tunable constant set, versioned with the converter output (the user-facing
-// display filter lives in settings.ts, PR6 — never conflate the two; see progress.md "Configs").
+// display filter lives in settings.ts, PR6 — never conflate the two).
 // --------------------------------------------------------------------------- //
 
 /** PARTIAL capture: the meter joined a run already in progress, so its totals are under-counted.
@@ -102,7 +102,7 @@ export function isSkipped(stageNo: number | null, clearTime: number, duration: n
 /** Seal the quality verdict by fixed precedence: degraded (a critical field was unreadable / the
  *  run is corrupt) > partial (under-counted capture) > skipped (below the floor, or not a clean
  *  success) > counted. A run is NEVER deleted by this — every verdict still yields a record the user
- *  sees, marked and filterable (progress.md "Skip != sumir"). `degraded` is passed in (the caller
+ *  sees, marked and filterable. `degraded` is passed in (the caller
  *  knows whether a critical read failed — an envelope error for new raws, or the gold:0+mode:"?"
  *  signature for migrated legacy runs). */
 export function classifyQuality(args: {

@@ -4,8 +4,8 @@ import type { RunRecord } from "../../shared/run-types.js";
 // Auto-uploader gate test (PR4 fix): before PR4 the app's read path dropped success-partials via
 // cleanRecords, so they never reached the uploader. PR4 made the read path read pre-converted logs/
 // (no cleanRecords), so the partial/degraded/skipped filter moved onto eligible() — onto the
-// converter's sealed `quality` verdict. This asserts the redesign's "Upload: Degradada/parcial/
-// skipped NÃO sobe" (progress.md): only a `counted` (or un-sealed legacy) success uploads.
+// converter's sealed `quality` verdict. This asserts the redesign's upload rule — degraded/partial/
+// skipped never upload: only a `counted` (or un-sealed legacy) success uploads.
 //
 // eligible() is module-private, so we drive the PUBLIC cycle (requestUploadNow -> runCycle) and
 // assert WHICH runs uploadRun was called with — testing the real selection end-to-end.

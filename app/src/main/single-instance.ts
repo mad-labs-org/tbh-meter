@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------- //
-// single-instance — the APP side of the single-writer guarantee (progress.md
-// "Dedup"). The reader-process supervisor already makes ONE app the single owner
+// single-instance — the APP side of the single-writer guarantee. The
+// reader-process supervisor already makes ONE app the single owner
 // of the reader (kill-before-respawn + kill-on-quit, by image name, in
 // reader-process.ts). But that only governs the readers a SINGLE app instance
 // spawns. If the user launches the app a SECOND time (double-click again, an

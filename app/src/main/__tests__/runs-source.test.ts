@@ -308,7 +308,7 @@ describe("normalizeRecord — heroes", () => {
 });
 
 // ---------------------------------------------------------------------------
-// The session-scoped dedup NET (progress.md "Dedup" — safety layer behind the
+// The session-scoped dedup NET (safety layer behind the
 // PR7 single-writer primary). These lock the pure decision directly: it collapses
 // the two-reader phantom (identical content under DIFFERENT sessions) and NEVER a
 // real farm (distinct runs in the SAME session, even if they look identical), so

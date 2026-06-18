@@ -7,10 +7,10 @@
 //   • a `raw/<id>.json` with no matching `logs/<id>.json`  => "convert this"
 //   • a `logs/<id>.json` whose structuredSchemaVersion < current  => "re-convert this"
 // so a crash mid-run self-heals on the next boot for free, and a converter bump re-runs everything
-// (progress.md "Reconcile = só os arquivos"). Writes are atomic (tmp -> rename) and idempotent:
+// (reconcile = just the files). Writes are atomic (tmp -> rename) and idempotent:
 // running a pass twice yields the same logs/ and never double-writes an up-to-date file.
 //
-// Three triggers (progress.md "Conversor — Gatilhos"):
+// Three triggers (the converter's triggers):
 //   1. boot — readdir raw/ vs logs/, convert the missing/stale; migrate legacy runs.jsonl lines.
 //   2. watch — a new raw/<id>.json appears -> convert it (run just finished).
 //   3. on-use (PR4) — a logs/<id>.json read with an old version -> ingestOne re-converts from raw.

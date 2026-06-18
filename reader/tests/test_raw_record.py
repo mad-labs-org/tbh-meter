@@ -1,11 +1,11 @@
-"""Testes do build_raw_record — o record RAW v2 que o reader emite (raw/<id>.json).
+"""Tests for build_raw_record — the RAW v2 record the reader emits (raw/<id>.json).
 
-Garante o contrato que o conversor (app) parseia: envelope ok/err por campo de dado, meta crua,
-ZERO campos derivados, e — o ponto do redesign — "não-li" (err) nunca vira "li zero". Espelha
-app/src/shared/raw-types.ts::RawRunV2 (mesma forma nos dois lados).
+Locks the contract the converter (app) parses: ok/err envelope per data field, raw meta, ZERO
+derived fields, and — the point of the redesign — "didn't read" (err) never becomes "read zero".
+Mirrors app/src/shared/raw-types.ts::RawRunV2 (same shape on both sides).
 
-v2 (Redesign 2): a identidade da run é o HORÁRIO DE FIM em ms (`id = str(ts_ms)`), SEM session_id
-nem run — mata a classe de bug do run_num-reset (id colidido → run nova sumida). Ver progress.md.
+v2 (Redesign 2): run identity is the END TIMESTAMP in ms (`id = str(ts_ms)`), with NO session_id and
+NO run — kills the run_num-reset bug class (colliding id → new run vanishes).
 """
 
 import json
@@ -32,15 +32,15 @@ def _rec(**over):
 def test_stamps_raw_schema_version_and_identity():
     r = _rec()
     assert r["raw_schema_version"] == RAW_SCHEMA_VERSION == 2
-    assert r["id"] == "1717800000123"                 # = str(ts_ms): o horário de fim em ms É a identidade
-    # v2: SEM session_id, SEM run — a run não pega mais emprestada a identidade da session.
+    assert r["id"] == "1717800000123"                 # = str(ts_ms): the end timestamp in ms IS the identity
+    # v2: NO session_id, NO run — the run no longer borrows the session's identity.
     assert "session_id" not in r
     assert "run" not in r
 
 
 def test_metadata_is_plain_no_envelope():
     r = _rec()
-    assert r["ts"] == 1717800000123                   # ms (v1 era segundos)
+    assert r["ts"] == 1717800000123                   # ms (v1 was seconds)
     assert r["duration"] == 92
     assert r["run_outcome"] == "success"
     assert r["game_version"] == "1.00.11"
@@ -55,10 +55,10 @@ def test_data_fields_are_enveloped_ok():
 
 
 def test_hero_dict_carries_the_exact_wire_keys_the_ts_mapHero_reads():
-    # Contrato produtor↔consumidor (Python build_raw_record -> TS convert.mapHero): o reader emite o
-    # hero CRU dentro de ok(heroes), com a casing MISTA (snake+camel) que mapHero lê por chave. Um
-    # rename de um lado só vira "missing"/campo perdido no conversor com CI verde — então fixamos as
-    # chaves AQUI, no lado que produz. Espelha app/src/shared/__fixtures__/raw-v1.ts (o hero do golden).
+    # Producer↔consumer contract (Python build_raw_record -> TS convert.mapHero): the reader emits the
+    # RAW hero inside ok(heroes), with the MIXED casing (snake+camel) that mapHero reads by key. A
+    # rename on one side alone becomes a "missing"/lost field in the converter with green CI — so we
+    # pin the keys HERE, on the producing side. Mirrors app/src/shared/__fixtures__/raw-v1.ts (the golden hero).
     hero = {
         "heroKey": 1001, "classId": 5, "class": "0x5", "level": 80, "exp": 1234567,
         "items": [{
@@ -76,24 +76,24 @@ def test_hero_dict_carries_the_exact_wire_keys_the_ts_mapHero_reads():
     r = _rec(heroes=[hero])
     assert r["heroes"]["ok"] is True
     h = r["heroes"]["value"][0]
-    # top-level hero keys (a casing exata que o mapHero do TS espera, snake + camel misturados)
+    # top-level hero keys (the exact casing the TS mapHero expects, snake + camel mixed)
     for k in ("heroKey", "classId", "class", "level", "exp", "items", "skills", "skillLevels",
               "stats", "exp_start", "exp_end", "xp_gained", "levelup", "deaths", "revives",
               "killed_by"):
-        assert k in h, f"hero key {k!r} ausente — quebra o contrato Python↔TS (mapHero)"
-    # item + mod keys (o sub-mapeamento que mapHero também lê por chave)
+        assert k in h, f"hero key {k!r} missing — breaks the Python↔TS contract (mapHero)"
+    # item + mod keys (the sub-mapping mapHero also reads by key)
     item = h["items"][0]
     for k in ("slot", "slotId", "grade", "gradeId", "itemKey", "uniqueId", "level", "mods"):
-        assert k in item, f"item key {k!r} ausente"
+        assert k in item, f"item key {k!r} missing"
     for k in ("recipeId", "recipe", "statId", "stat", "value", "tier"):
-        assert k in item["mods"][0], f"mod key {k!r} ausente"
+        assert k in item["mods"][0], f"mod key {k!r} missing"
 
 
 def test_unread_gold_is_err_not_zero():
-    # O bug do gold:0 — "não-li" tem que ser distinguível de "ganhei zero".
+    # The gold:0 bug — "didn't read" has to be distinguishable from "gained zero".
     r = _rec(gold=0, gold_ok=False)
     assert r["gold_gained"] == {"ok": False, "error": "gold unread (live+save failed)"}
-    # contraste: gold lido ZERO de verdade é ok(0), NÃO err.
+    # contrast: gold genuinely read as ZERO is ok(0), NOT err.
     assert _rec(gold=0, gold_ok=True)["gold_gained"] == {"ok": True, "value": 0}
 
 
@@ -103,12 +103,12 @@ def test_unread_xp_is_err():
 
 
 def test_party_off_makes_heroes_err():
-    # Party viva off a run inteira: o reader passa heroes_ok=False -> heroes vira err (não [] silencioso
-    # nem o roster do save). O conversor marca issues.heroes e — heroes ∈ CRITICAL_FIELDS — sela a run
-    # degraded: NÃO sobe pro leaderboard, mas aparece no app, marcada.
+    # Live party off the whole run: the reader passes heroes_ok=False -> heroes becomes err (not a silent
+    # [] nor the save's roster). The converter flags issues.heroes and — heroes ∈ CRITICAL_FIELDS — seals
+    # the run degraded: does NOT go to the leaderboard, but shows in the app, flagged.
     assert _rec(heroes=[], heroes_ok=False)["heroes"] == {
         "ok": False, "error": "party live off (StageManager unresolved)"}
-    # contraste: party viva OK -> ok(heroes), mesmo a lista (heroes_ok distingue "off" de conteúdo).
+    # contrast: live party OK -> ok(heroes), even an empty list (heroes_ok distinguishes "off" from content).
     assert _rec(heroes=[], heroes_ok=True)["heroes"] == {"ok": True, "value": []}
 
 
@@ -118,24 +118,24 @@ def test_unresolved_stage_fields_are_err():
     assert r["stageNo"]["ok"] is False
     assert r["difficulty"]["ok"] is False
     assert r["total_mobs"]["ok"] is False
-    # stageKey com um valor real segue ok (o input foi lido).
+    # stageKey with a real value stays ok (the input was read).
     assert r["stageKey"]["ok"] is True
 
 
 def test_unread_stage_key_is_err_not_ok_none():
-    # stageKey=None é leitura FALHA da chave de ranking (não "sem stage"): vira err -> o conversor
-    # marca issues.stageKey -> degrada a run. ok(None) silencioso aqui repetia o bug do gold:0.
+    # stageKey=None is a FAILED read of the ranking key (not "no stage"): becomes err -> the converter
+    # flags issues.stageKey -> degrades the run. A silent ok(None) here would repeat the gold:0 bug.
     assert _rec(stage_key=None)["stageKey"] == {"ok": False, "error": "stageKey unread"}
 
 
 def test_source_tag_rides_alongside_the_envelope():
-    # 3 graus: limpo (live) / defasado (save) / não-li (err). source vive ao lado do ok.
+    # 3 degrees: clean (live) / stale (save) / didn't read (err). source rides alongside the ok.
     assert _rec(gold_source="live")["gold_source"] == "live"
     assert _rec(gold_source="save")["gold_source"] == "save"
 
 
 def test_no_derived_or_legacy_fields():
-    # CRU: o conversor deriva dps/taxas/partial/status/mode/"3-9"/totais — não saem do reader.
+    # RAW: the converter derives dps/rates/partial/status/mode/"3-9"/totals — they don't come from the reader.
     r = _rec()
     for k in ("dps", "gold_per_sec", "xp_per_sec", "partial", "status", "mode", "stage",
               "schema_version", "deaths", "revives", "session_id", "run"):
@@ -143,9 +143,9 @@ def test_no_derived_or_legacy_fields():
 
 
 def test_account_snapshot_fields_are_enveloped():
-    # runes/inventory/stash = snapshot CRU da conta (SAVE), gravado em TODA run, em envelope ok().
-    # Aditivo SEM bump de RAW_SCHEMA_VERSION (o conversor ignora chave desconhecida); o wiki deriva
-    # depois (drop-rate real, correção de wave). id-only nos itens (o app resolve nome pelo itemKey).
+    # runes/inventory/stash = RAW account snapshot (SAVE), recorded on EVERY run, in an ok() envelope.
+    # Additive with NO RAW_SCHEMA_VERSION bump (the converter ignores unknown keys); the wiki derives
+    # later (real drop-rate, wave correction). id-only on items (the app resolves the name from itemKey).
     runes = [{"key": 101, "level": 5}, {"key": 1171, "level": 3}]
     inv = [{"itemKey": 315171, "uniqueId": "501734348895521012", "slotId": 1, "gradeId": 4,
             "level": 80, "mods": [{"recipeId": 1, "recipe": "x", "statId": 24, "stat": "PhysDmg%",
@@ -159,8 +159,8 @@ def test_account_snapshot_fields_are_enveloped():
 
 
 def test_account_snapshot_empty_list_is_ok_not_err():
-    # VAZIO GENUÍNO (a leitura rolou e não achou nada — conta nova sem runa, inventário limpo) -> ok([]).
-    # É o estado válido "li zero", distinto de "não-li" (próximo teste). A lista [] entra como ok([]).
+    # GENUINELY EMPTY (the read ran and found nothing — new account with no rune, clean inventory) -> ok([]).
+    # It's the valid "read zero" state, distinct from "didn't read" (next test). An [] list enters as ok([]).
     r = _rec(runes=[], inventory=[], stash=[])
     assert r["runes"] == {"ok": True, "value": []}
     assert r["inventory"] == {"ok": True, "value": []}
@@ -168,10 +168,10 @@ def test_account_snapshot_empty_list_is_ok_not_err():
 
 
 def test_account_snapshot_unread_is_err_not_empty():
-    # NÃO-LI (read_account_snapshot devolve None: psd nulo, lista ilegível, offset quebrado num patch)
-    # -> err, NUNCA ok([]). É o invariante do envelope (a mesma regra que matou o bug do gold:0): o
-    # app/wiki tem que distinguir "a conta não tem runa" de "falhei em ler as runas". ok([]) numa falha
-    # ressuscitaria o silent-error. read_account_snapshot sinaliza falha com None; aqui é o contrato.
+    # DIDN'T READ (read_account_snapshot returns None: null psd, unreadable list, offset broken by a patch)
+    # -> err, NEVER ok([]). It's the envelope invariant (the same rule that killed the gold:0 bug): the
+    # app/wiki has to distinguish "the account has no rune" from "I failed to read the runes". ok([]) on a
+    # failure would resurrect the silent-error. read_account_snapshot signals failure with None; here is the contract.
     r = _rec(runes=None, inventory=None, stash=None)
     assert r["runes"] == {"ok": False, "error": "runes unread (save/list unreadable)"}
     assert r["inventory"] == {"ok": False, "error": "inventory unread (save/list unreadable)"}
@@ -179,29 +179,29 @@ def test_account_snapshot_unread_is_err_not_empty():
 
 
 def test_absorbed_boss_box_lands_inside_drops_envelope_without_shape_change():
-    # Pending-close (o bug do baú-na-run-seguinte): o boss box que o jogo loga ~0.6s APÓS o
-    # clear é absorvido no record JÁ MONTADO via _absorb_drop. O contrato: ele aparece DENTRO
-    # do envelope ok de drops, no MESMO wire shape de sempre ({"box_key", "monster_type"}),
-    # SEM chave nova no record e SEM bump (forma inalterada — só o conteúdo da lista cresce,
-    # igual a um drop normal). O round-trip por json é o que o flush grava em disco.
+    # Pending-close (the box-in-the-next-run bug): the boss box the game logs ~0.6s AFTER the
+    # clear is absorbed into the ALREADY-BUILT record via _absorb_drop. The contract: it shows up INSIDE
+    # the ok envelope of drops, in the SAME wire shape as always ({"box_key", "monster_type"}),
+    # with NO new key in the record and NO bump (shape unchanged — only the list's content grows,
+    # just like a normal drop). The json round-trip is what the flush writes to disk.
     gray = {"box_key": 910011, "monster_type": 0}
     blue = {"box_key": 920001, "monster_type": 1}
     r = _rec(drops=[gray])
     assert _absorb_drop(r, blue) is True
     flushed = json.loads(json.dumps(r))
     assert flushed["drops"] == {"ok": True, "value": [gray, blue]}
-    assert set(flushed.keys()) == set(_rec().keys())   # NENHUMA chave nova: aditivo zero, sem bump
+    assert set(flushed.keys()) == set(_rec().keys())   # NO new key: zero additions, no bump
     assert flushed["raw_schema_version"] == RAW_SCHEMA_VERSION == 2
-    assert flushed["id"] == "1717800000123"            # id segue o ts_ms do CLOSE, não do flush
+    assert flushed["id"] == "1717800000123"            # id follows the CLOSE ts_ms, not the flush
 
 
 def test_raw_record_keys_are_the_documented_contract():
-    # O conjunto EXATO de chaves que o build_raw_record emite — ESPELHO de
-    # app/src/shared/raw-types.ts::RawRunV2. Adicionar/remover um campo aqui SEM atualizar o
-    # raw-types.ts (e este set) quebra o contrato Python↔TS com CI verde — então travamos o
-    # conjunto COMPLETO no lado que PRODUZ. (test_no_derived_or_legacy_fields trava o que NÃO entra;
-    # este trava o que ENTRA.) NB: runes/inventory/stash são SEMPRE emitidos (ok([]) no mínimo); são
-    # opcionais no raw-types.ts SÓ porque raw ANTIGO (pré-snapshot) não os tem.
+    # The EXACT set of keys build_raw_record emits — MIRROR of
+    # app/src/shared/raw-types.ts::RawRunV2. Adding/removing a field here WITHOUT updating
+    # raw-types.ts (and this set) breaks the Python↔TS contract with green CI — so we lock the
+    # COMPLETE set on the PRODUCING side. (test_no_derived_or_legacy_fields locks what does NOT enter;
+    # this locks what DOES enter.) NB: runes/inventory/stash are ALWAYS emitted (ok([]) at minimum); they're
+    # optional in raw-types.ts ONLY because OLD raw (pre-snapshot) doesn't have them.
     expected = {
         "raw_schema_version", "id", "ts", "run_outcome", "game_version",
         "duration", "stageKey", "act", "stageNo", "difficulty", "total_mobs", "mobs",
@@ -211,13 +211,13 @@ def test_raw_record_keys_are_the_documented_contract():
     assert set(_rec().keys()) == expected
 
 
-# ---- read_account_snapshot: a camada de LEITURA distingue NÃO-LI (None) de VAZIO ([]) ----
-# (o build_raw_record acima vira None->err / lista->ok; estes provam que o PRODUTOR de fato devolve
-#  None na falha e [] só no vazio genuíno — senão um ok([]) silencioso voltaria pelo gold:0).
+# ---- read_account_snapshot: the READ layer distinguishes DIDN'T-READ (None) from EMPTY ([]) ----
+# (build_raw_record above turns None->err / list->ok; these prove the PRODUCER actually returns
+#  None on failure and [] only on genuinely empty — otherwise a silent ok([]) would come back via gold:0).
 
 class _SnapStub:
-    """Stub mínimo p/ read_account_snapshot (o MockReader do conftest não tem read()/ru64()):
-    rptr/ri32/ru64 leem de `mem`; read(items+DATA, n) empacota os ponteiros de `arrays`."""
+    """Minimal stub for read_account_snapshot (conftest's MockReader has no read()/ru64()):
+    rptr/ri32/ru64 read from `mem`; read(items+DATA, n) packs the pointers from `arrays`."""
     def __init__(self, mem=None, arrays=None):
         self._mem = dict(mem or {})
         self._arrays = dict(arrays or {})
@@ -237,19 +237,19 @@ class _SnapStub:
 
 
 def test_read_snapshot_none_psd_is_all_none():
-    # Sem save vivo (psd None) -> NÃO-LI em tudo (None,None,None) -> o caller emite err nos 3.
+    # No live save (psd None) -> DIDN'T-READ on everything (None,None,None) -> the caller emits err on all 3.
     assert read_account_snapshot(_SnapStub(), None, {}) == (None, None, None)
 
 
 def test_read_snapshot_unreadable_lists_are_none_not_empty():
-    # psd válido mas NADA resolve (offset quebrado/leitura falha): RUNES ptr None, ITEMS ptr None ->
-    # runes None, e inventory/stash None (uid2item não montou). NUNCA [] — senão viraria ok([]) silencioso.
+    # valid psd but NOTHING resolves (broken offset/failed read): RUNES ptr None, ITEMS ptr None ->
+    # runes None, and inventory/stash None (uid2item didn't build). NEVER [] — else it'd become a silent ok([]).
     runes, inv, stash = read_account_snapshot(_SnapStub(), 0x100, {})
     assert runes is None and inv is None and stash is None
 
 
 def test_read_snapshot_empty_runes_list_is_empty_not_none():
-    # RUNES resolve numa lista REAL de size 0 (conta nova, nenhuma runa) -> [] (li-zero), NÃO None.
+    # RUNES resolves to a REAL list of size 0 (new account, no rune) -> [] (read-zero), NOT None.
     psd, rl = 0x100, 0x200
     runes, _, _ = read_account_snapshot(
         _SnapStub(mem={psd + PlayerSaveData.RUNES: rl, rl + List.SIZE: 0}), psd, {})
@@ -257,7 +257,7 @@ def test_read_snapshot_empty_runes_list_is_empty_not_none():
 
 
 def test_read_snapshot_reads_populated_runes():
-    # RUNES com 2 nós -> lista [{key, level}] (prova o caminho feliz da leitura, incl. o read() em lote).
+    # RUNES with 2 nodes -> list [{key, level}] (proves the happy path of the read, incl. the batched read()).
     psd, rl, arr, e1, e2 = 0x100, 0x200, 0x300, 0x1000, 0x1010
     mem = {
         psd + PlayerSaveData.RUNES: rl, rl + List.SIZE: 2, rl + List.ITEMS: arr,
@@ -269,11 +269,11 @@ def test_read_snapshot_reads_populated_runes():
 
 
 def test_read_snapshot_never_raises_even_if_reader_raises():
-    # NEVER-RAISES é contrato de vida-ou-morte: um throw em close_run mata o reader (o loop só
-    # captura KeyboardInterrupt -> run perdida + sessão derrubada). O Reader REAL devolve None em
-    # leitura ruim (nunca levanta), mas o snapshot não pode DEPENDER disso: cada bloco é guardado
-    # (try/except) e um reader que LEVANTA em qualquer primitivo vira NÃO-LI (None,None,None) ->
-    # err nos 3 — nunca propaga. Este teste trava o contrato do docstring ("cada bloco guardado").
+    # NEVER-RAISES is a life-or-death contract: a throw in close_run kills the reader (the loop only
+    # catches KeyboardInterrupt -> run lost + session torn down). The REAL Reader returns None on a
+    # bad read (never raises), but the snapshot can't DEPEND on that: each block is guarded
+    # (try/except) and a reader that RAISES on any primitive becomes DIDN'T-READ (None,None,None) ->
+    # err on all 3 — never propagates. This test locks the docstring's contract ("each block guarded").
     class _Raising:
         def rptr(self, a):
             raise RuntimeError("boom")

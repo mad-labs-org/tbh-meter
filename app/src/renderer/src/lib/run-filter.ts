@@ -1,8 +1,8 @@
 import type { RunIndexEntry } from "../../../shared/ipc-types.js";
 import { COUNT_FLOOR_SEC, ACT_BOSS_STAGE_NO } from "../../../shared/run-types.js";
 
-// Pure helpers for the runs-list DISPLAY filter (PR6) — layer 3 of the 3-layer status model
-// (progress.md "Status & filtro"): a LOCAL user preference that never touches the leaderboard.
+// Pure helpers for the runs-list DISPLAY filter (PR6) — layer 3 of the 3-layer status model:
+// a LOCAL user preference that never touches the leaderboard.
 //   layer 1 (recorded)  = every run, sealed by the converter — not configurable;
 //   layer 2 (counts)    = the structural floor enforced in the converter + backend — not here;
 //   layer 3 (this file) = what the user chooses to SEE in their own app.

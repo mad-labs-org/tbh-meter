@@ -1,6 +1,6 @@
 ---
 type: guide
-description: "Checklist sequenciado pra mapear um valor NOVO da memória do jogo — com um GATE de ORÁCULO duro (não sobe sem oráculo anotado + delta == oráculo em >=3 runs + 1 borda + teste sintético). Reúne a metodologia, a resolução name-free (estrutura ou índice), o stride certo, a cadeia de fallback e o que recapturar se o valor entra no calib."
+description: "Sequenced checklist for mapping a NEW value out of the game's memory — with a hard ORACLE GATE (nothing ships without a noted oracle + delta == oracle across >=3 runs + 1 edge case + synthetic test). Pulls together the methodology, name-free resolution (structure or index), the right stride, the fallback chain, and what to re-capture if the value enters calib."
 code_anchors:
   - metrics/gold.py
 asserts:
@@ -10,76 +10,76 @@ guarded_by:
   - tests/test_gold.py::TestCombatGoldSave::test_ignores_total_subkey_zero
 ---
 
-# Guia — mapear um valor NOVO da memória
+# Guide — mapping a NEW value out of memory
 
-Você quer ler um datum NOVO do jogo (outro `EAggregateType`, drops por run, um recurso
-não-gold, dano por atributo…). O caso-modelo é o **gold de combate** — leia o cabeçalho de
-`metrics/gold.py` (a história inteira: por que o nome ofuscado, por que o save é só fallback,
-como a estrutura foi cravada) e a metodologia em [[process/value-mapping-method]] **antes** de
-escrever qualquer leitura. Este guia é o checklist sequenciado; cada passo aponta o invariante
-co-obrigatório.
+You want to read a NEW datum from the game (another `EAggregateType`, per-run drops, a non-gold
+resource, damage per attribute…). The model case is **combat gold** — read the header of
+`metrics/gold.py` (the whole story: why the obfuscated name, why the save is fallback-only, how
+the structure was pinned down) and the methodology in [[process/value-mapping-method]] **before**
+writing any read. This guide is the sequenced checklist; each step points to its co-required
+invariant.
 
-> **Antes de começar — isto já existe?** Antes de "mapear", veja o inventário em
-> [[reference/value-inventory]]: muitos valores futuros (outros `EAggregateType`, gold por fonte)
-> reusam um singleton **já resolvido** — aí não há nada a "achar", é só ler outra chave.
+> **Before you start — does this already exist?** Before "mapping", check the inventory in
+> [[reference/value-inventory]]: many future values (other `EAggregateType`s, gold by source)
+> reuse an **already-resolved** singleton — then there's nothing to "find", you just read another key.
 
-## GATE de ORÁCULO (não-negociável)
+## ORACLE GATE (non-negotiable)
 
-**NÃO suba um valor novo sem TODOS os quatro:**
+**Do NOT ship a new value without ALL four:**
 
-1. **Oráculo anotado** — o número REAL do jogo (saldo, xp, dano de um hit), escrito ANTES de
-   procurar. Sem oráculo você não prova nada — foi a falta dele que deixou subir gold≈0 e depois
-   gold=1.97T (chute por valor isolado, sem resposta conhecida pra conferir).
-2. **`delta == oráculo` em `>= 3` runs** — o valor por-run tem que bater na unidade em pelo menos
-   três runs distintas, não numa só.
-3. **`+1` caso de BORDA** — uma run que estressa a semântica. No gold foi uma run **vendendo** um
-   item: provou que o combate (`COMBAT_SUBKEY`) **exclui** a venda (`live_total − live_combat` deu
-   o valor exato da venda). Ache a borda análoga do SEU valor (idle, level-up, morte, reload de
-   stage).
-4. **Teste sintético** — um unit-test com memória FALSA (célula viva vs cópia congelada) contra o
-   módulo real, modelo `test_gold.py`. **Todo valor novo ganha um desses** — é o que trava a
-   regra contra regressão silenciosa quando o jogo rebuilda.
+1. **Noted oracle** — the REAL number from the game (balance, xp, damage of one hit), written down
+   BEFORE searching. Without an oracle you prove nothing — its absence is what let gold≈0 and then
+   gold=1.97T ship (a guess off an isolated value, with no known answer to check against).
+2. **`delta == oracle` across `>= 3` runs** — the per-run value has to match to the unit in at
+   least three distinct runs, not just one.
+3. **`+1` EDGE case** — a run that stresses the semantics. For gold it was a run **selling** an
+   item: it proved that combat (`COMBAT_SUBKEY`) **excludes** the sale (`live_total − live_combat`
+   gave the exact sale value). Find the analogous edge for YOUR value (idle, level-up, death, stage
+   reload).
+4. **Synthetic test** — a unit test with FAKE memory (live cell vs frozen copy) against the real
+   module, modeled on `test_gold.py`. **Every new value gets one** — it's what locks the rule
+   against silent regression when the game rebuilds.
 
-Falhou qualquer um → **não sobe**. "Bateu numa run" não é prova.
+Fail any one → **it doesn't ship**. "Matched on one run" is not proof.
 
-## Checklist (na ordem)
+## Checklist (in order)
 
-1. **Anote o oráculo** (gate §1). Início/fim, ou um valor exato do jogo.
-2. **Ache por ESTRUTURA, nunca por nome nem por valor único** (gate §2 da metodologia em
-   [[process/value-mapping-method]]): assinatura de N valores conhecidos juntos, *liveness*
-   (a célula viva CRESCE; cópia congelada não), e subida de backrefs até a raiz. Rode os probes
-   read-only do `tbh-meter-dev` (fora do app) pra localizar a célula.
-3. **Suba à RAIZ se quiser fonte VIVA estável.** Se a fonte é um **singleton de nome ofuscado**
-   (identificador de 2 letras que DRIFTA por build — `ut`→`uu`), resolva-o por estrutura +
-   round-trip do campo estático, NUNCA por `find_class_by_name` — ver
-   [[invariants/gold-singleton-resolution]]. Se há um caminho por **TypeDefIndex (RVA)** — o
-   primário hoje, mais rápido que o scan — resolva por índice, também name-free por construção,
-   com o gate de revalidação anti-veneno — ver [[invariants/rva-index-resolution]]. (Sem fonte
-   viva estável, o snapshot do save serve de fallback.)
-4. **Use o STRIDE certo ao andar o dicionário.** Há DUAS geometrias de `Dictionary` IL2CPP —
-   `DictFloat` (valor float de 4B) vs `Dict8B` (valor 8B: long ou ponteiro). Escolher errado
-   corrompe o valor **em silêncio, sem crash**. Reuse `dict8b_items` pros dicts 8B e as constantes
-   nomeadas, nunca um literal de offset — ver [[invariants/dict-strides]].
-5. **Encaixe na cadeia de FALLBACK.** A forma canônica é `LIVE` (exato) → `SAVE` (defasado,
-   fallback) → **NUNCA** carteira/total (reintroduz venda/idle → over-count). O delta vem de uma
-   função tipo `run_gain` que devolve `None` no não-monotônico (e **zero é válido**, não é falha),
-   e preserva um `*_source` tag pra o app sinalizar leitura degradada — ver
+1. **Note the oracle** (gate §1). Start/end, or an exact value from the game.
+2. **Find by STRUCTURE, never by name nor by a single value** (gate §2 of the methodology in
+   [[process/value-mapping-method]]): a signature of N known values together, *liveness*
+   (the live cell GROWS; a frozen copy doesn't), and walking backrefs up to the root. Run the
+   read-only `tbh-meter-dev` probes (outside the app) to locate the cell.
+3. **Walk up to the ROOT if you want a stable LIVE source.** If the source is an **obfuscated-name
+   singleton** (a 2-letter identifier that DRIFTS per build — `ut`→`uu`), resolve it by structure +
+   a static-field round-trip, NEVER via `find_class_by_name` — see
+   [[invariants/gold-singleton-resolution]]. If there's a path via **TypeDefIndex (RVA)** — today's
+   primary, faster than the scan — resolve by index, also name-free by construction, with the
+   anti-poison revalidation gate — see [[invariants/rva-index-resolution]]. (Without a stable live
+   source, the save snapshot serves as fallback.)
+4. **Use the right STRIDE when walking the dictionary.** There are TWO IL2CPP `Dictionary`
+   geometries — `DictFloat` (4B float value) vs `Dict8B` (8B value: long or pointer). Picking wrong
+   corrupts the value **silently, without a crash**. Reuse `dict8b_items` for 8B dicts and the named
+   constants, never an offset literal — see [[invariants/dict-strides]].
+5. **Slot into the FALLBACK chain.** The canonical shape is `LIVE` (exact) → `SAVE` (lagging,
+   fallback) → **NEVER** wallet/total (reintroduces sale/idle → over-count). The delta comes from a
+   `run_gain`-style function that returns `None` on the non-monotonic case (and **zero is valid**,
+   not a failure), and preserves a `*_source` tag so the app can signal a degraded read — see
    [[invariants/metric-fallback-chains]].
-6. **Valide com o oráculo** (gate §2 + §3): `delta == oráculo` em `>= 3` runs + a 1 borda.
-7. **Persista no lugar certo (single source).** Offset/id/enum novo → `config/offsets.py` (com
-   comentário e ref do dump). Regra de NEGÓCIO (qual sub-chave significa o quê, ex.:
-   `COMBAT_SUBKEY = 1`) → no módulo da lógica (`metrics/…`), comentada — **não** em `offsets.py`,
-   que é só offsets/enums. Nome ofuscado → **resolver estrutural**, jamais hardcode.
-8. **Escreva o teste sintético** (gate §4), modelo `test_gold.py`.
-9. **Isole a lógica.** A leitura mora no módulo de domínio (`metrics/…` ou `game/…`); o
-   `meter_windows.py` só **chama**, nunca lê memória inline.
-10. **Se o valor entra no `runs.jsonl`** — bumpe `SCHEMA_VERSION` e normalize no app (guia próprio:
-    [[guides/add-runs-field]]).
-11. **Se a resolução do valor entra no CALIB** (índice/anchor/catálogo aprendido no scan e reusado
-    pelo fast path) — você mudou a FORMA do bloco calib: **bumpe `CACHE_FMT` E recapture
-    `config/calib_seed.json`** no novo formato. Bumpar o `CACHE_FMT` sozinho quebra o seed (o
-    `--selftest` da RC falha e o runtime rejeita o seed por `fmt` → cold scan em toda primeira
-    inicialização) — ver [[invariants/cache-management]].
+6. **Validate against the oracle** (gate §2 + §3): `delta == oracle` across `>= 3` runs + the 1 edge.
+7. **Persist in the right place (single source).** New offset/id/enum → `config/offsets.py` (with a
+   comment and dump ref). BUSINESS rule (which subkey means what, e.g.:
+   `COMBAT_SUBKEY = 1`) → in the logic module (`metrics/…`), commented — **not** in `offsets.py`,
+   which is offsets/enums only. Obfuscated name → **structural resolver**, never hardcoded.
+8. **Write the synthetic test** (gate §4), modeled on `test_gold.py`.
+9. **Isolate the logic.** The read lives in the domain module (`metrics/…` or `game/…`);
+   `meter_windows.py` only **calls**, never reads memory inline.
+10. **If the value enters `runs.jsonl`** — bump `SCHEMA_VERSION` and normalize in the app (its own
+    guide: [[guides/add-runs-field]]).
+11. **If the value's resolution enters CALIB** (index/anchor/catalog learned in the scan and reused
+    by the fast path) — you changed the SHAPE of the calib block: **bump `CACHE_FMT` AND re-capture
+    `config/calib_seed.json`** in the new format. Bumping `CACHE_FMT` alone breaks the seed (the
+    RC's `--selftest` fails and the runtime rejects the seed by `fmt` → cold scan on every first
+    launch) — see [[invariants/cache-management]].
 
 ## Related
 - [[process/value-mapping-method]]
@@ -88,4 +88,4 @@ Falhou qualquer um → **não sobe**. "Bateu numa run" não é prova.
 - [[invariants/dict-strides]]
 - [[invariants/metric-fallback-chains]]
 - [[invariants/cache-management]]
-Veja também: [[guides/add-runs-field]] (passo 10) · [[reference/value-inventory]] (já mapeados)
+See also: [[guides/add-runs-field]] (step 10) · [[reference/value-inventory]] (already mapped)

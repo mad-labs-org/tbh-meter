@@ -1,4 +1,4 @@
-"""Painel ao vivo no terminal usando rich. Só apresenta dados que recebe."""
+"""Live terminal panel using rich. Only displays the data it's given."""
 
 from rich.console import Group
 from rich.panel import Panel
@@ -17,16 +17,16 @@ class Dashboard:
     def render(self, *, total_dps, peak_dps, total_damage, elapsed,
                heroes, monsters_alive, kills_per_min, total_kills,
                stage_state, events_new):
-        """`heroes` = lista de (hp_atual, hp_max)."""
+        """`heroes` = list of (current_hp, hp_max)."""
         header = Panel(
             Text(
                 f"DPS  {format_dps(total_dps)}        "
-                f"pico  {format_dps(peak_dps)}        "
-                f"dano total  {format_number(total_damage)}",
+                f"peak  {format_dps(peak_dps)}        "
+                f"total damage  {format_number(total_damage)}",
                 style="bold green",
             ),
             title="tbh-meter",
-            subtitle=f"sessão {format_duration(elapsed)}",
+            subtitle=f"session {format_duration(elapsed)}",
         )
 
         party = Table(title="Party", expand=True)
@@ -42,15 +42,15 @@ class Dashboard:
                 format_percent(hp, hp_max),
             )
         if not heroes:
-            party.add_row("-", "(sem heróis lidos)", "-")
+            party.add_row("-", "(no heroes read)", "-")
 
         rodape = Panel(
             Text(
-                f"monstros vivos: {monsters_alive}    "
+                f"monsters alive: {monsters_alive}    "
                 f"kills/min: {kills_per_min:.0f}    "
-                f"kills (sessão): {total_kills}    "
+                f"kills (session): {total_kills}    "
                 f"stage_state: {stage_state}    "
-                f"eventos novos: {events_new}"
+                f"new events: {events_new}"
             )
         )
         return Group(header, party, rodape)

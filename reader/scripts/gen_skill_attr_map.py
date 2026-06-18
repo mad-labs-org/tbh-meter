@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
-"""gen_skill_attr_map.py — gera config/skill_attr_map.json + config/passive_skill_keys.json
-a partir do datamining.
+"""gen_skill_attr_map.py — generates config/skill_attr_map.json + config/passive_skill_keys.json
+from the datamine.
 
-O save guarda o nível de uma skill na ÁRVORE de atributos (AttributeSaveData{Key,Level}),
-indexado pela `attributeKey` do node. São DUAS pontes (active vs passive):
+The save stores a skill's level in the attribute TREE (AttributeSaveData{Key,Level}), indexed by
+the node's `attributeKey`. There are TWO bridges (active vs passive):
 
-  • ATIVAS: a skill EQUIPADA (HeroSaveData.equippedSKillKey) é uma `skillKey` que NÃO é a
-    attributeKey. skill_attr_map.json = {skillKey(refKey): attributeKey} dos nodes ACTIVESKILL
-    (cada um tem refKey == skillKey e um attributeKey próprio). O reader equipada->nível via map.
+  • ACTIVE: the EQUIPPED skill (HeroSaveData.equippedSKillKey) is a `skillKey` that is NOT the
+    attributeKey. skill_attr_map.json = {skillKey(refKey): attributeKey} of the ACTIVESKILL nodes
+    (each has refKey == skillKey and its own attributeKey). The reader goes equipped->level via map.
 
-  • PASSIVAS: não são equipadas (não aparecem em equippedSKillKey); existem só na árvore. Pra
-    um node PASSIVESKILL, refKey == attributeKey (cravado: 0/96 diferem) → a própria chave do
-    attr É a identidade da skill. passive_skill_keys.json = lista GLOBAL das attributeKeys
-    PASSIVESKILL; o reader inclui as que o herói investiu (interseção com attr_levels).
+  • PASSIVE: not equipped (don't appear in equippedSKillKey); they exist only in the tree. For a
+    PASSIVESKILL node, refKey == attributeKey (confirmed: 0/96 differ) → the attr key itself IS the
+    skill's identity. passive_skill_keys.json = GLOBAL list of the PASSIVESKILL attributeKeys; the
+    reader includes the ones the hero invested in (intersection with attr_levels).
 
-Fonte: web/src/data/heroes.json (datamining; mesma fonte que o app sincroniza). Rode de novo
-quando os dados do jogo mudarem:  python reader/scripts/gen_skill_attr_map.py
+Source: web/src/data/heroes.json (datamine; same source the app syncs from). Re-run when the game
+data changes:  python reader/scripts/gen_skill_attr_map.py
 
-Garantias checadas aqui (falha se quebrar): (1) cada refKey ativo mapeia p/ EXATAMENTE um
-attributeKey (mapa global não-ambíguo); (2) nenhum attributeKey passivo colide com um
-attributeKey de skill ativa (senão a interseção contaria a ativa também como passiva)."""
+Guarantees checked here (fails if broken): (1) each active refKey maps to EXACTLY one attributeKey
+(unambiguous global map); (2) no passive attributeKey collides with an active skill's attributeKey
+(otherwise the intersection would count the active one as passive too)."""
 
 import json
 import os
@@ -27,7 +27,7 @@ import sys
 
 
 def repo_root(start):
-    """Sobe a árvore até achar web/src/data/heroes.json. None se não achar."""
+    """Walk up the tree until web/src/data/heroes.json is found. None if not found."""
     d = os.path.abspath(start)
     while True:
         if os.path.isfile(os.path.join(d, "web", "src", "data", "heroes.json")):
@@ -39,7 +39,7 @@ def repo_root(start):
 
 
 def build_active_map(heroes):
-    """{skillKey(refKey): attributeKey} dos nodes ACTIVESKILL. Levanta em ambiguidade."""
+    """{skillKey(refKey): attributeKey} of the ACTIVESKILL nodes. Raises on ambiguity."""
     out = {}
     for h in heroes:
         for n in h.get("skillTree", []):
@@ -58,7 +58,7 @@ def build_active_map(heroes):
 
 
 def passive_keys(heroes):
-    """Set GLOBAL das attributeKeys (== refKey nas passivas) de TODOS os nodes PASSIVESKILL."""
+    """GLOBAL set of the attributeKeys (== refKey for passives) of ALL PASSIVESKILL nodes."""
     out = set()
     for h in heroes:
         for n in h.get("skillTree", []):
@@ -77,9 +77,9 @@ def main():
 
     active = build_active_map(heroes)
     passive = passive_keys(heroes)
-    # As passivas entram no reader por interseção (attr_levels ∩ passive). Se um attributeKey
-    # passivo for igual a um attributeKey de skill ATIVA, a ativa apareceria 2× (como passiva
-    # também). Cravado hoje: 0 colisões — mas falha alto se algum build do jogo introduzir uma.
+    # Passives enter the reader by intersection (attr_levels ∩ passive). If a passive attributeKey
+    # equals an ACTIVE skill's attributeKey, the active one would show up 2× (as a passive too).
+    # Confirmed today: 0 collisions — but fails loud if some game build introduces one.
     clash = set(active.values()) & passive
     if clash:
         raise SystemExit(f"active/passive attributeKey clash: {sorted(clash)[:10]} — "

@@ -1,7 +1,7 @@
-"""Invariantes estruturais de config/offsets.py.
+"""Structural invariants of config/offsets.py.
 
-Garante que as constantes mais críticas — especialmente as que têm histórico de
-causar bugs quando erradas — nunca mudem silenciosamente.
+Ensures the most critical constants — especially the ones with a history of causing
+bugs when wrong — never change silently.
 """
 
 from config.offsets import (
@@ -22,7 +22,7 @@ from config.offsets import (
 
 
 class TestDictStrides:
-    """Os dois strides NUNCA podem ser iguais — confundi-los corrompe gold e stats."""
+    """The two strides can NEVER be equal — confusing them corrupts gold and stats."""
 
     def test_dict_float_stride_is_0x10(self):
         assert DictFloat.STRIDE == 0x10
@@ -41,7 +41,7 @@ class TestDictStrides:
 
 
 class TestEAggregateType:
-    """GoldEarn=2 e BoxObtain=3 são os dois agregados que o reader lê ativamente."""
+    """GoldEarn=2 and BoxObtain=3 are the two aggregates the reader actively reads."""
 
     def test_gold_earn_is_2(self):
         assert EAggregateType.GoldEarn == 2
@@ -53,12 +53,12 @@ class TestEAggregateType:
         assert EAggregateType.MonsterKill == 0
 
     def test_box_open_is_16(self):
-        """BoxOpen (quando o baú é ABERTO) é diferente de BoxObtain (quando DROPA)."""
+        """BoxOpen (when the box is OPENED) differs from BoxObtain (when it DROPS)."""
         assert EAggregateType.BoxOpen == 16
 
 
 class TestELogType:
-    """GetBox=3 é o evento que capturamos para drops de baú."""
+    """GetBox=3 is the event we capture for box drops."""
 
     def test_stage_clear_is_1(self):
         assert ELogType.StageClear == 1
@@ -77,7 +77,7 @@ class TestELogType:
 
 
 class TestGetBoxLogOffsets:
-    """Offsets do GetBoxLog cravados do IL2CPP dump — nunca mudar sem atualizar a doc."""
+    """GetBoxLog offsets pinned from the IL2CPP dump — never change without updating the doc."""
 
     def test_box_key_at_0x40(self):
         assert GetBoxLog.BOX_KEY == 0x40
@@ -89,15 +89,15 @@ class TestGetBoxLogOffsets:
         assert GetBoxLog.MONSTER_TYPE == 0x50
 
     def test_layout_no_overlap(self):
-        """Os três campos têm stride 8 (ponteiros IL2CPP de 64 bits)."""
+        """The three fields have stride 8 (64-bit IL2CPP pointers)."""
         assert GetBoxLog.MONSTER_KEY - GetBoxLog.BOX_KEY == 8
         assert GetBoxLog.MONSTER_TYPE - GetBoxLog.MONSTER_KEY == 8
 
 
 class TestHeroDieLogOffsets:
-    """LIVE-CRACKED 2026-06-06 (32 eventos). A doc (run-data-map.md:145-146) tinha os campos
-    TROCADOS: o que ela chamava de hero@0x40 é na verdade o MONSTRO que matou, e killer@0x48 é
-    o HERÓI que morreu. Confirmado: heroKey=201 <-> string @0x48 = 'HeroName_201'."""
+    """LIVE-CRACKED 2026-06-06 (32 events). The doc (run-data-map.md:145-146) had the fields
+    SWAPPED: what it called hero@0x40 is actually the MONSTER that did the killing, and killer@0x48
+    is the HERO that died. Confirmed: heroKey=201 <-> string @0x48 = 'HeroName_201'."""
 
     def test_killer_monster_at_0x40(self):
         assert HeroDieLog.KILLER_MONSTER == 0x40
@@ -106,12 +106,12 @@ class TestHeroDieLogOffsets:
         assert HeroDieLog.VICTIM_HERO == 0x48
 
     def test_victim_after_killer_stride_8(self):
-        # Ordem cravada ao vivo: matador (0x40) vem ANTES da vítima (0x48), stride 8.
+        # Order pinned live: killer (0x40) comes BEFORE victim (0x48), stride 8.
         assert HeroDieLog.VICTIM_HERO - HeroDieLog.KILLER_MONSTER == 8
 
 
 class TestResurrectionLogOffsets:
-    """LIVE-CRACKED (5 eventos): @0x40 = herói revivido ('HeroName_<heroKey>'); @0x48/@0x50 vazios."""
+    """LIVE-CRACKED (5 events): @0x40 = revived hero ('HeroName_<heroKey>'); @0x48/@0x50 empty."""
 
     def test_hero_at_0x40(self):
         assert ResurrectionLog.HERO == 0x40
@@ -150,13 +150,13 @@ class TestAggregateSaveDataOffsets:
         assert AggregateSaveData.VALUE == 0x18
 
     def test_layout_alignment(self):
-        """TYPE e SUB_KEY são int32 contíguos; VALUE é long (8B) logo após."""
+        """TYPE and SUB_KEY are contiguous int32; VALUE is a long (8B) right after."""
         assert AggregateSaveData.SUB_KEY - AggregateSaveData.TYPE == 4
         assert AggregateSaveData.VALUE - AggregateSaveData.SUB_KEY == 4
 
 
 class TestEEquipClassType:
-    """Garante o enum correto (não o orphan EHeroType com mapeamento diferente)."""
+    """Ensures the correct enum (not the orphan EHeroType with a different mapping)."""
 
     def test_all_is_0(self):
         assert EEquipClassType.All == 0
@@ -179,12 +179,12 @@ class TestEEquipClassType:
 
 class TestAggregateManagerOffset:
     def test_aggregates_at_0x20(self):
-        """O offset do dict de agregados vivo. Estável entre builds (cravado)."""
+        """The offset of the live aggregates dict. Stable across builds (pinned)."""
         assert AggregateManager.AGGREGATES == 0x20
 
 
 class TestPlayerSaveDataOffset:
     def test_aggregates_at_0x98(self):
-        # 1.00.12 inseriu as listas BoxBucket no PlayerSaveData → todas as listas do save +0x10
-        # (era 0x88; confirmado vivo + dump 1.00.12). Ver class PlayerSaveData em offsets.py.
+        # 1.00.12 inserted the BoxBucket lists into PlayerSaveData → all save lists +0x10
+        # (was 0x88; confirmed live + 1.00.12 dump). See class PlayerSaveData in offsets.py.
         assert PlayerSaveData.AGGREGATES == 0x98

@@ -332,7 +332,7 @@ describe("RunsSource — id-dedup + session-scoped content dedup on read", () =>
 });
 
 describe("RunsSource — surfaces MIGRATED legacy runs (runs.jsonl -> ingest -> logs/ -> app read)", () => {
-  // The migration's literal continuity guarantee (progress.md "Migração & continuidade"): a player's
+  // The migration's literal continuity guarantee (migration & continuity): a player's
   // existing runs.jsonl must be consumable by the PR4 read path, not just by a hand-rolled readLogs.
   // This threads the WHOLE seam: a legacy line -> ingestPending (convertLegacy -> logs/) -> RunsSource.
   function writeLegacyLine(record: Record<string, unknown>): void {

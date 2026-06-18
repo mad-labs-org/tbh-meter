@@ -1,24 +1,21 @@
 ---
 type: invariant
-description: "Ciclo de vida da run: o reader INFERE start/fim da memória (LOG_LIST do LogManager cresce; fecha por StageClearLog/StageFailedLog casados por KLASS-POINTER) — boundary detection é DELE — e emite TODA run em raw/<id>.json. Os predicados skip (<30s exc. stage 10) e partial (success c/ captura <80% OU dano<=0) viraram a SPEC de contabilidade aplicada pelo CONVERSOR (app); o reader não descarta mais (skip ≠ sumir). SUCCESS adia só a ESCRITA por PENDING_CLOSE_GRACE (pending-close) pra absorver o boss box que o jogo loga ~0.6s APÓS o clear — senão o baú caía na run SEGUINTE."
+description: "Run lifecycle: the reader INFERS start/end from memory (LogManager's LOG_LIST grows; closes on StageClearLog/StageFailedLog matched by KLASS-POINTER) — boundary detection is ITS job — and emits EVERY run to raw/<id>.json. The skip (<30s exc. stage 10) and partial (success w/ capture <80% OR damage<=0) predicates became the accounting SPEC applied by the CONVERTER (app); the reader no longer drops (skip ≠ vanish). SUCCESS only delays the WRITE by PENDING_CLOSE_GRACE (pending-close) to absorb the boss box the game logs ~0.6s AFTER the clear — otherwise the chest landed in the NEXT run."
 symptoms:
-  - "run não conta"
-  - "run não fecha"
-  - "run não aparece"
-  - "run curta"
+  - "run does not close"
+  - "run does not appear"
   - "run skipped"
   - "x-10"
   - "stage 10 boss"
-  - "captura parcial"
+  - "partial capture"
   - "partial dropped"
   - "run does not count"
   - "short run"
-  - "baú na run errada"
-  - "baú na run seguinte"
-  - "blue chest na run abandonada"
+  - "chest in wrong run"
+  - "blue chest in abandoned run"
   - "boss box wrong run"
   - "chest credited to next run"
-  - "drop depois do clear"
+  - "drop after clear"
 code_anchors:
   - meter_windows.py::new_run
   - meter_windows.py::close_run
@@ -43,124 +40,127 @@ guarded_by:
   - tests/test_raw_record.py::test_absorbed_boss_box_lands_inside_drops_envelope_without_shape_change
 ---
 
-# Ciclo de vida da run
+# Run lifecycle
 
-Uma **run** é uma tentativa de stage. O reader não recebe evento de "começou/acabou": ele
-**infere o ciclo de vida pela memória**, vigiando a lista de logs do jogo a cada tick.
+A **run** is one stage attempt. The reader gets no "started/ended" event: it
+**infers the lifecycle from memory**, watching the game's log list every tick.
 
-## Boundary: a LOG_LIST do LogManager cresce
+## Boundary: LogManager's LOG_LIST grows
 
-A cada tick o loop lê o `size` da lista em `LogManager.LOG_LIST` (a "bíblia" `offsets.py`
-marca esse offset como o *boundary de run*). Quando o `size` **cresce**, o reader varre só as
-entries NOVAS (`[last_size, size)`) e olha o **klass-pointer** de cada uma (o primeiro qword da
-entry = ponteiro pra classe). É esse crescimento que carrega os eventos terminais — não há
-sinal de "start" separado: a run seguinte simplesmente começa quando a anterior fecha.
+Each tick the loop reads the list's `size` at `LogManager.LOG_LIST` (the "bible" `offsets.py`
+marks this offset as the *run boundary*). When `size` **grows**, the reader scans only the
+NEW entries (`[last_size, size)`) and looks at each one's **klass-pointer** (the entry's first
+qword = pointer to its class). It's this growth that carries the terminal events — there is no
+separate "start" signal: the next run simply begins when the previous one closes.
 
-## Fim: StageClearLog (sucesso) / StageFailedLog (falha) por klass-pointer
+## End: StageClearLog (success) / StageFailedLog (fail) by klass-pointer
 
-O fechamento é decidido comparando o klass-pointer da entry nova com `sc_class` /
-`sf_class` (resolvidos uma vez para `StageClearLog` e `StageFailedLog`):
+The close is decided by comparing the new entry's klass-pointer against `sc_class` /
+`sf_class` (resolved once for `StageClearLog` and `StageFailedLog`):
 
-- klass == `sc_class` → `close_run("success", ...)` — lê `CLEAR_TIME` do log.
-- klass == `sf_class` → `close_run("fail", ...)` — lê wave atual/total do log.
+- klass == `sc_class` → `close_run("success", ...)` — reads `CLEAR_TIME` from the log.
+- klass == `sf_class` → `close_run("fail", ...)` — reads current/total wave from the log.
 
-(As mesmas entries também carregam `GetBoxLog`/`HeroDieLog`/`ResurrectionLog`, casados pelo
-mesmo padrão de klass-pointer.) Há ainda um terceiro
-desfecho — `close_run("abandoned", ...)` — quando o stage recarrega (DeadMonsterUnit cai) ou o
-jogador troca de stage sem clarear/falhar, passada a janela de graça inicial.
+(The same entries also carry `GetBoxLog`/`HeroDieLog`/`ResurrectionLog`, matched by the
+same klass-pointer pattern.) There is also a third
+outcome — `close_run("abandoned", ...)` — when the stage reloads (DeadMonsterUnit drops) or the
+player switches stage without clearing/failing, once past the initial grace window.
 
-## Pending-close: o boss box chega DEPOIS do clear (só a ESCRITA do success é adiada)
+## Pending-close: the boss box arrives AFTER the clear (only the success WRITE is delayed)
 
-Provado ao vivo (1.00.11): o jogo loga o **baú de boss** (`GetBoxLog` com `MONSTER_TYPE` em
-`TRAILING_BOX_TIERS` — StageBoss/ActBoss) **~0.6s DEPOIS do `StageClearLog`**, num crescimento
-SEPARADO da `LOG_LIST`. Como o close já tinha resetado `R`, o baú caía na run **SEGUINTE** —
-invisível grindando o mesmo stage, gritante quando a próxima era abandonada (blue chest numa
-run "inválida" de 0s, e o clear real sem drop).
+Proven live (1.00.11): the game logs the **boss chest** (`GetBoxLog` with `MONSTER_TYPE` in
+`TRAILING_BOX_TIERS` — StageBoss/ActBoss) **~0.6s AFTER the `StageClearLog`**, in a SEPARATE
+growth of the `LOG_LIST`. Since the close had already reset `R`, the chest landed in the **NEXT**
+run — invisible while grinding the same stage, glaring when the next one was abandoned (blue chest
+in a 0s "invalid" run, and the real clear with no drop).
 
-A regra: **o fechamento NÃO atrasa** — leituras, métricas, `ts_ms` (a identidade) e o
-`new_run()` acontecem no close, como sempre (adiar o close vazaria os primeiros segundos da run
-seguinte pro record no auto-replay, pior que o bug). O que muda é que um close `success` **não
-escreve o arquivo na hora**: o record fica PENDENTE por até `PENDING_CLOSE_GRACE` e os
-`GetBoxLog` de boss que chegarem nesse meio-tempo (até no MESMO batch de entries) são absorvidos
-nele (`_box_belongs_to_pending` roteia; `_absorb_drop` muta o value DENTRO do envelope ok de
-drops — `build_raw_record` não copia a lista, então é isso que sai no JSON). Gray (mob, tier
-`Monster`) dropa DURANTE a stage → segue indo pra `R["drops"]` da run atual. Boss box **sem**
-pendente (ex.: anexou logo após um clear) → run atual + WARN no meter.log; um baú real nunca é
-descartado. `fail`/`abandoned` escrevem na hora (boss box só segue clear).
+The rule: **the close does NOT wait** — reads, metrics, `ts_ms` (the identity) and
+`new_run()` happen at the close, as always (delaying the close would leak the next run's first
+seconds into the record on auto-replay, worse than the bug). What changes is that a `success`
+close **does not write the file right away**: the record stays PENDING for up to
+`PENDING_CLOSE_GRACE` and any boss `GetBoxLog` that arrives in the meantime (even in the SAME
+batch of entries) is absorbed into it (`_box_belongs_to_pending` routes; `_absorb_drop` mutates
+the value INSIDE the drops envelope — `build_raw_record` doesn't copy the list, so that's what
+goes out in the JSON). A gray (mob, tier `Monster`) drops DURING the stage → keeps going to the
+current run's `R["drops"]`. A boss box **with no** pending (e.g. attached right after a clear) →
+current run + WARN in meter.log; a real chest is never dropped. `fail`/`abandoned` write right
+away (a boss box only follows a clear).
 
-O estado pendente nasce em `_new_pending` (rec + path + deadline `now + PENDING_CLOSE_GRACE` +
-lista fresca de absorvidos — o construtor é compartilhado com os testes pra forma não driftar).
-`flush_pending` escreve o pendente (mesma escrita atômica) e roda em **todos** os pontos de
-saída da janela: deadline vencida, checada APÓS a varredura da `LOG_LIST` do tick (um boss box
-que aflora no MESMO tick da expiração ainda é absorvido — janela efetiva `PENDING_CLOSE_GRACE`
-+ ≤1 tick); **topo do `close_run`** (qualquer status — ordem dos records preservada, nunca dois
-pendentes); o caminho de game-closed/re-attach (o pendente é uma run COMPLETA — o jogo fechar
-logo após o clear não pode sumir com ela); e o finally do `run()`. Trade-off ACEITO: um kill
-duro (AV SIGKILL) dentro da janela perde esse record. **Live**: a contagem de baús do live.json soma run atual + ABSORVIDOS (`_drop_counts`)
-— o boss box atrasado SOBE a contagem com o `stage_key` vivo ainda no stage clareado (o
-rising-edge que o cooldown-tracker/drop-notifier do app detectam); pós-flush ela cai (baseline
-no app, sem evento). Os drops completos do record pendente NÃO entram (os grays dele ficariam
-pendurados no overlay).
+The pending state is born in `_new_pending` (rec + path + deadline `now + PENDING_CLOSE_GRACE` +
+a fresh absorbed list — the constructor is shared with the tests so the shape doesn't drift).
+`flush_pending` writes the pending (same atomic write) and runs at **every** window exit point:
+deadline expired, checked AFTER the tick's `LOG_LIST` scan (a boss box that surfaces on the SAME
+tick as the expiry is still absorbed — effective window `PENDING_CLOSE_GRACE` + ≤1 tick); the
+**top of `close_run`** (any status — record order preserved, never two pendings); the
+game-closed/re-attach path (the pending is a COMPLETE run — the game closing right after the
+clear can't make it vanish); and the `run()` finally. ACCEPTED trade-off: a hard kill (AV
+SIGKILL) inside the window loses that record. **Live**: live.json's chest count sums the current
+run + ABSORBED (`_drop_counts`) — the late boss box RAISES the count with the `stage_key` still
+live on the cleared stage (the rising edge the app's cooldown-tracker/drop-notifier detect);
+post-flush it drops (baseline in the app, no event). The pending record's full drops do NOT enter
+(its grays would hang on the overlay).
 
-## SKIP — `_should_skip_run(measured, clear_time, stage)` (hoje a SPEC do conversor)
+## SKIP — `_should_skip_run(measured, clear_time, stage)` (now the converter's SPEC)
 
-Run curta **não CONTA** no leaderboard — mas **o reader NÃO a descarta mais**: ele emite TODA run
-em `raw/<id>.json` (skip ≠ sumir; senão o user acha que o meter quebrou e o app não consegue marcá-la
-como "ignorada"). Quem aplica a contabilidade é o **conversor** (app), sobre os campos crus do record.
-`_should_skip_run` segue aqui como a **spec canônica drift-testada** (o conversor a porta pro TS) e
-**não é mais chamada** no caminho de emissão. A regra real é:
+A short run **does NOT COUNT** on the leaderboard — but **the reader NO LONGER drops it**: it
+emits EVERY run to `raw/<id>.json` (skip ≠ vanish; otherwise the user thinks the meter broke and
+the app can't mark it as "ignored"). The accounting is applied by the **converter** (app), over
+the record's raw fields. `_should_skip_run` stays here as the **canonical drift-tested spec** (the
+converter ports it to TS) and is **no longer called** on the emission path. The real rule is:
 
 ```
 max(measured, clear_time or 0) < 30  AND  stage != 10
 ```
 
-A exceção `stage != 10` mantém o **x-10** (luta só de boss, que pode durar segundos). **Cuidado:
-`stage` aqui é o NÚMERO do stage (`StageNo`), NÃO o `EStageType.ACTBOSS`.** São sinais
-DIFERENTES: o `EStageType` é um *tipo* de stage (valor 1) lido de outro offset; o predicado
-compara o número `10` (o `si[1]` derivado do catálogo). Não troque um pelo outro — usar o tipo
-em vez do número aqui faria runs x-10 normais serem descartadas.
+The `stage != 10` exception keeps the **x-10** (boss-only fight, which can last seconds).
+**Careful: `stage` here is the stage NUMBER (`StageNo`), NOT the `EStageType.ACTBOSS`.** These
+are DIFFERENT signals: `EStageType` is a stage *type* (value 1) read from another offset; the
+predicate compares the number `10` (the `si[1]` derived from the catalog). Don't swap one for the
+other — using the type instead of the number here would make normal x-10 runs get dropped.
 
-**Floor no conversor = 15s** (constante TS, não-tunável). O `< 30` aqui é o valor histórico do
-reader, que o port revisita pra **15s**; o que o port NÃO pode perder é a **exceção x-10**
-(`stage != 10`) — esse é o invariante de verdade, não o número do floor.
+**Floor in the converter = 15s** (TS constant, non-tunable). The `< 30` here is the reader's
+historical value, which the port revisits at **15s**; what the port can NOT lose is the **x-10
+exception** (`stage != 10`) — that's the real invariant, not the floor number.
 
 ## PARTIAL — `_is_partial(status, clear_time, measured, total_damage)`
 
-Captura **PARCIAL** = o meter entrou numa run **já em andamento** (subcontou dano/gold/xp). Já
-**não vai no record** (`partial` saiu do raw): o **conversor** a deriva dos campos crus emitidos
-(`run_outcome`, `clear_time`, `duration`, `total_damage`) — mesma fórmula — e sela no `status`. O
-reader ainda computa `partial` só pra anotar o summary/console. A regra real (que o conversor porta) é:
+**PARTIAL** capture = the meter joined a run **already in progress** (undercounted
+damage/gold/xp). It **no longer goes in the record** (`partial` left the raw): the **converter**
+derives it from the emitted raw fields (`run_outcome`, `clear_time`, `duration`, `total_damage`) —
+same formula — and seals it into `status`. The reader still computes `partial` only to annotate
+the summary/console. The real rule (which the converter ports) is:
 
 ```
 status == "success"  AND  (
-    (clear_time >= 30 AND measured < clear_time * 0.8)   # entrou no meio
-    OR total_damage <= 0                                  # success sem dano = captura perdida
+    (clear_time >= 30 AND measured < clear_time * 0.8)   # joined mid-run
+    OR total_damage <= 0                                  # success with no damage = lost capture
 )
 ```
 
-Dois pontos que a skill drifou e que a VERDADE (o código + `tests/test_run_lifecycle_predicates.py`)
-contradiz:
+Two points the skill drifted on that the TRUTH (the code + `tests/test_run_lifecycle_predicates.py`)
+contradicts:
 
-- a segunda cláusula é **`total_damage <= 0`**, NÃO `== 0`. Qualquer dano não-positivo num
-  success é captura perdida (o jogo não limpa stage sem dano). Isso cobre o gap das x-10 com
-  `clear_time < 30` que pulavam a 1ª cláusula e subiam 0-de-tudo pro leaderboard (#163).
-- o trava `clear_time >= 30` na 1ª cláusula é de propósito: runs x-10 (boss, segundos) não
-  podem ser mal-marcadas como parciais — por isso só `<= 0` as pega.
+- the second clause is **`total_damage <= 0`**, NOT `== 0`. Any non-positive damage in a
+  success is a lost capture (the game doesn't clear a stage with no damage). This covers the gap
+  of x-10s with `clear_time < 30` that skipped the 1st clause and pushed all-zeros to the
+  leaderboard (#163).
+- the `clear_time >= 30` gate on the 1st clause is deliberate: x-10 runs (boss, seconds) must
+  not be mislabeled as partial — that's why only `<= 0` catches them.
 
-## new_run() inicializa TODO o estado por-run
+## new_run() initializes ALL the per-run state
 
-`new_run()` é a fonte ÚNICA do estado de uma run e devolve o dict zerado: `dps` (DpsTracker
-novo), `mobs`, `start`, as baselines de gold (`gold_start`/`gold_live_start`/`gold_save_start`),
-`heroes_start`, party viva (`party_live_start`) + o acumulador vivo de xp (`xp_acc`, semeado
-com a party do t=0 — ver [[invariants/metric-fallback-chains]]), `build`, `drops`,
-`party_seen`, `deaths`/`revives`/`killers`, `stage_key` e `adopt_until`. **Regra de ouro: todo
-campo que ACUMULA durante a run (delta de gold/xp, mortes, drops) tem que nascer aqui** — senão
-o valor vaza da run anterior. Ao adicionar um campo de run novo, inicialize em `new_run` E
-emita no `build_raw_record` (ver [[invariants/schema-versioning]] e [[guides/add-runs-field]]).
+`new_run()` is the SOLE source of a run's state and returns the zeroed dict: `dps` (a new
+DpsTracker), `mobs`, `start`, the gold baselines (`gold_start`/`gold_live_start`/`gold_save_start`),
+`heroes_start`, the live party (`party_live_start`) + the live xp accumulator (`xp_acc`, seeded
+with the party at t=0 — see [[invariants/metric-fallback-chains]]), `build`, `drops`,
+`party_seen`, `deaths`/`revives`/`killers`, `stage_key` and `adopt_until`. **Golden rule: every
+field that ACCUMULATES during the run (gold/xp delta, deaths, drops) has to be born here** —
+otherwise the value leaks from the previous run. When adding a new run field, initialize it in
+`new_run` AND emit it in `build_raw_record` (see [[invariants/schema-versioning]] and [[guides/add-runs-field]]).
 
 ## Related
-- [[invariants/instance-selection]] — o fim de run depende da LOG_LIST do LogManager VIVO; se o pick pegou a lista morta, `size` nunca cresce e NENHUMA run fecha.
-- [[invariants/schema-versioning]] — campo de run novo: bump do `SCHEMA_VERSION` + init no `new_run` + serialize no `close_run`.
-- [[invariants/log-event-detection]] — o casamento por klass-pointer das entries novas da `LOG_LIST` (o que dispara o fechamento).
-- [[reference/run-data-map]] — o shape do record que `close_run` emite, campo a campo.
-- [[guides/add-runs-field]] — a receita ponta-a-ponta de adicionar um campo à run.
+- [[invariants/instance-selection]] — the run end depends on the LIVE LogManager's LOG_LIST; if the pick grabbed the dead list, `size` never grows and NO run closes.
+- [[invariants/schema-versioning]] — new run field: bump `SCHEMA_VERSION` + init in `new_run` + serialize in `close_run`.
+- [[invariants/log-event-detection]] — the klass-pointer matching of the `LOG_LIST`'s new entries (what triggers the close).
+- [[reference/run-data-map]] — the shape of the record `close_run` emits, field by field.
+- [[guides/add-runs-field]] — the end-to-end recipe for adding a field to the run.

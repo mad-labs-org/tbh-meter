@@ -153,17 +153,34 @@ actually ships.
 
 Tag-driven, in the Actions tab (the build only runs on demand):
 
-1. **Create version tag** (`meter-1-stage`) — automatic on push to `main` touching `app/`,
-   `reader/`, or `data/`. Computes the next RC version from the commits and pushes a marker tag. No
-   build.
-2. **Build test version** (`meter-2-build`) — manual. Builds a side-by-side RC installer and
-   publishes it as a **draft release** here for smoke-testing.
-3. **Release to players** (`meter-3-ship`) — manual. Rebuilds the chosen RC as the stable app,
-   flips it to *Latest*, tags the built commit, and announces it.
+1. **Create version tag** (`meter-1-stage`) — automatic on push to `main` touching `app/`, `reader/`,
+   or `data/`. Computes the next RC version from the commits and pushes a marker tag
+   `tbh-meter-v<ver>-rc.<N>`. No build. It is a **green no-op when nothing under `app/`, `reader/`, or
+   `data/` changed** (the same "refuse on empty" guard `compute-version.mjs` enforces), and on any PR
+   close it deletes that PR's throwaway test-build draft. You never click this one.
+2. **Build test version** (`meter-2-build`) — manual. Builds the **RC variant** and publishes a **draft
+   release** here for smoke-testing (invisible to anonymous users and to the in-app updater). Inputs:
+   blank = the newest staged RC; `candidate=<ver>` = a specific RC; `pr=<N>` = a throwaway pre-merge
+   build of that PR's head (version `0.0.0-pr.<N>.<run>`, download link posted as a PR comment). One
+   mutable draft slot per target.
+3. **Release to players** (`meter-3-ship`) — manual. Rebuilds the **stable variant** from the chosen
+   RC's exact commit (frozen lockfile, so "ship == tested commit"), publishes it draft-first then flips
+   it to **Latest**, pushes the clean `tbh-meter-v<ver>` tag at the built commit (a plain push — never
+   forced), sweeps stale RC drafts, and announces on Discord. `direct_from_main=true` ships main's
+   current code straight to players with no RC. Guards refuse a downgrade (≤ the current Latest) and a
+   duplicate tag pointing at a different commit.
 
-`meter-build-core` is the internal Windows build shared by 2 and 3. Versioning is driven by
-`tbh-meter-v*` git tags (see `app/scripts/compute-version.mjs`); the `package.json` version is only a
-floor.
+`meter-build-core` is the internal Windows build (reader exe + `--selftest` + electron-builder) shared
+by 2 and 3.
+
+**The RC variant installs side by side.** `meter-2` (and PR builds) set `TBH_BUILD_VARIANT=rc`, so the
+RC installs as `tbh-meter-rc` in its own folder, stores its data in `~/tbh-meter-rc`, and has auto-update
+**disabled** — testing an RC never clobbers a real install.
+
+**Versioning** (`app/scripts/compute-version.mjs`): the base is the highest clean `X.Y.Z` `tbh-meter-v*`
+tag; `-rc.N` and `0.0.0-pr.*` tags never become the base. With **zero meter commits since the base it
+refuses**, so an empty release can't be cut. Graduating to `1.0.0` is just a normal commit that bumps the
+`package.json` version floor; that version is written only for the build, never committed.
 
 ### Required repository secrets (maintainers)
 

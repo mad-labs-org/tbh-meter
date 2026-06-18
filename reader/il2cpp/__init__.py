@@ -1,2 +1,2 @@
-# Coisas específicas do runtime Unity IL2CPP — basicamente: achar onde os
-# managers (singletons) moram na memória.
+# Unity IL2CPP runtime specifics — basically: find where the managers
+# (singletons) live in memory.

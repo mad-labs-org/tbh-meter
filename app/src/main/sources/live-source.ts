@@ -13,8 +13,8 @@ const STALE_AFTER_MS = 5_000;
 /** COOK a raw live snapshot into the overlay's LiveSnapshot. The reader emits raw numbers/ids
  *  (`live.json`); the app derives the SAME way a finished run does — `dps` via `computeDps` (the
  *  identical formula the converter uses, with `clearTime=0` so the reference is the live `elapsed`),
- *  the stage label via `resolveStage`, the mode name via `modeName`. One formula, no Python↔TS drift
- *  (progress.md "Live-meter" / "helper compartilhado"). `goldGain`/`xpGain` stay RAW gains (the
+ *  the stage label via `resolveStage`, the mode name via `modeName`. One formula, no Python↔TS drift.
+ *  `goldGain`/`xpGain` stay RAW gains (the
  *  overlay computes its own per-second rate); `approx` is always true (a live snapshot is mid-run).
  *  Pure: a RawLive in, a LiveSnapshot out — no I/O. */
 export function cookLive(raw: RawLive): LiveSnapshot {

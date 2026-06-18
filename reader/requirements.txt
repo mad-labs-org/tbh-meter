@@ -1,9 +1,9 @@
-# O READER/METER (Windows, onde o jogo está) agora é ZERO-DEP: ctypes puro + stdlib.
-# Nada pra instalar pra coletar — basta `python` no Windows.
-# (pymem foi REMOVIDO; substituído por tbh_meter/memory/* em ctypes, validado.)
+# The READER/METER (Windows, where the game lives) is now ZERO-DEP: pure ctypes + stdlib.
+# Nothing to install to collect — just `python` on Windows.
+# (pymem was REMOVED; replaced by tbh_meter/memory/* in ctypes, validated.)
 #
-# Opcional, só pro painel ao vivo LEGADO (main.py v1; o produto não precisa):
+# Optional, only for the LEGACY live panel (main.py v1; the product doesn't need it):
 #   rich>=13.7.0
 #
-# Lado Mac/servidor (upload/análise/disasm — fora do reader) usa o que quiser
-# sem restrição (ex.: psycopg2 pro DB, capstone pra disassembly).
+# Mac/server side (upload/analysis/disasm — outside the reader) uses whatever you like
+# with no restriction (e.g. psycopg2 for the DB, capstone for disassembly).

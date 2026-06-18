@@ -1,17 +1,17 @@
 ---
 type: reference
-description: "Matriz de viabilidade read-only por domínio (composição/modo/gold/xp/stats/equip/skills/agregados): o que é VIÁVEL/PARCIAL/INVIÁVEL e por quê — PLAIN (lê direto) vs Obscured (ACTk, dá lixo). O que o reader extrai HOJE, não o que o spec planejou."
+description: "Read-only viability matrix by domain (composition/mode/gold/xp/stats/equip/skills/aggregates): what is VIABLE/PARTIAL/UNVIABLE and why — PLAIN (reads direct) vs Obscured (ACTk, gives garbage). What the reader extracts TODAY, not what the spec planned."
 symptoms:
-  - "dá pra extrair X?"
+  - "can we extract X?"
   - "can we extract"
-  - "por que não tem per-hero DPS"
+  - "why no per-hero DPS"
   - "no per-hero damage"
-  - "dano por herói"
-  - "stat obscured lixo"
+  - "per-hero damage"
+  - "stat obscured garbage"
   - "ObscuredFloat XOR"
-  - "runes pets no runs.jsonl"
-  - "nível de skill"
-  - "nome do herói i18n"
+  - "runes pets in runs.jsonl"
+  - "skill level"
+  - "hero name i18n"
 code_anchors:
   - game/save.py::read_gold
   - game/build.py::read_build
@@ -24,89 +24,94 @@ asserts:
   - config.offsets.Unit.CORE_STATS_OBSCURED == 0x104
 ---
 
-# Matriz de viabilidade da extração (read-only)
+# Extraction viability matrix (read-only)
 
-O que o reader **consegue ler** da memória do jogo, por domínio, e **por quê**. A linha
-divisória é uma só:
+What the reader **can read** from the game's memory, by domain, and **why**. There's a single
+dividing line:
 
-- **PLAIN** — campo em texto puro; lê direto (`ri32`/`ri64`/`rf32` ou um Dict normal). É a
-  base de quase tudo que o reader extrai.
-- **Obscured (ACTk)** — o valor real NÃO é o campo: `hidden ^ key` na build atual dá **lixo**
-  (o real é um `fakeValue` PLAIN num offset vizinho, quando existe). Ler o campo Obscured cru é
-  uma classe de bug — ver [[invariants/obscured-data-offlimits]]. Por isso todo número que o
-  reader emite vem de uma fonte PLAIN, nunca de um XOR.
+- **PLAIN** — plain-text field; reads direct (`ri32`/`ri64`/`rf32` or a normal Dict). It's the
+  basis of nearly everything the reader extracts.
+- **Obscured (ACTk)** — the real value is NOT the field: `hidden ^ key` on the current build gives
+  **garbage** (the real one is a PLAIN `fakeValue` at a neighboring offset, when it exists). Reading
+  the raw Obscured field is a class of bug — see [[invariants/obscured-data-offlimits]]. That's why
+  every number the reader emits comes from a PLAIN source, never from a XOR.
 
-> Esta nota é o MAPA (o que dá / o que não dá). O **mapa de campos do `runs.jsonl`** (forma
-> exata de cada chave) é outra nota; o **modelo de dano** (por que DPS é só HP-delta de time)
-> é outra. Aqui é só viabilidade + a razão PLAIN/Obscured.
+> This note is the MAP (what works / what doesn't). The **`runs.jsonl` field map** (exact shape of
+> each key) is another note; the **damage model** (why DPS is only team HP-delta) is another. Here
+> it's just viability + the PLAIN/Obscured reason.
 
-## A matriz
+## The matrix
 
-| Domínio | Viável? | Fonte que o reader usa | PLAIN/Obsc |
+| Domain | Viable? | Source the reader uses | PLAIN/Obsc |
 |---|---|---|---|
-| **Composição** (party + classe) | ✅ viável | `StageManager.HERO_LIST` (Hero[]) vivo → `Unit.CACHE`(uf) → `HeroRuntime.INFO` → `HeroInfoData.HERO_KEY`/`CLASS_TYPE` | PLAIN |
-| **Modo / dificuldade** | ✅ viável | catálogo `StageInfoData.DIFFICULTY` (e `STAGE_TYPE`), casado pelo stageKey vivo | PLAIN |
-| **XP** (nível + exp vivos) | ✅ viável | `HeroRuntime.LEVEL_FAKE`/`EXP_FAKE` (= ACTk **fakeValue**, é PLAIN) | PLAIN |
-| **Stats por herói** (64 finais) | ✅ viável | `HeroRuntime.STATS_HOLDER`(xd) → `StatsHolder.FINAL_STATS` = `Dict<StatType,float>` (DictFloat) | PLAIN |
-| **Agregados/stage** (GoldEarn total, waves) | ✅ viável | `AggregateManager.AGGREGATES` (Dict8B) + `StageInfoData` waves | PLAIN |
-| **Gold por run** | 🟡 parcial | combate vivo = `AggregateManager.AGGREGATES`[GoldEarn][SubKey1]; SAVE = fallback | PLAIN¹ |
-| **Equipamentos** | 🟡 parcial | ficha (slot/raridade/nível-base/uniqueId/enchants persistidos) via `ItemSaveData` + catálogo `ItemInfoData` | PLAIN² |
-| **Skills** (equipadas + passivas + nível) | 🟡 parcial | `HeroSaveData.EQUIPPED_SKILLS` + `AttributeSaveData` (árvore investida) | PLAIN³ |
-| **DPS por herói** | ❌ inviável | — (o jogo não guarda dano por unidade; só HP-delta do TIME) | n/a |
-| **Dano/stat por atributo** | ❌ inviável | — (não está em memória; ver modelo de dano) | n/a |
-| **Snapshot da conta** (runas + inventário + stash) | ✅ viável | `PlayerSaveData.RUNES` (`RuneSaveData.KEY`/`LEVEL`) + `PlayerSaveData.INVENTORY_SLOTS`/`STASH` (`UNIQUE_ID` → join em `PlayerSaveData.ITEMS`), lido 1x no fechamento por `game/build.py::read_account_snapshot` | PLAIN |
-| **Pets** | ❌ não-extraído | — (account-wide, não muda por run; **sem símbolo no código atual**) | — |
-| **Nome legível** (herói/skill/item) | ❌ inviável | — (memória só tem chave de i18n; string-table é outro subsistema) | n/a |
+| **Composition** (party + class) | ✅ viable | live `StageManager.HERO_LIST` (Hero[]) → `Unit.CACHE`(uf) → `HeroRuntime.INFO` → `HeroInfoData.HERO_KEY`/`CLASS_TYPE` | PLAIN |
+| **Mode / difficulty** | ✅ viable | `StageInfoData.DIFFICULTY` catalog (and `STAGE_TYPE`), matched by the live stageKey | PLAIN |
+| **XP** (live level + exp) | ✅ viable | `HeroRuntime.LEVEL_FAKE`/`EXP_FAKE` (= ACTk **fakeValue**, is PLAIN) | PLAIN |
+| **Per-hero stats** (64 final) | ✅ viable | `HeroRuntime.STATS_HOLDER`(xd) → `StatsHolder.FINAL_STATS` = `Dict<StatType,float>` (DictFloat) | PLAIN |
+| **Aggregates/stage** (total GoldEarn, waves) | ✅ viable | `AggregateManager.AGGREGATES` (Dict8B) + `StageInfoData` waves | PLAIN |
+| **Gold per run** | 🟡 partial | live combat = `AggregateManager.AGGREGATES`[GoldEarn][SubKey1]; SAVE = fallback | PLAIN¹ |
+| **Equipment** | 🟡 partial | record (slot/rarity/base-level/uniqueId/persisted enchants) via `ItemSaveData` + `ItemInfoData` catalog | PLAIN² |
+| **Skills** (equipped + passive + level) | 🟡 partial | `HeroSaveData.EQUIPPED_SKILLS` + `AttributeSaveData` (invested tree) | PLAIN³ |
+| **Per-hero DPS** | ❌ unviable | — (the game doesn't store per-unit damage; only TEAM HP-delta) | n/a |
+| **Damage/stat per attribute** | ❌ unviable | — (not in memory; see damage model) | n/a |
+| **Account snapshot** (runes + inventory + stash) | ✅ viable | `PlayerSaveData.RUNES` (`RuneSaveData.KEY`/`LEVEL`) + `PlayerSaveData.INVENTORY_SLOTS`/`STASH` (`UNIQUE_ID` → join on `PlayerSaveData.ITEMS`), read once at close by `game/build.py::read_account_snapshot` | PLAIN |
+| **Pets** | ❌ not-extracted | — (account-wide, doesn't change per run; **no symbol in the current code**) | — |
+| **Readable name** (hero/skill/item) | ❌ unviable | — (memory only has the i18n key; the string-table is another subsystem) | n/a |
 
-¹ **Gold vivo é PLAIN** — o reader NÃO lê o `ObscuredLong` de gold-runtime. Ele lê o agregado
-cumulativo `GoldEarn[SubKey1]` (combate), que é um `long` plano. O difícil aqui nunca foi
-cripto: foi **achar o singleton** (`AggregateManager`, nome ofuscado que drifta) sem o nome —
-ver ¶ Gold abaixo. "Parcial" = depende da fonte (live exato vs save em saltos), não de XOR.
+¹ **Live gold is PLAIN** — the reader does NOT read the gold-runtime `ObscuredLong`. It reads the
+cumulative aggregate `GoldEarn[SubKey1]` (combat), which is a flat `long`. The hard part here was
+never crypto: it was **finding the singleton** (`AggregateManager`, obfuscated name that drifts)
+without the name — see the Gold section below. "Partial" = depends on the source (exact live vs save
+in jumps), not on XOR.
 
-² **Equip é parcial por causa do que NÃO se lê**: raridade, slot, tipo, nível-base e os enchants
-**persistidos** (`ItemEnchant` struct: stat/recipe/value/tier) são **100% PLAIN** e o reader
-emite todos. O que fica de fora é a **instância viva** do item (nível-vivo + mods rolados), cujos
-campos são `ObscuredInt` na classe de gear runtime → ler dá lixo → o reader **não toca** neles.
+² **Equip is partial because of what is NOT read**: rarity, slot, type, base-level and the
+**persisted** enchants (`ItemEnchant` struct: stat/recipe/value/tier) are **100% PLAIN** and the
+reader emits them all. What's left out is the item's **live instance** (live-level + rolled mods),
+whose fields are `ObscuredInt` on the gear-runtime class → reading gives garbage → the reader
+**doesn't touch** them.
 
-³ **Skill é parcial pela LACUNA de nível na fonte óbvia**: a skill equipada (`EQUIPPED_SKILLS`,
-int[]) e a info estática são PLAIN, mas o **nível** não vive em `HeroSaveData` — vem da árvore
-investida (`AttributeSaveData.LEVEL`, account-wide), ligada por um mapa skillKey→attributeKey
-gerado offline. O cache runtime da skill é Obscured → o reader entra pela árvore PLAIN, não por ele.
+³ **Skill is partial due to the level GAP in the obvious source**: the equipped skill
+(`EQUIPPED_SKILLS`, int[]) and the static info are PLAIN, but the **level** doesn't live in
+`HeroSaveData` — it comes from the invested tree (`AttributeSaveData.LEVEL`, account-wide), linked
+by a skillKey→attributeKey map generated offline. The skill's runtime cache is Obscured → the reader
+enters via the PLAIN tree, not via it.
 
-## Por que os três ❌ são duros (não é "ninguém tentou")
+## Why the three ❌ are hard (it's not "nobody tried")
 
-- **DPS / dano por herói** — o jogo **não persiste dano por unidade** em lugar nenhum legível. O
-  número do tooltip (`m_DPS`) é uma **string de UI** (TextMeshPro), não um campo numérico. A única
-  saída read-only é o meter próprio: Σ das quedas de HP dos monstros (HP é float PURO em
-  `UnitHealthController.HP_CURRENT`/`HP_MAX`) — isso dá **DPS de TIME**, sem decompor por herói.
-  Ver [[reference/damage-model]].
-- **Nome legível** — herói/skill/item carregam só `NameKey` (chave de i18n). Resolver pra texto
-  exige a string-table do jogo, que é outro subsistema fora do mapa de offsets. O reader emite o
-  **id** e deixa o front resolver o nome.
-- **Stats "core" individuais** de `Unit` (os 12 `ObscuredFloat` em `Unit.CORE_STATS_OBSCURED`) — o
-  mapeamento índice→StatType não é recuperável só do dump E os campos são Obscured. Não precisa:
-  `FINAL_STATS` já entrega os 64 por `StatType` em PLAIN.
+- **DPS / per-hero damage** — the game **does not persist per-unit damage** anywhere readable. The
+  tooltip number (`m_DPS`) is a **UI string** (TextMeshPro), not a numeric field. The only read-only
+  way out is the meter itself: Σ of the monsters' HP drops (HP is a PURE float in
+  `UnitHealthController.HP_CURRENT`/`HP_MAX`) — that gives **TEAM DPS**, without decomposing per
+  hero. See [[reference/damage-model]].
+- **Readable name** — hero/skill/item carry only `NameKey` (i18n key). Resolving to text requires the
+  game's string-table, which is another subsystem outside the offset map. The reader emits the **id**
+  and lets the front-end resolve the name.
+- **Individual "core" stats** of `Unit` (the 12 `ObscuredFloat` in `Unit.CORE_STATS_OBSCURED`) — the
+  index→StatType mapping isn't recoverable from the dump alone AND the fields are Obscured. Not
+  needed: `FINAL_STATS` already delivers all 64 by `StatType` in PLAIN.
 
-## Gold: o "parcial" não é cripto, é resolução de singleton
+## Gold: the "partial" isn't crypto, it's singleton resolution
 
-Gold por run sai do agregado cumulativo de **combate** (`GoldEarn[SubKey1]`), que é PLAIN. Os
-SubKeys NÃO são fontes paralelas: SubKey 1 = combate (o que a run quer), SubKey 0 = TOTAL (rollup
-que inclui **venda** → não usar), 2/3 = ruído. O obstáculo é que o dono desse Dict é um singleton
-de **nome ofuscado que muda entre builds** — então ele é resolvido por ÍNDICE (TypeDefIndex/RVA, o
-primário hoje) com fallback estrutural por scan, **nunca por nome**. Detalhe e fallback em
-[[invariants/gold-singleton-resolution]] e [[invariants/metric-fallback-chains]].
+Gold per run comes from the cumulative **combat** aggregate (`GoldEarn[SubKey1]`), which is PLAIN.
+The SubKeys are NOT parallel sources: SubKey 1 = combat (what the run wants), SubKey 0 = TOTAL
+(rollup that includes **selling** → don't use), 2/3 = noise. The obstacle is that the owner of that
+Dict is a singleton with an **obfuscated name that changes between builds** — so it's resolved by
+INDEX (TypeDefIndex/RVA, the primary today) with a structural scan fallback, **never by name**.
+Detail and fallback in [[invariants/gold-singleton-resolution]] and
+[[invariants/metric-fallback-chains]].
 
-## Como ler esta matriz na prática
+## How to read this matrix in practice
 
-- Vai **mapear um valor novo**? Comece perguntando "é PLAIN?". Se a fonte óbvia for Obscured,
-  procure o `fakeValue`/uma fonte PLAIN equivalente — não tente XOR (a build não usa hidden^key).
-- "✅ viável" aqui significa **o reader já extrai** (há função em `game/` ou `metrics/`). "🟡
-  parcial" = extrai um SUBCONJUNTO (a coluna explica qual fica de fora e por quê).
-- O save (`PlayerSaveData`) é **snapshot defasado**: ótimo pra ficha/identidade e como fallback,
-  ruim pra número ao vivo (gold/xp vivos vêm do mundo runtime, não do save).
+- About to **map a new value**? Start by asking "is it PLAIN?". If the obvious source is Obscured,
+  look for the `fakeValue`/an equivalent PLAIN source — don't try XOR (the build doesn't use
+  hidden^key).
+- "✅ viable" here means **the reader already extracts it** (there's a function in `game/` or
+  `metrics/`). "🟡 partial" = extracts a SUBSET (the column explains which part is left out and why).
+- The save (`PlayerSaveData`) is a **stale snapshot**: great for record/identity and as a fallback,
+  bad for the live number (live gold/xp come from the runtime world, not the save).
 
 ## Related
 - [[invariants/obscured-data-offlimits]]
 - [[invariants/gold-singleton-resolution]]
 - [[invariants/metric-fallback-chains]]
-Veja também: [[reference/run-data-map]] (forma exata de cada campo do runs.jsonl) · [[reference/damage-model]] (DPS = HP-delta de time, sem per-hero) · [[process/value-mapping-method]] (como achar uma fonte PLAIN) · [[guides/map-new-value]]
+See also: [[reference/run-data-map]] (exact shape of each runs.jsonl field) · [[reference/damage-model]] (DPS = team HP-delta, no per-hero) · [[process/value-mapping-method]] (how to find a PLAIN source) · [[guides/map-new-value]]

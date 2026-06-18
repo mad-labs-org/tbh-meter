@@ -1,4 +1,4 @@
-"""Testes para shared/utils.py — RollingWindow, formatação e utilitários."""
+"""Tests for shared/utils.py — RollingWindow, formatting, and utilities."""
 
 import pytest
 
@@ -27,13 +27,13 @@ class TestRollingWindow:
     def test_sample_expires_after_window(self):
         w = RollingWindow(5.0)
         w.add(100.0, timestamp=0.0)
-        # Em t=6 o sample de t=0 está fora da janela de 5s
+        # At t=6 the t=0 sample is outside the 5s window
         assert w.total(6.0) == pytest.approx(0.0)
 
     def test_rate_per_second(self):
         w = RollingWindow(10.0)
         w.add(200.0, timestamp=0.0)
-        # Em t=5 o sample ainda está na janela
+        # At t=5 the sample is still in the window
         assert w.rate_per_second(5.0) == pytest.approx(20.0)  # 200/10
 
     def test_rate_per_minute(self):
@@ -48,10 +48,10 @@ class TestRollingWindow:
         assert w.total(5.0) == pytest.approx(80.0)
 
     def test_partial_expiry(self):
-        """Só o sample mais antigo expira; o mais recente fica."""
+        """Only the oldest sample expires; the most recent one stays."""
         w = RollingWindow(5.0)
-        w.add(100.0, timestamp=0.0)  # expira em t=5
-        w.add(40.0, timestamp=3.0)   # expira em t=8
+        w.add(100.0, timestamp=0.0)  # expires at t=5
+        w.add(40.0, timestamp=3.0)   # expires at t=8
         assert w.total(6.0) == pytest.approx(40.0)
 
     def test_reset_clears_all(self):
@@ -148,7 +148,7 @@ class TestFormatPercent:
 
 
 # ---------------------------------------------------------------------------
-# init_diag_log / diag — log de infra (reader-diag.log), separado do meter.log
+# init_diag_log / diag — infra log (reader-diag.log), separate from meter.log
 # ---------------------------------------------------------------------------
 class TestDiagLog:
     def test_writes_when_initialized(self, tmp_path):
@@ -158,22 +158,22 @@ class TestDiagLog:
         try:
             u.diag("[party-pick] candidates=453 carriers=0 picked=0x1234")
             content = p.read_text(encoding="utf-8")
-            assert "reader start" in content                          # banner do init
+            assert "reader start" in content                          # init banner
             assert "[party-pick] candidates=453 carriers=0" in content
         finally:
-            u._DIAG = None                                            # não vaza p/ outros testes
+            u._DIAG = None                                            # don't leak into other tests
 
     def test_noop_when_uninitialized(self):
         import shared.utils as u
         u._DIAG = None
-        u.diag("não escreve nem levanta")                            # no-op silencioso (ex.: selftest)
+        u.diag("does not write or raise")                            # silent no-op (e.g. selftest)
 
     def test_never_raises_on_broken_sink(self, tmp_path):
-        # Contrato: diag NUNCA pode derrubar o reader. Sink fechado -> best-effort, engole o erro.
+        # Contract: diag must NEVER take down the reader. Closed sink -> best-effort, swallow the error.
         import shared.utils as u
         u.init_diag_log(str(tmp_path / "d.log"))
         try:
             u._DIAG.close()
-            u.diag("escrever em arquivo fechado não pode crashar")    # não levanta
+            u.diag("writing to a closed file must not crash")         # does not raise
         finally:
             u._DIAG = None

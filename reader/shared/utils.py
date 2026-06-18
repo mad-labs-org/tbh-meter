@@ -1,7 +1,7 @@
-"""utils.py — utilitários compartilhados: formatação humana + janela de tempo + log.
+"""utils.py — shared utilities: human formatting + time window + log.
 
-Reúne formatting (números gigantes K/M/B, tempo, %), timing (relógio monotônico +
-janela deslizante pro DPS/kills-min) e um tee de stdio (monitorar de fora). Nada de memória.
+Bundles formatting (huge numbers K/M/B, time, %), timing (monotonic clock +
+sliding window for DPS/kills-min) and a stdio tee (watch from outside). No memory.
 """
 
 import os
@@ -10,16 +10,16 @@ import time
 from collections import deque
 
 
-# ----------------------------- recursos (PyInstaller-safe) ------------------- #
+# ----------------------------- resources (PyInstaller-safe) ------------------ #
 def resource_path(rel: str) -> str:
-    """Caminho de um recurso EMPACOTÁVEL (ex.: config/level_curve.json), tanto em
-    source quanto congelado pelo PyInstaller. `rel` é relativo à RAIZ do projeto
-    (a pasta reader/), ex.: 'config/level_curve.json'.
+    """Path to a BUNDLEABLE resource (e.g. config/level_curve.json), both in
+    source and frozen by PyInstaller. `rel` is relative to the project ROOT
+    (the reader/ folder), e.g. 'config/level_curve.json'.
 
-    Frozen: PyInstaller seta sys.frozen e expõe a raiz dos dados em sys._MEIPASS
-    (onefile = dir temp; onedir = _internal/). O --add-data DEST tem que casar com
-    `rel` (ex.: --add-data "config/level_curve.json;config" -> rel="config/...").
-    Source: este arquivo vive em shared/, então a raiz é um nível acima."""
+    Frozen: PyInstaller sets sys.frozen and exposes the data root at sys._MEIPASS
+    (onefile = temp dir; onedir = _internal/). The --add-data DEST must match
+    `rel` (e.g. --add-data "config/level_curve.json;config" -> rel="config/...").
+    Source: this file lives in shared/, so the root is one level up."""
     if getattr(sys, "frozen", False):
         base = sys._MEIPASS  # type: ignore[attr-defined]
     else:
@@ -27,19 +27,19 @@ def resource_path(rel: str) -> str:
     return os.path.join(base, rel)
 
 
-# ----------------------------- formatação ----------------------------------- #
-# Sufixos para abreviar números grandes (idle games chegam a trilhões+).
+# ----------------------------- formatting ------------------------------------ #
+# Suffixes to abbreviate large numbers (idle games reach trillions+).
 _SUFFIXES = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"]
 
 
 def format_number(value: float, decimals: int = 2) -> str:
-    """1234567 -> '1.23M'. Mantém pequenos sem sufixo. Aceita negativo."""
+    """1234567 -> '1.23M'. Keeps small ones unsuffixed. Accepts negatives."""
     if value is None:
         return "-"
     sign = "-" if value < 0 else ""
     n = abs(float(value))
     if n < 1000:
-        # inteiro fica sem casas decimais; resto com 1 casa
+        # integers get no decimals; the rest get 1 decimal place
         return f"{sign}{n:.0f}" if n == int(n) else f"{sign}{n:.1f}"
     magnitude = 0
     while n >= 1000 and magnitude < len(_SUFFIXES) - 1:
@@ -49,7 +49,7 @@ def format_number(value: float, decimals: int = 2) -> str:
 
 
 def format_dps(value: float) -> str:
-    """DPS formatado com '/s'."""
+    """DPS formatted with '/s'."""
     return f"{format_number(value)}/s"
 
 
@@ -66,22 +66,22 @@ def format_duration(seconds: float) -> str:
 
 
 def format_percent(current: float, maximum: float) -> str:
-    """HP atual/máx -> '73%'. Protege contra divisão por zero."""
+    """current/max HP -> '73%'. Guards against division by zero."""
     if not maximum:
         return "0%"
     return f"{max(0.0, min(1.0, current / maximum)) * 100:.0f}%"
 
 
-# ----------------------------- tempo / janela -------------------------------- #
+# ----------------------------- time / window --------------------------------- #
 def now() -> float:
-    """Relógio monotônico (não anda pra trás se o sistema ajustar a hora)."""
+    """Monotonic clock (doesn't go backwards if the system adjusts the time)."""
     return time.monotonic()
 
 
 class RollingWindow:
-    """Acumula (timestamp, valor) e responde soma e taxa na janela.
+    """Accumulates (timestamp, value) and reports sum and rate over the window.
 
-    Ex.: window de 5s recebendo dano por tick -> total()/5 = DPS suavizado.
+    E.g. a 5s window receiving damage per tick -> total()/5 = smoothed DPS.
     """
 
     def __init__(self, window_seconds: float):
@@ -102,16 +102,16 @@ class RollingWindow:
             self._total -= v
 
     def total(self, timestamp: float | None = None) -> float:
-        """Soma dos valores ainda dentro da janela."""
+        """Sum of the values still inside the window."""
         self._trim(now() if timestamp is None else timestamp)
         return self._total
 
     def rate_per_second(self, timestamp: float | None = None) -> float:
-        """Soma / tamanho da janela (ex.: DPS)."""
+        """Sum / window size (e.g. DPS)."""
         return self.total(timestamp) / self.window if self.window else 0.0
 
     def rate_per_minute(self, timestamp: float | None = None) -> float:
-        """Conveniência pra kills/min etc."""
+        """Convenience for kills/min etc."""
         return self.rate_per_second(timestamp) * 60.0
 
     def reset(self) -> None:
@@ -119,12 +119,12 @@ class RollingWindow:
         self._total = 0.0
 
 
-# ----------------------------- log (monitorar de fora) ----------------------- #
+# ----------------------------- log (watch from outside) ---------------------- #
 def _stamp_lines(text, at_line_start):
-    """Prefixa [HH:MM:SS] no inicio de cada linha; devolve (texto, novo_at_line_start).
-    O estado e necessario porque print() escreve em pedacos (o conteudo e o newline em
-    writes separados), entao o carimbo so entra quando uma linha REALMENTE comeca. Linhas
-    vazias nao sao carimbadas. So pro arquivo (meter.log) — o console fica cru."""
+    """Prefixes [HH:MM:SS] at the start of each line; returns (text, new_at_line_start).
+    State is needed because print() writes in chunks (the content and the newline in
+    separate writes), so the stamp only goes in when a line REALLY starts. Empty lines
+    aren't stamped. File only (meter.log) — the console stays raw."""
     if not text:
         return text, at_line_start
     stamp = time.strftime("[%H:%M:%S] ")
@@ -142,9 +142,9 @@ def _stamp_lines(text, at_line_start):
 
 
 class _Tee:
-    """Escreve em vários streams (console + arquivo). Tolerante a erro de I/O. Pro
-    arquivo, troca '\\r' por '\\n' (a linha-viva do meter usa \\r in-place -> no arquivo
-    vira 1 linha/atualização, legível, em vez de um \\r-amontoado ilegível)."""
+    """Writes to multiple streams (console + file). Tolerant of I/O errors. For the
+    file, swaps '\\r' for '\\n' (the meter's live line uses \\r in-place -> in the file
+    it becomes 1 line/update, readable, instead of an illegible \\r-pileup)."""
 
     def __init__(self, console, fileobj):
         self._console = console
@@ -152,14 +152,14 @@ class _Tee:
         self._file_at_line_start = True
 
     def write(self, s):
-        # console: CRU (sem timestamp) — nao quebra a linha-viva (\r) nem duplica horario
-        # quando o app captura este stdout.
+        # console: RAW (no timestamp) — doesn't break the live line (\r) or duplicate the time
+        # when the app captures this stdout.
         try:
             self._console.write(s)
             self._console.flush()
         except Exception:
             pass
-        # arquivo (meter.log): \r -> \n e [HH:MM:SS] no comeco de cada linha (log de debug).
+        # file (meter.log): \r -> \n and [HH:MM:SS] at the start of each line (debug log).
         try:
             stamped, self._file_at_line_start = _stamp_lines(
                 s.replace("\r", "\n"), self._file_at_line_start)
@@ -177,12 +177,12 @@ class _Tee:
 
 
 def tee_stdio(log_path, max_bytes=5_000_000):
-    """Espelha stdout+stderr num arquivo (além do console) — deixa o run OBSERVÁVEL de
-    fora (ex.: o share SMB, onde o Claude lê). Cria o dir. Chamar 1x no main().
-    Bound de tamanho: o app respawna o reader com frequência (~5s com o jogo fechado) e o
-    tee dá append, então um meter.log de vida-longa cresceria sem limite. Se já passou de
-    max_bytes recomeça do zero; senão dá append (um respawn não perde o contexto recente).
-    Best-effort: se não der pra abrir o arquivo, segue só no console."""
+    """Mirrors stdout+stderr to a file (besides the console) — makes the run OBSERVABLE from
+    outside (e.g. the SMB share, where Claude reads). Creates the dir. Call once in main().
+    Size bound: the app respawns the reader frequently (~5s with the game closed) and the
+    tee appends, so a long-lived meter.log would grow without limit. If it already passed
+    max_bytes it restarts from scratch; otherwise it appends (a respawn doesn't lose recent
+    context). Best-effort: if the file can't be opened, it continues on the console only."""
     try:
         os.makedirs(os.path.dirname(log_path) or ".", exist_ok=True)
         mode = "a"
@@ -199,19 +199,19 @@ def tee_stdio(log_path, max_bytes=5_000_000):
     return f
 
 
-# ----------------------------- log de infra (diag) --------------------------- #
-# SEPARADO do meter.log (que é evento/usuário: attach / resolve / run-close / erro). Aqui mora o
-# INTERNO da resolução e da SELEÇÃO DE INSTÂNCIA — os dados que faltaram em vários debugs. Ex.: o
-# party-off do 1.00.13: o meter.log só dizia "0 heroes deployed", sem dizer QUAL StageManager foi
-# escolhido, que existiam 453 candidatas, nem que a escolhida era um GHOST (heroKey ok, lvl=0). Uma
-# linha de diag teria mostrado tudo. Sempre ligado (não gateado por --debug); mesmo bound do tee.
+# ----------------------------- infra log (diag) ------------------------------ #
+# SEPARATE from meter.log (which is event/user: attach / resolve / run-close / error). Here lives the
+# INTERNALS of resolution and INSTANCE SELECTION — the data missing in several debugs. E.g. the
+# 1.00.13 party-off: meter.log only said "0 heroes deployed", without saying WHICH StageManager was
+# chosen, that there were 453 candidates, nor that the chosen one was a GHOST (heroKey ok, lvl=0). A
+# diag line would have shown it all. Always on (not gated by --debug); same bound as the tee.
 _DIAG = None
 
 
 def init_diag_log(log_path, max_bytes=5_000_000):
-    """Abre o log de infra (reader-diag.log), separado do meter.log. Mesma política de bound do
-    tee_stdio (recomeça se passou de max_bytes; senão append, pra um respawn não perder contexto).
-    Best-effort: NUNCA levanta — um diagnóstico não pode derrubar o reader. Chamar 1x no main()."""
+    """Opens the infra log (reader-diag.log), separate from meter.log. Same bound policy as
+    tee_stdio (restarts if it passed max_bytes; otherwise append, so a respawn doesn't lose context).
+    Best-effort: NEVER raises — a diagnostic can't take down the reader. Call once in main()."""
     global _DIAG
     try:
         os.makedirs(os.path.dirname(log_path) or ".", exist_ok=True)
@@ -224,8 +224,8 @@ def init_diag_log(log_path, max_bytes=5_000_000):
 
 
 def diag(msg):
-    """Anexa uma linha [HH:MM:SS] no log de infra. No-op se não inicializado (testes, selftest).
-    NUNCA levanta — best-effort igual ao _Tee."""
+    """Appends a [HH:MM:SS] line to the infra log. No-op if not initialized (tests, selftest).
+    NEVER raises — best-effort like _Tee."""
     f = _DIAG
     if f is None:
         return
