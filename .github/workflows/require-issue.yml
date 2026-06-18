@@ -29,6 +29,8 @@ jobs:
             "dependabot[bot]"|"github-actions[bot]")
               echo "Bot PR ($ACTOR) — exempt."; exit 0;;
           esac
+          # $owner/$repo/$pr below are GraphQL variables (bound via -F), not shell vars.
+          # shellcheck disable=SC2016
           COUNT=$(gh api graphql -f query='
             query($owner:String!,$repo:String!,$pr:Int!){
               repository(owner:$owner,name:$repo){
