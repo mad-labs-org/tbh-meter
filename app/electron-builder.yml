@@ -29,10 +29,10 @@ files:
 # electron-updater resolves the newest build via GitHub's /releases/latest endpoint, so the
 # custom tbh-meter-v<version> tag prefix works as long as that release is flagged "Latest".
 #
-# PUBLIC repo on purpose: the source (tbh-wiki) is PRIVATE, and electron-updater on a user's
-# machine has no GitHub token — it would 404 on a private repo's release assets ("Update
-# check failed"). So releases live in a dedicated PUBLIC repo the app reads anonymously; CI
-# publishes there with a cross-repo token (RELEASES_TOKEN). See meter-3-ship.yml.
+# PUBLIC repo on purpose: electron-updater on a user's machine has no GitHub token — it would
+# 404 on a private repo's release assets ("Update check failed"). So source AND releases live
+# in this one public repo, which the app reads anonymously; CI publishes to this repo's own
+# Releases with the built-in GITHUB_TOKEN (no cross-repo token). See meter-3-ship.yml.
 publish:
   provider: github
   owner: mad-labs-org
