@@ -6,6 +6,12 @@ vi.mock("electron", () => ({ app: { isPackaged: true } }));
 vi.mock("electron-updater", () => ({ default: { autoUpdater: {} } }));
 vi.mock("../variant.js", () => ({ isRcBuild: () => false }));
 vi.mock("../settings.js", () => ({ resolveOutputDir: () => "/tmp/tbh-meter-test" }));
+// fetchLatestShippedVersion now rides Electron's net stack (httpFetch -> net.fetch).
+// Delegate the helper to whatever global fetch the test currently stubs, so the
+// existing vi.stubGlobal("fetch", ...) cases keep driving it unchanged.
+vi.mock("../net-fetch.js", () => ({
+  httpFetch: (input: string | GlobalRequest, init?: RequestInit) => fetch(input, init),
+}));
 
 import {
   awaitDownloadWithRetry,

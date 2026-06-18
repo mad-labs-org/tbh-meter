@@ -31,11 +31,13 @@ manual `shareRun()` or `auto-upload` → `ingest-map.ts` translation → `POST /
 app-derived `session` field) → API dedups by externalId (`device:ts` for v2; legacy `session:run`
 preserved) → app records URL in `uploads.json` → `onShareUpdated()` broadcast.
 
-Signed in → Bearer token (attributed, ranks on the leaderboard). Signed out → anonymous upload with
-the `X-Device-Id` header (`device-id.ts`, per-install UUID; opt-out via the `anonymousUpload`
-setting). Anonymous runs surface only on the session page (excluded from the leaderboard/pick-rate
-RPCs); on sign-in the app fires `POST /runs/claim` (`claimDeviceRuns()` in `share.ts`) and the API
-re-attributes them by device-hash.
+Upload REQUIRES sign-in: every `POST /runs` carries the Discord Bearer token (attributed, ranks on
+the leaderboard) plus an Ed25519 request signature (`request-signer.ts`, verified by the API's
+`middleware/signature.ts`). Signed out = a clean "sign in to sync" state — runs stay local and the
+auto-uploader drains the backlog on the next sign-in; there is no anonymous upload path. The
+per-install device id (`device-id.ts`) survives only to claim legacy anonymous runs: on sign-in the
+app fires `POST /runs/claim` (`claimDeviceRuns()` in `share.ts`) and the API re-attributes them by
+device-hash.
 
 ## Gotchas
 

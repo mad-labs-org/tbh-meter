@@ -32,7 +32,6 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
   const [expanded, setExpanded] = useState(true);
   const [pinned, setPinned] = useState(true);
   const [signedIn, setSignedIn] = useState(false);
-  const [anonUpload, setAnonUpload] = useState(true);
   // Smooth elapsed clock: anchored to each snapshot's elapsedSec + wall time, advanced by a
   // local interval. Decouples the displayed seconds from the file-poll/reader-write cadence,
   // which otherwise alias (poll 700ms vs write ~1s) and make the second tick unevenly.
@@ -45,17 +44,15 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
   // Real live data from the reader (live.json, cooked by the main process) — the only source.
   useEffect(() => window.meter.onLive(setSnap), []);
 
-  // Layout mode + anonymous-upload flag + always-on-top are persisted in settings
-  // (SSOT): read once, then stay in sync.
+  // Layout mode + always-on-top are persisted in settings (SSOT): read once,
+  // then stay in sync.
   useEffect(() => {
     void window.meter.getSettings().then((s) => {
       setExpanded(s.liveExpanded);
-      setAnonUpload(s.anonymousUpload);
       setPinned(s.alwaysOnTop);
     });
     return window.meter.onSettingsChanged((s) => {
       setExpanded(s.liveExpanded);
-      setAnonUpload(s.anonymousUpload);
       setPinned(s.alwaysOnTop);
     });
   }, []);
@@ -182,7 +179,7 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
             className="flex min-w-0 flex-1 cursor-move select-none items-center gap-1.5"
           >
             <span
-              title={syncTitle(signedIn, anonUpload, t)}
+              title={syncTitle(signedIn, t)}
               className={cn(
                 "size-1.5 shrink-0 rounded-full",
                 signedIn ? "live-pulse bg-brand-400" : "bg-amber-400",
@@ -258,7 +255,7 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
         stageExtra={showThreat ? <StageThreatBadges info={threat} /> : undefined}
       >
         <span
-          title={syncTitle(signedIn, anonUpload, t)}
+          title={syncTitle(signedIn, t)}
           className={cn(
             "flex items-center gap-1 font-mono text-[10px] font-bold uppercase tracking-[0.14em]",
             signedIn ? "text-brand-300" : "text-amber-300",
@@ -270,11 +267,7 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
               signedIn ? "live-pulse bg-brand-400" : "bg-amber-400",
             )}
           />
-          {signedIn
-            ? t("live.statusLive")
-            : anonUpload
-              ? t("live.statusAnon")
-              : t("live.statusOffline")}
+          {signedIn ? t("live.statusLive") : t("live.statusOffline")}
         </span>
       </TitleBar>
 
@@ -331,15 +324,9 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
 
 // ── Shared pieces ─────────────────────────────────────────────────────────────
 
-/** Tooltip for the sync status dot: attributed / anonymous / local-only. */
-function syncTitle(
-  signedIn: boolean,
-  anonUpload: boolean,
-  t: ReturnType<typeof useT>,
-): string {
-  if (signedIn) return t("live.syncLive");
-  if (anonUpload) return t("live.syncAnon");
-  return t("live.syncOff");
+/** Tooltip for the sync status dot: attributed (signed in) / local-only (signed out). */
+function syncTitle(signedIn: boolean, t: ReturnType<typeof useT>): string {
+  return signedIn ? t("live.syncLive") : t("live.syncOff");
 }
 
 /** Title bar: drag region (mac-traffic-light dots + "TBH Meter" + run #) plus a

@@ -18,11 +18,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.blockedMsg": "Ридер заблокирован — возможно, его закрывает антивирус.",
   "live.retry": "Повторить",
   "live.statusLive": "Live",
-  "live.statusAnon": "Аноним",
   "live.statusOffline": "Офлайн",
   "live.syncLive": "Live — забеги загружаются в таблицу лидеров",
-  "live.syncAnon":
-    "Забеги загружаются анонимно — войдите через Discord, чтобы попасть в таблицу лидеров",
   "live.syncOff": "Нет синхронизации — войдите, чтобы загружать забеги",
   "live.dps": "DPS",
   "live.mobs": "Мобы",
@@ -112,9 +109,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.uploadAuto": "Успешные забеги загружаются автоматически.",
   "settings.signInPitch":
     "Войдите через Discord в шапке, чтобы попасть в таблицу лидеров TBH Helper. Вход также привяжет забеги, уже загруженные анонимно с этого компьютера.",
-  "settings.anonUpload": "Загружать забеги анонимно без входа",
-  "settings.anonUploadDesc":
-    "Так ваша страница сессии на TBH Helper продолжает работать. Анонимные забеги никогда не попадают в таблицу лидеров; выключите — и забеги останутся на этом компьютере до входа.",
   "settings.usageStats": "Статистика использования",
   "settings.usageStatsLabel": "Делиться анонимной статистикой использования",
   "settings.usageStatsDesc":

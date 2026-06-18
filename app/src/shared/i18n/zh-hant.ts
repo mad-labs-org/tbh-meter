@@ -18,10 +18,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.blockedMsg": "讀取器被攔截 — 可能是防毒軟體在關閉它。",
   "live.retry": "重試",
   "live.statusLive": "Live",
-  "live.statusAnon": "匿名",
   "live.statusOffline": "離線",
   "live.syncLive": "Live — 正在將挑戰上傳到排行榜",
-  "live.syncAnon": "正在匿名上傳挑戰 — 使用 Discord 登入即可加入排行榜",
   "live.syncOff": "未同步 — 登入後才會上傳你的挑戰",
   "live.dps": "DPS",
   "live.mobs": "怪物",
@@ -109,9 +107,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.uploadAuto": "成功的挑戰會自動上傳。",
   "settings.signInPitch":
     "在頂列使用 Discord 登入即可登上 TBH Helper 排行榜。登入還會認領此電腦已匿名上傳的挑戰。",
-  "settings.anonUpload": "未登入時匿名上傳挑戰",
-  "settings.anonUploadDesc":
-    "確保你在 TBH Helper 的場次頁面可用。匿名挑戰絕不會出現在排行榜上；關閉後，挑戰將留在本機直到你登入。",
   "settings.usageStats": "使用統計",
   "settings.usageStatsLabel": "分享匿名使用統計",
   "settings.usageStatsDesc":

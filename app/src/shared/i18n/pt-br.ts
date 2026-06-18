@@ -18,10 +18,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.blockedMsg": "Leitor bloqueado — o antivírus pode estar fechando ele.",
   "live.retry": "Tentar de novo",
   "live.statusLive": "Live",
-  "live.statusAnon": "Anôn",
   "live.statusOffline": "Offline",
   "live.syncLive": "Live — enviando as runs para o ranking",
-  "live.syncAnon": "Enviando runs anonimamente — entre com Discord para entrar no ranking",
   "live.syncOff": "Sem sincronizar — entre para enviar suas runs",
   "live.dps": "DPS",
   "live.mobs": "Mobs",
@@ -111,9 +109,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.uploadAuto": "Runs bem-sucedidas sobem automaticamente.",
   "settings.signInPitch":
     "Entre com Discord pelo topo da janela para ranquear no ranking do TBH Helper. Entrar também reivindica as runs já enviadas anonimamente deste computador.",
-  "settings.anonUpload": "Enviar runs anonimamente enquanto desconectado",
-  "settings.anonUploadDesc":
-    "Mantém sua página de sessão no TBH Helper funcionando. Runs anônimas nunca aparecem no ranking; desligue e as runs ficam neste computador até você entrar.",
   "settings.usageStats": "Estatísticas de uso",
   "settings.usageStatsLabel": "Compartilhar estatísticas de uso anônimas",
   "settings.usageStatsDesc":

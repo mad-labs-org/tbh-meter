@@ -20,7 +20,7 @@ code_anchors:
   - config/offsets.py::StatsHolder.FINAL_STATS
 asserts:
   - config.offsets.Unit.CORE_STATS_OBSCURED == 0x104
-  - config.offsets.Monster.CACHE_OBSCURED == 0x3B0
+  - config.offsets.Monster.CACHE_OBSCURED == 0x3B8
   - config.offsets.EEquipClassType.Knight == 1
   - config.offsets.EEquipClassType.Ranger == 2
 guarded_by:

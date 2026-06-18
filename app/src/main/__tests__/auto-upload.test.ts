@@ -21,7 +21,7 @@ vi.mock("../sources/runs-source.js", () => ({
   getRunsSource: () => ({ all: () => records }),
 }));
 vi.mock("../auth.js", () => ({ getAccessToken: async () => "token" }));
-vi.mock("../settings.js", () => ({ getSettings: () => ({ anonymousUpload: true }) }));
+vi.mock("../settings.js", () => ({ getSettings: () => ({}) }));
 vi.mock("../share.js", () => ({
   uploadRun: (run: RunRecord) => uploadRun(run),
   isUploaded: () => false,

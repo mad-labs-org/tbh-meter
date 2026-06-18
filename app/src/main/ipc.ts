@@ -242,12 +242,11 @@ export function registerIpcHandlers(deps: IpcDeps): void {
   ipcMain.handle("meter:open-session-stats", async (event, arg: unknown) => {
     const sessionId = isValidSessionId(arg) ? arg : getRunsSource().all()[0]?.sessionId;
     if (!isValidSessionId(sessionId)) return; // nothing resolvable → no-op
-    // Signed out + anonymous upload disabled = nothing was uploaded, so the
-    // website's session page would be empty (#252). Offer sign-in first — the
-    // auto-uploader drains the local backlog (including this session's runs)
-    // right after — instead of a dead-end page. With anonymous upload on
-    // (the default), signed-out runs are on the site already: no prompt.
-    if (!getSettings().anonymousUpload && !(await getStatus()).signedIn) {
+    // Upload requires sign-in (Phase 2): while signed out NOTHING is uploaded, so
+    // the website's session page would be empty (#252). Offer sign-in first — the
+    // auto-uploader drains the local backlog (including this session's runs) right
+    // after — instead of opening a dead-end page.
+    if (!(await getStatus()).signedIn) {
       const win = BrowserWindow.fromWebContents(event.sender);
       const opts = {
         type: "warning" as const,

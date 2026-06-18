@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import electronUpdater from "electron-updater";
 import type { UpdateStatus } from "../shared/ipc-types.js";
 import { reportError } from "./error-report.js";
+import { httpFetch } from "./net-fetch.js";
 import { resolveOutputDir } from "./settings.js";
 import { isRcBuild } from "./variant.js";
 
@@ -357,7 +358,7 @@ export function isNewerVersion(a: string, b: string): boolean {
  *  never-rejects contract is pinned by tests (stubbed global fetch). */
 export async function fetchLatestShippedVersion(): Promise<string | null> {
   try {
-    const res = await fetch(RELEASES_LATEST_API_URL, {
+    const res = await httpFetch(RELEASES_LATEST_API_URL, {
       headers: { accept: "application/vnd.github+json" },
       signal: AbortSignal.timeout(AUTHORITY_TIMEOUT_MS),
     });

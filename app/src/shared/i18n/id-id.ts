@@ -18,11 +18,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.blockedMsg": "Reader terblokir — mungkin ditutup antivirus.",
   "live.retry": "Coba lagi",
   "live.statusLive": "Live",
-  "live.statusAnon": "Anonim",
   "live.statusOffline": "Offline",
   "live.syncLive": "Live — run diunggah ke papan peringkat",
-  "live.syncAnon":
-    "Mengunggah run secara anonim — masuk dengan Discord untuk ikut papan peringkat",
   "live.syncOff": "Tidak sinkron — masuk untuk mengunggah run-mu",
   "live.dps": "DPS",
   "live.mobs": "Mob",
@@ -112,9 +109,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.uploadAuto": "Run yang sukses diunggah otomatis.",
   "settings.signInPitch":
     "Masuk dengan Discord dari header untuk masuk papan peringkat TBH Helper. Masuk juga mengklaim run yang sudah diunggah anonim dari komputer ini.",
-  "settings.anonUpload": "Unggah run secara anonim saat belum masuk",
-  "settings.anonUploadDesc":
-    "Menjaga halaman sesimu di TBH Helper tetap jalan. Run anonim tidak pernah tampil di papan peringkat; matikan dan run tetap di komputer ini sampai kamu masuk.",
   "settings.usageStats": "Statistik penggunaan",
   "settings.usageStatsLabel": "Bagikan statistik penggunaan anonim",
   "settings.usageStatsDesc":

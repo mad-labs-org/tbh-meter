@@ -18,11 +18,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.blockedMsg": "Reader blockiert — vermutlich beendet ihn das Antivirus.",
   "live.retry": "Erneut versuchen",
   "live.statusLive": "Live",
-  "live.statusAnon": "Anonym",
   "live.statusOffline": "Offline",
   "live.syncLive": "Live — Runs werden zur Bestenliste hochgeladen",
-  "live.syncAnon":
-    "Runs werden anonym hochgeladen — melde dich mit Discord an, um in die Bestenliste zu kommen",
   "live.syncOff": "Keine Synchronisierung — melde dich an, um deine Runs hochzuladen",
   "live.dps": "DPS",
   "live.mobs": "Mobs",
@@ -113,9 +110,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.uploadAuto": "Erfolgreiche Runs werden automatisch hochgeladen.",
   "settings.signInPitch":
     "Melde dich oben mit Discord an, um in der TBH-Helper-Bestenliste zu ranken. Die Anmeldung beansprucht auch die bereits anonym von diesem Rechner hochgeladenen Runs.",
-  "settings.anonUpload": "Runs anonym hochladen, solange abgemeldet",
-  "settings.anonUploadDesc":
-    "Hält deine Session-Seite auf TBH Helper am Laufen. Anonyme Runs erscheinen nie in der Bestenliste; schalte es aus und Runs bleiben auf diesem Rechner, bis du dich anmeldest.",
   "settings.usageStats": "Nutzungsstatistiken",
   "settings.usageStatsLabel": "Anonyme Nutzungsstatistiken teilen",
   "settings.usageStatsDesc":

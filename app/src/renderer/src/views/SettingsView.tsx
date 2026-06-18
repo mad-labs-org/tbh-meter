@@ -153,7 +153,7 @@ export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) 
       </div>
 
       <div className="border-t border-surface-600 pt-3">
-        <LeaderboardRow settings={settings} onSettingsChange={onSettingsChange} />
+        <LeaderboardRow />
       </div>
 
       <div className="border-t border-surface-600 pt-3">
@@ -726,8 +726,7 @@ function BlueChestTrackerRow({
 
 /**
  * Discord account section for leaderboard sharing.
- *   signed out -> pitch pointing at the header's sign-in button + the
- *                 anonymous-upload opt-out (uploads are anonymous by default)
+ *   signed out -> pitch pointing at the header's sign-in button (sign in to upload)
  *   signed in  -> "Signed in as <name>" + sign out
  */
 /** Privacy toggle: opt out of the anonymous usage count (Google Analytics on the
@@ -759,13 +758,7 @@ function UsageStatsRow({
   );
 }
 
-function LeaderboardRow({
-  settings,
-  onSettingsChange,
-}: {
-  settings: AppSettings;
-  onSettingsChange: (partial: Partial<AppSettings>) => void;
-}) {
+function LeaderboardRow() {
   const t = useT();
   const [auth, setAuth] = useState<AuthStatus | null>(null);
 
@@ -793,23 +786,7 @@ function LeaderboardRow({
           </button>
         </div>
       ) : (
-        <>
-          <p className="mt-0.5 text-xs text-zinc-500">{t("settings.signInPitch")}</p>
-          <label className="mt-2 flex cursor-pointer items-start gap-2 text-xs text-zinc-400">
-            <input
-              type="checkbox"
-              checked={settings.anonymousUpload}
-              onChange={(e) => onSettingsChange({ anonymousUpload: e.target.checked })}
-              className="mt-0.5 size-3.5 shrink-0 cursor-pointer accent-brand-500"
-            />
-            <span>
-              {t("settings.anonUpload")}
-              <span className="block text-[11px] text-zinc-500">
-                {t("settings.anonUploadDesc")}
-              </span>
-            </span>
-          </label>
-        </>
+        <p className="mt-0.5 text-xs text-zinc-500">{t("settings.signInPitch")}</p>
       )}
     </div>
   );

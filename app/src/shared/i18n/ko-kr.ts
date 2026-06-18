@@ -18,10 +18,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.blockedMsg": "리더가 차단됨 — 백신이 종료시키고 있을 수 있습니다.",
   "live.retry": "재시도",
   "live.statusLive": "Live",
-  "live.statusAnon": "익명",
   "live.statusOffline": "오프라인",
   "live.syncLive": "Live — 런을 리더보드에 업로드 중",
-  "live.syncAnon": "런을 익명으로 업로드 중 — Discord로 로그인하면 리더보드에 참여합니다",
   "live.syncOff": "동기화 안 됨 — 로그인하면 런이 업로드됩니다",
   "live.dps": "DPS",
   "live.mobs": "몹",
@@ -111,9 +109,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.uploadAuto": "성공한 런은 자동으로 업로드됩니다.",
   "settings.signInPitch":
     "상단에서 Discord로 로그인하면 TBH Helper 리더보드에 랭크됩니다. 로그인하면 이 컴퓨터에서 익명으로 업로드된 런도 내 계정으로 귀속됩니다.",
-  "settings.anonUpload": "로그아웃 상태에서 런을 익명으로 업로드",
-  "settings.anonUploadDesc":
-    "TBH Helper의 세션 페이지가 계속 작동합니다. 익명 런은 리더보드에 나오지 않습니다. 끄면 로그인할 때까지 런이 이 컴퓨터에만 남습니다.",
   "settings.usageStats": "사용 통계",
   "settings.usageStatsLabel": "익명 사용 통계 공유",
   "settings.usageStatsDesc":

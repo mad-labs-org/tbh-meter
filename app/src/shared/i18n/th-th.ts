@@ -18,11 +18,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.blockedMsg": "ตัวอ่านถูกบล็อก — แอนตี้ไวรัสอาจกำลังปิดมัน",
   "live.retry": "ลองใหม่",
   "live.statusLive": "Live",
-  "live.statusAnon": "ไม่ระบุตัว",
   "live.statusOffline": "ออฟไลน์",
   "live.syncLive": "Live — กำลังอัปโหลดรันขึ้นลีดเดอร์บอร์ด",
-  "live.syncAnon":
-    "อัปโหลดรันแบบไม่ระบุตัว — เข้าสู่ระบบด้วย Discord เพื่อขึ้นลีดเดอร์บอร์ด",
   "live.syncOff": "ไม่ซิงก์ — เข้าสู่ระบบเพื่ออัปโหลดรันของคุณ",
   "live.dps": "DPS",
   "live.mobs": "ม็อบ",
@@ -112,9 +109,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.uploadAuto": "รันที่สำเร็จจะอัปโหลดอัตโนมัติ",
   "settings.signInPitch":
     "เข้าสู่ระบบด้วย Discord ที่แถบบนเพื่อขึ้นลีดเดอร์บอร์ด TBH Helper การเข้าสู่ระบบยังรับรันที่เคยอัปโหลดแบบไม่ระบุตัวจากเครื่องนี้ด้วย",
-  "settings.anonUpload": "อัปโหลดรันแบบไม่ระบุตัวเมื่อยังไม่เข้าสู่ระบบ",
-  "settings.anonUploadDesc":
-    "ทำให้หน้าเซสชันของคุณบน TBH Helper ใช้งานได้ รันไม่ระบุตัวไม่ขึ้นลีดเดอร์บอร์ด ปิดแล้วรันจะอยู่ในเครื่องนี้จนกว่าจะเข้าสู่ระบบ",
   "settings.usageStats": "สถิติการใช้งาน",
   "settings.usageStatsLabel": "แชร์สถิติการใช้งานแบบไม่ระบุตัวตน",
   "settings.usageStatsDesc":

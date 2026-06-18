@@ -18,11 +18,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.blockedMsg": "Czytnik zablokowany — antywirus może go zamykać.",
   "live.retry": "Spróbuj ponownie",
   "live.statusLive": "Live",
-  "live.statusAnon": "Anonim",
   "live.statusOffline": "Offline",
   "live.syncLive": "Live — przejścia trafiają do rankingu",
-  "live.syncAnon":
-    "Wysyłanie anonimowe — zaloguj się przez Discorda, aby dołączyć do rankingu",
   "live.syncOff": "Brak synchronizacji — zaloguj się, aby wysyłać swoje przejścia",
   "live.dps": "DPS",
   "live.mobs": "Moby",
@@ -113,9 +110,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.uploadAuto": "Udane przejścia wysyłają się automatycznie.",
   "settings.signInPitch":
     "Zaloguj się przez Discorda z nagłówka, aby trafić do rankingu TBH Helper. Logowanie przejmuje też przejścia wysłane już anonimowo z tego komputera.",
-  "settings.anonUpload": "Wysyłaj przejścia anonimowo bez logowania",
-  "settings.anonUploadDesc":
-    "Dzięki temu twoja strona sesji na TBH Helper działa. Anonimowe przejścia nigdy nie trafiają do rankingu; wyłącz, a przejścia zostaną na tym komputerze aż się zalogujesz.",
   "settings.usageStats": "Statystyki użytkowania",
   "settings.usageStatsLabel": "Udostępniaj anonimowe statystyki użytkowania",
   "settings.usageStatsDesc":

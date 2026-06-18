@@ -18,11 +18,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.blockedMsg": "Trình đọc bị chặn — có thể phần mềm diệt virus đang tắt nó.",
   "live.retry": "Thử lại",
   "live.statusLive": "Live",
-  "live.statusAnon": "Ẩn danh",
   "live.statusOffline": "Ngoại tuyến",
   "live.syncLive": "Live — các lượt chơi đang được tải lên bảng xếp hạng",
-  "live.syncAnon":
-    "Đang tải lượt chơi ẩn danh — đăng nhập bằng Discord để vào bảng xếp hạng",
   "live.syncOff": "Không đồng bộ — đăng nhập để tải lượt chơi lên",
   "live.dps": "DPS",
   "live.mobs": "Quái",
@@ -113,9 +110,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.uploadAuto": "Lượt chơi thành công tự động tải lên.",
   "settings.signInPitch":
     "Đăng nhập bằng Discord ở thanh trên để xếp hạng trên bảng xếp hạng TBH Helper. Đăng nhập cũng nhận lại các lượt đã tải ẩn danh từ máy này.",
-  "settings.anonUpload": "Tải lượt chơi ẩn danh khi chưa đăng nhập",
-  "settings.anonUploadDesc":
-    "Giúp trang phiên của bạn trên TBH Helper hoạt động. Lượt ẩn danh không bao giờ lên bảng xếp hạng; tắt đi thì lượt chơi sẽ ở lại máy này đến khi bạn đăng nhập.",
   "settings.usageStats": "Thống kê sử dụng",
   "settings.usageStatsLabel": "Chia sẻ thống kê sử dụng ẩn danh",
   "settings.usageStatsDesc":

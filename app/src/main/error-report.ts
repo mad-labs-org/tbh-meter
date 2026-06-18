@@ -1,6 +1,7 @@
 import { app } from "electron";
 import { release } from "node:os";
 import { API_URL } from "./config.js";
+import { httpFetch } from "./net-fetch.js";
 
 // --------------------------------------------------------------------------- //
 // Error reporting — relays unhandled errors to the API (POST /meter-errors),
@@ -59,23 +60,66 @@ interface ErrorShape {
   stack?: string;
 }
 
+export interface ErrorCause {
+  /** Lower-level error code, e.g. UNABLE_TO_VERIFY_LEAF_SIGNATURE / ECONNREFUSED / ETIMEDOUT. */
+  code?: string;
+  /** The cause's own message. */
+  message?: string;
+}
+
+/** Pull the underlying transport reason out of an error's `.cause`. undici (Node's
+ *  global fetch) wraps the real failure — a self-signed-cert / proxy / DNS error —
+ *  in `err.cause` while the top-level message is only "fetch failed", so the cause
+ *  is the diagnostic signal. Returns empty fields when there is no usable cause. */
+export function describeCause(err: unknown): ErrorCause {
+  if (typeof err !== "object" || err === null || !("cause" in err)) return {};
+  const cause = (err as { cause?: unknown }).cause;
+  if (typeof cause !== "object" || cause === null) {
+    return typeof cause === "string" && cause !== "" ? { message: cause } : {};
+  }
+  const { message, code } = cause as { message?: unknown; code?: unknown };
+  return {
+    code: typeof code === "string" && code !== "" ? code : undefined,
+    message: typeof message === "string" && message !== "" ? message : undefined,
+  };
+}
+
+/** Render a cause as a short "[CODE: message]" suffix (either part optional). */
+function causeSuffix(cause: ErrorCause): string {
+  if (!cause.code && !cause.message) return "";
+  if (cause.code && cause.message) return ` [${cause.code}: ${cause.message}]`;
+  return ` [${cause.code ?? cause.message}]`;
+}
+
 /** Normalize anything throwable into { message, stack }. Plain objects with a
  *  string `message` (e.g. API error bodies, IPC payloads) keep it; everything
- *  else is stringified. */
+ *  else is stringified. The underlying `.cause` (when present) is appended to both
+ *  message and stack so a wrapped transport failure ("fetch failed" -> the real
+ *  UNABLE_TO_VERIFY_LEAF_SIGNATURE / ECONNREFUSED) is visible in the report. */
 function describe(err: unknown): ErrorShape {
-  if (err instanceof Error) return { message: err.message, stack: err.stack };
+  const suffix = causeSuffix(describeCause(err));
+  if (err instanceof Error) {
+    return {
+      message: `${err.message}${suffix}`,
+      stack: err.stack ? `${err.stack}${suffix}` : suffix || undefined,
+    };
+  }
   if (typeof err === "object" && err !== null) {
     const { message, stack } = err as { message?: unknown; stack?: unknown };
     if (typeof message === "string") {
-      return { message, stack: typeof stack === "string" ? stack : undefined };
+      const stackStr = typeof stack === "string" ? stack : undefined;
+      return {
+        message: `${message}${suffix}`,
+        stack: stackStr ? `${stackStr}${suffix}` : suffix || undefined,
+      };
     }
     try {
-      return { message: JSON.stringify(err) };
+      return { message: `${JSON.stringify(err)}${suffix}` };
     } catch {
       // fall through to String()
     }
   }
-  return { message: String(err) };
+  return { message: `${String(err)}${suffix}` };
 }
 
 /**
@@ -100,7 +144,16 @@ export function reportError(
     if (value !== undefined) extraOut[name.slice(0, 40)] = String(value).slice(0, MAX_EXTRA_VALUE);
   }
 
-  void fetch(`${API_URL}/meter-errors`, {
+  // The relay rides Electron's net stack (net.fetch — honors the system proxy and
+  // OS cert store, unlike Node's undici). net.fetch THROWS if called before the app
+  // is ready, and the global uncaughtException/unhandledRejection hooks can fire
+  // during early startup — so skip the relay (best-effort, never throw) until ready.
+  if (!app.isReady()) {
+    console.warn(`[error-report] dropped pre-ready report (${context}): ${message}`);
+    return;
+  }
+
+  void httpFetch(`${API_URL}/meter-errors`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

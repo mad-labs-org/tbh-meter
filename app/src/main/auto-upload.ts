@@ -3,7 +3,6 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { getRunsSource } from "./sources/runs-source.js";
 import { getAccessToken } from "./auth.js";
-import { getSettings } from "./settings.js";
 import { uploadRun, isUploaded, claimDeviceRuns } from "./share.js";
 import type { RunRecord } from "../shared/run-types.js";
 
@@ -18,12 +17,11 @@ import type { RunRecord } from "../shared/run-types.js";
 // record of successful uploads.
 //
 // Semantics:
-//   - EVERY successful local run is auto-uploaded — signed in (attributed,
-//     ranks on the leaderboard) or signed out (anonymous via the device id,
-//     session page only; claimed by the account on sign-in). Turning the
-//     "anonymous upload" setting off restores the old behavior: signed-out
-//     runs stay local until a sign-in. The backlog drains oldest-first,
-//     MAX_PER_CYCLE per tick.
+//   - Upload REQUIRES sign-in (Phase 2): every successful local run is auto-uploaded
+//     ONLY while signed in (attributed, ranks on the leaderboard). Signed out =
+//     ticks are a no-op; the backlog stays local and drains on the next sign-in
+//     (notifySignedIn fires an immediate cycle). The backlog drains oldest-first,
+//     MAX_PER_CYCLE per tick. There is no anonymous upload path.
 //   - Dedup: uploads.json (via isUploaded) is the source of truth for "already
 //     shared".
 //   - failed: runs the API permanently rejected (bad_request) so we stop retrying
@@ -138,10 +136,12 @@ async function runCycle(): Promise<void> {
   if (running) return;
   running = true;
   try {
-    // Signed out: uploads continue anonymously (device-id) unless the user
-    // opted out in Settings — then ticks are a no-op, like before.
+    // Upload requires sign-in (Phase 2): while signed out, ticks are a clean
+    // no-op — no anonymous uploads, no error spam, no permanent-retry churn.
+    // The backlog simply drains on the next sign-in (notifySignedIn fires a
+    // cycle immediately, and the scheduler keeps ticking).
     const token = await getAccessToken();
-    if (!token && !getSettings().anonymousUpload) return;
+    if (!token) return;
 
     const state = readState();
 
@@ -171,10 +171,10 @@ async function runCycle(): Promise<void> {
         console.log(`[auto-upload] aborting cycle: ${result.code}`);
         break;
       } else if (result.code === "unauthorized") {
-        // Signed out with anonymous upload off (uploadRun's pre-flight gate), or
-        // the JWT just expired mid-cycle (uploadRun cleared the session on a 401).
-        // Either way the run isn't marked failed — it retries once signed in again
-        // (or anonymously, if that setting is turned back on).
+        // Signed out (uploadRun's pre-flight gate) or the JWT just expired mid-cycle
+        // (uploadRun cleared the session on a 401). The run isn't marked failed — it
+        // retries on the next sign-in. No retry-loop: the cycle aborts here and the
+        // signed-out gate above keeps subsequent ticks a no-op until sign-in.
         console.log("[auto-upload] aborting cycle: unauthorized");
         break;
       } else if (result.code === "bad_request") {

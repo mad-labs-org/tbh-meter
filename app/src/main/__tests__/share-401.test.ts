@@ -16,10 +16,14 @@ vi.mock("../auth.js", () => ({
   getAccessToken: async () => "bearer-token",
   clearSession: () => clearSession(),
 }));
-vi.mock("../settings.js", () => ({ getSettings: () => ({ anonymousUpload: false }) }));
+vi.mock("../settings.js", () => ({ getSettings: () => ({}) }));
 vi.mock("../device-id.js", () => ({ getDeviceId: () => "device-uuid" }));
 vi.mock("../runs-store.js", () => ({ getRun: () => null }));
-vi.mock("../error-report.js", () => ({ reportError: () => {} }));
+vi.mock("../error-report.js", () => ({ reportError: () => {}, describeCause: () => ({}) }));
+// uploadRun posts via httpFetch (Electron net) — delegate to the stubbed global fetch.
+vi.mock("../net-fetch.js", () => ({
+  httpFetch: (input: string | GlobalRequest, init?: RequestInit) => fetch(input, init),
+}));
 
 const { uploadRun } = await import("../share.js");
 

@@ -23,10 +23,8 @@ export const DICT = {
   "live.blockedMsg": "Reader blocked — antivirus may be closing it.",
   "live.retry": "Retry",
   "live.statusLive": "Live",
-  "live.statusAnon": "Anon",
   "live.statusOffline": "Offline",
   "live.syncLive": "Live — uploading runs to the leaderboard",
-  "live.syncAnon": "Uploading runs anonymously — sign in with Discord to join the leaderboard",
   "live.syncOff": "Not syncing — sign in to upload your runs",
   "live.dps": "DPS",
   "live.mobs": "Mobs",
@@ -116,9 +114,6 @@ export const DICT = {
   "settings.uploadAuto": "Successful runs upload automatically.",
   "settings.signInPitch":
     "Sign in with Discord from the header to rank on the TBH Helper leaderboard. Signing in also claims the runs already uploaded anonymously from this computer.",
-  "settings.anonUpload": "Upload runs anonymously while signed out",
-  "settings.anonUploadDesc":
-    "Keeps your session page on TBH Helper working. Anonymous runs never appear on the leaderboard; turn this off and runs stay on this computer until you sign in.",
   "settings.usageStats": "Usage statistics",
   "settings.usageStatsLabel": "Share anonymous usage statistics",
   "settings.usageStatsDesc":

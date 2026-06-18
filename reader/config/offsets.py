@@ -102,7 +102,10 @@ ACTK_FAKE = 0xC
 class Unit:                            # base de Hero/Monster (dump.cs ~319277)
     HEALTH_CONTROLLER = 0xB0           # -> UnitHealthController
     IS_HERO = 0x100                    # bool b_isHero
-    CACHE = 0x3A0                      # Hero.cache -> uf (wrapper de progressão)
+    CACHE = 0x3A8                      # Hero.cache -> uf (wrapper de progressão). 1.00.14 inseriu
+                                       # `Action OnCrowdControlAppliedAction` @0x3A0 no FIM de Unit
+                                       # (base cresceu +0x8) -> Hero.cache 0x3A0->0x3A8; TODO campo de
+                                       # subclasse de Unit deslocou +0x8 (Monster idem, abaixo).
     CORE_STATS_OBSCURED = 0x104        # 12 stats core: ObscuredFloat (XOR) — NÃO LER (lixo); use
                                        # xd.FINAL_STATS (Dict<StatType,float> PLAIN). Marcador p/
                                        # docs/invariants/obscured-data-offlimits (test_obscured_markers).
@@ -113,10 +116,13 @@ class UnitHealthController:            # HP em float PURO (dump.cs ~319894)
     HP_MAX = 0x4C
 
 
-class Monster:
-    STAGE_KEY = 0x3CC                  # bceo = stageKey VIVO (o do save congela na troca)
-    CACHE_OBSCURED = 0x3B0             # ud.tl cache Obscured — NÃO LER; use os campos PLAIN do
-                                       # Monster. Marcador p/ docs/invariants/obscured-data-offlimits.
+class Monster:                         # extends Unit -> herdou o +0x8 do 1.00.14 (ver Unit.CACHE)
+    STAGE_KEY = 0x3D4                  # stageKey VIVO (o do save congela na troca). 1.00.14: 0x3CC->0x3D4.
+                                       # ⚠ diff_offsets deu FALSO-OK (campo nome-ofuscado, só checa
+                                       # adjacência -> deslocamento +0x8 uniforme passa) — pego no dump.cs
+                                       # vs baseline 1.00.13; confirmar no validate_live (stage).
+    CACHE_OBSCURED = 0x3B8             # cache Obscured — NÃO LER; use os campos PLAIN do Monster.
+                                       # 1.00.14: 0x3B0->0x3B8. Marcador p/ docs/invariants/obscured-data-offlimits.
 
 
 class StageManager:                    # singleton (dump.cs ~327247)

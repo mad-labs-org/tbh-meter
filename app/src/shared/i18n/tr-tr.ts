@@ -18,11 +18,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.blockedMsg": "Okuyucu engellendi — antivirüs kapatıyor olabilir.",
   "live.retry": "Tekrar dene",
   "live.statusLive": "Canlı",
-  "live.statusAnon": "Anonim",
   "live.statusOffline": "Çevrimdışı",
   "live.syncLive": "Canlı — runlar lider tablosuna yükleniyor",
-  "live.syncAnon":
-    "Runlar anonim yükleniyor — lider tablosuna katılmak için Discord ile giriş yap",
   "live.syncOff": "Senkron yok — runlarını yüklemek için giriş yap",
   "live.dps": "DPS",
   "live.mobs": "Moblar",
@@ -113,9 +110,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.uploadAuto": "Başarılı runlar otomatik yüklenir.",
   "settings.signInPitch":
     "TBH Helper lider tablosunda sıralanmak için üst bardan Discord ile giriş yap. Giriş, bu bilgisayardan anonim yüklenmiş runları da hesabına bağlar.",
-  "settings.anonUpload": "Çıkış yapıldığında runları anonim yükle",
-  "settings.anonUploadDesc":
-    "TBH Helper'daki oturum sayfanı çalışır tutar. Anonim runlar lider tablosunda asla görünmez; kapatırsan runlar giriş yapana kadar bu bilgisayarda kalır.",
   "settings.usageStats": "Kullanım istatistikleri",
   "settings.usageStatsLabel": "Anonim kullanım istatistiklerini paylaş",
   "settings.usageStatsDesc":

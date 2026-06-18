@@ -3,18 +3,24 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { getRun } from "./runs-store.js";
 import { getAccessToken, clearSession } from "./auth.js";
-import { getSettings } from "./settings.js";
 import { getDeviceId } from "./device-id.js";
+import { signRequest } from "./request-signer.js";
 import { API_URL, SITE_URL } from "./config.js";
-import { reportError } from "./error-report.js";
+import { reportError, describeCause } from "./error-report.js";
+import { httpFetch } from "./net-fetch.js";
 import { mapGear, mapSkillLevels, type IngestGearSlot } from "./ingest-map.js";
 import { tsToMs } from "./sources/runs-source.js";
 import type { RunRecord, RunHero, RunDrop } from "../shared/run-types.js";
 
 // --------------------------------------------------------------------------- //
 // Share service — maps a local RunRecord to the API's POST /runs payload, uploads
-// it with the user's Discord access token (or anonymously via the device id while
-// signed out — see device-id.ts), and remembers the resulting public URL.
+// it with the user's Discord access token, and remembers the resulting public URL.
+//
+// Upload REQUIRES sign-in (Phase 2): every request carries `Authorization: Bearer`
+// AND an Ed25519 request signature (request-signer.ts; matches the API verifier in
+// api/src/middleware/signature.ts). There is no anonymous upload path — signed out =
+// a clean "sign in to sync" state. The install's device id (device-id.ts) lives on
+// only to claim legacy anonymous runs via POST /runs/claim on a later sign-in.
 //
 // Network + auth live here in the MAIN process. The renderer only triggers
 // shareRun / getShareStatus over IPC and receives a discriminated result.
@@ -274,32 +280,50 @@ export async function uploadRun(run: RunRecord): Promise<ShareResult> {
     return { ok: false, code: "bad_request", message: "This run has no party data to share." };
   }
 
-  // Signed in -> attributed upload (Bearer token). Signed out -> anonymous upload
-  // via the install's device id (claimed by the account on a later sign-in),
-  // unless the user turned anonymous upload off in Settings.
+  // Upload REQUIRES sign-in (Phase 2): only an attributed, signed request reaches
+  // the leaderboard. Signed out = a clean "sign in to sync" state, never an
+  // anonymous upload — the old X-Device-Id ingest path is gone. (device-id.ts +
+  // POST /runs/claim stay, to claim any legacy anonymous runs on a later sign-in.)
   const token = await getAccessToken();
-  if (!token && !getSettings().anonymousUpload) {
-    return { ok: false, code: "unauthorized", message: "Sign in with Discord to share runs." };
+  if (!token) {
+    return { ok: false, code: "unauthorized", message: "Sign in with Discord to sync runs." };
   }
 
   const payload = buildPayload(run);
+  // Serialize ONCE: the SAME string is both hashed (for X-Signature) and sent as
+  // the body. Re-stringifying would risk a hash/body mismatch → a 401 on every
+  // signed request once the API enforces signatures. See request-signer.ts.
+  const bodyString = JSON.stringify(payload);
+  const endpoint = `${API_URL}/runs`;
 
-  let res: Response;
+  let res: GlobalResponse;
   try {
-    res = await fetch(`${API_URL}/runs`, {
+    res = await httpFetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : { "X-Device-Id": getDeviceId() }),
+        Authorization: `Bearer ${token}`,
+        // Ed25519 request signature (always-on; ignored by the API until its flag flips).
+        ...signRequest("POST", endpoint, bodyString),
       },
-      body: JSON.stringify(payload),
+      body: bodyString,
     });
   } catch (err) {
-    reportError("share:upload-network", err, { externalId: payload.externalId });
+    // The transport reason (AV TLS interception, proxy, DNS) is buried in
+    // err.cause — surface its message + code so the Discord report is diagnosable
+    // instead of just "fetch failed".
+    const cause = describeCause(err);
+    reportError("share:upload-network", err, {
+      externalId: payload.externalId,
+      causeCode: cause.code,
+      causeMessage: cause.message,
+    });
+    const detail = err instanceof Error ? err.message : "unknown";
+    const causeSuffix = cause.message ? ` (${cause.code ?? "cause"}: ${cause.message})` : "";
     return {
       ok: false,
       code: "network",
-      message: err instanceof Error ? `Network error: ${err.message}` : "Network error.",
+      message: `Network error: ${detail}${causeSuffix}`,
     };
   }
 
@@ -315,9 +339,12 @@ export async function uploadRun(run: RunRecord): Promise<ShareResult> {
     // 401 on an attributed upload = the JWT expired. There is no refresh token
     // (the API mints a ~30d HS256 token, no refresh), so this is terminal for the
     // session: clear it + broadcast "signed out" (same UX as a lost session). The
-    // run is NOT marked failed — once signed out, anonymous upload (if enabled)
-    // picks it up on a later tick; otherwise it waits for the next sign-in.
-    if (res.status === 401 && token) {
+    // run is NOT marked failed — it waits for the next sign-in to upload.
+    // (A 401 here is the EXPIRED-token case. The signature is always-on but the API
+    // ignores it until REQUIRE_RUN_SIGNATURE is enabled, so it cannot 401 us yet;
+    // once it does, a signature 401 is also terminal-for-this-attempt, which is fine —
+    // clearSession() only fires when we actually held a token, as here.)
+    if (res.status === 401) {
       clearSession();
     }
     // Relay only actionable (client-side) failures; transient/infra ones are
@@ -370,7 +397,10 @@ export async function claimDeviceRuns(): Promise<void> {
   const token = await getAccessToken();
   if (!token) return;
   try {
-    const res = await fetch(`${API_URL}/runs/claim`, {
+    // Claim is Bearer-only (the JWT is the real lock) and unsigned: it only re-attributes
+    // the caller's own legacy anonymous runs, and request signing is scoped to the run
+    // ingest path (POST /runs). Don't sign here — the API never verifies it on /claim.
+    const res = await httpFetch(`${API_URL}/runs/claim`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

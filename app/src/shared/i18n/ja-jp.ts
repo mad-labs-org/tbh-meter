@@ -18,10 +18,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.blockedMsg": "リーダーがブロックされました — ウイルス対策ソフトが終了させている可能性があります。",
   "live.retry": "再試行",
   "live.statusLive": "Live",
-  "live.statusAnon": "匿名",
   "live.statusOffline": "オフライン",
   "live.syncLive": "Live — ランをリーダーボードにアップロード中",
-  "live.syncAnon": "ランを匿名でアップロード中 — Discordでサインインしてリーダーボードに参加",
   "live.syncOff": "未同期 — サインインしてランをアップロード",
   "live.dps": "DPS",
   "live.mobs": "モブ",
@@ -111,9 +109,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.uploadAuto": "成功したランは自動でアップロードされます。",
   "settings.signInPitch":
     "ヘッダーからDiscordでサインインすると、TBH Helperのリーダーボードにランクインできます。サインインすると、このPCから匿名でアップロード済みのランも自分のものになります。",
-  "settings.anonUpload": "サインアウト中はランを匿名でアップロード",
-  "settings.anonUploadDesc":
-    "TBH Helperのセッションページが機能し続けます。匿名のランはリーダーボードには表示されません。オフにすると、サインインするまでランはこのPCに留まります。",
   "settings.usageStats": "利用統計",
   "settings.usageStatsLabel": "匿名の利用統計を共有する",
   "settings.usageStatsDesc":

@@ -5,7 +5,7 @@ import type { RunRecord } from "../../shared/run-types.js";
 vi.mock("electron", () => ({ app: { getVersion: () => "0.0.0-test", getPath: () => "/tmp" } }));
 vi.mock("../auth.js", () => ({ getAccessToken: () => null }));
 vi.mock("../runs-store.js", () => ({ getRun: () => null }));
-vi.mock("../error-report.js", () => ({ reportError: () => {} }));
+vi.mock("../error-report.js", () => ({ reportError: () => {}, describeCause: () => ({}) }));
 
 const { buildPayload } = await import("../share.js");
 
