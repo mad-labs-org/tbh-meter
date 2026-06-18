@@ -1,0 +1,269 @@
+# TBH Meter / 2. Build test version to download — a Windows installer you can install and
+# smoke-test, that NEVER reaches players. MANUAL.
+#
+# It builds the side-by-side `rc` variant (own appId/folder, data in ~/tbh-meter-rc, auto-update
+# OFF) and publishes it as a DRAFT on the public releases repo — drafts are invisible to
+# anonymous users AND to electron-updater's /releases/latest, so a test build can never leak.
+# Maintainers download it while logged in.
+#
+# Two things you can build (the common case needs NO input):
+#   • blank          → the newest staged RC (the one Meter 1 just minted). The normal flow.
+#   • candidate=…    → a specific staged RC, e.g. 0.31.0-rc.2.
+#   • pr=342         → a THROWAWAY build of that PR's head, BEFORE merging. Version is
+#                      0.0.0-pr.342.<run> (honest: obviously not a real release; the PR number
+#                      gives it its own draft slot so two PRs can never collide), and the
+#                      download link is posted as a comment on the PR. Wins over `candidate`.
+#
+# Each target owns exactly ONE draft slot (its tag name), replaced on every rebuild — so the
+# releases list stays an honest dashboard of what's live, never a pile of duplicates.
+name: Release · 2 · build test version
+
+run-name: "Build · ${{ inputs.pr != '' && format('PR #{0}', inputs.pr) || (inputs.candidate != '' && inputs.candidate || 'newest staged RC') }} — ${{ github.actor }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate:
+        description: "Staged RC to build, e.g. 0.31.0-rc.2. Blank = the newest staged RC."
+        required: false
+        type: string
+      pr:
+        description: "PR number for a throwaway pre-merge build, e.g. 342. Wins over 'candidate'; the link is posted on the PR."
+        required: false
+        type: string
+
+concurrency:
+  # One build per target; different targets run in parallel, the same target serializes.
+  # cancel-in-progress:false so a re-run never aborts a draft mid-publish.
+  group: meter-build-${{ inputs.pr != '' && format('pr-{0}', inputs.pr) || (inputs.candidate != '' && inputs.candidate || 'newest-rc') }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    name: Resolve what to build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read # gh pr view
+    timeout-minutes: 10
+    outputs:
+      kind: ${{ steps.r.outputs.kind }}
+      sha: ${{ steps.r.outputs.sha }}
+      version: ${{ steps.r.outputs.version }}
+      slot_tag: ${{ steps.r.outputs.slot_tag }}
+      pr: ${{ steps.r.outputs.pr }}
+      branch: ${{ steps.r.outputs.branch }}
+      version_matrix: ${{ steps.r.outputs.version_matrix }}
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - name: Resolve target → (kind, sha, version, slot)
+        id: r
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # gh pr view, against THIS repo
+          # Inputs via env (not direct ${{ }} interpolation into bash) — robust to odd quoting.
+          PR_INPUT: ${{ inputs.pr }}
+          CAND_INPUT: ${{ inputs.candidate }}
+        run: |
+          PR="$PR_INPUT"
+          CAND="$CAND_INPUT"
+          PR="${PR#\#}" # tolerate "#342"
+
+          if [ -n "$PR" ] && [ -n "$CAND" ]; then
+            echo "::error::Pass EITHER a PR number OR a candidate RC, not both."; exit 1
+          fi
+
+          if [ -n "$PR" ]; then
+            # --- Throwaway PR build (pre-merge) — gh's built-in --jq, no node needed ---
+            SHA=$(gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid' 2>/dev/null || true)
+            BRANCH=$(gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json headRefName --jq '.headRefName' 2>/dev/null || true)
+            if [ -z "$SHA" ]; then echo "::error::PR #$PR not found (or no head commit)."; exit 1; fi
+            VERSION="0.0.0-pr.$PR.${{ github.run_number }}"
+            SLOT="tbh-meter-pr-$PR"
+            KIND="pr"
+          else
+            # --- A staged RC tag ---
+            git fetch --tags -q
+            if [ -z "$CAND" ]; then
+              # Newest staged RC = highest rc-version tag (versionsort, rc-aware).
+              TAG=$(git -c versionsort.suffix=-rc tag -l 'tbh-meter-v*-rc.*' --sort=-v:refname | head -n1)
+              if [ -z "$TAG" ]; then
+                echo "::error::No staged RC found. Merge meter work (Meter 1 stages one) or pass a PR number."; exit 1
+              fi
+            else
+              TAG="tbh-meter-v${CAND#tbh-meter-v}"
+            fi
+            if ! git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+              echo "::error::Tag $TAG does not exist."; exit 1
+            fi
+            SHA=$(git rev-parse "$TAG^{commit}")
+            VERSION="${TAG#tbh-meter-v}"
+            SLOT="$TAG"
+            BRANCH=""
+            KIND="rc"
+          fi
+
+          echo "::notice::Building $VERSION ($KIND) from ${SHA:0:7}"
+          {
+            echo "kind=$KIND"
+            echo "sha=$SHA"
+            echo "version=$VERSION"
+            echo "slot_tag=$SLOT"
+            echo "pr=$PR"
+            echo "branch=$BRANCH"
+            echo "version_matrix=[\"$VERSION\"]"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build
+    needs: resolve
+    permissions:
+      contents: read
+    # The matrix value renders the COMPUTED version in the job name (build (0.31.0-rc.2)) —
+    # the only platform way to surface it in the Actions sidebar.
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.resolve.outputs.version_matrix) }}
+    uses: ./.github/workflows/meter-build-core.yml
+    with:
+      ref: ${{ needs.resolve.outputs.sha }}
+      version: ${{ matrix.version }}
+      variant: rc
+
+  publish:
+    name: Publish draft
+    needs: [resolve, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # publishes the draft release in this repo
+      pull-requests: write # sticky PR comment with the download link
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: tbh-meter-rc-windows
+          path: dist
+
+      - name: Publish the draft (+ PR comment)
+        id: pub
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # publishes the draft release in this repo
+          NOTES_TOKEN: ${{ secrets.GITHUB_TOKEN }} # reads THIS repo (changelog) + PR comment
+          KIND: ${{ needs.resolve.outputs.kind }}
+          VERSION: ${{ needs.resolve.outputs.version }}
+          SLOT: ${{ needs.resolve.outputs.slot_tag }}
+          PR: ${{ needs.resolve.outputs.pr }}
+          BRANCH: ${{ needs.resolve.outputs.branch }}
+          SHA: ${{ needs.resolve.outputs.sha }}
+        run: |
+          RELEASES_REPO="$GITHUB_REPOSITORY"
+          INSTALLER=$(basename dist/*.exe)
+
+          if [ "$KIND" = "pr" ]; then
+            TITLE="tbh-meter PR #$PR · build ${{ github.run_number }}"
+            {
+              echo "> 🧪 **Throwaway pre-merge test build** of PR #$PR (\`$BRANCH\` @ \`${SHA:0:7}\`)."
+              echo "> Side-by-side \`tbh-meter-rc\` build: own folder, data in \`~/tbh-meter-rc\`, **no** auto-update."
+              echo "> Not promotable — ship the real thing by merging, then Meter 2 → Meter 3."
+            } > release-notes.md
+          else
+            LAST_STABLE=$(git -c versionsort.suffix=-rc tag -l 'tbh-meter-v*' --sort=-v:refname \
+              | grep -E '^tbh-meter-v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)
+            RANGE="${LAST_STABLE:+$LAST_STABLE..}$SHA"
+            CHANGES=$(git log "$RANGE" --no-merges --pretty='- %s' -- app reader data | head -n 80)
+            TITLE="tbh-meter v$VERSION (RC)"
+            {
+              echo "> ⚠️ **Release candidate — for testing only.** Side-by-side \`tbh-meter-rc\` build:"
+              echo "> own folder, data in \`~/tbh-meter-rc\`, **no** auto-update. Your real install is untouched."
+              echo
+              if [ -n "$CHANGES" ]; then
+                echo "## Changes since ${LAST_STABLE:-the beginning}"; echo; echo "$CHANGES"; echo
+              fi
+            } > release-notes.md
+          fi
+          {
+            echo "## Download"
+            echo
+            echo "Grab **\`$INSTALLER\`** and run it."
+            echo
+            echo "## \"Windows protected your PC\" warning"
+            echo
+            echo "These builds are **not code-signed**, so SmartScreen shows a blue warning the first"
+            echo "time you run them. Click **More info → Run anyway**. If your antivirus quarantines"
+            echo "**tbh-reader.exe**, allow/restore it (bundled Python reader)."
+          } >> release-notes.md
+
+          # One mutable draft slot per target: remove any prior draft for this tag (the by-tag
+          # API can't see drafts, so list+filter), then recreate with the fresh installer.
+          DRAFT_ID=$(gh api "repos/$RELEASES_REPO/releases" --paginate \
+            --jq "[.[] | select(.tag_name==\"$SLOT\" and .draft==true)] | .[0].id // empty")
+          if [ -n "$DRAFT_ID" ]; then
+            gh api -X DELETE "repos/$RELEASES_REPO/releases/$DRAFT_ID"
+            echo "Replaced prior draft for $SLOT (id $DRAFT_ID)."
+          fi
+          URL=$(gh release create "$SLOT" dist/*.exe \
+            --repo "$RELEASES_REPO" --draft --title "$TITLE" --notes-file release-notes.md)
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Published draft: $URL"
+
+          # PR mode: post/update a sticky comment with the link, where the dev is already looking.
+          if [ "$KIND" = "pr" ]; then
+            BODY=$(printf '%s\n' \
+              "🧪 **Test build ready** — \`$INSTALLER\`" \
+              "" \
+              "[**Download the installer**]($URL) (log in with access to the releases repo)." \
+              "Installs side-by-side as \`tbh-meter-rc\` — own folder, data in \`~/tbh-meter-rc\`, no auto-update. Your real install is untouched." \
+              "" \
+              "_build ${{ github.run_number }} · \`$BRANCH\` @ \`${SHA:0:7}\` · re-run Meter 2 for this PR to refresh._")
+            GH_TOKEN="$NOTES_TOKEN" gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --edit-last --body "$BODY" 2>/dev/null \
+              || GH_TOKEN="$NOTES_TOKEN" gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "$BODY"
+
+            # Race guard: if the PR already closed during this build, Meter 1's PR-close cleanup
+            # may have run before this draft existed — delete it now so no stale slot is orphaned.
+            STATE=$(GH_TOKEN="$NOTES_TOKEN" gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json state --jq '.state' 2>/dev/null || true)
+            if [ "$STATE" = "MERGED" ] || [ "$STATE" = "CLOSED" ]; then
+              DID=$(gh api "repos/$RELEASES_REPO/releases" --paginate \
+                --jq "[.[] | select(.tag_name==\"$SLOT\" and .draft==true)] | .[0].id // empty")
+              if [ -n "$DID" ]; then
+                gh api -X DELETE "repos/$RELEASES_REPO/releases/$DID" && echo "PR #$PR already $STATE — removed its now-orphan draft."
+              fi
+            fi
+          fi
+
+      - name: Job summary
+        if: always()
+        shell: bash
+        env:
+          URL: ${{ steps.pub.outputs.url }}
+          VERSION: ${{ needs.resolve.outputs.version }}
+          SHA: ${{ needs.resolve.outputs.sha }}
+        run: |
+          {
+            echo "## 🧪 Test version built"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| **Version** | \`$VERSION\` |"
+            echo "| **From commit** | \`${SHA:0:7}\` |"
+            echo
+            if [ -n "$URL" ]; then
+              echo "### ➡️ [Open the draft & download the installer]($URL)"
+              echo
+              echo "Side-by-side \`tbh-meter-rc\` (own folder, \`~/tbh-meter-rc\`, no auto-update)."
+              echo "When it checks out, run **TBH Meter / 3. Release to players** to ship it."
+            else
+              echo "⚠️ Build ran but no draft URL — check the Publish step logs."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

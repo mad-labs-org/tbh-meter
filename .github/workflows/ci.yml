@@ -1,0 +1,131 @@
+# Continuous integration — runs on PRs and pushes to main that touch the source.
+# Free unlimited standard runners on public repos, so the app's lint/types, unit, and integration
+# suites run as SEPARATE parallel jobs (plus the Python reader) instead of one serial job.
+name: Test · CI
+
+on:
+  push:
+    branches: [main]
+    # Scoped to the source tree. Until app/ and reader/ land, these paths don't exist, so CI
+    # stays inert — it never runs (and never reddens main when this file itself merges).
+    paths:
+      - "app/**"
+      - "reader/**"
+      - "data/**"
+  pull_request:
+    paths:
+      - "app/**"
+      - "reader/**"
+      - "data/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app-lint:
+    name: app · lint + types
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          package_json_file: app/package.json
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      # tsc imports src/shared/data/*.json (git-ignored, regenerated) — populate from the snapshot.
+      - name: Sync game data from the committed snapshot
+        run: pnpm sync-data
+      - name: Lint + typecheck (eslint + tsc)
+        run: pnpm check
+
+  app-unit:
+    name: app · unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          package_json_file: app/package.json
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Sync game data from the committed snapshot
+        run: pnpm sync-data
+      # Everything EXCEPT *.integration.test.ts (those run in the integration job, in parallel).
+      - name: Unit tests (vitest)
+        run: pnpm exec vitest run --exclude '**/*.integration.test.ts'
+
+  app-integration:
+    name: app · integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          package_json_file: app/package.json
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Sync game data from the committed snapshot
+        run: pnpm sync-data
+      # Only the *.integration.test.ts files (module-wiring tests; fixtures/MSW, no real game).
+      - name: Integration tests (vitest)
+        run: pnpm exec vitest run integration.test
+
+  reader:
+    name: reader
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: reader
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.12"
+      # The reader is zero-dependency (pure ctypes + stdlib); only the lint/test tooling is
+      # installed. The tests are platform-independent, so they run on the free Linux runner.
+      - name: Install lint + test tooling
+        run: pip install ruff -r requirements-dev.txt
+      - name: Lint (ruff)
+        run: ruff check .
+      - name: Tests (pytest)
+        run: python -m pytest
