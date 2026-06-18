@@ -26,8 +26,8 @@
     "@electron-toolkit/tsconfig": "^2.0.0",
     "@electron-toolkit/utils": "^4.0.0",
     "clsx": "^2.1.1",
-    "electron-updater": "^6.6.2",
-    "lucide-react": "^1.17.0",
+    "electron-updater": "^6.8.9",
+    "lucide-react": "^1.21.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tailwind-merge": "^3.6.0"
@@ -41,14 +41,14 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
-    "@tailwindcss/vite": "^4.3.0",
+    "@tailwindcss/vite": "^4.3.1",
     "@types/node": "^22.15.30",
-    "@types/react": "^19.1.6",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.1.5",
     "@vitejs/plugin-react": "^4.3.4",
     "cross-env": "^10.1.0",
     "electron": "^36.3.1",
-    "electron-builder": "^26.0.12",
+    "electron-builder": "^26.15.3",
     "electron-vite": "^3.1.0",
     "eslint": "^9.28.0",
     "eslint-config-prettier": "^10.1.8",
@@ -56,11 +56,11 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^16.2.0",
     "msw": "^2.14.6",
-    "prettier": "^3.5.3",
-    "tailwindcss": "^4.3.0",
+    "prettier": "^3.8.4",
+    "tailwindcss": "^4.3.1",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.33.0",
+    "typescript-eslint": "^8.61.1",
     "vite": "^6.4.3",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.9"
   }
 }
