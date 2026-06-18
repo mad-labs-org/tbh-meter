@@ -1,4 +1,4 @@
-name: PR title
+name: Check · PR title
 
 # Enforces Conventional Commits on the PR title. Titles are load-bearing: the release pipeline
 # derives the version (feat→minor, fix→patch, !→major) and the changelog from commit subjects,

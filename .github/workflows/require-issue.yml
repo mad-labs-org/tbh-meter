@@ -1,4 +1,4 @@
-name: Require linked issue
+name: Check · linked issue
 
 # Every PR must close an issue ("no PR without an issue"). Reads the PR's real issue linkage
 # (closingIssuesReferences — populated by "Closes #N" in the body or the Development panel),
