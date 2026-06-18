@@ -5,7 +5,7 @@
 **A live DPS / Gold / EXP meter & run tracker overlay for [Task Bar Hero](https://store.steampowered.com/)**
 
 [![Latest release](https://img.shields.io/github/v/release/mad-labs-org/tbh-meter-releases?label=latest&color=4c1)](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/mad-labs-org/tbh-meter-releases/total?color=blue)](https://github.com/mad-labs-org/tbh-meter-releases/releases)
+[![Downloads](https://img.shields.io/github/downloads/mad-labs-org/tbh-meter-releases/total?color=blue&cacheSeconds=3600)](https://github.com/mad-labs-org/tbh-meter-releases/releases)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-0078d4)](https://github.com/mad-labs-org/tbh-meter-releases/releases/latest)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-ffdd00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/viniarruda)
 
