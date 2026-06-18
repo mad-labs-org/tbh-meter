@@ -30,9 +30,8 @@ on:
       - "app/**"
       - "reader/**"
       - "data/**"
-      # NOTE: the pipeline workflow files are deliberately NOT listed here yet. Until the source
-      # (app/, reader/) lands, a self-referencing path would fire `stage` on a pipeline-only edit
-      # and fail (no compute-version.mjs). Re-add them in the PR that brings the code.
+      - ".github/workflows/meter-1-stage.yml"
+      - ".github/workflows/meter-build-core.yml"
   pull_request:
     types: [closed]
 
