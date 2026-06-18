@@ -35,7 +35,7 @@ Como funciona e como manter: [README](README.md).
 <!-- regras duras: quebrou = dado errado/crash -->
 
 - [[invariants/instance-selection]] — pick estrutural do singleton (managers); evita lista-morta → runs que nunca fecham · `meter_windows.py`
-- [[invariants/schema-versioning]] — bump `SCHEMA_VERSION` (fonte única) + normalizar app-side ao adicionar campo no runs.jsonl · `meter_windows.py`
+- [[invariants/schema-versioning]] — bump `RAW_SCHEMA_VERSION` (raw/<id>.json) + normalizar app-side ao adicionar campo; `SCHEMA_VERSION` é o marco congelado (11) do runs.jsonl legado · `meter_windows.py`
 - [[invariants/run-lifecycle]] — início via `LOG_LIST`; fim por `StageClearLog`/`StageFailedLog`; skip <30s exceto `stage != 10`; partial = success + (<80% clear OU dano ≤ 0); boss box pós-clear → pending-close · `meter_windows.py`
 - [[invariants/orchestration-purity]] — `meter_windows.py` é orquestrador fino (zero leitura inline fora do scaffolding); métrica/captura nova → `metrics/` ou `game/` · `meter_windows.py`
 - [[invariants/offsets-single-source]] — offset/enum/stride → `config/offsets.py`; regra de negócio (ex.: `COMBAT_SUBKEY`) → módulo da lógica; `SCHEMA_VERSION` → `meter_windows.py` · `config/offsets.py`

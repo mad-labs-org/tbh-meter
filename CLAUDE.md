@@ -78,9 +78,9 @@ version is only written for the build, never committed.
 **RC variant (side-by-side):** Meter 2 (and PR builds) set `TBH_BUILD_VARIANT=rc` (baked into
 `__TBH_VARIANT__` by `electron.vite.config.ts`) plus electron-builder `-c.appId/productName=…rc`
 overrides, so the RC installs as `tbh-meter-rc` in its own folder, stores data in `~/tbh-meter-rc`,
-and has auto-update **disabled** — it never clobbers the real install. Tokens: `RELEASES_TOKEN`
-(cross-repo PAT) publishes to the releases repo; the default `GITHUB_TOKEN` pushes the version tag
-here.
+and has auto-update **disabled** — it never clobbers the real install. Source, pipeline, and
+release artifacts all live in this one repo, so the default `GITHUB_TOKEN` publishes the releases
+**and** pushes the version tags here (no cross-repo PAT).
 
 ## Verify before finishing
 
