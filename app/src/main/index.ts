@@ -217,8 +217,10 @@ function openListWindow(): void {
 
 // --------------------------------------------------------------------------- //
 // SPLASH window — Discord-style startup screen. Shown on launch while the reader
-// brings the game's memory up; closes itself once the reader signals "ready" (or the
-// user clicks "Pular"). Frameless + transparent so it floats as a rounded card.
+// brings the game's memory up; dismissed main-side once real data flows (no skip button).
+// Frameless + OPAQUE on purpose: a transparent window let Electron 42's Chromium compose
+// the opaque card as translucent on Windows (the desktop showed through), so we paint an
+// opaque window background instead. Win11 still rounds the corners natively.
 // --------------------------------------------------------------------------- //
 
 function createSplashWindow(): BrowserWindow {
@@ -227,12 +229,12 @@ function createSplashWindow(): BrowserWindow {
     height: SPLASH_HEIGHT,
     center: true,
     frame: false,
-    transparent: true,
+    transparent: false,
     resizable: false,
     alwaysOnTop: true,
     skipTaskbar: true,
     icon: appIconAsset,
-    backgroundColor: "#00000000",
+    backgroundColor: "#0d0e1a",
     show: false,
     webPreferences: commonWebPreferences(),
   });
@@ -254,7 +256,7 @@ let readyDismissTimer: ReturnType<typeof setTimeout> | null = null;
 const READY_FALLBACK_MS = 8000;
 // While the splash is up, watch for the reader going "blocked" (AV keeps killing it):
 // loading can't proceed, so hand off to the overlay's blocked + Retry message rather than
-// trap the user behind a splash that never loads (this replaces the old "Pular" escape).
+// trap the user behind a splash that never loads (this replaced the old manual skip button).
 let splashBlockedWatch: ReturnType<typeof setInterval> | null = null;
 // Safety-net deadline: a reader stuck on "searching" (game not running) yields none of the
 // three dismiss signals (no live data, never "ready", never "blocked"), so the splash would hang
