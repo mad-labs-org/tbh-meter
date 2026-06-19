@@ -11,8 +11,8 @@ disable-model-invocation: false
 # tbh-commit
 
 Turn working-tree changes into clean conventional commits and (optionally) a PR. Commit subjects
-become the release changelog — the meter computes versions and release notes from them (see the
-`release-meter` skill).
+become the release changelog — the meter computes versions and release notes from them (see
+`.github/CONTRIBUTING.md` -> How releases work).
 
 Honor the repo's laws: **branch + PR, never commit to `main`**; conventional commits; **never
 force-push or rewrite pushed history**; never hand-edit generated files (the `guard-generated-files`

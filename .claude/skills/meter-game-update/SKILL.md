@@ -157,7 +157,7 @@ ship-readiness (it cannot run the game); `validate_live` PASS is mandatory and i
 **7 — Ship.** Commit the new `calib_seed.json` + the `GAME_VERSION` bump (a reader-only change). This touches `reader/`, so it IS a meter change and stages a
 release normally. The seed is baked into the `.exe`, so the fix reaches players only via a shipped
 release — merge → **step 1** auto-creates the version tag → **step 2** builds a test version → **step 3**
-releases it (Latest + Discord). Use the `release-meter` skill; see `CLAUDE.md` for the pipeline.
+releases it (Latest + Discord) via the numbered meter workflows (`.github/CONTRIBUTING.md` -> How releases work; `CLAUDE.md` for the pipeline).
 
 ## Don't
 
