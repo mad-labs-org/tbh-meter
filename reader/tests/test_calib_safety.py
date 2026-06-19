@@ -37,7 +37,14 @@ from config import offsets as O
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _SCRIPT = os.path.normpath(os.path.join(_HERE, "..", "scripts", "diff_offsets_vs_dump.py"))
 # Fresh Il2CppDumper dump on the maintainer's machine (does NOT live in the repo — see header).
-_DUMP = os.path.expanduser("~/tbh-dump/tool/dump.cs")
+# Il2CppDumper writes next to its DLL (~/tbh-dump/tool/), but the skill + preflight point --dump at
+# ~/tbh-dump/out/. Search BOTH so the adversarial gate RUNS wherever the dump landed instead of
+# silently SKIPPING (false confidence) when the maintainer follows the documented out/ convention.
+_DUMP = next(
+    (p for p in (os.path.expanduser("~/tbh-dump/out/dump.cs"),
+                 os.path.expanduser("~/tbh-dump/tool/dump.cs")) if os.path.isfile(p)),
+    os.path.expanduser("~/tbh-dump/out/dump.cs"),
+)
 _SEED = os.path.normpath(os.path.join(_HERE, "..", "config", "calib_seed.json"))
 
 # Without the real dump there's no way to run the real-smoke alarm; skip rather than fake it. RUNS on
