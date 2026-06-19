@@ -176,6 +176,14 @@ async function runCycle(): Promise<void> {
         // signed-out gate above keeps subsequent ticks a no-op until sign-in.
         console.log("[auto-upload] aborting cycle: unauthorized");
         break;
+      } else if (result.code === "forbidden") {
+        // 403 = the run-signature gate rejected this upload (missing / clock-skewed /
+        // bad signature, or a key the API doesn't accept). NOT an auth failure, so the
+        // session stays intact (uploadRun never clearSession()s on 403). Every run this
+        // cycle would be rejected identically, so abort; the run is NOT marked failed —
+        // it retries next tick, where a clock resync or an app update can recover it.
+        console.log("[auto-upload] aborting cycle: signature rejected (403)");
+        break;
       } else if (result.code === "bad_request") {
         // Permanent per-run rejection: record it so we never retry it again.
         state.failed[run.id] = result.code;

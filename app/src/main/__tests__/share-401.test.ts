@@ -92,4 +92,23 @@ describe("uploadRun 401 -> clearSession", () => {
     expect(res.ok).toBe(false);
     expect(clearSession).not.toHaveBeenCalled();
   });
+
+  it("does NOT clear the session on a 403 (run-signature rejection, not auth)", async () => {
+    // The run-signature gate (REQUIRE_RUN_SIGNATURE) returns 403, not 401. A logged-in
+    // user with a valid token but a bad/clock-skewed/missing signature must stay signed
+    // in (the 2026-06-19 regression: a signature 401 signed users out). Surfacing the
+    // "forbidden" code lets auto-upload abort the cycle without dropping the session.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: false,
+        status: 403,
+        json: async () => ({ error: { code: "forbidden", message: "Request signature verification failed." } }),
+      })),
+    );
+    const res = await uploadRun(run());
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.code).toBe("forbidden");
+    expect(clearSession).not.toHaveBeenCalled();
+  });
 });

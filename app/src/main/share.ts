@@ -336,14 +336,17 @@ export async function uploadRun(run: RunRecord): Promise<ShareResult> {
 
   if (!res.ok) {
     const errBody = body as ApiErrorBody | null;
-    // 401 on an attributed upload = the JWT expired. There is no refresh token
-    // (the API mints a ~30d HS256 token, no refresh), so this is terminal for the
-    // session: clear it + broadcast "signed out" (same UX as a lost session). The
-    // run is NOT marked failed — it waits for the next sign-in to upload.
-    // (A 401 here is the EXPIRED-token case. The signature is always-on but the API
-    // ignores it until REQUIRE_RUN_SIGNATURE is enabled, so it cannot 401 us yet;
-    // once it does, a signature 401 is also terminal-for-this-attempt, which is fine —
-    // clearSession() only fires when we actually held a token, as here.)
+    // 401 = the JWT expired / session invalid. There is no refresh token (the API
+    // mints a ~30d HS256 token, no refresh), so this is terminal for the session:
+    // clear it + broadcast "signed out" (same UX as a lost session). The run is NOT
+    // marked failed — it waits for the next sign-in to upload.
+    //
+    // ONLY 401 clears the session. A run-signature rejection comes back as 403
+    // (signature.ts), NOT 401 — a bad/expired/clock-skewed signature on an
+    // otherwise-valid token must not sign the user out. (It used to: the API
+    // returned 401 for signature failures, so a logged-in meter went OFFLINE the
+    // moment a signature tripped — the 2026-06-19 regression. 403 is handled below
+    // by auto-upload as terminal-for-this-attempt, with the session left intact.)
     if (res.status === 401) {
       clearSession();
     }
