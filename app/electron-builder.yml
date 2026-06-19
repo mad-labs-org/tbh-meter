@@ -32,7 +32,15 @@ files:
 # PUBLIC repo on purpose: electron-updater on a user's machine has no GitHub token — it would
 # 404 on a private repo's release assets ("Update check failed"). So source AND releases live
 # in this one public repo, which the app reads anonymously; CI publishes to this repo's own
-# Releases with the built-in GITHUB_TOKEN (no cross-repo token). See meter-3-ship.yml.
+# Releases with the built-in GITHUB_TOKEN (no cross-repo token).
+#
+# History / compatibility: this repo was previously the separate public releases repo
+# `mad-labs-org/tbh-meter-releases` (while the source lived in the private tbh-wiki). It was
+# RENAMED to `tbh-meter` in the open-source migration. Apps installed under the old name have
+# `tbh-meter-releases` baked into their app-update.yml and keep updating via GitHub's permanent
+# rename redirect (301 -> tbh-meter); they self-heal to the new name on their first update.
+# !! NEVER create a new repo named `mad-labs-org/tbh-meter-releases` — that kills the redirect
+# and strands every not-yet-updated install. See meter-3-ship.yml.
 publish:
   provider: github
   owner: mad-labs-org

@@ -25,3 +25,7 @@ __pycache__/
 .ruff_cache/
 
 # The committed game-data snapshot in data/ is the source of truth — do NOT ignore it.
+
+# Claude Code: skills/agents/hooks/settings ARE tracked; these are per-machine artifacts.
+.claude/agent-memory/
+.claude/worktrees/
