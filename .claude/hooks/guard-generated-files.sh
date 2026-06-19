@@ -1,6 +1,6 @@
 #!/bin/sh
 # PreToolUse[Edit|Write|NotebookEdit] guard: deny hand-edits of GENERATED files
-# (root CLAUDE.md: "data/ and the renderer's public/{sprites,heroes}/ are generated").
+# (.claude/CLAUDE.md: "data/ and the renderer's public/{sprites,heroes}/ are generated").
 # The sync script writes via Bash/node, so pipelines are unaffected — only direct
 # tool edits are blocked. Adapted from the tbh-wiki guard for the standalone layout.
 command -v jq >/dev/null 2>&1 || {

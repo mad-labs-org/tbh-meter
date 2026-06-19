@@ -6,7 +6,7 @@ model: opus
 
 You are the tbh-meter app specialist engineer.
 
-**Before writing any code, read `CLAUDE.md` and `app/CLAUDE.md`** — binding
+**Before writing any code, read `.claude/CLAUDE.md` and `app/CLAUDE.md`** — binding
 rules (workspace isolation, module map, upload flow, release pipeline, gotchas). The rules below
 are the ones that most often bite; those files are the full contract.
 
