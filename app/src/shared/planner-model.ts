@@ -1,14 +1,14 @@
-// Pure functions for the off-stage EXP "Optimal Climb" planner. No IO, no data imports — callers
-// inject resolvers (RewardExpOf / MaxLifeOf, from exp-model.ts and here) and plain shapes, mirroring
-// exp-model.ts's no-deps contract. Model + proofs: scratchpad/pl_{design,algorithm,review}.md and
-// docs/exp-leveling-model.md. The XP numerator, keep penalty, level curve and per-level rate are
-// REUSED from exp-model.ts — this module adds only clear-time (Investigation A), stage ranking, and
-// the climb traversal + band collapse (Investigation C).
-import {
-  expToNextLevel,
-  modeledExpPerSecond,
-  type LevelCurve,
-} from "./exp-model.js";
+// Pure scheduling for the EXP "Leveling Planner". No IO, no data imports — callers inject plain
+// shapes whose `expPerClearAtLevel` / `clearTimeAtLevel` closures already fold in ALL the XP math
+// (the measured-or-modeled per-clear XP, the keep penalty, the player's effective EXP multiplier).
+// This module is PURE SCHEDULING: it only divides XP-needed by a rate to get a time, then traverses
+// levels. Keep/bonus/account math lives entirely in the data layer (planner-data.ts) + exp-model.ts.
+//
+// Model, proofs + the A§/C§/E# citations used below: docs/exp-leveling-model.md ("Leveling Planner").
+// The separability proof that makes the single-hero per-level argmin globally optimal still holds:
+// each level's time depends only on (level, stage) via the injected closures, so per-level choices
+// never couple.
+import { expToNextLevel, type LevelCurve } from "./exp-model.js";
 
 // ─────────────────────────── CLEAR-TIME (Investigation A) ───────────────────────────
 
@@ -150,42 +150,10 @@ export function resolveClearTime(
   };
 }
 
-// ─────────────────────────── STAGE RANKING (single level) ───────────────────────────
-
-/** A farmable stage with its precomputed XP-per-clear and clear-time (caller derives both from the
- *  bundled data + the player's runs). */
-export interface FarmCandidate {
-  /** Datamine key (4-digit) — for display/join, NOT the climb math. */
-  stageKey: number;
-  stageLevel: number;
-  /** stageClearExp(stage), precomputed by the caller from bundled data. */
-  expPerClear: number;
-  /** resolveClearTime(...), precomputed by the caller. */
-  clear: ClearTimeResult;
-}
-
-export interface HeroFarmInput {
-  heroLevel: number;
-  /** The hero's own gear/skill EXP bonus percent (RunHero.stats["47"]); default 0 (absent in logs). */
-  bonusPct: number;
-  /** level ≥ cap/target → no farming. */
-  capped: boolean;
-}
+// ─────────────────────────── KEEP CONFIDENCE (under-level warning) ───────────────────────────
 
 /** solid (gap 0–12) · thin (deep gap ≥+13 or interpolated anchor) · approx (under-level, gap<0). */
 export type KeepConfidence = "solid" | "thin" | "approx";
-
-export interface FarmRank {
-  stageKey: number;
-  stageLevel: number;
-  xpPerSec: number;
-  keep: number;
-  /** gap = heroLevel − stageLevel (surfaced for the advisor/tooltips). */
-  gap: number;
-  clearTier: ClearTimeTier;
-  clearConfidence: ClearConfidence;
-  keepConfidence: KeepConfidence;
-}
 
 /** Deepest over-level gap with a MEASURED keep anchor (OVERLEVEL_KEEP tops out at gap 27, but past
  *  ~+12 the anchors thin out and the keep there is single-sample/interpolated). gap ≥ this → thin. */
@@ -198,81 +166,34 @@ export function keepConfidenceOf(gap: number): KeepConfidence {
   return "solid";
 }
 
-/**
- * Rank candidate stages for ONE hero by modeled XP/sec, descending (best first). Pure; delegates the
- * rate to {@link modeledExpPerSecond}. A capped hero → []. A stage with clearTime ≤ 0 / Infinity (or
- * Infinite-seconds T3) yields xpPerSec 0 and sorts last. The account multiplier scales every stage
- * equally, so it never changes the order (F-A). (wf_design §3.2)
- */
-export function rankStagesForHero(
-  hero: HeroFarmInput,
-  candidates: ReadonlyArray<FarmCandidate>,
-  accountXpMultiplier: number,
-): FarmRank[] {
-  if (hero.capped) return [];
-  const ranked = candidates.map((c): FarmRank => {
-    const gap = hero.heroLevel - c.stageLevel;
-    const clearSec = c.clear.seconds;
-    const xpPerSec = Number.isFinite(clearSec)
-      ? modeledExpPerSecond(
-          c.expPerClear,
-          hero.heroLevel,
-          c.stageLevel,
-          clearSec,
-          hero.bonusPct,
-          accountXpMultiplier,
-        )
-      : 0;
-    return {
-      stageKey: c.stageKey,
-      stageLevel: c.stageLevel,
-      xpPerSec,
-      keep: keepFractionFromRate(c, hero, accountXpMultiplier),
-      gap,
-      clearTier: c.clear.tier,
-      clearConfidence: c.clear.confidence,
-      keepConfidence: keepConfidenceOf(gap),
-    };
-  });
-  // Sort by xpPerSec desc; stable tiebreak by stageKey so output is deterministic.
-  ranked.sort((a, b) => b.xpPerSec - a.xpPerSec || a.stageKey - b.stageKey);
-  return ranked;
-}
-
-/** Recover the keep fraction the rate used, for display. modeledExpPerSecond folds keep in, so we
- *  re-derive it from the public exp-model surface rather than duplicating the table. */
-function keepFractionFromRate(
-  c: FarmCandidate,
-  hero: HeroFarmInput,
-  accountXpMultiplier: number,
-): number {
-  // rate = epc·keep·(1+bonus/100)·acct / clearSec  ⇒  keep = rate·clearSec / (epc·(1+bonus/100)·acct)
-  const clearSec = c.clear.seconds;
-  if (!Number.isFinite(clearSec) || clearSec <= 0 || c.expPerClear <= 0) return 0;
-  const rate = modeledExpPerSecond(
-    c.expPerClear,
-    hero.heroLevel,
-    c.stageLevel,
-    clearSec,
-    hero.bonusPct,
-    accountXpMultiplier,
-  );
-  return (rate * clearSec) / (c.expPerClear * (1 + hero.bonusPct / 100) * accountXpMultiplier);
-}
-
 // ─────────────────────────── THE CLIMB (Investigation C) ───────────────────────────
 
 /** The level at which a hero is maxed / capped — the level curve has key 100 (the 100→101 level-up)
  *  but no key 101, so `expToNextLevel(101)` is null. A hero at MAX_LEVEL has nothing left to climb. */
 export const MAX_LEVEL = 101;
 
-/** A candidate the climb may pick at any level. `clearTimeAtLevel` is a FUNCTION of hero level so a
- *  future DPS-growth refinement (C§3) is a drop-in: v1 callers return a constant (current DPS). */
+/** Per-row data-confidence signal: whether a stage's per-clear XP came from the player's OWN measured
+ *  runs on that stage ("measured") or was projected from the datamine × the player's recovered
+ *  effective multiplier ("estimated"). Drives the badge; replaces the old global "bonus uncaptured"
+ *  banners. The data layer (planner-data.ts) sets it. */
+export type CandidateSource = "measured" | "estimated";
+
+/**
+ * A candidate the climb may pick at any level. Both rate inputs are FUNCTIONS of hero level so the
+ * data layer can scale them as the gap changes:
+ *  - `expPerClearAtLevel(L)` — the XP the hero earns per clear at level L. The data layer bakes the
+ *    keep penalty, the rune/accessory bonus and the account multiplier into this number (measured
+ *    runs already embed all of it; estimated stages apply the recovered multiplier). FINITE, ≥0.
+ *  - `clearTimeAtLevel(L)` — seconds to clear the stage at level L (v1 callers return a constant).
+ * The per-level rate is simply `expPerClearAtLevel(L) / clearTimeAtLevel(L).seconds`.
+ */
 export interface ClimbCandidate {
   stageKey: number;
   stageLevel: number;
-  expPerClear: number;
+  expPerClearAtLevel: (heroLevel: number) => number;
   clearTimeAtLevel: (heroLevel: number) => ClearTimeResult;
+  /** Whether `expPerClearAtLevel` is anchored on the player's measured runs on this stage. */
+  source: CandidateSource;
 }
 
 export interface ClimbHero {
@@ -280,7 +201,6 @@ export interface ClimbHero {
   level: number;
   /** Within-level EXP already banked (RunHero.exp) — sets the FIRST band's remainder (edge E8). */
   expIntoLevel: number;
-  bonusPct: number;
 }
 
 export interface PlanBand {
@@ -293,6 +213,8 @@ export interface PlanBand {
   clearTier: ClearTimeTier;
   clearConfidence: ClearConfidence;
   keepConfidence: KeepConfidence;
+  /** The band's stage's data source — drives the per-row measured/estimated badge. */
+  source: CandidateSource;
 }
 
 export type PlanStatus = "ok" | "capped" | "already-at-target" | "no-farmable-stage";
@@ -315,6 +237,7 @@ interface LevelStep {
   clearTier: ClearTimeTier;
   clearConfidence: ClearConfidence;
   keepConfidence: KeepConfidence;
+  source: CandidateSource;
 }
 
 const CONFIDENCE_RANK: Record<ClearConfidence, number> = {
@@ -325,31 +248,32 @@ const CONFIDENCE_RANK: Record<ClearConfidence, number> = {
   none: 4,
 };
 const KEEP_RANK: Record<KeepConfidence, number> = { solid: 0, thin: 1, approx: 2 };
+const SOURCE_RANK: Record<CandidateSource, number> = { measured: 0, estimated: 1 };
 
-/** Per-level argmax: the best stage at a given hero level, with the modeled rate it achieves. Shared
- *  by the single-hero climb (band engine) and the team loop. Returns null when no farmable stage. */
+/** Pure per-(level,stage) rate: XP earned per second on a candidate at a hero level. The single
+ *  source of "how fast is this stage" used by every traversal. ≤0 / non-finite inputs → 0 (no
+ *  income), so callers can filter on `rate > 0`. */
+function candidateRate(cand: ClimbCandidate, level: number): { rate: number; clear: ClearTimeResult } {
+  const clear = cand.clearTimeAtLevel(level);
+  const clearSec = clear.seconds;
+  if (!Number.isFinite(clearSec) || clearSec <= 0) return { rate: 0, clear };
+  const xpc = cand.expPerClearAtLevel(level);
+  if (!Number.isFinite(xpc) || xpc <= 0) return { rate: 0, clear };
+  return { rate: xpc / clearSec, clear };
+}
+
+/** Per-level argmax: the best stage at a given hero level, with the rate it achieves. Shared by the
+ *  single-hero climb (band engine) and the team loop. Returns null when no farmable stage. */
 function bestStageAtLevel(
   level: number,
-  bonusPct: number,
   candidates: ReadonlyArray<ClimbCandidate>,
-  accountXpMultiplier: number,
   excludeUnderLevel: boolean,
 ): { cand: ClimbCandidate; rate: number; clear: ClearTimeResult } | null {
   let best: { cand: ClimbCandidate; rate: number; clear: ClearTimeResult } | null = null;
   for (const cand of candidates) {
     if (excludeUnderLevel && cand.stageLevel > level) continue; // edge E4: stay in the validated region
-    const clear = cand.clearTimeAtLevel(level);
-    const clearSec = clear.seconds;
-    if (!Number.isFinite(clearSec) || clearSec <= 0) continue; // edge E5: no income on this stage
-    const rate = modeledExpPerSecond(
-      cand.expPerClear,
-      level,
-      cand.stageLevel,
-      clearSec,
-      bonusPct,
-      accountXpMultiplier,
-    );
-    if (rate <= 0) continue;
+    const { rate, clear } = candidateRate(cand, level);
+    if (rate <= 0) continue; // edge E5: no income on this stage
     // Deterministic tiebreak by stageKey so equal-rate ties (and tests) are stable.
     if (best == null || rate > best.rate || (rate === best.rate && cand.stageKey < best.cand.stageKey)) {
       best = { cand, rate, clear };
@@ -359,7 +283,7 @@ function bestStageAtLevel(
 }
 
 /** Collapse a per-level step list into maximal same-stage bands [from, to) (half-open). The band
- *  inherits the WEAKEST confidence of its member levels. */
+ *  inherits the WEAKEST confidence (clear + keep + source) of its member levels. */
 function collapseBands(steps: ReadonlyArray<LevelStep>): PlanBand[] {
   const bands: PlanBand[] = [];
   let i = 0;
@@ -370,6 +294,7 @@ function collapseBands(steps: ReadonlyArray<LevelStep>): PlanBand[] {
     let clearConfidence = steps[i].clearConfidence;
     let keepConfidence = steps[i].keepConfidence;
     let clearTier = steps[i].clearTier;
+    let source = steps[i].source;
     for (let k = i; k <= j; k++) {
       seconds += steps[k].seconds;
       if (CONFIDENCE_RANK[steps[k].clearConfidence] > CONFIDENCE_RANK[clearConfidence]) {
@@ -379,6 +304,7 @@ function collapseBands(steps: ReadonlyArray<LevelStep>): PlanBand[] {
       if (KEEP_RANK[steps[k].keepConfidence] > KEEP_RANK[keepConfidence]) {
         keepConfidence = steps[k].keepConfidence;
       }
+      if (SOURCE_RANK[steps[k].source] > SOURCE_RANK[source]) source = steps[k].source;
     }
     bands.push({
       fromLevel: steps[i].level,
@@ -389,6 +315,7 @@ function collapseBands(steps: ReadonlyArray<LevelStep>): PlanBand[] {
       clearTier,
       clearConfidence,
       keepConfidence,
+      source,
     });
     i = j + 1;
   }
@@ -397,7 +324,8 @@ function collapseBands(steps: ReadonlyArray<LevelStep>): PlanBand[] {
 
 /**
  * EXACTLY-OPTIMAL single-hero climb: per-level argmax + band collapse (C§1, proven by exchange/
- * separability and verified against a brute-force DP). Pure.
+ * separability and verified against a brute-force DP). Pure. `candidates` is THIS hero's array (the
+ * data layer builds a hero-specific candidate set so the measured XP is per-hero).
  *
  * Edge cases route to {@link PlanStatus}, never a NaN/Infinity band:
  *  - target ≤ current → "already-at-target" (E6/E2, empty bands, 0s)
@@ -410,7 +338,6 @@ export function singleHeroClimb(
   targetLevel: number,
   candidates: ReadonlyArray<ClimbCandidate>,
   curve: LevelCurve,
-  accountXpMultiplier: number,
   opts: { excludeUnderLevel: boolean },
 ): HeroPlan {
   const cappedTarget = Math.min(targetLevel, MAX_LEVEL);
@@ -424,13 +351,7 @@ export function singleHeroClimb(
       // Hit the cap before reaching target (E1).
       return { heroKey: hero.heroKey, status: "capped", bands: [], totalSeconds: 0 };
     }
-    const best = bestStageAtLevel(
-      level,
-      hero.bonusPct,
-      candidates,
-      accountXpMultiplier,
-      opts.excludeUnderLevel,
-    );
+    const best = bestStageAtLevel(level, candidates, opts.excludeUnderLevel);
     if (best == null) {
       return { heroKey: hero.heroKey, status: "no-farmable-stage", bands: [], totalSeconds: 0 };
     }
@@ -445,6 +366,7 @@ export function singleHeroClimb(
       clearTier: best.clear.tier,
       clearConfidence: best.clear.confidence,
       keepConfidence: keepConfidenceOf(gap),
+      source: best.cand.source,
     });
   }
   const bands = collapseBands(steps);
@@ -476,7 +398,6 @@ interface TeamHeroState {
   heroKey: number;
   level: number;
   expIntoLevel: number;
-  bonusPct: number;
   finishSeconds: number | null; // set when this hero first reaches target
 }
 
@@ -499,7 +420,7 @@ function xpRemainingToTarget(state: TeamHeroState, target: number, curve: LevelC
 interface SegmentChoice {
   cand: ClimbCandidate;
   clear: ClearTimeResult;
-  /** heroKey → modeled rate on the chosen stage at that hero's current level. */
+  /** heroKey → rate on the chosen stage at that hero's current level. */
   rates: Map<number, number>;
   /** The hero whose normalized progress the stage maximizes (the binding constraint). */
   gatingHeroKey: number;
@@ -507,14 +428,16 @@ interface SegmentChoice {
 
 /** Greedy-minnorm stage pick for the current team state: maximize, over not-done heroes, the MIN of
  *  (rate / xpRemainingToTarget) — i.e. balance normalized progress so no hero falls behind. Returns
- *  null when no stage gives every not-done hero positive income. */
+ *  null when no stage gives every not-done hero positive income. The per-hero rate uses THIS team's
+ *  shared candidate array; each hero's `expPerClearAtLevel` is its own (the data layer keys the map
+ *  by hero), but the stage SET + clear-time per stage are shared. */
 function pickStageMinNorm(
   notDone: ReadonlyArray<TeamHeroState>,
   target: number,
   candidates: ReadonlyArray<ClimbCandidate>,
   curve: LevelCurve,
-  accountXpMultiplier: number,
   excludeUnderLevel: boolean,
+  ratesByHero: PerHeroRates,
 ): SegmentChoice | null {
   // Precompute each not-done hero's remaining XP (independent of stage).
   const remaining = new Map<number, number>();
@@ -532,19 +455,7 @@ function pickStageMinNorm(
         feasible = false;
         break;
       }
-      const clear = cand.clearTimeAtLevel(h.level);
-      const clearSec = clear.seconds;
-      const rate =
-        Number.isFinite(clearSec) && clearSec > 0
-          ? modeledExpPerSecond(
-              cand.expPerClear,
-              h.level,
-              cand.stageLevel,
-              clearSec,
-              h.bonusPct,
-              accountXpMultiplier,
-            )
-          : 0;
+      const rate = ratesByHero.rate(h.heroKey, cand, h.level);
       if (rate <= 0) {
         feasible = false;
         break;
@@ -565,9 +476,36 @@ function pickStageMinNorm(
   return best;
 }
 
+/**
+ * Resolver of per-(hero,stage,level) rates for the team loop. In the team API every hero may carry
+ * its OWN `expPerClearAtLevel` for a given stageKey (measured XP is per-hero), so a hero's rate must
+ * be evaluated against THAT hero's candidate. We index per hero by stageKey; the shared candidate
+ * array drives the iteration order + clear-time, and this resolver swaps in the hero-specific XP.
+ */
+class PerHeroRates {
+  private readonly byHero: Map<number, Map<number, ClimbCandidate>>;
+  constructor(candidatesByHero: ReadonlyMap<number, ReadonlyArray<ClimbCandidate>>) {
+    this.byHero = new Map();
+    for (const [heroKey, cands] of candidatesByHero) {
+      const m = new Map<number, ClimbCandidate>();
+      for (const c of cands) m.set(c.stageKey, c);
+      this.byHero.set(heroKey, m);
+    }
+  }
+  /** This hero's rate on `sharedCand`'s stage at `level`, using the hero's own per-clear XP closure
+   *  but the shared candidate's clear-time (clears are shared across the team). 0 when the hero has
+   *  no entry for that stage or no income. */
+  rate(heroKey: number, sharedCand: ClimbCandidate, level: number): number {
+    const own = this.byHero.get(heroKey)?.get(sharedCand.stageKey);
+    if (!own) return 0;
+    const { rate } = candidateRate(own, level);
+    return rate;
+  }
+}
+
 /** Advance the team by one segment on `choice.cand`: farm until the next not-done hero levels up,
- *  applying the XP gain to every not-done hero. Mutates `states`; returns the segment duration and
- *  the clear-time result observed (for the band confidence). Infinity → caller bails (E5). */
+ *  applying the XP gain to every not-done hero. Mutates `states`; returns the segment duration.
+ *  Infinity → caller bails (E5). */
 function advanceSegment(
   choice: SegmentChoice,
   states: ReadonlyArray<TeamHeroState>,
@@ -613,8 +551,8 @@ function minNormMakespan(
   target: number,
   candidates: ReadonlyArray<ClimbCandidate>,
   curve: LevelCurve,
-  accountXpMultiplier: number,
   excludeUnderLevel: boolean,
+  ratesByHero: PerHeroRates,
   startElapsed = 0,
 ): number {
   let elapsed = startElapsed;
@@ -624,7 +562,7 @@ function minNormMakespan(
   while (states.some((s) => s.level < target)) {
     if (++segs > maxSegments) return Infinity;
     const notDone = states.filter((s) => s.level < target);
-    const choice = pickStageMinNorm(notDone, target, candidates, curve, accountXpMultiplier, excludeUnderLevel);
+    const choice = pickStageMinNorm(notDone, target, candidates, curve, excludeUnderLevel, ratesByHero);
     if (choice == null) return Infinity;
     const dt = advanceSegment(choice, states, target, curve, elapsed);
     if (!Number.isFinite(dt)) return Infinity;
@@ -640,28 +578,39 @@ function cloneStates(states: ReadonlyArray<TeamHeroState>): TeamHeroState[] {
 /**
  * TEAM climb (shared clears, makespan) via greedy-minnorm with a 1-step rollout (C§2). Pure.
  *
- * The team farms one stage at a time; each clear advances every not-done hero at its own keep-rate.
- * The objective is the MAKESPAN — the time the last hero reaches target. Greedy-minnorm balances
- * normalized progress; the 1-step rollout (DEFAULT, per review issue #1) closes the known
- * keep-cliff counterexamples where bare minnorm is up to ~3.85% off optimal. `perHero[]` is each
- * hero's EXACT single-hero plan (shown alongside). Capped heroes are "done" and never gate.
+ * The team farms one stage at a time; each clear advances every not-done hero at its own rate (the
+ * shared-clear semantics: when the team picks stage S for a step, each hero advances via its own
+ * `candidatesByHero.get(heroKey)` entry for S; clear-time per stage is identical across heroes). The
+ * objective is the MAKESPAN — the time the last hero reaches target. Greedy-minnorm balances
+ * normalized progress; the 1-step rollout (DEFAULT, per review issue #1) closes the known keep-cliff
+ * counterexamples where bare minnorm is up to ~3.85% off optimal. `perHero[]` is each hero's EXACT
+ * single-hero plan. Capped heroes are "done" and never gate.
+ *
+ * `candidatesByHero` maps heroKey → that hero's candidate array (same stage SET/keys per hero,
+ * hero-specific `expPerClearAtLevel`). The first party member's array (or any hero's) defines the
+ * shared stage iteration; per-hero rates are resolved against each hero's own array.
  *
  * `opts.rollout` defaults to TRUE; pass false only as a test/benchmark escape hatch.
  */
 export function teamClimb(
   party: ReadonlyArray<ClimbHero>,
   targetLevel: number,
-  candidates: ReadonlyArray<ClimbCandidate>,
+  candidatesByHero: ReadonlyMap<number, ReadonlyArray<ClimbCandidate>>,
   curve: LevelCurve,
-  accountXpMultiplier: number,
   opts: { excludeUnderLevel: boolean; rollout?: boolean },
 ): TeamPlan {
   const target = Math.min(targetLevel, MAX_LEVEL);
   const rollout = opts.rollout ?? true; // review fix #1: rollout is the DEFAULT.
+  const ratesByHero = new PerHeroRates(candidatesByHero);
+
+  // The shared stage iteration set: every distinct stageKey across the heroes' arrays. Using a union
+  // (rather than one hero's array) keeps the loop correct even if the data layer ever emits ragged
+  // sets; today they are identical per hero. Deduped, deterministic by stageKey.
+  const shared = sharedCandidateAxis(candidatesByHero);
 
   // Per-hero exact plans (always computed — they are the provably-optimal individual view).
   const perHero = party.map((h) =>
-    singleHeroClimb(h, target, candidates, curve, accountXpMultiplier, {
+    singleHeroClimb(h, target, candidatesByHero.get(h.heroKey) ?? [], curve, {
       excludeUnderLevel: opts.excludeUnderLevel,
     }),
   );
@@ -671,7 +620,6 @@ export function teamClimb(
     heroKey: h.heroKey,
     level: h.level,
     expIntoLevel: h.expIntoLevel,
-    bonusPct: h.bonusPct,
     finishSeconds: h.level >= target ? 0 : null,
   }));
 
@@ -699,14 +647,7 @@ export function teamClimb(
     if (++segs > maxSegments) break; // defensive; should never trigger with positive rates
     const notDone = states.filter((s) => s.level < target);
 
-    let choice = pickStageMinNorm(
-      notDone,
-      target,
-      candidates,
-      curve,
-      accountXpMultiplier,
-      opts.excludeUnderLevel,
-    );
+    let choice = pickStageMinNorm(notDone, target, shared, curve, opts.excludeUnderLevel, ratesByHero);
     if (choice == null) {
       return {
         status: "no-farmable-stage",
@@ -721,40 +662,16 @@ export function teamClimb(
     if (rollout) {
       // Score each first-stage choice by its rollout makespan (force that stage for one segment on a
       // CLONE, then run bare minnorm to the end) and keep the minimum. Closes minnorm's one-step
-      // myopia (review issue #1: bare minnorm is up to ~3.85% off optimal in-region; rollout → exact
-      // on the known counterexamples). The committable SegmentChoice is rebuilt against the real
-      // not-done set so it advances the live state. Ties fall back to minnorm's pick (stage-key
-      // order), keeping the result deterministic.
-      let bestMakespan = makespanFromTrial(
-        states,
-        choice.cand,
-        target,
-        candidates,
-        curve,
-        accountXpMultiplier,
-        opts.excludeUnderLevel,
-      );
-      for (const cand of candidates) {
+      // myopia (review issue #1). The committable SegmentChoice is rebuilt against the real not-done
+      // set so it advances the live state. Ties fall back to minnorm's pick (stage-key order),
+      // keeping the result deterministic.
+      let bestMakespan = makespanFromTrial(states, choice.cand, target, shared, curve, opts.excludeUnderLevel, ratesByHero);
+      for (const cand of shared) {
         if (cand.stageKey === choice.cand.stageKey) continue;
-        const candMakespan = makespanFromTrial(
-          states,
-          cand,
-          target,
-          candidates,
-          curve,
-          accountXpMultiplier,
-          opts.excludeUnderLevel,
-        );
+        const candMakespan = makespanFromTrial(states, cand, target, shared, curve, opts.excludeUnderLevel, ratesByHero);
         // Strictly better only (no `<=`), so the minnorm default wins exact ties → determinism.
         if (candMakespan < bestMakespan - 1e-9) {
-          const rebuilt = scoreFirstChoice(
-            cand,
-            notDone,
-            target,
-            curve,
-            accountXpMultiplier,
-            opts.excludeUnderLevel,
-          );
+          const rebuilt = scoreFirstChoice(cand, notDone, target, curve, opts.excludeUnderLevel, ratesByHero);
           if (rebuilt != null) {
             bestMakespan = candMakespan;
             choice = rebuilt;
@@ -810,6 +727,20 @@ export function teamClimb(
   };
 }
 
+/** The shared stage axis for the team loop: one ClimbCandidate per distinct stageKey across all
+ *  heroes (deduped by stageKey, sorted for determinism). Clear-time + stageLevel are shared, so any
+ *  hero's candidate for a stage is a fine representative for iteration; per-hero XP is swapped in by
+ *  {@link PerHeroRates}. */
+function sharedCandidateAxis(
+  candidatesByHero: ReadonlyMap<number, ReadonlyArray<ClimbCandidate>>,
+): ClimbCandidate[] {
+  const byKey = new Map<number, ClimbCandidate>();
+  for (const cands of candidatesByHero.values()) {
+    for (const c of cands) if (!byKey.has(c.stageKey)) byKey.set(c.stageKey, c);
+  }
+  return [...byKey.values()].sort((a, b) => a.stageKey - b.stageKey);
+}
+
 /** Build a SegmentChoice for a SPECIFIC candidate against the given not-done heroes (the rollout's
  *  forced first move). Returns null if the candidate gives any not-done hero zero income. */
 function scoreFirstChoice(
@@ -817,8 +748,8 @@ function scoreFirstChoice(
   notDone: ReadonlyArray<TeamHeroState>,
   target: number,
   curve: LevelCurve,
-  accountXpMultiplier: number,
   excludeUnderLevel: boolean,
+  ratesByHero: PerHeroRates,
 ): SegmentChoice | null {
   const remaining = new Map<number, number>();
   for (const h of notDone) remaining.set(h.heroKey, Math.max(1e-9, xpRemainingToTarget(h, target, curve)));
@@ -827,12 +758,7 @@ function scoreFirstChoice(
   let gatingHeroKey = notDone[0]?.heroKey ?? -1;
   for (const h of notDone) {
     if (excludeUnderLevel && cand.stageLevel > h.level) return null;
-    const clear = cand.clearTimeAtLevel(h.level);
-    const clearSec = clear.seconds;
-    const rate =
-      Number.isFinite(clearSec) && clearSec > 0
-        ? modeledExpPerSecond(cand.expPerClear, h.level, cand.stageLevel, clearSec, h.bonusPct, accountXpMultiplier)
-        : 0;
+    const rate = ratesByHero.rate(h.heroKey, cand, h.level);
     if (rate <= 0) return null;
     rates.set(h.heroKey, rate);
     const norm = rate / (remaining.get(h.heroKey) ?? 1);
@@ -852,18 +778,18 @@ function makespanFromTrial(
   target: number,
   candidates: ReadonlyArray<ClimbCandidate>,
   curve: LevelCurve,
-  accountXpMultiplier: number,
   excludeUnderLevel: boolean,
+  ratesByHero: PerHeroRates,
 ): number {
   const trial = cloneStates(realStates);
   const notDone = trial.filter((s) => s.level < target);
-  const firstChoice = scoreFirstChoice(cand, notDone, target, curve, accountXpMultiplier, excludeUnderLevel);
+  const firstChoice = scoreFirstChoice(cand, notDone, target, curve, excludeUnderLevel, ratesByHero);
   if (firstChoice == null) return Infinity;
   const dt = advanceSegment(firstChoice, trial, target, curve, 0);
   if (!Number.isFinite(dt)) return Infinity;
   // Continue with bare minnorm, threading `dt` as the origin so the returned value is the ABSOLUTE
   // makespan (the forced first segment + everything after).
-  return minNormMakespan(trial, target, candidates, curve, accountXpMultiplier, excludeUnderLevel, dt);
+  return minNormMakespan(trial, target, candidates, curve, excludeUnderLevel, ratesByHero, dt);
 }
 
 /** Collapse consecutive same-stage team segments into bands, tracking the gating hero per band. */
@@ -889,9 +815,59 @@ function collapseTeamSegments(
       clearTier: clear.tier,
       clearConfidence: clear.confidence,
       keepConfidence: keepConfidenceOf(gap),
-      gatingHeroKey: head.gatingHeroKey,
+      source: head.choice.cand.source,
+      gatingHeroKey: head.choice.gatingHeroKey,
     });
     i = j + 1;
   }
   return bands;
+}
+
+// ─────────────────────────── NEXT-LEVEL RANK (the "3-9 vs 3-7?" answer) ───────────────────────────
+
+/** One ranked stage option for taking a hero from its current level to the next, sorted by time. */
+export interface NextLevelRank {
+  stageKey: number;
+  stageLevel: number;
+  /** Seconds to earn this level-up on this stage at the hero's CURRENT level. Finite, > 0. */
+  seconds: number;
+  source: CandidateSource;
+  keepConfidence: KeepConfidence;
+}
+
+/**
+ * Rank the candidate stages for advancing `hero` ONE level (level → level+1), fastest first. For each
+ * candidate: `seconds = xpNeededToNextLevel(hero) / rate(hero.level)`, where the XP needed is the
+ * remaining EXP into the current level (`expToNextLevel(level) − expIntoLevel`). Pure.
+ *
+ * Excludes candidates with no income (rate ≤ 0 / non-finite) and capped heroes (no next level). When
+ * `excludeUnderLevel`, drops stages above the hero's level (stay in the validated keep region).
+ * Deterministic: ties on time break by stageKey. This is the "should I farm 3-9 or 3-7?" answer.
+ */
+export function rankNextLevel(
+  hero: ClimbHero,
+  candidates: ReadonlyArray<ClimbCandidate>,
+  curve: LevelCurve,
+  opts: { excludeUnderLevel: boolean } = { excludeUnderLevel: true },
+): NextLevelRank[] {
+  const need = expToNextLevel(hero.level, curve);
+  if (need == null) return []; // capped — no next level
+  const remaining = Math.max(0, need - hero.expIntoLevel);
+  const out: NextLevelRank[] = [];
+  for (const cand of candidates) {
+    if (opts.excludeUnderLevel && cand.stageLevel > hero.level) continue;
+    const { rate } = candidateRate(cand, hero.level);
+    if (rate <= 0) continue;
+    const seconds = remaining / rate;
+    if (!Number.isFinite(seconds) || seconds < 0) continue;
+    out.push({
+      stageKey: cand.stageKey,
+      stageLevel: cand.stageLevel,
+      seconds,
+      source: cand.source,
+      keepConfidence: keepConfidenceOf(hero.level - cand.stageLevel),
+    });
+  }
+  out.sort((a, b) => a.seconds - b.seconds || a.stageKey - b.stageKey);
+  return out;
 }
