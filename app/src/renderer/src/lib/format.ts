@@ -35,6 +35,23 @@ export function formatDuration(seconds: number): string {
   return `${rounded}s`;
 }
 
+/** Compact, human ETA from a second count — for the time-to-level readout, which spans seconds to
+ *  days at high levels (`formatDuration`'s raw "7193s" is unreadable there). "45s", "12m", "1h59m",
+ *  "2d3h". Non-finite or negative (no XP income / capped) → "—". */
+export function formatEta(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds < 0) return "—";
+  const s = Math.round(seconds);
+  if (s < 60) return `${s}s`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  const mm = m % 60;
+  if (h < 24) return mm ? `${h}h${mm}m` : `${h}h`;
+  const d = Math.floor(h / 24);
+  const hh = h % 24;
+  return hh ? `${d}d${hh}h` : `${d}d`;
+}
+
 export function statusLabel(status: RunStatus, t: Translate = tEn): string {
   switch (status) {
     case "success":

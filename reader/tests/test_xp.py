@@ -363,3 +363,52 @@ class TestPartyXpAccumulator:
         assert acc.total() is None                           # nothing valid seen yet
         acc.update({601: (10, 100.0)})
         assert acc.total() == pytest.approx(0.0)
+
+
+# ---------------------------------------------------------------------------
+# party_progress — per-hero live leveling snapshot for the overlay (level+exp+gain)
+# ---------------------------------------------------------------------------
+
+class TestPartyProgress:
+    def test_combines_snapshot_level_exp_with_accumulated_gain(self):
+        acc = PartyXpAccumulator()
+        acc.update({101: (91, 1000.0)})
+        acc.update({101: (91, 1500.0)})                      # +500 gain
+        prog = xp_mod.party_progress(acc, {101: (91, 1500.0)})
+        assert prog == {101: {"level": 91, "exp": 1500.0, "gain": 500.0}}
+
+    def test_seen_no_gain_yet_is_zero_not_none(self):
+        """1st sighting -> gain 0.0 (VALID), never None: the entry is always renderable."""
+        acc = PartyXpAccumulator()
+        acc.update({101: (91, 1000.0)})
+        assert xp_mod.party_progress(acc, {101: (91, 1000.0)})[101]["gain"] == 0.0
+
+    def test_capped_hero_gain_zero(self, real_curve):
+        """Hero at the cap (101): accumulated gain is phantom-suppressed to 0.0; level/exp still raw."""
+        acc = PartyXpAccumulator()
+        acc.update({201: (101, 3.0e9)})
+        acc.update({201: (101, 3.0e9 + 50_000.0)})
+        e = xp_mod.party_progress(acc, {201: (101, 3.0e9 + 50_000.0)})[201]
+        assert e["level"] == 101
+        assert e["gain"] == 0.0
+        assert e["exp"] == pytest.approx(3.0e9 + 50_000.0)
+
+    def test_keyed_by_current_snapshot_absent_hero_omitted(self):
+        """A hero in the accumulator but ABSENT from the current snapshot (dead/dropped) gets no
+        entry — there's no live rate to project for someone not gaining right now."""
+        acc = PartyXpAccumulator()
+        acc.update({101: (91, 100.0), 301: (93, 200.0)})
+        acc.update({101: (91, 300.0), 301: (93, 400.0)})
+        prog = xp_mod.party_progress(acc, {101: (91, 300.0)})   # only 101 deployed now
+        assert set(prog) == {101}
+
+    def test_empty_and_garbage_never_raise(self):
+        acc = PartyXpAccumulator()
+        assert xp_mod.party_progress(acc, {}) == {}
+        assert xp_mod.party_progress(acc, None) == {}
+        assert xp_mod.party_progress(acc, {101: None, 301: (None, 5.0), 401: "x"}) == {}
+
+    def test_none_accumulator_degrades_to_zero_gain(self):
+        """No accumulator (defensive) -> still emits level/exp with gain 0.0 (never raises)."""
+        assert xp_mod.party_progress(None, {101: (91, 1000.0)}) == {
+            101: {"level": 91, "exp": 1000.0, "gain": 0.0}}

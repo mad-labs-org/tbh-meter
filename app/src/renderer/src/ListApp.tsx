@@ -7,6 +7,7 @@ import { RunListView } from "~/views/RunListView";
 import { RunDetailView } from "~/views/RunDetailView";
 import { SettingsView } from "~/views/SettingsView";
 import { CooldownsView } from "~/views/CooldownsView";
+import { PlannerView } from "~/views/PlannerView";
 import { SignInPromptModal } from "~/components/SignInPromptModal";
 
 export default function ListApp() {
@@ -57,6 +58,7 @@ export default function ListApp() {
             />
           ))}
         {activeTab === "cooldowns" && <CooldownsView />}
+        {activeTab === "planner" && <PlannerView />}
         {activeTab === "settings" && (
           <SettingsView settings={settings} onSettingsChange={handleSettingsChange} />
         )}

@@ -75,6 +75,7 @@ function snap(stageKey: number, drops: [number, number, number]): LiveSnapshot {
     party: null,
     drops,
     partyStats: null,
+    partyProgress: null,
     approx: true,
   };
 }

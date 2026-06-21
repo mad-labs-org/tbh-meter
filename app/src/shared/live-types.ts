@@ -50,4 +50,10 @@ export interface RawLive {
    *  ADDITIVE (no schema bump): an older reader omits it; the app detects it by presence and the
    *  per-hero resistance tooltip simply doesn't render. Empty `{}` = no live party. */
   party_stats?: Record<string, Record<string, number>>;
+  /** Live per-hero LEVELING snapshot — `{heroKey: {level, exp, gain}}` (heroKey is a JSON string;
+   *  `exp` is within-level so the app's "remaining" is curve[level]−exp; `gain` is the run's
+   *  accumulated xp, from which the app derives the live rate). ADDITIVE (no schema bump): an older
+   *  reader omits it; the app detects it by presence and the time-to-level chip simply doesn't render.
+   *  Empty `{}` = no live party. Powers the overlay's "time to next level". */
+  party_progress?: Record<string, { level: number; exp: number; gain: number }>;
 }

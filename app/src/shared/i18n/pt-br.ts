@@ -29,6 +29,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.noLoot": "sem loot",
   "live.team": "Time",
   "live.time": "Tempo",
+  "live.timeToLevel": "Time to level",
+  "live.maxed": "MAX",
   "live.chestCommon": "Comum",
   "live.chestStageBoss": "Boss da fase",
   "live.chestActBoss": "Boss do ato",
@@ -319,4 +321,67 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "ago.w": "{n}sem atrás",
   "ago.mo": "{n}mês atrás",
   "ago.y": "{n}a atrás",
+
+  // ── EXP "Leveling Planner" (English source — new strings stay English) ──
+  "header.tabPlanner": "Leveling Planner",
+  // Step 1 — pick the subject
+  "planner.stepWho": "Who do you want to level?",
+  "planner.subjectTeam": "Team",
+  "planner.subjectTeamFull": "Whole team",
+  "planner.heroesCaption": "Your {n} most-recently-played heroes, from your run history.",
+  "planner.maxPill": "MAX",
+  // Step 2 — target
+  "planner.stepHowFar": "How far?",
+  "planner.targetLabel": "Target level",
+  // Step 3 — the plan + its sub-tabs
+  "planner.planForHero": "{subject}'s plan",
+  "planner.tabFullClimb": "Full Climb",
+  "planner.tabNextLevel": "Next Level",
+  // Data-basis mode (practical = farmed-only / theoretical = + datamine estimates)
+  "planner.modePractical": "Practical",
+  "planner.modeTheoretical": "Theoretical",
+  "planner.modePracticalDef": "Only stages you've farmed — ranked by your real XP/s. No estimates.",
+  "planner.modeTheoreticalDef": "Every stage, including ones you've never farmed — times are game-data estimates.",
+  "planner.practicalEmpty": "No farmed stages for this hero yet — switch to",
+  // Full Climb tab
+  "planner.climbTo": "To {target}",
+  "planner.climbTotal": "≈ {time} · at {dps} DPS",
+  "planner.colLevels": "Levels",
+  "planner.colStage": "Best stage",
+  "planner.colTime": "Time",
+  "planner.colSource": "Source",
+  "planner.gatedBy": "Gated by {hero} (last to finish).",
+  "planner.perHeroBreakdown": "Per-hero breakdown",
+  // Next Level tab
+  "planner.nextLevelUp": "Next level-up",
+  "planner.nextLevelJump": "Lv {from} → {to}",
+  "planner.nextBestRoute": "best route",
+  "planner.nextWhereToFarm": "Where to farm it — fastest first:",
+  "planner.showAllStages": "Show all {n}",
+  "planner.showFewer": "Show fewer",
+  "planner.gatingHero": "gating hero",
+  // Source badges (the only confidence signal — measured XP vs datamine estimate)
+  "planner.srcMeasured": "your runs",
+  "planner.srcEstimated": "estimated",
+  "planner.srcMeasuredTip": "Time from the real XP you earned on this stage — your runes & accessories are already baked in.",
+  "planner.srcEstimatedTip": "You haven't farmed this stage — projected from game data scaled by your measured EXP rate; sharpens as you play it.",
+  "planner.footMeasuredVsEstimated":
+    "From your runs = the real XP you earned there. Estimated = stages you haven't farmed, projected from game data.",
+  // Under-level keep warning (the lone keep caveat that survives)
+  "planner.keepApprox": "above your level",
+  "planner.keepApproxTip":
+    "This stage is above your level — the XP-keep here is unvalidated; treat as a rough guide.",
+  "planner.noFarmStage": "No valid farm stage at Lv {level} — clear a higher stage first.",
+  // How it works
+  "planner.howTitle": "How it works",
+  "planner.how1": "Reads your runs — your levels, clear times, and the real XP you gained per stage.",
+  "planner.how2": "Finds the fastest route — the best stage for each level as you climb (the sweet spot rises with you).",
+  "planner.how3": "Honest about confidence — ● from your runs where you've farmed; ◔ estimated from game data elsewhere.",
+  // States
+  "planner.emptyTitle": "Play a few runs first",
+  "planner.emptyBody":
+    "The planner learns from your own clears — your levels, clear times, and the real XP you gained per stage. Once you've finished a run or two, it'll map the fastest path to your target level.",
+  "planner.maxedTitle": "Your team is maxed",
+  "planner.maxedBody": "Nothing left to climb.",
+  "planner.alreadyThere": "Already at the target level.",
 };

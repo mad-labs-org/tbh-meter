@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ago, qualityBadge } from "./format";
+import { ago, formatEta, qualityBadge } from "./format";
 
 describe("qualityBadge", () => {
   it("labels each non-counted verdict", () => {
@@ -26,6 +26,31 @@ describe("qualityBadge", () => {
 
   it("does not mark a legacy run with no verdict", () => {
     expect(qualityBadge(undefined)).toBeNull();
+  });
+});
+
+describe("formatEta — compact human ETA for time-to-level", () => {
+  it("shows seconds under a minute", () => {
+    expect(formatEta(0)).toBe("0s");
+    expect(formatEta(45)).toBe("45s");
+    expect(formatEta(59.4)).toBe("59s");
+  });
+
+  it("shows whole minutes under an hour", () => {
+    expect(formatEta(60)).toBe("1m");
+    expect(formatEta(52 * 60)).toBe("52m");
+  });
+
+  it("shows hours+minutes, then days+hours at high levels", () => {
+    expect(formatEta(2 * 3600)).toBe("2h");
+    expect(formatEta(3600 + 59 * 60)).toBe("1h59m");
+    expect(formatEta(2 * 86400 + 3 * 3600)).toBe("2d3h");
+  });
+
+  it("returns — for no income (Infinity) or bad input", () => {
+    expect(formatEta(Infinity)).toBe("—");
+    expect(formatEta(-5)).toBe("—");
+    expect(formatEta(NaN)).toBe("—");
   });
 });
 

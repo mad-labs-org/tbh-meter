@@ -3,6 +3,7 @@ import skillsData from "../../../shared/data/skills.json";
 import stagesData from "../../../shared/data/stages.json";
 import itemsMinData from "../../../shared/data/items-min.json";
 import chestsMinData from "../../../shared/data/chests-min.json";
+import levelCurveData from "../../../shared/data/level_curve.json";
 import { boxLevel } from "../../../shared/chest-boxes";
 // Stage→box + the route's box list live in shared/ (the main process keys cooldowns by box too);
 // re-exported here so renderer code keeps importing chest facts from one place (game-data).
@@ -40,6 +41,11 @@ const stages = stagesData as StageRecord[];
 export const heroMap = new Map<number, HeroRecord>(heroes.map((h) => [h.key, h]));
 export const skillMap = new Map<number, SkillRecord>(skills.map((s) => [s.key, s]));
 export const stageMap = new Map<number, StageRecord>(stages.map((s) => [s.key, s]));
+
+/** Hero leveling curve {level: ExpForLevelUp} (LevelInfoData), synced from reader/config into the
+ *  bundled data. Levels 1..100 present; 101+ absent = the cap (no further progression). Feeds the
+ *  overlay's time-to-level via exp-model (expToNextLevel / timeToNextLevel). */
+export const levelCurve = levelCurveData as Record<number, number>;
 
 export function heroName(key: number): string {
   return heroMap.get(key)?.name ?? `Hero ${key}`;

@@ -8,7 +8,7 @@ import { cn } from "~/lib/utils";
 const drag = { WebkitAppRegion: "drag" } as React.CSSProperties;
 const noDrag = { WebkitAppRegion: "no-drag" } as React.CSSProperties;
 
-export type ListTab = "runs" | "cooldowns" | "settings";
+export type ListTab = "runs" | "cooldowns" | "planner" | "settings";
 
 interface ListHeaderProps {
   activeTab: ListTab;
@@ -32,6 +32,9 @@ export function ListHeader({ activeTab, onTabChange, onClose }: ListHeaderProps)
         </TabButton>
         <TabButton active={activeTab === "cooldowns"} onClick={() => onTabChange("cooldowns")}>
           {t("header.tabTracker")}
+        </TabButton>
+        <TabButton active={activeTab === "planner"} onClick={() => onTabChange("planner")}>
+          {t("header.tabPlanner")}
         </TabButton>
         <TabButton active={activeTab === "settings"} onClick={() => onTabChange("settings")}>
           {t("header.tabSettings")}

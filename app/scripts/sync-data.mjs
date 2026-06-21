@@ -35,4 +35,17 @@ for (const [sub, dest] of copies) {
   console.log(`sync-data: ${sub} (${entries.length}) -> ${dest.slice(root.length + 1)}`);
 }
 
+// The hero leveling curve (LevelInfoData) lives at reader/config (the reader's source of truth);
+// the overlay's time-to-level needs it too, so copy it alongside the JSON snapshot into the
+// generated app data dir (single source = reader/config; this copy is git-ignored like the rest).
+const curveSrc = join(root, "reader", "config", "level_curve.json");
+const curveDest = join(here, "..", "src", "shared", "data", "level_curve.json");
+if (existsSync(curveSrc)) {
+  mkdirSync(dirname(curveDest), { recursive: true });
+  cpSync(curveSrc, curveDest);
+  console.log(`sync-data: level_curve.json -> ${curveDest.slice(root.length + 1)}`);
+} else {
+  console.log(`sync-data: level_curve.json missing (${curveSrc}); skipping`);
+}
+
 console.log("sync-data: done");

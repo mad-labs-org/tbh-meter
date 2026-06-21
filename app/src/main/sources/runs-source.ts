@@ -425,6 +425,9 @@ function projectIndex(r: RunRecord): RunIndexEntry {
       heroKey: h.heroKey,
       class: h.class,
       level: h.level,
+      // Per-hero run XP — the Leveling Planner's measured-XP source (only emitted when present so the
+      // index stays minimal; older records without per-hero gain simply omit it).
+      ...(typeof h.xpGained === "number" ? { xpGained: h.xpGained } : {}),
     })),
     // Carry drops so the list's Drops column renders without fetching full records.
     ...(r.drops && r.drops.length > 0 ? { drops: r.drops } : {}),

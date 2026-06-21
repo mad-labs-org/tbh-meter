@@ -100,6 +100,36 @@ describe("cookLive — derives the overlay snapshot from the reader's raw live",
       cookLive(rawLive({ party_stats: { "201": { "12": NaN as unknown as number } } })).partyStats,
     ).toBeNull();
   });
+
+  it("re-keys party_progress (JSON-string keys) to numbers, keeping only all-finite entries", () => {
+    const snap = cookLive(
+      rawLive({
+        party_progress: {
+          "101": { level: 91, exp: 1234, gain: 56789 },
+          "301": { level: 93, exp: 50, gain: 60000 },
+        },
+      }),
+    );
+    expect(snap.partyProgress).toEqual({
+      101: { level: 91, exp: 1234, gain: 56789 },
+      301: { level: 93, exp: 50, gain: 60000 },
+    });
+  });
+
+  it("maps a missing/empty/partial party_progress to null (older reader → no ETA chip)", () => {
+    expect(cookLive(rawLive({ party_progress: undefined })).partyProgress).toBeNull();
+    expect(cookLive(rawLive({ party_progress: {} })).partyProgress).toBeNull();
+    // a hero missing a field or carrying a non-finite value is dropped entirely; empty result → null.
+    type Prog = { level: number; exp: number; gain: number };
+    expect(
+      cookLive(rawLive({ party_progress: { "101": { level: 91, exp: NaN as unknown as number, gain: 5 } } }))
+        .partyProgress,
+    ).toBeNull();
+    expect(
+      cookLive(rawLive({ party_progress: { "101": { level: 91, gain: 5 } as unknown as Prog } }))
+        .partyProgress,
+    ).toBeNull();
+  });
 });
 
 describe("parseLiveJson — parse the reader's live.json text then cook", () => {

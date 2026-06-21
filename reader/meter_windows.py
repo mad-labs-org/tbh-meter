@@ -400,7 +400,7 @@ def build_raw_record(*, ts_ms, run_outcome, game_version, duration,
 
 def build_live_record(*, run, stage_key, act, stage_no, difficulty,
                        mobs, total_mobs, damage_now, elapsed, gold_now, xp_now, party, drops,
-                       party_stats=None):
+                       party_stats=None, party_progress=None):
     """Builds the RAW LIVE snapshot (live.json, overwritten ~1x/s) from ALREADY-read values —
     RAW observation, NO cooking. The reader STOPPED deriving dps/label/format here: it emits only the
     live numbers/ids and the APP cooks (computeDps/resolveStage/modeName) with the SAME helpers as the
@@ -418,7 +418,11 @@ def build_live_record(*, run, stage_key, act, stage_no, difficulty,
       `None` when neither live nor save resolved (the overlay simply doesn't show the line).
     - `party_stats` = {heroKey: {statId: value}} of the 64 live FINAL stats per hero (same source as the
       raw, read_live_stats_by_hero). ADDITIVE (no bump, schema-versioning exception): an old reader doesn't
-      emit it → the app detects by presence and the overlay degrades (no tooltip). Empty = no live party."""
+      emit it → the app detects by presence and the overlay degrades (no tooltip). Empty = no live party.
+    - `party_progress` = {heroKey: {level, exp, gain}} — the per-hero LIVE leveling snapshot (level +
+      within-level exp + run-accumulated xp, built by metrics/xp.party_progress) that powers the overlay's
+      time-to-level. ADDITIVE too (same schema-versioning exception as party_stats): an old reader omits it
+      → no ETA shown. Empty = no live party."""
     return {
         "raw_schema_version": RAW_SCHEMA_VERSION,
         "run": run,
@@ -435,6 +439,7 @@ def build_live_record(*, run, stage_key, act, stage_no, difficulty,
         "party": party,
         "drops": drops,
         "party_stats": party_stats or {},
+        "party_progress": party_progress or {},
     }
 
 
@@ -1438,6 +1443,10 @@ def run(hz, output_dir, debug=False):
                 # record). gold/xp/party/drops as already read; None disappears in the overlay. ATOMIC write
                 # (tmp+rename): the app may read live.json at any moment → never a half-file.
                 _si_live = stage_info.get(cur_key)
+                # Per-hero live leveling snapshot (level+exp+accumulated gain) for the overlay's
+                # time-to-level — assembled from the SAME pl_end + xp accumulator already in hand
+                # (metrics/xp keeps this orchestrator read-free). Additive in live.json (like party_stats).
+                live_progress = xp.party_progress(R["xp_acc"], pl_end)
                 live_rec = build_live_record(
                     run=run_num,
                     stage_key=cur_key,
@@ -1448,7 +1457,8 @@ def run(hz, output_dir, debug=False):
                     damage_now=dps_t.total_damage, elapsed=elapsed,
                     gold_now=g_gain, xp_now=x_gain,
                     party=party_keys, drops=[dc[0], dc[1], dc[2]],
-                    party_stats=live_stats)
+                    party_stats=live_stats,
+                    party_progress=live_progress)
                 _write_atomic(live_path, json.dumps(live_rec))
                 last_snap = now
             time.sleep(interval)

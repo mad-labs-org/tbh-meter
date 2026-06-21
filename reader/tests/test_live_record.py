@@ -76,6 +76,15 @@ def test_party_stats_pass_through_and_default_empty():
     assert _live(party_stats=stats)["party_stats"] == stats
 
 
+def test_party_progress_pass_through_and_default_empty():
+    # {heroKey: {level, exp, gain}} per-hero live leveling snapshot — powers the overlay's
+    # time-to-level. Default {} (reader without the param / no live party) = no ETA shown.
+    assert _live()["party_progress"] == {}
+    prog = {101: {"level": 91, "exp": 1234.0, "gain": 56789.0},
+            301: {"level": 93, "exp": 50.0, "gain": 60000.0}}
+    assert _live(party_progress=prog)["party_progress"] == prog
+
+
 def test_no_envelope_no_outcome_no_cooked_fields():
     # RAW: NO envelope (ephemeral, not audited), NO run_outcome (run in progress), and ZERO
     # cooked presentation (dps/label/mode/stage-string) — the app cooks it.

@@ -161,3 +161,35 @@ class PartyXpAccumulator:
         if not self._heroes:
             return None
         return sum(st["acc"] for st in self._heroes.values())
+
+
+def party_progress(acc, party):
+    """Per-hero LIVE leveling snapshot for the overlay's time-to-level: {heroKey: {level, exp, gain}}.
+
+    Assembles ALREADY-read values (no memory, no clock):
+      - `level`/`exp`: within-level live values from read_live_party (HeroRuntime LEVEL_FAKE/EXP_FAKE).
+        `exp` resets on level-up, so the app's "remaining to next level" is curve[level] - exp.
+      - `gain`: the run's accumulated XP for that hero (PartyXpAccumulator.gain, level-up-bridged), from
+        which the app derives the live rate (delta gain / delta t) and the ETA. 0.0 = seen with no gain
+        yet (just-deployed, or AT the cap where gain is phantom-suppressed) -> the app shows "-"/"MAX";
+        never None here (the hero is in `party`, so the accumulator saw it this very tick).
+
+    Keyed by the CURRENT snapshot (`party` == read_live_party): the heroes deployed RIGHT NOW. A hero in
+    the accumulator but absent from `party` (dead/dropped) gets no entry (no live rate to project).
+    ADDITIVE for live.json (mirrors party_stats): an old reader omits it -> the app degrades (no ETA).
+    Never raises -> {} (the read_live_party / accumulator never-raise contract)."""
+    out = {}
+    try:
+        items = party.items() if party else ()
+        for hk, cur in items:
+            try:
+                lv, exp = cur
+            except (TypeError, ValueError):
+                continue
+            if lv is None or exp is None:
+                continue
+            g = acc.gain(hk) if acc is not None else None
+            out[hk] = {"level": lv, "exp": exp, "gain": g if g is not None else 0.0}
+    except Exception:
+        return {}
+    return out

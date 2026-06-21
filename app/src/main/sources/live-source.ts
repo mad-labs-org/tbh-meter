@@ -31,6 +31,7 @@ export function cookLive(raw: RawLive): LiveSnapshot {
   // Re-key to numbers for the renderer; keep only finite numeric stat values. `undefined`
   // (older reader, no field) → null, so the resistance tooltip degrades cleanly.
   const partyStats = cookPartyStats(raw.party_stats);
+  const partyProgress = cookPartyProgress(raw.party_progress);
   return {
     runNumber: typeof raw.run === "number" && Number.isFinite(raw.run) ? raw.run : null,
     // SAME derivation the run record uses (converter/helpers): label from act-stageNo, localized
@@ -52,6 +53,7 @@ export function cookLive(raw: RawLive): LiveSnapshot {
     party: party && party.length > 0 ? party : null,
     drops,
     partyStats,
+    partyProgress,
     approx: true,
   };
 }
@@ -75,6 +77,30 @@ function cookPartyStats(
       }
     }
     if (Object.keys(cooked).length > 0) out[hk] = cooked;
+  }
+  return Object.keys(out).length > 0 ? out : null;
+}
+
+/** Re-key the reader's `{ "101": { level, exp, gain } }` (JSON-string keys) to numeric
+ *  `{101: {level, exp, gain}}`, keeping only entries whose level/exp/gain are ALL finite numbers.
+ *  Returns null for a missing/empty/invalid map (older reader, or no live party) so the renderer
+ *  treats "no leveling data" uniformly. Pure, never throws. */
+function cookPartyProgress(
+  raw: RawLive["party_progress"],
+): Record<number, { level: number; exp: number; gain: number }> | null {
+  if (!raw || typeof raw !== "object") return null;
+  const out: Record<number, { level: number; exp: number; gain: number }> = {};
+  for (const [heroKey, p] of Object.entries(raw)) {
+    const hk = Number(heroKey);
+    if (!Number.isFinite(hk) || !p || typeof p !== "object") continue;
+    const { level, exp, gain } = p as { level: unknown; exp: unknown; gain: unknown };
+    if (
+      typeof level === "number" && Number.isFinite(level) &&
+      typeof exp === "number" && Number.isFinite(exp) &&
+      typeof gain === "number" && Number.isFinite(gain)
+    ) {
+      out[hk] = { level, exp, gain };
+    }
   }
   return Object.keys(out).length > 0 ? out : null;
 }
