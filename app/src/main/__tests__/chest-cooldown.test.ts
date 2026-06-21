@@ -40,6 +40,7 @@ function snap(stageKey: number | null, blueCount: number | null): LiveSnapshot {
     party: null,
     drops: blueCount == null ? null : [0, blueCount, 0],
     partyStats: null,
+    partyProgress: null,
     approx: true,
   };
 }
