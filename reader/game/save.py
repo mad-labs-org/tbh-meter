@@ -66,13 +66,31 @@ def pick_live_sm(reader, cands):
     return None
 
 
-def pick_live_csd(reader, cands):
-    """LIVE CommonSaveData = the one with the HIGHEST playTime (with a plausible stageKey). Reads
-    the currentStageKey live. Mirrors the monolith (scans ALL candidates, no cap)."""
-    best, best_pt = None, -1.0
+# A real CommonSaveData's playTime is bounded seconds of active play (the live save reads ~1.76e6 =
+# ~488h). The CommonSaveData type scan also matches FALSE-POSITIVE instances whose PLAYTIME slot is a
+# random bit pattern — a denormal (~1e-38), 0, inf/nan, or huge (1.00.17: 3.77e19). 1e9 s (~31 yr) is
+# comfortably above any real save and below that garbage, so it rejects the false matches.
+_MAX_PLAYTIME_S = 1e9
+
+
+def pick_live_csd(reader, cands, stage_info=None):
+    """LIVE CommonSaveData = the REAL save among the candidates. The type scan also returns
+    FALSE-POSITIVE instances (garbage memory matching the type) — guard against them: require a SANE
+    playTime AND a plausible currentStageKey. When stage_info is given, a candidate whose key is an
+    ACTUAL catalog stage outranks any whose key merely falls under the numeric bound — that uniquely
+    fingerprints the real save (1.00.17: a garbage instance with pt=3.77e19, key=6775040 beat the
+    real save pt=1.76e6, key=4309 under the old highest-playTime-only rule). Within a tier the
+    highest playTime wins. Scans ALL candidates, no cap (mirrors the monolith); no readable
+    candidate -> None (degrades honestly, like pick_live_sm)."""
+    best, best_rank = None, (False, -1.0)
     for a in (cands or []):
         key = reader.ri32(a + CommonSaveData.CURRENT_STAGE_KEY)
         pt = reader.rf32(a + CommonSaveData.PLAYTIME)
-        if key is not None and 0 < key < 10_000_000 and pt is not None and pt > best_pt:
-            best_pt, best = pt, a
+        if key is None or not (0 < key < 10_000_000):
+            continue
+        if pt is None or not (0.0 < pt < _MAX_PLAYTIME_S):
+            continue
+        rank = (bool(stage_info) and key in stage_info, pt)  # in-catalog tier first, then playTime
+        if rank > best_rank:
+            best_rank, best = rank, a
     return best

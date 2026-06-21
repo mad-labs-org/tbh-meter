@@ -22,7 +22,7 @@ VALIDATES (with the game OPEN and IN COMBAT on a stage):
   [xp-live]     the deployed heroes have plausible live level/exp (HeroRuntime fakeValue)
   [dps]         MonsterSpawnManager + UnitHealthController: >=1 live monster with hp_max>0
   [stats]       StatsHolder.FINAL_STATS (DictFloat): >=1 hero with a dict of ~64 live stats
-  [stage]       the live currentStageKey resolves an entry in the StageInfoData catalog
+  [stage]       the LIVE stage key (Monster.STAGE_KEY) resolves an entry in the StageInfoData catalog
   [run-cycle]   LogManager resolves + LOG_LIST structurally readable (size>=0) — the run boundary
   [catalogs]    stage_info (incl. ACTBOSS x-10) + item_cat + hero_cat non-empty
 
@@ -179,11 +179,18 @@ def main():
     stats_ok = any(n >= 32 for n in stats_sizes.values())
     checks.append(("stats", stats_ok, f"heroesWithStats={len(stats_by_hero)} sizes={sorted(stats_sizes.values())}"))
 
-    # [stage] the live currentStageKey resolves a catalog entry (mode derivable != '?').
-    csd = save.pick_live_csd(reader, csd_list)
-    skey = reader.ri32(csd + CommonSaveData.CURRENT_STAGE_KEY) if csd else None
-    checks.append(("stage", bool(stage_info) and skey is not None and skey in stage_info,
-                   f"curKey={skey} {'in catalog' if skey in (stage_info or {}) else 'OUTSIDE the catalog'}"))
+    # [stage] the LIVE stage key (Monster.STAGE_KEY — the source the overlay AND the run record
+    # actually use) resolves a catalog entry. The save SNAPSHOT (CommonSaveData.currentStageKey via
+    # pick_live_csd) is only a fallback seed: it freezes on a stage switch AND the CommonSaveData type
+    # scan can match false positives (1.00.17: a garbage instance read key=6775040, pt=3.77e19), so it
+    # is surfaced for diagnostics but the LIVE key is what gates — never validate the stale snapshot in
+    # isolation (that is what made this check spuriously red on a correctly-calibrated 1.00.17 seed).
+    live_sk = models.live_stage_key(reader, msm) if msm else None
+    csd = save.pick_live_csd(reader, csd_list, stage_info)
+    snap = reader.ri32(csd + CommonSaveData.CURRENT_STAGE_KEY) if csd else None
+    live_ok = live_sk is not None and live_sk in (stage_info or {})
+    checks.append(("stage", bool(stage_info) and live_ok,
+                   f"live={live_sk} ({'in' if live_ok else 'OUTSIDE'} catalog) snapshot={snap}"))
 
     # [run-cycle] LogManager resolves + LOG_LIST structurally readable. The end of EVERY run is detected by
     # the LOG_LIST growing (LogManager.LOG_LIST@0x20, size@List.SIZE); a badly-resolved LogManager or a

@@ -93,7 +93,7 @@ TRAILING_BOX_TIERS = (EMonsterLogType.Boss, EMonsterLogType.ActBoss)
 # inside the window loses that record. See docs/invariants/run-lifecycle.
 PENDING_CLOSE_GRACE = 3.0
 
-GAME_VERSION = "1.00.16"   # FALLBACK: the GameAssembly.dll build the reader was made against; the INSTALLED version comes from the game's Version.txt (_detect_game_version)
+GAME_VERSION = "1.00.17"   # FALLBACK: the GameAssembly.dll build the reader was made against; the INSTALLED version comes from the game's Version.txt (_detect_game_version)
 # raw/<id>.json: the LIVE format the reader emits (1 file per run). Bump ONLY when the SHAPE of the
 # output changes — NOT per game build (re-seed/address doesn't count). The converter (app) dispatches
 # on this value. Mirrors app/src/shared/raw-types.ts::RawRunV2. See [[invariants/schema-versioning]].
@@ -837,7 +837,7 @@ def run(hz, output_dir, debug=False):
              f"sc={bool(sc_class)} sf={bool(sf_class)})")
         return
 
-    csd = save.pick_live_csd(reader, csd_list)
+    csd = save.pick_live_csd(reader, csd_list, stage_info)
     sm = save.pick_live_sm(reader, sm_list)
     print(f"[live party] StageManager {'ok' if sm else 'NOT found (live xp off, uses save)'}"
           f" — {len(build.read_live_party(reader, sm))} heroes deployed.")
@@ -1223,7 +1223,7 @@ def run(hz, output_dir, debug=False):
                                 (sc_class, sf_class, msm, lm, csd_list, psd_list,
                                  stage_info, item_cat, hero_cat, sm_list, gold_klass, gb_class,
                                  die_class, res_class) = rr
-                                csd = save.pick_live_csd(reader, csd_list)
+                                csd = save.pick_live_csd(reader, csd_list, stage_info)
                                 sm = save.pick_live_sm(reader, sm_list)
                                 _smd = build.describe_sm_candidates(reader, sm_list, sm)
                                 diag(f"[party-pick] re-attach candidates={_smd['total']} "
@@ -1268,7 +1268,7 @@ def run(hz, output_dir, debug=False):
             dps_live = dps_t.dps(now)
 
             if now - last_refresh >= REFRESH:
-                c = save.pick_live_csd(reader, csd_list)
+                c = save.pick_live_csd(reader, csd_list, stage_info)
                 if c:
                     csd = c
                 last_refresh = now

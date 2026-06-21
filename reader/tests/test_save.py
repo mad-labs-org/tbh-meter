@@ -1,4 +1,4 @@
-"""game/save.py — live StageManager selection (pick_live_sm).
+"""game/save.py — live save-instance selection (pick_live_sm + pick_live_csd).
 
 Regression for the "StageManager NOT found" sync / live-party bug: pick_live_sm only
 returns a StageManager once a party is deployed (HeroList populated). It used to be
@@ -7,9 +7,9 @@ The reader now re-picks lazily — these prove the recovery the re-pick relies o
 SAME candidate address yields None before the party deploys and the address after.
 """
 
-from config.offsets import StageManager, Array, Unit, HeroRuntime, HeroInfoData
+from config.offsets import StageManager, Array, Unit, HeroRuntime, HeroInfoData, CommonSaveData
 from game.build import hero_in_run, read_live_party, describe_sm_candidates
-from game.save import pick_live_sm
+from game.save import pick_live_sm, pick_live_csd
 from tests.conftest import MockReader
 
 SM = 0x1000       # StageManager carrier address (stable for the session)
@@ -160,3 +160,60 @@ class TestHeroInRun:
         # NEVER the save's roster, and no xp>0 proxy (a guess that could pick up a hero with idle xp).
         assert hero_in_run(201, set()) is False
         assert hero_in_run(101, set()) is False
+
+
+# ---------------------------------------------------------------------------
+# pick_live_csd — the LIVE save among false-positive type matches
+# ---------------------------------------------------------------------------
+
+class TestPickLiveCsd:
+    """The CommonSaveData type scan also returns GARBAGE instances (memory whose first qword matches
+    the type). 1.00.17: a false positive read playTime=3.77e19, currentStageKey=6775040 — and the old
+    'highest playTime among 0<key<10M' rule PICKED IT over the real save (playTime=1.76e6, key=4309),
+    which made the validate_live `stage` check spuriously red on a correctly-calibrated seed. The
+    picker now requires a SANE playTime AND prefers an in-catalog stage key. [[meter-game-update]]"""
+
+    REAL = 0x1000          # the real save (sane playTime, in-catalog key)
+    GARBAGE = 0x7FFB0000   # a false-positive type match (insane playTime, sub-10M garbage key)
+    CATALOG = {4309: (3, 9, 50, 4)}   # int-keyed, like load_calib's stage_info
+
+    def _reader(self, real_pt=1_755_888.375, real_key=4309, garb_pt=3.77e19, garb_key=6_775_040):
+        return MockReader(mem={
+            self.REAL + CommonSaveData.PLAYTIME: real_pt,
+            self.REAL + CommonSaveData.CURRENT_STAGE_KEY: real_key,
+            self.GARBAGE + CommonSaveData.PLAYTIME: garb_pt,
+            self.GARBAGE + CommonSaveData.CURRENT_STAGE_KEY: garb_key,
+        })
+
+    def test_rejects_garbage_playtime_even_without_catalog(self):
+        # The playTime sanity bound alone (no stage_info) rejects the 3.77e19 false positive.
+        assert pick_live_csd(self._reader(), [self.GARBAGE, self.REAL]) == self.REAL
+
+    def test_prefers_in_catalog_key(self):
+        # With the catalog, the real save (key in catalog) wins outright over the garbage instance.
+        assert pick_live_csd(self._reader(), [self.GARBAGE, self.REAL], self.CATALOG) == self.REAL
+
+    def test_in_catalog_key_beats_higher_playtime(self):
+        # A decoy with a SANE-but-higher playTime and an out-of-catalog key must NOT beat the real
+        # save: catalog membership is the stronger fingerprint (ranks above playTime).
+        reader = self._reader(real_pt=1000.0, real_key=4309, garb_pt=9e8, garb_key=5000)
+        assert pick_live_csd(reader, [self.GARBAGE, self.REAL], self.CATALOG) == self.REAL
+
+    def test_highest_playtime_when_no_catalog_signal(self):
+        # No stage_info, both keys plausible -> falls back to highest playTime (legacy behavior kept).
+        reader = MockReader(mem={
+            0x1000 + CommonSaveData.PLAYTIME: 100.0, 0x1000 + CommonSaveData.CURRENT_STAGE_KEY: 1101,
+            0x2000 + CommonSaveData.PLAYTIME: 500.0, 0x2000 + CommonSaveData.CURRENT_STAGE_KEY: 2202,
+        })
+        assert pick_live_csd(reader, [0x1000, 0x2000]) == 0x2000
+
+    def test_none_when_all_garbage(self):
+        # Only false positives (insane playTime) -> None: degrades honestly, never returns a garbage base.
+        reader = MockReader(mem={
+            self.GARBAGE + CommonSaveData.PLAYTIME: 3.77e19,
+            self.GARBAGE + CommonSaveData.CURRENT_STAGE_KEY: 6_775_040,
+        })
+        assert pick_live_csd(reader, [self.GARBAGE], self.CATALOG) is None
+
+    def test_empty_candidates(self):
+        assert pick_live_csd(MockReader(mem={}), []) is None

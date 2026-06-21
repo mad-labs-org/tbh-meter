@@ -55,7 +55,7 @@ Three layers, in order of preference:
 | **Wallet (balance)** | `game/save.py::read_gold` | CurrencySaveData `Key==GOLD_KEY`. Also from the save (stale). **Never** use the wallet delta for the run's gold — it includes sales/idle (the regression that `run_gain==None` prevents). |
 | **Hero build** | `game/build.py::read_build` | class/level/exp + equipped items (rarity/level/mods/enchants) + invested skills/passives. Identity/profile — slow to change, the save serves. |
 | **Account snapshot (runes / inventory / stash)** | `game/build.py::read_account_snapshot` | ACCOUNT-WIDE state at close — profile, not metric: here there is no per-run delta for the save's lag to corrupt (no "live" mirror was mapped, nor was one missed). Runes (`PlayerSaveData.RUNES`) + inventory/stash items (`INVENTORY_SLOTS`/`STASH` → join on `ITEMS`). Goes to the raw in an ok/err envelope: NOT-READ → `None` → `err`, never a silent `ok([])`. |
-| **playTime / current stage** | `game/save.py::pick_live_csd` | CommonSaveData (picks the one with the highest playTime; reads the live currentStageKey). |
+| **playTime / current stage** | `game/save.py::pick_live_csd` | CommonSaveData — picks the REAL save among the type scan's candidates (incl. false positives): requires a sane playTime, prefers an in-catalog `currentStageKey`, then highest playTime. The snapshot `currentStageKey` is a STALE fallback seed; the live stage is `Monster.STAGE_KEY` (`game/models.py::live_stage_key`). |
 
 ## ⚪ TODO / future (find with the methodology in section 2 of value-mapping-plan)
 
