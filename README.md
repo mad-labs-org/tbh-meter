@@ -103,6 +103,8 @@ The app bundles a small **game-data snapshot** (committed under [`data/`](./data
 
 Issues and PRs are welcome — start with [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for setup, the test gates, and the release flow, and the [Code of Conduct](./.github/CODE_OF_CONDUCT.md). Found a security issue? See [SECURITY.md](./.github/SECURITY.md). Come say hi on [Discord](https://discord.gg/eYqUkxu3).
 
+We are migrating the board project to a public one: https://github.com/orgs/mad-labs-org/projects/10/views/1. Feel free to contribute!
+
 ## Support
 
 If TBH Meter helps your runs, consider buying the team a coffee — it keeps development going.
