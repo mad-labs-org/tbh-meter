@@ -311,7 +311,13 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
       <div className="flex items-center justify-between border-t border-surface-600 bg-surface-800/90 px-2.5 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
         <span className="flex items-center gap-1.5">
           {t("live.team")}
-          <PartyFrame party={snap.party} partyStats={snap.partyStats} mode={snap.mode} />
+          <PartyFrame
+            party={snap.party}
+            partyStats={snap.partyStats}
+            partyProgress={snap.partyProgress}
+            elapsedSec={snap.elapsedSec}
+            mode={snap.mode}
+          />
         </span>
         <span className="flex items-center gap-1.5">
           {t("live.time")}{" "}
@@ -499,17 +505,21 @@ function ChestIcon({ className, title }: { className?: string; title?: string })
   );
 }
 
-/** Live party frame: deployed heroes' idle sprites. Reuses heroSprite + public/heroes/
- *  (same source as the runs list). Each hero hover-shows its effective elemental resistances on the
- *  current stage (HeroFrame), when the reader emits per-hero stats. Renders nothing until the reader
- *  emits the party. */
+/** Live party frame: each deployed hero's idle sprite with its live level + ETA to the next level,
+ *  and a hover card (within-level progress + rate, plus elemental resistances — HeroFrame). Reuses
+ *  heroSprite + public/heroes/ (same source as the runs list). Renders nothing until the reader emits
+ *  the party; the level/ETA need the reader's per-hero progress (older reader → sprite only). */
 function PartyFrame({
   party,
   partyStats,
+  partyProgress,
+  elapsedSec,
   mode,
 }: {
   party: number[] | null;
   partyStats: Record<number, Record<number, number>> | null;
+  partyProgress: Record<number, { level: number; exp: number; gain: number }> | null;
+  elapsedSec: number;
   mode: string;
 }) {
   const heroes = (party ?? [])
@@ -517,13 +527,15 @@ function PartyFrame({
     .filter((h): h is { key: number; src: string } => h.src != null);
   if (!heroes.length) return null;
   return (
-    <span className="flex items-center gap-1">
+    <span className="flex items-end gap-2">
       {heroes.map((h) => (
         <HeroFrame
           key={h.key}
           heroKey={h.key}
           src={h.src}
           stats={partyStats?.[h.key]}
+          progress={partyProgress?.[h.key]}
+          elapsedSec={elapsedSec}
           mode={mode}
         />
       ))}

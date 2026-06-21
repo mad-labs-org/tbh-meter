@@ -29,6 +29,8 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.noLoot": "전리품 없음",
   "live.team": "팀",
   "live.time": "시간",
+  "live.timeToLevel": "Time to level",
+  "live.maxed": "MAX",
   "live.chestCommon": "일반",
   "live.chestStageBoss": "스테이지 보스",
   "live.chestActBoss": "액트 보스",

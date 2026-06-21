@@ -34,6 +34,8 @@ export const DICT = {
   "live.noLoot": "no loot",
   "live.team": "Team",
   "live.time": "Time",
+  "live.timeToLevel": "Time to level",
+  "live.maxed": "MAX",
   "live.chestCommon": "Common",
   "live.chestStageBoss": "Stage boss",
   "live.chestActBoss": "Act boss",
