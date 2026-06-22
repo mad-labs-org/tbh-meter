@@ -93,7 +93,7 @@ TRAILING_BOX_TIERS = (EMonsterLogType.Boss, EMonsterLogType.ActBoss)
 # inside the window loses that record. See docs/invariants/run-lifecycle.
 PENDING_CLOSE_GRACE = 3.0
 
-GAME_VERSION = "1.00.17"   # FALLBACK: the GameAssembly.dll build the reader was made against; the INSTALLED version comes from the game's Version.txt (_detect_game_version)
+GAME_VERSION = "1.00.19"   # FALLBACK: the GameAssembly.dll build the reader was made against; the INSTALLED version comes from the game's Version.txt (_detect_game_version)
 # raw/<id>.json: the LIVE format the reader emits (1 file per run). Bump ONLY when the SHAPE of the
 # output changes — NOT per game build (re-seed/address doesn't count). The converter (app) dispatches
 # on this value. Mirrors app/src/shared/raw-types.ts::RawRunV2. See [[invariants/schema-versioning]].
