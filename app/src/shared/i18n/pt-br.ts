@@ -291,6 +291,9 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "signin.dontShow": "Não mostrar de novo",
   "signin.notNow": "Agora não",
 
+  "signin.expiredTitle": "Sua sessão expirou",
+  "signin.expiredBody":
+    "Você foi desconectado, então suas runs pararam de sincronizar com o ranking. Elas ficam salvas localmente. Entre de novo para retomar.",
   // ── Tray menu ──
   "tray.showLive": "Mostrar live meter",
   "tray.openRuns": "Abrir runs",

@@ -285,6 +285,9 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "signin.dontShow": "不再显示",
   "signin.notNow": "暂不",
 
+  "signin.expiredTitle": "你的登录已过期",
+  "signin.expiredBody":
+    "你已退出登录，挑战因此停止同步到排行榜。挑战仍保存在本地。重新登录即可继续同步。",
   // ── Tray menu ──
   "tray.showLive": "显示实时悬浮窗",
   "tray.openRuns": "打开挑战列表",

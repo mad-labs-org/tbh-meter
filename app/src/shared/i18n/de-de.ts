@@ -292,6 +292,9 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "signin.dontShow": "Nicht mehr anzeigen",
   "signin.notNow": "Jetzt nicht",
 
+  "signin.expiredTitle": "Deine Sitzung ist abgelaufen",
+  "signin.expiredBody":
+    "Du wurdest abgemeldet, daher werden deine Runs nicht mehr mit der Bestenliste synchronisiert. Sie werden lokal gespeichert. Melde dich erneut an, um fortzufahren.",
   // ── Tray menu ──
   "tray.showLive": "Live-Meter zeigen",
   "tray.openRuns": "Runs öffnen",

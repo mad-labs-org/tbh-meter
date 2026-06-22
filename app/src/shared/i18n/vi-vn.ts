@@ -292,6 +292,9 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "signin.dontShow": "Đừng hiện lại",
   "signin.notNow": "Để sau",
 
+  "signin.expiredTitle": "Phiên của bạn đã hết hạn",
+  "signin.expiredBody":
+    "Bạn đã bị đăng xuất, nên lượt chơi của bạn ngừng đồng bộ lên bảng xếp hạng. Chúng vẫn được lưu cục bộ. Đăng nhập lại để tiếp tục.",
   // ── Tray menu ──
   "tray.showLive": "Hiện live meter",
   "tray.openRuns": "Mở lượt chơi",

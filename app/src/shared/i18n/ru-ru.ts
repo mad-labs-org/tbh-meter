@@ -291,6 +291,9 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "signin.dontShow": "Больше не показывать",
   "signin.notNow": "Не сейчас",
 
+  "signin.expiredTitle": "Ваша сессия истекла",
+  "signin.expiredBody":
+    "Вы вышли из аккаунта, поэтому ваши забеги перестали синхронизироваться с таблицей лидеров. Они сохраняются локально. Войдите снова, чтобы продолжить.",
   // ── Tray menu ──
   "tray.showLive": "Показать live-метер",
   "tray.openRuns": "Открыть забеги",

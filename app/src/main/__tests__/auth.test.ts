@@ -14,6 +14,11 @@ vi.mock("electron", () => ({
   BrowserWindow: { getAllWindows: () => [] },
 }));
 
+// Spy on the renderer fan-out so we can assert clearSession("expired") emits the
+// involuntary-logout signal (and a plain sign-out does not).
+const broadcast = vi.fn();
+vi.mock("../broadcast.js", () => ({ broadcast: (...args: unknown[]) => broadcast(...args) }));
+
 const sessionPath = join(dir, "auth-session.json");
 
 afterAll(() => {
@@ -29,6 +34,7 @@ async function freshAuth() {
 
 beforeEach(() => {
   rmSync(sessionPath, { force: true });
+  broadcast.mockClear();
 });
 
 // --------------------------------------------------------------------------- //
@@ -135,6 +141,26 @@ describe("clearSession / clearSessionFile", () => {
     expect(existsSync(sessionPath)).toBe(false); // persisted removal
     expect(await auth.getAccessToken()).toBeNull();
     expect(await auth.getStatus()).toEqual({ signedIn: false });
+  });
+
+  it("clearSession('expired') emits meter:session-expired (involuntary 401 logout)", async () => {
+    writeFileSync(sessionPath, JSON.stringify({ accessToken: "tok-xyz" }), "utf-8");
+    const auth = await freshAuth();
+    await auth.getAccessToken(); // force load so clearSession has a session to clear
+
+    auth.clearSession("expired");
+
+    expect(broadcast).toHaveBeenCalledWith("meter:session-expired");
+  });
+
+  it("clearSession() (manual sign-out) does NOT emit meter:session-expired", async () => {
+    writeFileSync(sessionPath, JSON.stringify({ accessToken: "tok-xyz" }), "utf-8");
+    const auth = await freshAuth();
+    await auth.getAccessToken();
+
+    auth.clearSession();
+
+    expect(broadcast).not.toHaveBeenCalledWith("meter:session-expired");
   });
 
   it("clearSessionFile removes the file even before the session was loaded", async () => {

@@ -292,6 +292,9 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "signin.dontShow": "Nie pokazuj ponownie",
   "signin.notNow": "Nie teraz",
 
+  "signin.expiredTitle": "Twoja sesja wygasła",
+  "signin.expiredBody":
+    "Zostałeś wylogowany, więc twoje przejścia przestały synchronizować się z rankingiem. Są zapisywane lokalnie. Zaloguj się ponownie, aby wznowić.",
   // ── Tray menu ──
   "tray.showLive": "Pokaż live meter",
   "tray.openRuns": "Otwórz przejścia",

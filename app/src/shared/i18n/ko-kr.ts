@@ -289,6 +289,9 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "signin.dontShow": "다시 표시하지 않기",
   "signin.notNow": "나중에",
 
+  "signin.expiredTitle": "세션이 만료되었습니다",
+  "signin.expiredBody":
+    "로그아웃되어 런이 리더보드 동기화를 멈췄습니다. 런은 로컬에 저장됩니다. 다시 로그인하면 동기화를 재개합니다.",
   // ── Tray menu ──
   "tray.showLive": "라이브 미터 표시",
   "tray.openRuns": "런 목록 열기",

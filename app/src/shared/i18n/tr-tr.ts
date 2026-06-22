@@ -292,6 +292,9 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "signin.dontShow": "Bir daha gösterme",
   "signin.notNow": "Şimdi değil",
 
+  "signin.expiredTitle": "Oturumun sona erdi",
+  "signin.expiredBody":
+    "Çıkış yapıldı, bu yüzden runların lider tablosuna senkronlanmayı durdurdu. Yerel olarak kaydediliyorlar. Devam etmek için tekrar giriş yap.",
   // ── Tray menu ──
   "tray.showLive": "Canlı meter'i göster",
   "tray.openRuns": "Runları aç",

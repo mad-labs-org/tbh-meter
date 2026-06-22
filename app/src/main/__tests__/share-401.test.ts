@@ -14,12 +14,17 @@ vi.mock("electron", () => ({
 const clearSession = vi.fn();
 vi.mock("../auth.js", () => ({
   getAccessToken: async () => "bearer-token",
-  clearSession: () => clearSession(),
+  // Forward the reason arg so the test can assert "expired" vs "manual".
+  clearSession: (reason?: string) => clearSession(reason),
 }));
 vi.mock("../settings.js", () => ({ getSettings: () => ({}) }));
 vi.mock("../device-id.js", () => ({ getDeviceId: () => "device-uuid" }));
 vi.mock("../runs-store.js", () => ({ getRun: () => null }));
-vi.mock("../error-report.js", () => ({ reportError: () => {}, describeCause: () => ({}) }));
+const reportError = vi.fn();
+vi.mock("../error-report.js", () => ({
+  reportError: (...args: unknown[]) => reportError(...args),
+  describeCause: () => ({}),
+}));
 // uploadRun posts via httpFetch (Electron net) — delegate to the stubbed global fetch.
 vi.mock("../net-fetch.js", () => ({
   httpFetch: (input: string | GlobalRequest, init?: RequestInit) => fetch(input, init),
@@ -72,6 +77,7 @@ function mockFetchStatus(status: number): void {
 
 beforeEach(() => {
   clearSession.mockClear();
+  reportError.mockClear();
 });
 
 afterEach(() => {
@@ -79,11 +85,24 @@ afterEach(() => {
 });
 
 describe("uploadRun 401 -> clearSession", () => {
-  it("clears the session on a 401 (expired token, no refresh)", async () => {
+  it("clears the session as 'expired' on a 401 (expired token, no refresh)", async () => {
     mockFetchStatus(401);
     const res = await uploadRun(run());
     expect(res.ok).toBe(false);
     expect(clearSession).toHaveBeenCalledTimes(1);
+    // "expired" (not "manual") so the renderer prompts a re-sign-in instead of
+    // going silently offline.
+    expect(clearSession).toHaveBeenCalledWith("expired");
+  });
+
+  it("pings session-expired telemetry on a 401 (the 401 is suppressed from the upload-failed relay)", async () => {
+    mockFetchStatus(401);
+    await uploadRun(run());
+    expect(reportError).toHaveBeenCalledWith(
+      "auth:session-expired",
+      expect.any(String),
+      expect.objectContaining({ status: 401 }),
+    );
   });
 
   it("does NOT clear the session on a non-401 4xx (a payload rejection)", async () => {

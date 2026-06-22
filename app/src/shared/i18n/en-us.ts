@@ -298,6 +298,9 @@ export const DICT = {
   "signin.dontShow": "Don't show this again",
   "signin.notNow": "Not now",
 
+  "signin.expiredTitle": "Your session expired",
+  "signin.expiredBody":
+    "You were signed out, so your runs stopped syncing to the leaderboard. They're saved locally. Sign in again to resume.",
   // ── Tray menu ──
   "tray.showLive": "Show live meter",
   "tray.openRuns": "Open runs",

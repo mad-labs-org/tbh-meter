@@ -148,6 +148,10 @@ export interface MeterApi {
   authSignOut(): Promise<void>;
   /** Subscribe to auth changes (sign-in/out, token refresh). Returns an unsubscribe fn. */
   onAuthChanged(cb: (status: AuthStatus) => void): () => void;
+  /** Fired when the session was cleared involuntarily by a 401 (expired/rotated token,
+   *  no refresh) — distinct from a deliberate sign-out, so the UI can prompt a re-sign-in
+   *  instead of going silently offline. Returns an unsubscribe fn. */
+  onSessionExpired(cb: () => void): () => void;
   /** Share a successful run to the leaderboard; returns a discriminated result. */
   shareRun(runId: string): Promise<ShareResult>;
   /** Whether a run was already shared (and its public URL, if so). */

@@ -51,6 +51,16 @@ export function isReportableUploadFailure(status: number): boolean {
   return status < 500 && status !== 401 && status !== 408 && status !== 429;
 }
 
+// Telemetry for the involuntary-logout (401) path. 401 is deliberately suppressed
+// from the upload-failed relay above (it is self-healing for noise purposes), so
+// without an explicit ping a JWT_SECRET rotation or mass token expiry is INVISIBLE
+// to us — the 2026-06 incident only surfaced via player DMs. error-report dedups per
+// (context, message) per session, so keeping these identical at both 401 sites makes
+// the ping fire AT MOST ONCE per session: a fleet logout-rate signal, not 401 noise.
+const SESSION_EXPIRED_CONTEXT = "auth:session-expired";
+const SESSION_EXPIRED_MESSAGE =
+  "Bearer JWT rejected (401) — session cleared; user must re-sign-in (no refresh token).";
+
 interface UploadEntry {
   id: string;
   url: string;
@@ -338,8 +348,10 @@ export async function uploadRun(run: RunRecord): Promise<ShareResult> {
     const errBody = body as ApiErrorBody | null;
     // 401 = the JWT expired / session invalid. There is no refresh token (the API
     // mints a ~30d HS256 token, no refresh), so this is terminal for the session:
-    // clear it + broadcast "signed out" (same UX as a lost session). The run is NOT
-    // marked failed — it waits for the next sign-in to upload.
+    // clear it as "expired" (broadcasts meter:session-expired so the renderer prompts
+    // a re-sign-in instead of going silently OFFLINE) + ping telemetry (the 401 is
+    // suppressed from the relay below). The run is NOT marked failed — it stays queued
+    // and uploads on the next sign-in.
     //
     // ONLY 401 clears the session. A run-signature rejection comes back as 403
     // (signature.ts), NOT 401 — a bad/expired/clock-skewed signature on an
@@ -348,7 +360,11 @@ export async function uploadRun(run: RunRecord): Promise<ShareResult> {
     // moment a signature tripped — the 2026-06-19 regression. 403 is handled below
     // by auto-upload as terminal-for-this-attempt, with the session left intact.)
     if (res.status === 401) {
-      clearSession();
+      clearSession("expired");
+      reportError(SESSION_EXPIRED_CONTEXT, SESSION_EXPIRED_MESSAGE, {
+        externalId: payload.externalId,
+        status: 401,
+      });
     }
     // Relay only actionable (client-side) failures; transient/infra ones are
     // already retried by auto-upload and would just be noise. See helper.
@@ -415,8 +431,13 @@ export async function claimDeviceRuns(): Promise<void> {
       const data = (await res.json().catch(() => null)) as { claimed?: number } | null;
       if (data?.claimed) console.log(`[share] claimed ${data.claimed} anonymous run(s)`);
     } else {
-      // 401 = the JWT expired (no refresh token). Treat the session as gone.
-      if (res.status === 401) clearSession();
+      // 401 = the JWT was rejected (expired, or JWT_SECRET rotated — no refresh
+      // token). Treat the session as gone, surface it (claim runs at startup, so this
+      // is often the FIRST path to detect a dead restored token), and ping telemetry.
+      if (res.status === 401) {
+        clearSession("expired");
+        reportError(SESSION_EXPIRED_CONTEXT, SESSION_EXPIRED_MESSAGE, { phase: "claim" });
+      }
       console.warn(`[share] claim failed (HTTP ${res.status})`);
     }
   } catch (err) {

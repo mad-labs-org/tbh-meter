@@ -291,6 +291,9 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "signin.dontShow": "Jangan tampilkan lagi",
   "signin.notNow": "Nanti saja",
 
+  "signin.expiredTitle": "Sesimu telah berakhir",
+  "signin.expiredBody":
+    "Kamu keluar, jadi run-mu berhenti tersinkron ke papan peringkat. Run tetap tersimpan lokal. Masuk lagi untuk melanjutkan.",
   // ── Tray menu ──
   "tray.showLive": "Tampilkan live meter",
   "tray.openRuns": "Buka run",

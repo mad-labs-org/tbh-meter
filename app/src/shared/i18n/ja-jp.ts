@@ -291,6 +291,9 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "signin.dontShow": "今後表示しない",
   "signin.notNow": "あとで",
 
+  "signin.expiredTitle": "セッションの有効期限が切れました",
+  "signin.expiredBody":
+    "サインアウトされたため、ランがリーダーボードへの同期を停止しました。ランはローカルに保存されています。再度サインインすると同期を再開します。",
   // ── Tray menu ──
   "tray.showLive": "ライブメーターを表示",
   "tray.openRuns": "ラン一覧を開く",

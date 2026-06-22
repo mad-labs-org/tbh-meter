@@ -289,6 +289,9 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "signin.dontShow": "ไม่ต้องแสดงอีก",
   "signin.notNow": "ยังก่อน",
 
+  "signin.expiredTitle": "เซสชันของคุณหมดอายุ",
+  "signin.expiredBody":
+    "คุณถูกออกจากระบบ รันของคุณจึงหยุดซิงค์กับลีดเดอร์บอร์ด รันยังถูกบันทึกไว้ในเครื่อง เข้าสู่ระบบอีกครั้งเพื่อซิงค์ต่อ",
   // ── Tray menu ──
   "tray.showLive": "แสดง live meter",
   "tray.openRuns": "เปิดรายการรัน",
