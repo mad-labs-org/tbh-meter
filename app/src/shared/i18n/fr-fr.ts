@@ -287,10 +287,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   // ── Sign-in prompt modal ──
   "signin.title": "Partagez vos runs au classement",
   "signin.body":
-    "Vous n'êtes pas connecté. Vos runs sont quand même envoyées anonymement, donc votre page de session TBH Helper fonctionne — mais elles ne comptent pour le classement et votre profil qu'après connexion avec Discord. Se connecter récupère aussi les runs déjà envoyées depuis cet ordinateur.",
+    "Vous n'êtes pas connecté, donc vos runs restent sur cet ordinateur et n'atteignent pas le classement. Connectez-vous avec Discord pour les synchroniser et qu'elles comptent au classement et sur votre profil.",
   "signin.dontShow": "Ne plus afficher",
   "signin.notNow": "Pas maintenant",
 
+  "signin.pendingTitle": "Vos runs ne se synchronisent pas",
+  "signin.pendingBody":
+    "Vous êtes déconnecté, donc vos runs terminées n'atteignent plus le classement ({count} en attente en local). Connectez-vous pour les synchroniser.",
   "signin.expiredTitle": "Votre session a expiré",
   "signin.expiredBody":
     "Vous avez été déconnecté, donc vos runs ne se synchronisent plus avec le classement. Elles sont enregistrées localement. Reconnectez-vous pour reprendre.",

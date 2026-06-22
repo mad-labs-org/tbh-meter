@@ -28,7 +28,7 @@ vi.mock("../share.js", () => ({
   claimDeviceRuns: async () => {},
 }));
 
-import { requestUploadNow } from "../auto-upload.js";
+import { requestUploadNow, countPendingRuns } from "../auto-upload.js";
 
 /** A clean, leaderboard-eligible success run (the only class that SHOULD upload). */
 function countedRun(overrides: Partial<RunRecord> = {}): RunRecord {
@@ -124,5 +124,24 @@ describe("auto-upload eligible() — only the converter's `counted` verdict uplo
     delete legacy.quality;
     records.push(legacy);
     expect(await uploadedIds()).toEqual(["old:1"]);
+  });
+});
+
+describe("countPendingRuns() — the signed-out backlog size (issue #60)", () => {
+  it("is 0 when there are no local runs", () => {
+    expect(countPendingRuns()).toBe(0);
+  });
+
+  it("counts ONLY upload-eligible runs (same gate as the uploader), regardless of sign-in", () => {
+    // countPendingRuns is auth-agnostic — it answers "how many runs would sync if you
+    // signed in", so the renderer can prompt a signed-out user about a growing backlog.
+    records.push(
+      countedRun({ id: "ok:1" }),
+      countedRun({ id: "ok:2" }),
+      countedRun({ id: "p:1", quality: "partial", partial: true }), // excluded
+      countedRun({ id: "d:1", quality: "degraded" }), // excluded
+      countedRun({ id: "sk:1", quality: "skipped" }), // excluded
+    );
+    expect(countPendingRuns()).toBe(2);
   });
 });
