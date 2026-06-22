@@ -186,14 +186,17 @@ class PlayerSaveData:                  # plaintext save, snapshot (NOT live)
     # between settingSaveData and currenySaveDatas → ALL save lists shifted +0x10. Without this,
     # read_gold/read_heroes read the WRONG list → pick_live_psd None → run with heroes=[] → never closed
     # (confirmed live + dump 1.00.12; see the dump offsets).
-    CURRENCIES = 0x38                  # List<CurrencySaveData>   (currenySaveDatas)
-    HEROES = 0x40                      # List<HeroSaveData>       (heroSaveDatas)
-    ATTRIBUTES = 0x50                  # List<AttributeSaveData> (invested skill/passive tree)
-    RUNES = 0x60                       # List<RuneSaveData> — account-wide runes (LIVE-CRACKED 2026-06-09)
-    INVENTORY_SLOTS = 0x68             # List<InventorySaveData> — inventory slot -> item uniqueId
-    STASH = 0x70                       # List<StashSaveData> — stash slot -> item uniqueId (separate from the inv)
-    ITEMS = 0x90                       # List<ItemSaveData> (item data; the slots above reference by uniqueId)
-    AGGREGATES = 0x98                  # List<AggregateSaveData> (gold/xp oracle, stale)
+    # 1.00.19 did it AGAIN (same break class): inserted AlchemyPendingIdList (0x38) + AlchemyReceiptList
+    # (0x40) — the alchemy feature — between BoxBucketGetBoxList and currenySaveDatas, so ALL save lists
+    # below shifted +0x10 once more. Offsets are PlayerSaveData TypeDefIndex 2675 in dump.cs (1.00.19).
+    CURRENCIES = 0x48                  # List<CurrencySaveData>   (currenySaveDatas)
+    HEROES = 0x50                      # List<HeroSaveData>       (heroSaveDatas)
+    ATTRIBUTES = 0x60                  # List<AttributeSaveData> (invested skill/passive tree)
+    RUNES = 0x70                       # List<RuneSaveData> — account-wide runes (LIVE-CRACKED 2026-06-09)
+    INVENTORY_SLOTS = 0x78             # List<InventorySaveData> — inventory slot -> item uniqueId
+    STASH = 0x80                       # List<StashSaveData> — stash slot -> item uniqueId (separate from the inv)
+    ITEMS = 0xA0                       # List<ItemSaveData> (item data; the slots above reference by uniqueId)
+    AGGREGATES = 0xA8                  # List<AggregateSaveData> (gold/xp oracle, stale)
 
 
 class RuneSaveData:                    # invested rune node (account-wide). NAME-readable class in the save.

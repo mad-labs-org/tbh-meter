@@ -184,7 +184,8 @@ class TestAggregateManagerOffset:
 
 
 class TestPlayerSaveDataOffset:
-    def test_aggregates_at_0x98(self):
-        # 1.00.12 inserted the BoxBucket lists into PlayerSaveData → all save lists +0x10
-        # (was 0x88; confirmed live + 1.00.12 dump). See class PlayerSaveData in offsets.py.
-        assert PlayerSaveData.AGGREGATES == 0x98
+    def test_aggregates_at_0xa8(self):
+        # PlayerSaveData save lists have shifted +0x10 TWICE from inserted fields:
+        # 1.00.12 (BoxBucketUse/GetBoxList) and 1.00.19 (AlchemyPendingIdList/AlchemyReceiptList).
+        # AGGREGATES: 0x88 → 0x98 (1.00.12) → 0xA8 (1.00.19). See class PlayerSaveData in offsets.py.
+        assert PlayerSaveData.AGGREGATES == 0xA8
