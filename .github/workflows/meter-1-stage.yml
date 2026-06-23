@@ -113,7 +113,9 @@ jobs:
           COUNT=$(git log "$RANGE" --no-merges --oneline -- app reader data | wc -l | tr -d ' ')
           CHANGES=$(git log "$RANGE" --no-merges --pretty='- %s' -- app reader data | head -n 50)
           {
-            echo "## 🏷️ Release candidate staged"
+            echo "# 🏷️ Staged tbh-meter v$VERSION"
+            echo
+            echo "_Release candidate ready — build it with Meter 2, then ship with Meter 3._"
             echo
             echo "| | |"
             echo "|---|---|"
