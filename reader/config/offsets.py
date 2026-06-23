@@ -91,8 +91,12 @@ class Singleton:
     INSTANCE = 0x0                     # bbwf (the singleton)
 
 
-# ACTk Obscured (this build): the REAL value is the PLAIN `fakeValue` at base+0xC
-# (ObscuredInt/Float). hidden^key gives GARBAGE. ObscuredLong: fake probably @+0x18.
+# ACTk Obscured struct layout (CodeStage.AntiCheat.ObscuredTypes): hash@0x0, hiddenValue@0x4,
+# currentCryptoKey@0x8, fakeValue@0xC. Through 1.00.19 the PLAIN `fakeValue` decoy was kept in sync
+# with the real value, so reading it was legal. hidden^key gives GARBAGE (off-limits — see
+# docs/invariants/obscured-data-offlimits). 1.00.20 KILLED the fakeValue decoy build-wide (reads 0):
+# the only remaining source is the cipher, which is off-limits. Live values that used the decoy
+# (HeroRuntime level/exp) now degrade to the save — see HeroRuntime below + game/build.read_live_party.
 ACTK_FAKE = 0xC
 
 
@@ -186,14 +190,17 @@ class PlayerSaveData:                  # plaintext save, snapshot (NOT live)
     # between settingSaveData and currenySaveDatas → ALL save lists shifted +0x10. Without this,
     # read_gold/read_heroes read the WRONG list → pick_live_psd None → run with heroes=[] → never closed
     # (confirmed live + dump 1.00.12; see the dump offsets).
-    CURRENCIES = 0x38                  # List<CurrencySaveData>   (currenySaveDatas)
-    HEROES = 0x40                      # List<HeroSaveData>       (heroSaveDatas)
-    ATTRIBUTES = 0x50                  # List<AttributeSaveData> (invested skill/passive tree)
-    RUNES = 0x60                       # List<RuneSaveData> — account-wide runes (LIVE-CRACKED 2026-06-09)
-    INVENTORY_SLOTS = 0x68             # List<InventorySaveData> — inventory slot -> item uniqueId
-    STASH = 0x70                       # List<StashSaveData> — stash slot -> item uniqueId (separate from the inv)
-    ITEMS = 0x90                       # List<ItemSaveData> (item data; the slots above reference by uniqueId)
-    AGGREGATES = 0x98                  # List<AggregateSaveData> (gold/xp oracle, stale)
+    # 1.00.19 did it AGAIN (same break class): inserted AlchemyPendingIdList (0x38) + AlchemyReceiptList
+    # (0x40) — the alchemy feature — between BoxBucketGetBoxList and currenySaveDatas, so ALL save lists
+    # below shifted +0x10 once more. Offsets are PlayerSaveData TypeDefIndex 2675 in dump.cs (1.00.19).
+    CURRENCIES = 0x48                  # List<CurrencySaveData>   (currenySaveDatas)
+    HEROES = 0x50                      # List<HeroSaveData>       (heroSaveDatas)
+    ATTRIBUTES = 0x60                  # List<AttributeSaveData> (invested skill/passive tree)
+    RUNES = 0x70                       # List<RuneSaveData> — account-wide runes (LIVE-CRACKED 2026-06-09)
+    INVENTORY_SLOTS = 0x78             # List<InventorySaveData> — inventory slot -> item uniqueId
+    STASH = 0x80                       # List<StashSaveData> — stash slot -> item uniqueId (separate from the inv)
+    ITEMS = 0xA0                       # List<ItemSaveData> (item data; the slots above reference by uniqueId)
+    AGGREGATES = 0xA8                  # List<AggregateSaveData> (gold/xp oracle, stale)
 
 
 class RuneSaveData:                    # invested rune node (account-wide). NAME-readable class in the save.
@@ -272,10 +279,17 @@ class StageInfoData:                   # catalog (currentStageKey encodes the mo
 
 # ----- hero progression runtime (reached via Unit.CACHE) -----
 class HeroRuntime:                     # `uf` (uf : uo)
-    INFO = 0x30                        # beew -> HeroInfoData (for HeroKey/class)
-    STATS_HOLDER = 0x10                # behg -> xd (holder of the 64 stats)
-    LEVEL_FAKE = 0xD8                  # befp.fakeValue = LIVE HeroLevel (PLAIN)
-    EXP_FAKE = 0x118                   # beft.fakeValue = HeroExp within the level (LIVE)
+    INFO = 0x30                        # beew -> HeroInfoData (for HeroKey/class) — reads LIVE, the
+                                       # live party IDENTITY (game/build.read_live_party).
+    STATS_HOLDER = 0x10                # behg -> xd (holder of the 64 stats) — reads LIVE.
+    # DEAD since 1.00.20: these are the ACTk `fakeValue` decoy (ObscuredInt/Float base+0xC). The
+    # recompile zeroed the decoy build-wide -> they READ 0; the real live level/exp moved behind the
+    # cipher (hiddenValue/currentCryptoKey @ base+0x4/+0x8), which is OFF-LIMITS
+    # (docs/invariants/obscured-data-offlimits). read_live_party no longer reads them — it sources
+    # level/exp from the save. KEPT as dump history + for the _raw_hero_list diagnostic; DO NOT revive
+    # them as a live source (a 0 gate rejects every real hero; decoding the cipher is forbidden).
+    LEVEL_FAKE = 0xD8                  # befp.fakeValue (DEAD: reads 0 since 1.00.20)
+    EXP_FAKE = 0x118                   # beft.fakeValue (DEAD: reads 0 since 1.00.20)
 
 
 class StatsHolder:                     # `xd` (dump.cs:342026)

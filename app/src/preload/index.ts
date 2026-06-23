@@ -104,6 +104,14 @@ const meter: MeterApi = {
     return () => ipcRenderer.off("meter:auth-changed", listener);
   },
 
+  onSessionExpired: (cb) => {
+    const listener = (): void => cb();
+    ipcRenderer.on("meter:session-expired", listener);
+    return () => ipcRenderer.off("meter:session-expired", listener);
+  },
+
+  getPendingSyncCount: () => ipcRenderer.invoke("meter:get-pending-sync-count"),
+
   shareRun: (runId) => ipcRenderer.invoke("meter:share-run", runId),
   getShareStatus: (runId) => ipcRenderer.invoke("meter:get-share-status", runId),
 

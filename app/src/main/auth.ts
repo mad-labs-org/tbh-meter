@@ -201,13 +201,26 @@ export function getAccessToken(): Promise<string | null> {
   return Promise.resolve(loadSession()?.accessToken ?? null);
 }
 
-/** Clear the stored session + broadcast "signed out". Called on explicit sign-out
- *  and when the API rejects the bearer with 401 (the token expired — no refresh). */
-export function clearSession(): void {
+/**
+ * Clear the stored session + broadcast "signed out".
+ *
+ * `reason` distinguishes the two callers so the renderer can react differently:
+ *   - "manual" (default): the user pressed Sign out — a deliberate, expected state.
+ *   - "expired": the API rejected the bearer with 401 (the ~30-day HS256 token
+ *     expired OR the server's JWT_SECRET was rotated — there is no refresh token).
+ *     The user was signed in a moment ago and is being kicked involuntarily, so we
+ *     additionally emit `meter:session-expired` for the renderer to surface a clear
+ *     "sign in again" prompt instead of silently dropping to OFFLINE. The silent
+ *     logout was invisible to the user AND to us (401 upload failures are suppressed
+ *     from the error relay — see share.ts isReportableUploadFailure), which is why a
+ *     JWT_SECRET rotation only surfaced via player DMs.
+ */
+export function clearSession(reason: "manual" | "expired" = "manual"): void {
   if (!loadSession()) return;
   session = null;
   persistSession();
   broadcastStatus();
+  if (reason === "expired") broadcast("meter:session-expired");
 }
 
 export function signOut(): Promise<void> {

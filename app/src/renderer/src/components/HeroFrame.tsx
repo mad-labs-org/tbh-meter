@@ -104,7 +104,10 @@ export function HeroFrame({
       )}
 
       {(progress || info) && (
-        <OverlayTooltip anchorRef={anchorRef} open={open}>
+        // placement="top": this frame lives in the overlay's bottom footer, so the card opens the
+        // tooltip UPWARD — a downward one would grow the window under the cursor and flicker (see
+        // OverlayTooltip).
+        <OverlayTooltip anchorRef={anchorRef} open={open} placement="top">
           <div className="flex min-w-[8.5rem] flex-col gap-2">
             <div className="flex items-center justify-between gap-3 border-b border-surface-600/70 pb-1">
               <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-200">

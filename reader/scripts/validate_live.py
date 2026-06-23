@@ -13,13 +13,15 @@ MANDATORY validation step of the /meter-game-update skill — no build ships wit
 VALIDATES (with the game OPEN and IN COMBAT on a stage):
   [calib/seed]  the embedded SEED covers the live build's fp -> fast path, no cold scan
   [gold]        AggregateManager resolves (idx from the seed) + live GoldEarn[SubKey1] > 0
-  [party-live]  StageManager (pick_live_sm) resolves + 1..12 DEPLOYED heroes (not the save roster)
+  [party-live]  StageManager (pick_live_sm) resolves + 1..12 DEPLOYED heroes (not the save roster);
+                identity gated on hero_cat (the ghost discriminator since 1.00.20)
   [hero-class]  each deployed hero resolves a plausible EEquipClassType (classId) via hero_cat
   [save-build]  pick_live_psd + read_gold>0 + read_heroes>=1 (the SAVE path that broke on 1.00.12)
   [build-record] read_build (the heroes[] the run UPLOADS) >=1 hero AND >=1 with items[] OR skills[]
                  (proves ATTRIBUTES/ITEMS/EQUIPPED_* — not just HEROES) + read_account_snapshot
                  (runes/inventory/stash) not-all-None (proves RUNES/INVENTORY/STASH/ITEMS)
-  [xp-live]     the deployed heroes have plausible live level/exp (HeroRuntime fakeValue)
+  [xp-live]     the deployed heroes carry a plausible save LEVEL (the live within-level exp died in
+                1.00.20 → xp degrades to the save; read_live_party returns exp=None by design)
   [dps]         MonsterSpawnManager + UnitHealthController: >=1 live monster with hp_max>0
   [stats]       StatsHolder.FINAL_STATS (DictFloat): >=1 hero with a dict of ~64 live stats
   [stage]       the LIVE stage key (Monster.STAGE_KEY) resolves an entry in the StageInfoData catalog
@@ -51,7 +53,7 @@ from shared.memory import Reader, find_pid, open_process         # noqa: E402
 from il2cpp import typeinfo                                      # noqa: E402
 from metrics import gold                                         # noqa: E402
 from game import save, build, models                             # noqa: E402
-from config.offsets import CommonSaveData, List, LogManager, EEquipClassType  # noqa: E402
+from config.offsets import CommonSaveData, List, LogManager, EEquipClassType, MonsterSpawnManager, Unit  # noqa: E402
 
 # Valid classId range = the REAL members of EEquipClassType (single-source: derived from the enum,
 # not a literal). CLASS_TYPE is EEquipClassType, NEVER EHeroType (orphan) — see the obscured invariant.
@@ -116,10 +118,38 @@ def main():
                    f"klass={hex(gold_klass) if gold_klass else None} live={glive}"))
 
     # [party-live] StageManager resolves + 1..12 DEPLOYED heroes (the REAL party, not the save roster).
-    sm = save.pick_live_sm(reader, sm_list)
-    party = build.read_live_party(reader, sm) if sm else {}
+    # The party IDENTITY is read LIVE and gated on hero_cat (the ghost discriminator since 1.00.20 — the
+    # ACTk live level decoy died, so the old lvl>0 gate would reject every real hero). Level/exp degrade
+    # to the save inside read_live_party; here we pass save_heroes so the keys carry their save level.
+    sm = save.pick_live_sm(reader, sm_list, hero_cat)
+    save_heroes_live = save.read_heroes(reader, save.pick_live_psd(reader, psd_list))
+    party = build.read_live_party(reader, sm, hero_cat, save_heroes_live) if sm else {}
     checks.append(("party-live", bool(sm) and 1 <= len(party) <= 12,
                    f"sm={'ok' if sm else 'NOT found'} deployed={len(party)} keys={sorted(party)}"))
+
+    # --- DIAGNOSTICS: WHY party/dps/stage read empty (the breakdown the one-liner lacks). Reuses
+    #     describe_sm_candidates (the data the real reader writes to reader-diag.log). Pure reads.
+    #     total=0 → no StageManager instances enumerated (resolution/backref). total>0 & hk_accept=0 →
+    #     HeroList/CACHE/INFO/HeroKey chain reads garbage. hk_accept>0 & carriers=0 → the heroKeys don't
+    #     resolve a catalog class (ghost discriminator) — the ghost slots print the raw (hk,lvl,exp).
+    #     (lvl/exp in the raw sample are the DEAD ACTk decoy since 1.00.20; the carrier check uses hero_cat.)
+    try:
+        smd = build.describe_sm_candidates(reader, sm_list, sm, hero_cat)
+        log(f"   ↳ [diag sm]  total={smd['total']} hk_accept={smd['hk_accept']} carriers={smd['carriers']} "
+            f"picked={hex(smd['picked']) if smd['picked'] else None}")
+        for addr, slots in smd["ghosts"]:
+            log(f"        ghost @{hex(addr)} raw(hk,lvl,exp)/slot={slots}")
+    except Exception as e:
+        log(f"   ↳ [diag sm]  error: {e}")
+    try:
+        ml = reader.rptr(msm + MonsterSpawnManager.MONSTER_LIST) if msm else None
+        raw = list(reader.list_ptrs(ml, cap=600)) if ml else []
+        first = raw[0] if raw else None
+        fhc = reader.rptr(first + Unit.HEALTH_CONTROLLER) if first else None
+        log(f"   ↳ [diag msm] msm={hex(msm) if msm else None} listPtr={hex(ml) if ml else None} "
+            f"rawCount={len(raw)} firstUnit={hex(first) if first else None} firstHC={hex(fhc) if fhc else None}")
+    except Exception as e:
+        log(f"   ↳ [diag msm] error: {e}")
 
     # [hero-class] each deployed hero resolves an EEquipClassType (HeroInfoData.CLASS_TYPE via hero_cat),
     # not EHeroType (orphan). Without this, CLASS_TYPE@0x48 could slip and the static diff never checks the
@@ -156,10 +186,17 @@ def main():
                    f"heroes={len(build_recs)} withGearOrSkills={geared} "
                    f"snapshot(runes/inv/stash)={[None if x is None else len(x) for x in snap]}"))
 
-    # [xp-live] the deployed heroes have plausible live level/exp (HeroRuntime fakeValue; read_live_party gates).
-    xp_ok = bool(party) and all(0 < lvl <= 999 and exp >= 0 for lvl, exp in party.values())
+    # [xp-live] xp is sourced for the deployed heroes. 1.00.20: the live within-level exp DIED (the ACTk
+    # decoy zeroed; the real value is behind the off-limits cipher — obscured-data-offlimits), so the live
+    # xp accumulator can't run and xp HONESTLY degrades to the per-hero SAVE delta (xp_source="save", per
+    # metric-fallback-chains). read_live_party now returns (save_level, None). So the live-XP precondition is:
+    # the party resolves AND every deployed hero has a plausible LEVEL from the save (the save xp fallback's
+    # input). exp is None by design (NOT a failure) — asserting "live exp > 0" would assert a value the build
+    # no longer exposes. The save-XP delta itself is exercised by [save-build]/[build-record].
+    xp_ok = bool(party) and all(lvl is not None and 0 < lvl <= 999 for lvl, _exp in party.values())
     checks.append(("xp-live", xp_ok,
-                   (f"{len(party)} heroes w/ valid level/exp" if party else "no live party (in combat?)")))
+                   (f"{len(party)} heroes w/ save level (live within-level exp dead since 1.00.20 → xp via save)"
+                    if party else "no live party (in combat?)")))
 
     # [dps] MonsterSpawnManager + UnitHealthController: DPS = Σ of monster HP drops. models.live_monsters
     # iterates (unit, hp_cur, hp_max) reading MONSTER_LIST/SUMMONED_LIST + Unit.HEALTH_CONTROLLER + HP@0x40/0x4C.

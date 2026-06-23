@@ -108,6 +108,18 @@ export function requestUploadNow(): void {
   void runCycle();
 }
 
+/** How many local runs are eligible to upload but have not been uploaded yet — the
+ *  pending-sync backlog. Surfaced to the renderer (via IPC) so a signed-out user with
+ *  queued runs can be prompted to "sign in to sync N runs": while signed out runCycle
+ *  is a silent no-op, so the growing backlog is otherwise invisible until the user
+ *  happens to notice the OFFLINE pill (issue #60). */
+export function countPendingRuns(): number {
+  const { failed } = readState();
+  return getRunsSource()
+    .all()
+    .filter((r) => eligible(r, failed)).length;
+}
+
 function eligible(run: RunRecord, failed: Record<string, string>): boolean {
   return (
     run.status === "success" &&
