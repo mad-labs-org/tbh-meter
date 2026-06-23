@@ -1,5 +1,7 @@
 """build.py — reads the hero's BUILD: equips/mods/skills (from the save) + the 64 live
-FINAL stats (id-only) + live level/xp (ACTk fakeValue). Mirrors the monolith.
+FINAL stats (id-only) + the LIVE deployed party identity (heroKeys from StageManager.HeroList;
+level/exp degrade to the save since 1.00.20 killed the ACTk live decoy — see read_live_party).
+Mirrors the monolith.
 
 The 64 stats come out keyed by statId int (id-only; the front resolves the name). The
 item/mod/class labels are still filled in (via the offsets enums) so the output matches
@@ -77,9 +79,34 @@ def read_attribute_levels(reader, psd):
     return res
 
 
-def read_live_party(reader, sm):
-    """{heroKey: (level, exp)} LIVE values for the deployed party (fakeValue, without the save's leak).
-    Never raises -> {} on any failure."""
+def read_live_party(reader, sm, hero_cat=None, save_heroes=None):
+    """{heroKey: (level, exp)} for the LIVE DEPLOYED party (StageManager.HeroList). The party
+    IDENTITY (which heroKeys are on the field) is read LIVE — the invariant party source — and the
+    per-hero level/exp are sourced from `save_heroes` (the live within-level decoy died, see below).
+    Never raises -> {} on any failure.
+
+    1.00.20 — why level/exp no longer come from memory here. Through 1.00.19 the live level/exp were
+    the ACTk `fakeValue` PLAIN decoys (HeroRuntime.LEVEL_FAKE/EXP_FAKE @ base+0xC of the ObscuredInt/
+    Float), kept in sync with the real value, so reading them was legal. In 1.00.20 the recompile
+    KILLED those decoys build-wide (they read 0); the real live level/exp moved BEHIND the ObscuredInt
+    cipher (hiddenValue/currentCryptoKey @ base+0x4/+0x8) — and decoding the cipher is exactly what
+    [[invariants/obscured-data-offlimits]] forbids (hidden^key is garbage; ACTk rotates the key + the
+    decode-method name every build). The decoy can't be revived. So the live WITHIN-LEVEL exp is gone:
+    level/exp degrade to the SAVE (`save_heroes`, the lagging within-level snapshot — the same fallback
+    the xp chain already uses). This keeps the party LIVE while only the level/exp VALUES degrade
+    (LIVE->SAVE, [[invariants/metric-fallback-chains]]); it NEVER lets the roster define the party.
+
+    Ghost discriminator (replaces the dead `lvl>0` filter). The scan/backref returns torn-down/template
+    StageManager 'ghosts' alongside the live carrier ([[invariants/instance-selection]] family). The
+    old discriminator — a real heroKey but `lvl=0` — relied on the now-dead live level. The new, name-
+    free one: the deployed heroKey must resolve a REAL class in `hero_cat` (the 6 hero classes; a ghost
+    carries a stale/garbage key that isn't a catalog hero). Verified in 1.00.20: among ALL StageManager
+    instances ONLY the deployed ones carry a catalog heroKey (no heroKey-bearing ghosts). hero_cat=None
+    -> heroKey-plausibility only (diagnostic callers that just want any live StageManager address).
+
+    pick<->read AGREEMENT (the 1.00.13 invariant): the IDENTITY gate here (heroKey + hero_cat) is the
+    SAME validation pick_live_sm uses (it calls this); save_heroes only FILLS the level/exp, never gates
+    — so pick and read never disagree on which slot is a carrier."""
     res = {}
     try:
         if not sm:
@@ -101,11 +128,19 @@ def read_live_party(reader, sm):
             hk = reader.ri32(hi + HeroInfoData.HERO_KEY) if hi else None
             if hk is None or not (0 < hk < 10_000_000):
                 continue
-            lvl = reader.ri32(uf + HeroRuntime.LEVEL_FAKE)
-            exp = reader.rf32(uf + HeroRuntime.EXP_FAKE)
-            if lvl is None or exp is None or not (0 < lvl <= 999) or exp < 0:
+            # GHOST discriminator: a real deployed hero resolves a class in the catalog; a ghost
+            # carries a stale/garbage key that doesn't. heroKey-plausibility only when hero_cat is absent.
+            if hero_cat is not None and hk not in hero_cat:
                 continue
-            res[hk] = (lvl, exp)
+            # LEVEL from the SAVE (the live decoy is dead; the live level is behind the cipher, off-
+            # limits) — informative for the overlay/diagnostics. EXP is FORCED None: the live WITHIN-
+            # LEVEL exp is gone, and feeding the stale SAVE exp into the live xp accumulator would make
+            # the SAVE fallback silently report as LIVE (xp_source="live") — forbidden by
+            # [[invariants/metric-fallback-chains]] rule 2. None keeps the accumulator EMPTY, so close_run
+            # honestly tags the run's xp `save` and uses the per-hero save delta (capped→0). The party
+            # IDENTITY stays fully LIVE; only level/exp degrade.
+            lvl = (save_heroes or {}).get(hk, (None, None))[0]
+            res[hk] = (lvl, None)
     except Exception:
         return {}
     return res
@@ -113,7 +148,9 @@ def read_live_party(reader, sm):
 
 def _raw_hero_list(reader, sm):
     """RAW HeroList (hk, lvl, exp) per slot, WITHOUT read_live_party's validity filter — just for
-    diagnostics (describe_sm_candidates), to see WHY an instance is a ghost (e.g. lvl=0).
+    diagnostics (describe_sm_candidates), to see WHY an instance is a ghost (e.g. a non-catalog hk).
+    lvl/exp are the DEAD ACTk decoy (LEVEL_FAKE/EXP_FAKE read 0 since 1.00.20) — kept only so the raw
+    sample still shows what those offsets hold; the discriminator is now the heroKey, not lvl.
     Never-raises -> [] on any failure."""
     out = []
     try:
@@ -138,15 +175,16 @@ def _raw_hero_list(reader, sm):
     return out
 
 
-def describe_sm_candidates(reader, sm_list, picked):
+def describe_sm_candidates(reader, sm_list, picked, hero_cat=None):
     """Diagnostics for the StageManager pick (for the reader-diag.log infra log). Returns a dict:
       total      number of candidates (StageManager instances from the scan/backref)
-      hk_accept  how many the WEAK check would accept (>=1 valid heroKey) = the OLD pick's universe
-      carriers   how many are a REAL carrier (non-empty read_live_party) = what the NEW pick accepts
+      hk_accept  how many have >=1 plausible heroKey (0<hk<10M) = the loosest universe
+      carriers   how many are a REAL carrier (non-empty read_live_party) = what the pick accepts
       picked     chosen address (or None)
-      ghosts     up to 5 samples (addr, raw heroes) of hk_accept-but-NOT-carrier (e.g. lvl=0)
-    `hk_accept > carriers` is the signature of the 1.00.13 bug (there were ghosts in the old pick's universe);
+      ghosts     up to 5 samples (addr, raw heroes) of hk_accept-but-NOT-carrier (a non-catalog heroKey)
+    `hk_accept > carriers` flags ghosts in the loose universe (heroKey-bearing but not catalog heroes);
     `carriers == 0` with the run in combat = the carrier wasn't even captured by the scan (rare case, H4).
+    Passes `hero_cat` through so the carrier test uses the SAME (catalog) discriminator the pick uses.
     Pure read, never-raises."""
     hk_accept, carriers, ghosts = 0, 0, []
     try:
@@ -155,7 +193,7 @@ def describe_sm_candidates(reader, sm_list, picked):
             if not any(hk is not None and 0 < hk < 10_000_000 for hk, _, _ in heroes):
                 continue
             hk_accept += 1
-            if read_live_party(reader, a):
+            if read_live_party(reader, a, hero_cat):
                 carriers += 1
             elif len(ghosts) < 5:
                 ghosts.append((a, heroes[:6]))

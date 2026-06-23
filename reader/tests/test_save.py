@@ -5,6 +5,13 @@ returns a StageManager once a party is deployed (HeroList populated). It used to
 called once at attach, so attaching outside a stage left it None for the whole session.
 The reader now re-picks lazily — these prove the recovery the re-pick relies on: the
 SAME candidate address yields None before the party deploys and the address after.
+
+1.00.20: the live party discriminator is the DEPLOYED heroKey resolving a real class in hero_cat
+(the ACTk live-level decoy died, so the old lvl>0 gate would reject every real hero — see
+docs/invariants/party-live-resolution + obscured-data-offlimits). These build the carrier with a
+heroKey that IS in the catalog and a ghost with a heroKey that is NOT — the new ghost shape. The
+HeroRuntime LEVEL_FAKE/EXP_FAKE offsets are DEAD (read 0) and no longer gate, so the mock no longer
+sets them.
 """
 
 from config.offsets import StageManager, Array, Unit, HeroRuntime, HeroInfoData, CommonSaveData
@@ -15,10 +22,13 @@ from tests.conftest import MockReader
 SM = 0x1000       # StageManager carrier address (stable for the session)
 GHOST_SM = 0x7000  # a non-live StageManager slot (torn-down/template) the scan also returns
 
+# The catalog (heroKey -> classId). Real deployed heroes carry one of these keys; ghosts don't.
+HERO_CAT = {101: 1, 201: 2, 301: 3, 401: 4, 501: 5, 601: 6}
+
 
 def _live_party_reader():
-    """A reader whose StageManager SM has a valid deployed party (HeroList) — a hero with a
-    full live runtime (heroKey + level + exp), i.e. one read_live_party actually extracts."""
+    """A reader whose StageManager SM has a valid deployed party (HeroList) — a hero whose heroKey
+    resolves a real class in HERO_CAT, i.e. one read_live_party actually extracts."""
     hl, h0, uf, hi = 0x2000, 0x3000, 0x4000, 0x5000
     return MockReader(
         mem={
@@ -27,21 +37,19 @@ def _live_party_reader():
             hl + Array.DATA: h0,
             h0 + Unit.CACHE: uf,
             uf + HeroRuntime.INFO: hi,
-            hi + HeroInfoData.HERO_KEY: 101,    # 0 < hk < 10_000_000
-            uf + HeroRuntime.LEVEL_FAKE: 80,    # 0 < lvl <= 999
-            uf + HeroRuntime.EXP_FAKE: 100.0,   # exp >= 0
+            hi + HeroInfoData.HERO_KEY: 101,    # 0 < hk < 10M AND in HERO_CAT
         }
     )
 
 
 def test_pick_live_sm_none_when_no_party_deployed():
     # Not in a stage (town/transition): no HeroList -> not a live StageManager.
-    assert pick_live_sm(MockReader(mem={}), [SM]) is None
+    assert pick_live_sm(MockReader(mem={}), [SM], HERO_CAT) is None
 
 
 def test_pick_live_sm_finds_sm_once_party_deploys():
     # Same candidate address as the None case above -> re-picking recovers in-stage.
-    assert pick_live_sm(_live_party_reader(), [SM]) == SM
+    assert pick_live_sm(_live_party_reader(), [SM], HERO_CAT) == SM
 
 
 def test_pick_live_sm_finds_solo_hero_outside_slot_zero():
@@ -55,19 +63,17 @@ def test_pick_live_sm_finds_solo_hero_outside_slot_zero():
             hl + Array.DATA + 2 * 8: h,  # slots 0 and 1 null
             h + Unit.CACHE: uf,
             uf + HeroRuntime.INFO: hi,
-            hi + HeroInfoData.HERO_KEY: 201,
-            uf + HeroRuntime.LEVEL_FAKE: 60,
-            uf + HeroRuntime.EXP_FAKE: 0.0,
+            hi + HeroInfoData.HERO_KEY: 201,   # in HERO_CAT
         }
     )
-    assert pick_live_sm(reader, [SM]) == SM
+    assert pick_live_sm(reader, [SM], HERO_CAT) == SM
 
 
 def test_pick_live_sm_rejects_garbage_hero_list_length():
     # HeroList present but a bogus length (>12) -> not a real party -> None.
     hl = 0x2000
     reader = MockReader(mem={SM + StageManager.HERO_LIST: hl, hl + Array.MAX_LENGTH: 9999})
-    assert pick_live_sm(reader, [SM]) is None
+    assert pick_live_sm(reader, [SM], HERO_CAT) is None
 
 
 def test_pick_live_sm_none_for_empty_candidates():
@@ -79,66 +85,74 @@ def test_pick_live_sm_finds_carrier_beyond_600_candidates():
     # party carrier BEYOND 600. The fixed cap dropped it -> 'StageManager NOT found' EVEN in
     # combat (the 1s re-try never reached it) -> party fell back to the roster. pick_live_sm now scans ALL.
     decoys = [0x900000 + i * 0x100 for i in range(700)]   # 700 candidates with no HeroList (skipped)
-    assert pick_live_sm(_live_party_reader(), decoys + [SM]) == SM   # carrier at index 700
+    assert pick_live_sm(_live_party_reader(), decoys + [SM], HERO_CAT) == SM   # carrier at index 700
 
 
 def _ghost_then_carrier_reader():
-    """sm_list with a GHOST (torn-down/template StageManager: HeroList with a VALID heroKey but
-    lvl=0 -> read_live_party REJECTS it) and the live CARRIER (valid hk+lvl+exp), at distinct addresses.
-    Mirrors the 1.00.13 field bug (game 1.00.13, user log): among the ~453 instances the
-    backref returned a ghost BEFORE the carrier; pick_live_sm only checked hk -> grabbed the ghost ->
-    read_live_party read {} -> 'StageManager ok — 0 heroes deployed' for the whole session (heroes:err on
-    every run). [[invariants/party-live-resolution]]"""
-    g_hl, g_h, g_uf, g_hi = 0x2000, 0x3000, 0x4000, 0x5000   # GHOST: hk ok, lvl=0
-    c_hl, c_h, c_uf, c_hi = 0x9000, 0xA000, 0xB000, 0xC000   # CARRIER: hk+lvl+exp ok
+    """sm_list with a GHOST (torn-down/template StageManager: HeroList with a heroKey that is NOT a
+    catalog hero -> read_live_party REJECTS it via the hero_cat discriminator) and the live CARRIER
+    (heroKey in HERO_CAT), at distinct addresses. Same bug FAMILY as the 1.00.13 field bug (game
+    1.00.13, user log): among the ~453 instances the backref returned a ghost BEFORE the carrier; a
+    pick that disagreed with read grabbed the ghost -> read_live_party read {} -> 'StageManager ok — 0
+    heroes deployed' for the whole session (heroes:err on every run). The discriminator changed in
+    1.00.20 (lvl>0 -> heroKey-in-catalog, since the live level died), but pick<->read agreement is the
+    same invariant. [[invariants/party-live-resolution]]"""
+    g_hl, g_h, g_uf, g_hi = 0x2000, 0x3000, 0x4000, 0x5000   # GHOST: hk present but NOT in HERO_CAT
+    c_hl, c_h, c_uf, c_hi = 0x9000, 0xA000, 0xB000, 0xC000   # CARRIER: hk in HERO_CAT
     return MockReader(mem={
         GHOST_SM + StageManager.HERO_LIST: g_hl,
         g_hl + Array.MAX_LENGTH: 1,
         g_hl + Array.DATA: g_h,
         g_h + Unit.CACHE: g_uf,
         g_uf + HeroRuntime.INFO: g_hi,
-        g_hi + HeroInfoData.HERO_KEY: 101,        # passes the weak check (hk)
-        g_uf + HeroRuntime.LEVEL_FAKE: 0,         # fails read_live_party (requires 0 < lvl)
-        g_uf + HeroRuntime.EXP_FAKE: 0.0,
+        g_hi + HeroInfoData.HERO_KEY: 999_999,    # plausible hk (0<hk<10M) but NOT a catalog hero -> ghost
         SM + StageManager.HERO_LIST: c_hl,
         c_hl + Array.MAX_LENGTH: 1,
         c_hl + Array.DATA: c_h,
         c_h + Unit.CACHE: c_uf,
         c_uf + HeroRuntime.INFO: c_hi,
-        c_hi + HeroInfoData.HERO_KEY: 201,
-        c_uf + HeroRuntime.LEVEL_FAKE: 80,
-        c_uf + HeroRuntime.EXP_FAKE: 1234.0,
+        c_hi + HeroInfoData.HERO_KEY: 201,        # in HERO_CAT -> real carrier (no level needed)
     })
 
 
 def test_pick_live_sm_skips_ghost_and_picks_carrier():
-    # Regression for 1.00.13: the ghost (valid hk, lvl=0) comes BEFORE the carrier in the scan. pick_live_sm
-    # must SKIP the ghost (read_live_party=={}) and return the CARRIER — otherwise it freezes on the ghost
-    # (`if not sm` in the loop) and the party stays off the whole session. The chosen instance must
-    # ALWAYS be readable by read_live_party (pick<->read MUST NOT disagree — the root of the bug).
+    # The ghost (heroKey not in catalog) comes BEFORE the carrier in the scan. pick_live_sm must SKIP it
+    # (read_live_party=={}) and return the CARRIER — otherwise it freezes on the ghost (`if not sm` in the
+    # loop) and the party stays off the whole session. The chosen instance must ALWAYS be readable by
+    # read_live_party (pick<->read MUST NOT disagree — the root of the 1.00.13 bug).
     reader = _ghost_then_carrier_reader()
-    picked = pick_live_sm(reader, [GHOST_SM, SM])     # ghost at index 0
-    assert picked == SM                                # not the ghost (GHOST_SM)
-    assert read_live_party(reader, picked) != {}       # pick<->read agreement
+    picked = pick_live_sm(reader, [GHOST_SM, SM], HERO_CAT)     # ghost at index 0
+    assert picked == SM                                         # not the ghost (GHOST_SM)
+    assert read_live_party(reader, picked, HERO_CAT) != {}      # pick<->read agreement
 
 
 def test_pick_live_sm_none_when_only_ghosts():
-    # Only ghosts (no readable carrier): degrades honestly -> None (party off, as today), NEVER
-    # returns a ghost that read_live_party can't read. Ensures the fix doesn't invent a carrier.
+    # Only ghosts (no catalog carrier): degrades honestly -> None (party off), NEVER returns a ghost that
+    # read_live_party can't read. Ensures the discriminator doesn't invent a carrier from a stale heroKey.
     reader = _ghost_then_carrier_reader()
-    assert pick_live_sm(reader, [GHOST_SM]) is None
+    assert pick_live_sm(reader, [GHOST_SM], HERO_CAT) is None
+
+
+def test_pick_live_sm_real_hero_accepted_without_live_level():
+    # 1.00.20 core regression: a REAL deployed hero (heroKey in catalog) must be accepted even though the
+    # live level/exp decoy is DEAD (LEVEL_FAKE/EXP_FAKE absent/0). The old lvl>0 gate rejected it -> empty
+    # party -> sm NOT found -> hero-class/xp-live/stats cascade-fail. The carrier sets NO level offsets.
+    reader = _ghost_then_carrier_reader()
+    assert pick_live_sm(reader, [SM], HERO_CAT) == SM
+    party = read_live_party(reader, SM, HERO_CAT)
+    assert party == {201: (None, None)}                # identity present; level/exp unavailable live
 
 
 def test_describe_sm_candidates_classifies_carrier_vs_ghost():
-    # Infra diagnostic (reader-diag.log): separates carrier from ghost — the data that was MISSING in the
-    # 1.00.13 debug. With [ghost, carrier]: 2 candidates, both hk-accept (they have a valid heroKey), but only
-    # 1 carrier (the ghost has lvl=0 → read_live_party empty). The ghost becomes a sample. hk_accept>carriers
-    # is the signature of the bug.
+    # Infra diagnostic (reader-diag.log): separates carrier from ghost. With [ghost, carrier]: 2
+    # candidates, both hk-accept (they have a plausible heroKey 0<hk<10M), but only 1 carrier (the ghost's
+    # key isn't a catalog hero → read_live_party empty). The ghost becomes a sample. hk_accept>carriers is
+    # the signature of a ghost in the loose universe.
     reader = _ghost_then_carrier_reader()
-    d = describe_sm_candidates(reader, [GHOST_SM, SM], picked=SM)
+    d = describe_sm_candidates(reader, [GHOST_SM, SM], picked=SM, hero_cat=HERO_CAT)
     assert d["total"] == 2
-    assert d["hk_accept"] == 2                          # both pass the weak check (hk)
-    assert d["carriers"] == 1                           # only the carrier is read_live_party-readable
+    assert d["hk_accept"] == 2                          # both have a plausible heroKey
+    assert d["carriers"] == 1                           # only the catalog hero is read_live_party-readable
     assert d["picked"] == SM
     assert len(d["ghosts"]) == 1 and d["ghosts"][0][0] == GHOST_SM
 
