@@ -14,7 +14,8 @@ import {
   AOE_FACTOR_RANGE,
 } from "./planner-data";
 import { expKeepFraction } from "../../../shared/exp-model.js";
-import { stageEnemyHp, type StageClearStats, type StageHpInput } from "../../../shared/planner-model.js";
+import { stageEnemyHp, rankNextLevel, type StageClearStats, type StageHpInput } from "../../../shared/planner-model.js";
+import { levelCurve } from "./game-data";
 import type { RunIndexEntry } from "../../../shared/ipc-types.js";
 import type { RunRecord } from "../../../shared/run-types.js";
 import stagesData from "../../../shared/data/stages.json";
@@ -380,6 +381,52 @@ describe("buildHeroCandidates", () => {
     const cands = buildHeroCandidates(301, bases, measured, 1.3);
     const c = cands.find((x) => x.stageKey === target.stageKey)!;
     expect(c.source).toBe("estimated");
+  });
+});
+
+// ── Practical-mode under-leveling regression (the Orphias report) ────────────────────────────
+// A team that UNDER-LEVELS — farms a stage ABOVE their level for more XP (an optimal, common
+// strategy) — must still see that real farmed stage in Practical mode. Before the fix the
+// under-level exclusion (meant only for the UNVALIDATED under-level keep PROJECTION of estimated
+// stages) also dropped the measured stage, so Practical showed "No farmed stages for this hero yet"
+// despite many runs there. HELL 2-6 = datamine key 3206 (stageLevel 66); the reported team was L62.
+describe("Practical mode + under-leveling (regression)", () => {
+  it("a MEASURED stage above the hero's level survives the Practical filter + Next-Level rank", () => {
+    const hellTwoSix = resolveStageKeyFromIndex({ stage: "2-6", mode: "Hell", stageNo: 6 });
+    expect(hellTwoSix).toBe(3206); // sanity: bundled data covers HELL 2-6 (stageLevel 66)
+
+    const heroKey = 201; // Ranger, as in the report; the whole team was L62 on a L66 stage
+    const index: RunIndexEntry[] = [
+      idxEntry({
+        stage: "2-6",
+        mode: "Hell",
+        stageNo: 6,
+        clearTime: 228,
+        dps: 26_130,
+        party: [{ heroKey, class: "Ranger", level: 62, xpGained: 8_160_000 }],
+      }),
+    ];
+
+    const calibration = calibrateStages(index);
+    const measured = collectMeasuredXp(index);
+    const bases = buildStageBases(calibration, partyDpsFromIndex(index));
+    const muH = recoverHeroMultiplier(heroKey, bases, measured);
+    const cands = buildHeroCandidates(heroKey, bases, measured, muH);
+
+    // The farmed stage is MEASURED and sits 4 levels ABOVE the hero (L66 vs L62).
+    const farmed = cands.find((c) => c.stageKey === 3206)!;
+    expect(farmed.source).toBe("measured");
+    expect(farmed.stageLevel).toBe(66);
+
+    // Practical = measured-only candidates; Next Level evaluates at the hero's current level.
+    const practical = cands.filter((c) => c.source === "measured");
+    const ranked = rankNextLevel({ heroKey, level: 62, expIntoLevel: 0 }, practical, levelCurve, {
+      excludeUnderLevel: true,
+    });
+
+    // The fix: the real farmed stage IS ranked (no "No farmed stages for this hero yet").
+    expect(ranked.length).toBeGreaterThan(0);
+    expect(ranked[0].stageKey).toBe(3206);
   });
 });
 
