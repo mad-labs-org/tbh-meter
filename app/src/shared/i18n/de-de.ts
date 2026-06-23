@@ -288,10 +288,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   // ── Sign-in prompt modal ──
   "signin.title": "Teile deine Runs in der Bestenliste",
   "signin.body":
-    "Du bist nicht angemeldet. Deine Runs werden trotzdem anonym hochgeladen, deine Session-Seite auf TBH Helper funktioniert also — aber für die Bestenliste und dein Profil zählen sie erst nach der Anmeldung mit Discord. Die Anmeldung beansprucht auch die bereits von diesem Rechner hochgeladenen Runs.",
+    "Du bist nicht angemeldet, daher bleiben deine Runs auf diesem Computer und erreichen die Bestenliste nicht. Melde dich mit Discord an, um sie zu synchronisieren, damit sie für die Bestenliste und dein Profil zählen.",
   "signin.dontShow": "Nicht mehr anzeigen",
   "signin.notNow": "Jetzt nicht",
 
+  "signin.pendingTitle": "Deine Runs werden nicht synchronisiert",
+  "signin.pendingBody":
+    "Du bist abgemeldet, daher erreichen abgeschlossene Runs die Bestenliste nicht mehr ({count} lokal ausstehend). Melde dich an, um sie zu synchronisieren.",
   "signin.expiredTitle": "Deine Sitzung ist abgelaufen",
   "signin.expiredBody":
     "Du wurdest abgemeldet, daher werden deine Runs nicht mehr mit der Bestenliste synchronisiert. Sie werden lokal gespeichert. Melde dich erneut an, um fortzufahren.",

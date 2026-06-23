@@ -30,7 +30,7 @@ import {
 import { initAuth, getStatus, signIn, signOut } from "./auth.js";
 import { shareRun, getShareStatus } from "./share.js";
 import { reportError } from "./error-report.js";
-import { requestUploadNow } from "./auto-upload.js";
+import { requestUploadNow, countPendingRuns } from "./auto-upload.js";
 import { isValidSessionId, sessionStatsUrl, requestSessionReset } from "./session-stats.js";
 import { SITE_URL, DISCORD_INVITE_URL } from "./config.js";
 import { broadcast } from "./broadcast.js";
@@ -215,6 +215,10 @@ export function registerIpcHandlers(deps: IpcDeps): void {
     }
   });
   ipcMain.handle("meter:auth-sign-out", () => signOut());
+  // Pending-sync backlog size: how many local runs are queued but not uploaded.
+  // The renderer uses it to prompt a signed-out user whose runs are silently piling
+  // up locally (issue #60).
+  ipcMain.handle("meter:get-pending-sync-count", () => countPendingRuns());
 
   // --- Leaderboard sharing ----------------------------------------------------
   ipcMain.handle("meter:share-run", (_event, runId: string) => shareRun(String(runId)));

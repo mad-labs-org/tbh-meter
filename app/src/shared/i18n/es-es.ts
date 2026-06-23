@@ -288,10 +288,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   // ── Sign-in prompt modal ──
   "signin.title": "Comparte tus runs en la clasificación",
   "signin.body":
-    "No has iniciado sesión. Tus runs se suben igualmente de forma anónima, así que tu página de sesión en TBH Helper funciona — pero solo cuentan para la clasificación y tu perfil cuando inicias sesión con Discord. Iniciar sesión también reclama las runs ya subidas desde este equipo.",
+    "No has iniciado sesión, así que tus runs se quedan en este equipo y no llegan a la clasificación. Inicia sesión con Discord para sincronizarlas y que cuenten en la clasificación y tu perfil.",
   "signin.dontShow": "No volver a mostrar",
   "signin.notNow": "Ahora no",
 
+  "signin.pendingTitle": "Tus runs no se están sincronizando",
+  "signin.pendingBody":
+    "Has cerrado sesión, así que las runs completadas dejaron de llegar a la clasificación ({count} en espera localmente). Inicia sesión para sincronizarlas.",
   "signin.expiredTitle": "Tu sesión ha caducado",
   "signin.expiredBody":
     "Se cerró tu sesión, así que tus runs dejaron de sincronizarse con la clasificación. Se guardan localmente. Inicia sesión de nuevo para reanudar.",

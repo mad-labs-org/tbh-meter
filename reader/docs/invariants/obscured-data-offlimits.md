@@ -49,6 +49,19 @@ anchor on them and the test can guard them. They **must not be referenced by any
 (`metrics/`, `game/`) — if a module cites `CORE_STATS_OBSCURED`/`CACHE_OBSCURED`, it's because someone is
 about to read there, and `guarded_by` fails on purpose.
 
+## The dead `fakeValue` decoy is NOT a back door (1.00.20)
+
+ACTk keeps each Obscured value as `hash / hiddenValue / currentCryptoKey / fakeValue` (the cipher fields +
+a PLAIN `fakeValue` decoy at base+`ACTK_FAKE`). When the build keeps the decoy in sync with the real value
+(through 1.00.19), reading the decoy is legal — that is how the live hero level/exp were read
+(`HeroRuntime.LEVEL_FAKE`/`EXP_FAKE`). **1.00.20 zeroed the decoy build-wide** (it reads 0). The tempting
+"fix" is to read `hiddenValue ^ currentCryptoKey` instead — that is **reading the cipher, forbidden by
+this invariant** (ObscuredFloat decodes that way, ObscuredInt uses a heavier transform; either way ACTk
+rotates the key and the decode-method name every build, so it re-breaks). When a decoy dies, the value is
+**gone** — degrade to the PLAIN substitute (the save), never decode. See `HeroRuntime` in `config/offsets.py`
+(the dead offsets are kept as dump history, marked DO-NOT-REVIVE) and `game/build.read_live_party`
+([[invariants/party-live-resolution]]).
+
 ## Orphan enum: hero class identity
 
 A hero's class (Knight/Ranger/…) comes from **`EEquipClassType`**

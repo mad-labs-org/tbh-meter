@@ -288,10 +288,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   // ── Sign-in prompt modal ──
   "signin.title": "Runlarını lider tablosunda paylaş",
   "signin.body":
-    "Giriş yapmadın. Runların yine de anonim yüklenir, yani TBH Helper'daki oturum sayfan çalışır — ama lider tablosuna ve profiline ancak Discord ile giriş yaptıktan sonra sayılırlar. Giriş, bu bilgisayardan yüklenmiş runları da hesabına bağlar.",
+    "Giriş yapmadın, bu yüzden runların bu bilgisayarda kalır ve lider tablosuna ulaşmaz. Bunları senkronlamak ve lider tablosu ile profilinde sayılması için Discord ile giriş yap.",
   "signin.dontShow": "Bir daha gösterme",
   "signin.notNow": "Şimdi değil",
 
+  "signin.pendingTitle": "Runların senkronlanmıyor",
+  "signin.pendingBody":
+    "Çıkış yaptın, bu yüzden tamamlanan runlar lider tablosuna ulaşmayı durdurdu (yerelde {count} bekliyor). Senkronlamak için giriş yap.",
   "signin.expiredTitle": "Oturumun sona erdi",
   "signin.expiredBody":
     "Çıkış yapıldı, bu yüzden runların lider tablosuna senkronlanmayı durdurdu. Yerel olarak kaydediliyorlar. Devam etmek için tekrar giriş yap.",

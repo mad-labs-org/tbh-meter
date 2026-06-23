@@ -285,10 +285,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   // ── Sign-in prompt modal ──
   "signin.title": "런을 리더보드에 공유하세요",
   "signin.body":
-    "로그인하지 않았습니다. 런은 익명으로 업로드되어 TBH Helper의 세션 페이지는 작동하지만, 리더보드와 프로필에는 Discord 로그인 후에만 집계됩니다. 로그인하면 이 컴퓨터에서 업로드된 런도 내 계정으로 귀속됩니다.",
+    "로그인하지 않아 런이 이 컴퓨터에만 저장되고 리더보드에 반영되지 않습니다. Discord로 로그인하면 동기화되어 리더보드와 프로필에 반영됩니다.",
   "signin.dontShow": "다시 표시하지 않기",
   "signin.notNow": "나중에",
 
+  "signin.pendingTitle": "런이 동기화되지 않고 있습니다",
+  "signin.pendingBody":
+    "로그아웃 상태여서 완료된 런이 리더보드에 반영되지 않습니다(로컬에 {count}개 대기 중). 로그인하여 동기화하세요.",
   "signin.expiredTitle": "세션이 만료되었습니다",
   "signin.expiredBody":
     "로그아웃되어 런이 리더보드 동기화를 멈췄습니다. 런은 로컬에 저장됩니다. 다시 로그인하면 동기화를 재개합니다.",

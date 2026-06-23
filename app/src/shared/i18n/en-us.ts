@@ -294,10 +294,13 @@ export const DICT = {
   // ── Sign-in prompt modal ──
   "signin.title": "Share your runs on the leaderboard",
   "signin.body":
-    "You are not signed in. Your runs still upload anonymously, so your session page on TBH Helper works — but they only count for the leaderboard and your profile after you sign in with Discord. Signing in also claims the runs already uploaded from this computer.",
+    "You're not signed in, so your runs stay on this computer and never reach the leaderboard. Sign in with Discord to sync them so they count for the leaderboard and your profile.",
   "signin.dontShow": "Don't show this again",
   "signin.notNow": "Not now",
 
+  "signin.pendingTitle": "Your runs aren't syncing",
+  "signin.pendingBody":
+    "You're signed out, so finished runs stopped reaching the leaderboard ({count} waiting locally). Sign in to sync them.",
   "signin.expiredTitle": "Your session expired",
   "signin.expiredBody":
     "You were signed out, so your runs stopped syncing to the leaderboard. They're saved locally. Sign in again to resume.",
