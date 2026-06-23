@@ -8,7 +8,7 @@
     "render": "remotion render src/index.ts ReleaseVideo out/release.mp4 --concurrency=4"
   },
   "dependencies": {
-    "@remotion/cli": "^4.0.0",
+    "@remotion/cli": "^4.0.482",
     "@remotion/google-fonts": "^4.0.474",
     "@remotion/transitions": "^4.0.474",
     "lucide-react": "^1.17.0",
