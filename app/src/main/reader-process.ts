@@ -181,19 +181,29 @@ function killAllReaders(): void {
   }
 }
 
-/** Read a tail of the on-disk reader logs (meter.log + live.json) from the
- *  output directory. These files are written by the reader process itself and contain
- *  far richer diagnostic info than the ring buffer (timestamped attach/resolve/gold
- *  events, run records, the current live snapshot). Best-effort: missing or unreadable
- *  files are silently omitted — never let a log-read failure block the error report. */
-function readReaderLogs(maxBytes = 40_000): string {
+/** Read a tail of the on-disk reader logs from the output directory, concatenated into ONE blob the
+ *  error relay attaches to the Discord report. Order + per-file budgets matter:
+ *   - reader-diag.log — the decision SPINE (attach/resolve path + the build fingerprint, party-pick,
+ *     run-close). The FIRST place to look for resolution / instance-pick problems, so it leads and
+ *     gets the largest share — it carries the player's build `fp=`, the missing piece when a
+ *     "can't calibrate / stuck on this version" report came in with no way to see their game build.
+ *   - meter.log — the verbose timestamped event log.
+ *   - live.json — the current raw live snapshot (~1×/s), replaced the old cooked meter_live.txt.
+ *  The per-file budgets sum WELL under error-report's 50k `logs` cap, so the relay never truncates a
+ *  whole file away. Best-effort: missing/unreadable files are silently omitted — never let a
+ *  log-read failure block the error report. */
+export function readReaderLogs(): string {
   const dir = resolveOutputDir();
   const parts: string[] = [];
-  // live.json (the raw live snapshot, overwritten ~1×/s) replaced the old cooked meter_live.txt.
-  for (const [name, tail] of [["live.json", 2_000], ["meter.log", maxBytes]] as const) {
+  const files = [
+    ["reader-diag.log", 16_000],
+    ["meter.log", 28_000],
+    ["live.json", 2_000],
+  ] as const;
+  for (const [name, tail] of files) {
     try {
       const content = readFileSync(join(dir, name), "utf-8");
-      // Take a tail: if file is large, send the last `tail` chars (most recent).
+      // Tail: if the file is larger than its budget, keep the last `tail` chars (most recent).
       const slice = content.length > tail ? `...(truncated)\n${content.slice(-tail)}` : content;
       parts.push(`=== ${name} ===\n${slice}`);
     } catch {

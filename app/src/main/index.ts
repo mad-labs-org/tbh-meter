@@ -28,6 +28,7 @@ import {
   readerWillRun,
   getReaderState,
   getReaderStatus,
+  readReaderLogs,
 } from "./reader-process.js";
 import type { ReaderStatus } from "../shared/ipc-types.js";
 import type { LiveSnapshot } from "../shared/run-types.js";
@@ -61,8 +62,9 @@ import {
 app.setName(isRcBuild() ? "tbh-meter-rc" : "tbh-meter");
 
 // Discord webhook error reporting (no Sentry/Datadog) — installed before anything
-// else can fail so startup crashes are reported too.
-installGlobalErrorReporting();
+// else can fail so startup crashes are reported too. The reader-log tail (reader-diag.log +
+// meter.log + live.json) rides along on every report so a Discord post is self-sufficient to debug.
+installGlobalErrorReporting(readReaderLogs);
 
 let liveWin: BrowserWindow | null = null;
 let listWin: BrowserWindow | null = null;
