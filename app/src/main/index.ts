@@ -325,8 +325,21 @@ function loadRenderer(win: BrowserWindow, hash: "list" | "splash" | null): void 
 // when the zoomed layout actually reflows, which is not guaranteed.
 let liveContentHeight = 48;
 
+// The last known-good width, in DIP. Stored separately from the live window's bounds
+// because getBounds().width can return transient inflated values on Windows while a
+// transparent frameless window is being dragged via setPosition() on high-DPI monitors
+// (200 % / 4K). When pinLiveHeight fires mid-drag and re-applies that transient width
+// via setBounds, it creates a feedback loop that drives the width upward every tick of
+// the move — the overlay keeps growing while the user drags (#live-drag-width-feedback).
+// Keeping the width in a stable variable breaks the loop: the pin never feeds the bad
+// value back. The explicit resize (right-edge drag → setLiveWidth) updates this variable
+// normally, so user-driven resize is unaffected.
+let lastKnownWidth = DEFAULT_LIVE_WIDTH;
+
 /** Pin the live window's height to the renderer-measured content height × the live
- *  font scale (the zoom factor makes window px = CSS px × scale). Width stays free. */
+ *  font scale (the zoom factor makes window px = CSS px × scale). Width is kept from
+ *  the last known-good value — NOT from getBounds().width — to avoid a destructive
+ *  feedback loop during a move drag on high-DPI monitors (see lastKnownWidth). */
 function pinLiveHeight(): void {
   if (!liveWin || liveWin.isDestroyed()) return;
   const scale = clampFontScale(getSettings().liveFontScale);
@@ -334,7 +347,7 @@ function pinLiveHeight(): void {
   liveWin.setMinimumSize(MIN_LIVE_WIDTH, h);
   liveWin.setMaximumSize(0, h); // width 0 => unlimited; height locked to content
   const b = liveWin.getBounds();
-  const w = Math.max(b.width, MIN_LIVE_WIDTH); // never let a transient 0 width stick
+  const w = Math.max(lastKnownWidth, MIN_LIVE_WIDTH); // NOT b.width — see lastKnownWidth doc
   if (b.height !== h || b.width !== w) {
     liveWin.setBounds({ x: b.x, y: b.y, width: w, height: h });
   }
@@ -359,6 +372,7 @@ function setLiveWidth(width: number): void {
   const b = liveWin.getBounds();
   if (b.width !== w) {
     liveWin.setBounds({ x: b.x, y: b.y, width: w, height: b.height });
+    lastKnownWidth = w;
   }
 }
 
@@ -373,6 +387,7 @@ function resetLiveWindow(): void {
   const x = Math.round(workArea.x + (workArea.width - width) / 2);
   const y = Math.round(workArea.y + 24);
   liveWin.setBounds({ x, y, width, height });
+  lastKnownWidth = width;
   if (!liveWin.isVisible()) liveWin.show();
   saveLiveBounds(liveWin);
 }
