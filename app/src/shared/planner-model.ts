@@ -262,6 +262,29 @@ function candidateRate(cand: ClimbCandidate, level: number): { rate: number; cle
   return { rate: xpc / clearSec, clear };
 }
 
+/**
+ * Whether to drop a candidate for sitting ABOVE the hero's level (the hero is under-leveling it).
+ * `excludeUnderLevel` exists to stay out of the UNVALIDATED under-level keep formula when PROJECTING
+ * XP (E4: validated keep region, gap ≥ 0) — so it applies to ESTIMATED stages only. A MEASURED
+ * candidate carries the player's REAL per-clear XP from runs they actually did on that stage
+ * (under-level and all), so it is ALWAYS eligible: hiding a stage the player is literally farming was
+ * the under-leveling bug (a team below the stage they farm for more XP saw "no farmed stages"). At or
+ * below the hero's level → never dropped, regardless of source.
+ *
+ * Caveat: the Next-Level view is exact (it scores at the hero's CURRENT level, where the measured XP
+ * is ground truth). The Full-Climb projection scales that measured XP by keep(L)/keep(anchor) across
+ * the climb, so for DEEP under-leveling it rides the same unvalidated under-level keep — bounded by
+ * the 0.01 keep floor (no divergence) and surfaced as keep-confidence `approx`.
+ */
+function dropsUnderLevel(
+  source: CandidateSource,
+  stageLevel: number,
+  heroLevel: number,
+  excludeUnderLevel: boolean,
+): boolean {
+  return excludeUnderLevel && source === "estimated" && stageLevel > heroLevel;
+}
+
 /** Per-level argmax: the best stage at a given hero level, with the rate it achieves. Shared by the
  *  single-hero climb (band engine) and the team loop. Returns null when no farmable stage. */
 function bestStageAtLevel(
@@ -271,7 +294,7 @@ function bestStageAtLevel(
 ): { cand: ClimbCandidate; rate: number; clear: ClearTimeResult } | null {
   let best: { cand: ClimbCandidate; rate: number; clear: ClearTimeResult } | null = null;
   for (const cand of candidates) {
-    if (excludeUnderLevel && cand.stageLevel > level) continue; // edge E4: stay in the validated region
+    if (dropsUnderLevel(cand.source, cand.stageLevel, level, excludeUnderLevel)) continue; // E4 (estimated only)
     const { rate, clear } = candidateRate(cand, level);
     if (rate <= 0) continue; // edge E5: no income on this stage
     // Deterministic tiebreak by stageKey so equal-rate ties (and tests) are stable.
@@ -451,7 +474,8 @@ function pickStageMinNorm(
     let gatingHeroKey = notDone[0]?.heroKey ?? -1;
     let feasible = true;
     for (const h of notDone) {
-      if (excludeUnderLevel && cand.stageLevel > h.level) {
+      const source = ratesByHero.sourceOf(h.heroKey, cand.stageKey) ?? cand.source;
+      if (dropsUnderLevel(source, cand.stageLevel, h.level, excludeUnderLevel)) {
         feasible = false;
         break;
       }
@@ -500,6 +524,12 @@ class PerHeroRates {
     if (!own) return 0;
     const { rate } = candidateRate(own, level);
     return rate;
+  }
+  /** This hero's OWN source for a stage — the team loop honours the per-hero measured/estimated flag
+   *  in the under-level rule, since a stage one hero measured may be estimated for another. undefined
+   *  when the hero has no candidate for that stage (then the rate is 0 anyway → infeasible). */
+  sourceOf(heroKey: number, stageKey: number): CandidateSource | undefined {
+    return this.byHero.get(heroKey)?.get(stageKey)?.source;
   }
 }
 
@@ -757,7 +787,8 @@ function scoreFirstChoice(
   let minNorm = Infinity;
   let gatingHeroKey = notDone[0]?.heroKey ?? -1;
   for (const h of notDone) {
-    if (excludeUnderLevel && cand.stageLevel > h.level) return null;
+    const source = ratesByHero.sourceOf(h.heroKey, cand.stageKey) ?? cand.source;
+    if (dropsUnderLevel(source, cand.stageLevel, h.level, excludeUnderLevel)) return null;
     const rate = ratesByHero.rate(h.heroKey, cand, h.level);
     if (rate <= 0) return null;
     rates.set(h.heroKey, rate);
@@ -855,7 +886,7 @@ export function rankNextLevel(
   const remaining = Math.max(0, need - hero.expIntoLevel);
   const out: NextLevelRank[] = [];
   for (const cand of candidates) {
-    if (opts.excludeUnderLevel && cand.stageLevel > hero.level) continue;
+    if (dropsUnderLevel(cand.source, cand.stageLevel, hero.level, opts.excludeUnderLevel)) continue;
     const { rate } = candidateRate(cand, hero.level);
     if (rate <= 0) continue;
     const seconds = remaining / rate;

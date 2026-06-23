@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { ReaderStatus, UpdateStatus } from "./ipc-types.js";
-import { shouldDismissStalledSplash, SEARCHING_DISMISS_MS } from "./splash-decide.js";
+import {
+  shouldDismissStalledSplash,
+  shouldForceDismissSplash,
+  SEARCHING_DISMISS_MS,
+  SPLASH_HARD_DISMISS_MS,
+} from "./splash-decide.js";
 
 // Update states that are NOT an in-flight install — the safety net is allowed to fire under these
 // (they fall through to the reader phase in splashPhase, so the splash shows the reader card).
@@ -63,5 +68,38 @@ describe("shouldDismissStalledSplash", () => {
     // Regression guard on the constant itself: a budget anywhere near 8s could cut a calibrated
     // boot that's about to stream. Keep it well clear (≥ 4× the 8s fallback).
     expect(SEARCHING_DISMISS_MS).toBeGreaterThanOrEqual(8000 * 4);
+  });
+});
+
+describe("shouldForceDismissSplash (hard ceiling, any phase)", () => {
+  it("does NOT dismiss before the ceiling, no matter the (non-applying) update", () => {
+    for (const update of NON_APPLYING_UPDATES) {
+      expect(shouldForceDismissSplash(update, 0)).toBe(false);
+      expect(shouldForceDismissSplash(update, SPLASH_HARD_DISMISS_MS - 1)).toBe(false);
+    }
+  });
+
+  it("dismisses past the ceiling when no update is applying (the stuck-in-scanning escape)", () => {
+    // The gap this closes: a reader stuck on 'resolving'/'scanning' yields none of the other four
+    // dismissals, so without this it hangs forever. Past the ceiling it frees the user regardless.
+    for (const update of NON_APPLYING_UPDATES) {
+      expect(shouldForceDismissSplash(update, SPLASH_HARD_DISMISS_MS)).toBe(true);
+      expect(shouldForceDismissSplash(update, SPLASH_HARD_DISMISS_MS + 60_000)).toBe(true);
+    }
+  });
+
+  it("still defers to an in-flight update even past the ceiling (about to relaunch)", () => {
+    const inFlight: UpdateStatus[] = [
+      { state: "available", version: "1.4.3" },
+      { state: "downloading", version: "1.4.3", percent: 50 },
+      { state: "downloaded", version: "1.4.3" },
+    ];
+    for (const update of inFlight) {
+      expect(shouldForceDismissSplash(update, SPLASH_HARD_DISMISS_MS + 60_000)).toBe(false);
+    }
+  });
+
+  it("sits well beyond the splash's own 'up to 5 min' promise so a slow first boot is never cut", () => {
+    expect(SPLASH_HARD_DISMISS_MS).toBeGreaterThan(5 * 60_000);
   });
 });

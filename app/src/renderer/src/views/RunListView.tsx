@@ -600,8 +600,9 @@ function SessionStatsButton({
 
 // --------------------------------------------------------------------------- //
 // Show-ignored toggle (PR6) — flips the hide-non-counted display preference. When hiding, it shows
-// how many runs the QUALITY gate is filtering out (skipped/partial/degraded — marked + filterable,
-// never deleted), so the count always matches what flipping the toggle reveals (the duration gate
+// how many runs the QUALITY gate is filtering out (skipped/degraded — partial clears stay shown;
+// all marked + filterable, never deleted), so the count always matches what flipping the toggle
+// reveals (the duration gate
 // is separate, controlled in Settings). Persists via settings. Hidden entirely when nothing is
 // quality-hidden AND the filter is already on (no count to reveal), but stays visible while
 // showing-all so the user can re-hide.

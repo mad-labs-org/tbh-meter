@@ -103,7 +103,7 @@ export const DICT = {
     "Choose which runs show in your list. This is local only — it never changes the leaderboard.",
   "settings.hideIgnored": "Hide ignored runs",
   "settings.hideIgnoredDesc":
-    "Skipped, partial and incomplete-data runs stay hidden. They still count toward your session and can be revealed from the runs list anytime.",
+    "Skipped and unreadable-data runs stay hidden; partial clears (the meter joined mid-run) still show. Hidden runs still count toward your session and can be revealed from the runs list anytime.",
   "settings.hideShorter": "Hide runs shorter than",
   "settings.seconds": "seconds",
   "settings.minDurationDesc":
@@ -157,9 +157,9 @@ export const DICT = {
   "runs.hideIgnoredBtn": "Hide ignored",
   "runs.showIgnoredBtn": "Show ignored ({count})",
   "runs.hideIgnoredTitle":
-    "Hide skipped, partial and degraded runs (they still count toward your session)",
+    "Hide skipped and degraded runs (partial clears still show; everything still counts toward your session)",
   "runs.showIgnoredTitle":
-    "Show runs the meter ignored — too short, partial captures, or with unreadable data",
+    "Show runs the meter ignored — too short or with unreadable data",
   "runs.columns": "Columns",
   "runs.columnsTitle": "Show / hide / reorder columns",
   "runs.newSession": "New session",

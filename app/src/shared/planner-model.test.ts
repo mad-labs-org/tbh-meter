@@ -417,7 +417,10 @@ describe("singleHeroClimb", () => {
 
   it("no farmable stage at a level → no-farmable-stage (E3)", () => {
     const curve = flatCurve(1000, 90, 95);
-    const plan = singleHeroClimb({ heroKey: 1, level: 90, expIntoLevel: 0 }, 93, [climbCand(1, 95, 1e6, 10)], curve, {
+    // The only stage is ESTIMATED and above the hero (L95 vs L90) → excluded by E4 (no unvalidated
+    // under-level projection), leaving nothing to farm. (A measured under-level stage would be KEPT.)
+    const onlyEstimatedUnder = { ...climbCand(1, 95, 1e6, 10), source: "estimated" as const };
+    const plan = singleHeroClimb({ heroKey: 1, level: 90, expIntoLevel: 0 }, 93, [onlyEstimatedUnder], curve, {
       excludeUnderLevel: true,
     });
     expect(plan.status).toBe("no-farmable-stage");
@@ -430,6 +433,21 @@ describe("singleHeroClimb", () => {
     });
     expect(plan.status).toBe("ok");
     expect(plan.bands[0].keepConfidence).toBe("approx"); // gap −5
+  });
+
+  it("KEEPS a measured under-level stage even with excludeUnderLevel ON (Full-Climb path of the fix)", () => {
+    // The under-leveling fix at the CLIMB engine (not just rankNextLevel): a hero L90 whose only
+    // farmed stage is MEASURED at L95 (under by 5) must still get a plan — the player demonstrably
+    // farms it. Without the fix this returned "no-farmable-stage" (the bug Orphias hit, climb path).
+    const curve = flatCurve(1000, 90, 95);
+    const measuredUnder = climbCand(1, 95, 1e6, 10); // climbCand defaults source: "measured"
+    const plan = singleHeroClimb({ heroKey: 1, level: 90, expIntoLevel: 0 }, 92, [measuredUnder], curve, {
+      excludeUnderLevel: true,
+    });
+    expect(plan.status).toBe("ok");
+    expect(plan.bands).toHaveLength(1);
+    expect(plan.bands[0].source).toBe("measured");
+    expect(plan.bands[0].keepConfidence).toBe("approx"); // gap −5 still surfaced
   });
 
   it("mid-level start consumes the within-level remainder for the FIRST level only (E8)", () => {
@@ -563,13 +581,22 @@ describe("rankNextLevel", () => {
     expect(rankNextLevel({ heroKey: 1, level: 101, expIntoLevel: 0 }, [climbCand(1, 95, 1e6, 10)], capCurve)).toEqual([]);
   });
 
-  it("excludeUnderLevel drops stages above the hero's level; off → keeps them (approx keep)", () => {
+  it("excludeUnderLevel drops ESTIMATED under-level stages but always KEEPS measured ones", () => {
+    // The under-level exclusion exists to stay out of the UNVALIDATED under-level keep formula when
+    // PROJECTING XP — so it applies to estimated stages only. A measured stage carries the player's
+    // REAL farmed XP, so it is eligible even above the hero's level (the under-leveling fix: a player
+    // who farms a higher stage for more XP must still see it ranked).
     const hero: ClimbHero = { heroKey: 1, level: 90, expIntoLevel: 0 };
-    const over = climbCand(1, 95, 1e6, 10); // stage above hero
-    expect(rankNextLevel(hero, [over], curve, { excludeUnderLevel: true })).toEqual([]);
-    const kept = rankNextLevel(hero, [over], curve, { excludeUnderLevel: false });
-    expect(kept).toHaveLength(1);
-    expect(kept[0].keepConfidence).toBe("approx");
+    const overEstimated = { ...climbCand(1, 95, 1e6, 10), source: "estimated" as const };
+    const overMeasured = climbCand(2, 95, 1e6, 10); // climbCand defaults source: "measured"
+    // Estimated above the hero → dropped (no unvalidated under-level projection).
+    expect(rankNextLevel(hero, [overEstimated], curve, { excludeUnderLevel: true })).toEqual([]);
+    // Measured above the hero → KEPT even with the flag on (it's the player's real farmed stage).
+    const keptMeasured = rankNextLevel(hero, [overMeasured], curve, { excludeUnderLevel: true });
+    expect(keptMeasured).toHaveLength(1);
+    expect(keptMeasured[0].keepConfidence).toBe("approx"); // gap −5 → still flagged approx
+    // Flag off → both kept regardless of source.
+    expect(rankNextLevel(hero, [overEstimated], curve, { excludeUnderLevel: false })).toHaveLength(1);
   });
 
   it("excludes stages with no income (Infinity clear time)", () => {
@@ -673,16 +700,52 @@ describe("teamClimb", () => {
 
   it("no-farmable-stage propagates when no stage feeds every climbing hero", () => {
     const curve = flat(1000);
+    // The only stage is ESTIMATED and above both heroes (L95 vs L90) → excluded by E4 for everyone.
+    const onlyEstimatedUnder = { ...climbCand(1, 95, 1e6, 10), source: "estimated" as const };
     const plan = teamClimb(
       [
         { heroKey: 10, level: 90, expIntoLevel: 0 },
         { heroKey: 20, level: 90, expIntoLevel: 0 },
       ],
       93,
-      teamMap([10, 20], [climbCand(1, 95, 1e6, 10)]),
+      teamMap([10, 20], [onlyEstimatedUnder]),
       curve,
       { excludeUnderLevel: true },
     );
+    expect(plan.status).toBe("no-farmable-stage");
+  });
+
+  it("KEEPS a measured under-level stage for the whole team (Orphias's L62-on-L66 case, team path)", () => {
+    // Both heroes farmed the under-level stage together (deployed as a team → both MEASURED), so it
+    // stays eligible for the team. Without the fix the team saw "no farmed stages" too.
+    const curve = flat(1000);
+    const party: ClimbHero[] = [
+      { heroKey: 10, level: 90, expIntoLevel: 0 },
+      { heroKey: 20, level: 90, expIntoLevel: 0 },
+    ];
+    const plan = teamClimb(party, 92, teamMap([10, 20], [climbCand(1, 95, 1e6, 10)]), curve, {
+      excludeUnderLevel: true,
+    });
+    expect(plan.status).toBe("ok");
+    expect(plan.bands.length).toBeGreaterThan(0);
+    expect(plan.bands[0].source).toBe("measured");
+  });
+
+  it("the team under-level rule is PER-HERO: a stage measured by one hero but estimated by another is dropped", () => {
+    // Stage L95 above both L90 heroes. Hero 10 has it MEASURED (eligible); hero 20 only ESTIMATED
+    // (its under-level keep projection is unvalidated → dropped). A team stage must feed EVERY hero,
+    // so the team has no farmable stage. Pins that the loop consults each hero's OWN source
+    // (PerHeroRates.sourceOf) — using the shared candidate's source would wrongly keep it for hero 20.
+    const curve = flat(1000);
+    const party: ClimbHero[] = [
+      { heroKey: 10, level: 90, expIntoLevel: 0 },
+      { heroKey: 20, level: 90, expIntoLevel: 0 },
+    ];
+    const byHero = new Map<number, ClimbCandidate[]>([
+      [10, [climbCand(1, 95, 1e6, 10)]], // measured (default)
+      [20, [{ ...climbCand(1, 95, 1e6, 10), source: "estimated" as const }]],
+    ]);
+    const plan = teamClimb(party, 92, byHero, curve, { excludeUnderLevel: true });
     expect(plan.status).toBe("no-farmable-stage");
   });
 

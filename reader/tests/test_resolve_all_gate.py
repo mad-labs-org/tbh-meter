@@ -237,3 +237,45 @@ class TestResolveFast:
         monkeypatch.setattr(mw, "resolve_via_rva", lambda r, tb, idx, tg, sg: self._rv())
         monkeypatch.setattr(mw, "resolve_combat_gold_klass_by_index", lambda r, tb, idx: None)  # gold fail
         assert mw._resolve_fast(None, 0x7ff800000000, CALIB) is None
+
+
+class TestIncompleteResolutionStatus:
+    """run() bails when the scan/fast-path returns an INCOMPLETE tuple (a manager missing —
+    typically a cold scan run OUTSIDE combat: nothing gets persisted, so the reader exits and
+    the app supervisor re-spawns it, scanning AGAIN every launch). The OBSERVABILITY contract:
+    on that bail the reader must emit a TERMINAL [[STATUS]] marker that reverts the splash to a
+    deadline-protected phase (`searching`) — NOT leave it stranded on `scanning`/`resolving`
+    forever (the "stuck on First time on this version" symptom). Every OTHER exit in run()
+    either reaches `ready` or reverts to `searching` (game-not-open); the incomplete-resolution
+    path was the one asymmetry that emitted no terminal marker.
+
+    Monkeypatches all of run()'s heavy I/O delegates (find_pid/open_process/Reader/version/
+    ga_module/fingerprint/resolve_all) so the test exercises ONLY the bring-up status sequence."""
+
+    def _drive_run_to_incomplete(self, monkeypatch, tmp_path):
+        # an INCOMPLETE 14-tuple: msm=None (a manager missing) → run()'s
+        # `if not (msm and lm and sc_class and sf_class)` guard fires.
+        incomplete = (None, "sf", None, "lm", [], [], {1: (1, 1, 1, 0)},
+                      {2: (1, 1, 1)}, {3: 1}, [], None, None, None, None)
+        monkeypatch.setattr(mw, "find_pid", lambda: 1234)
+        monkeypatch.setattr(mw, "open_process", lambda pid: 0xDEAD)
+        monkeypatch.setattr(mw, "Reader", lambda handle: object())
+        monkeypatch.setattr(mw, "_detect_game_version", lambda handle: "1.00.19")
+        monkeypatch.setattr(mw.typeinfo, "ga_module", lambda pid: (0x7ff800000000, 0x62ea000))
+        monkeypatch.setattr(mw.typeinfo, "build_fingerprint", lambda r, b, version=None: FP)
+        monkeypatch.setattr(mw, "resolve_all", lambda r, pid, fp, cache: incomplete)
+        # load_calib is consulted again right after resolve_all (for tbase/idx_ut) → keep it a miss.
+        monkeypatch.setattr(mw, "load_calib", lambda path, fp: None)
+        mw.run(hz=10, output_dir=str(tmp_path), debug=False)
+
+    def test_incomplete_resolution_reverts_splash_to_searching(self, monkeypatch, tmp_path, capsys):
+        self._drive_run_to_incomplete(monkeypatch, tmp_path)
+        markers = [ln.split("[[STATUS]]")[1].strip().split()[0]
+                   for ln in capsys.readouterr().out.splitlines() if "[[STATUS]]" in ln]
+        # never reaches ready (resolution failed) ...
+        assert "ready" not in markers
+        # ... and the LAST terminal marker is `searching`, so the splash leaves the
+        # `resolving`/`scanning` phase the app can't time out and lands on the deadline-protected one.
+        assert markers[-1] == "searching", (
+            f"incomplete-resolution bail left the splash stranded on {markers[-1]!r} "
+            f"(full sequence: {markers}) — must revert to `searching`")

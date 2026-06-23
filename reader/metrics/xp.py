@@ -1,13 +1,21 @@
-"""xp.py — LIVE per-hero XP: tick-by-tick ACCUMULATOR (PartyXpAccumulator) + level-up
-bridging via the curve.
+"""xp.py — per-hero XP: tick-by-tick ACCUMULATOR (PartyXpAccumulator) + level-up
+bridging via the curve. The within-level exp feeding it is a {heroKey: (level, exp)} snapshot
+(build.read_live_party shape); the accumulator itself is source-agnostic.
 
-Live xp (HeroRuntime.EXP_FAKE) is within-level and resets on level-up; the curve
-(config/level_curve.json = ExpForLevelUp per level) fills the wrap. Validated live:
+The live within-level exp WAS HeroRuntime.EXP_FAKE (ACTk fakeValue decoy) and resets on level-up;
+the curve (config/level_curve.json = ExpForLevelUp per level) fills the wrap. Validated live:
 across 3 level-ups the sum matched with diff 0. Within-level is MONOTONIC outside level-up
 (the dip detector ran many runs with a death and never fired) — death only PAUSES the gain.
 
+1.00.20: the live within-level exp DIED (the EXP_FAKE decoy zeroed build-wide; the real value moved
+behind the off-limits ObscuredFloat cipher — see config/offsets.HeroRuntime + obscured-data-offlimits).
+build.read_live_party now yields exp=None, so the accumulator sees NOBODY (total()->None) and the
+orchestrator falls back to the per-hero SAVE delta, honestly tagging xp_source="save"
+([[invariants/metric-fallback-chains]]). The accumulator logic below is unchanged — it just no longer
+gets fed a live exp until/unless a future build restores a readable one.
+
 CAP: a level with no curve entry has no defined progression (level_capped) — the game keeps
-incrementing EXP_FAKE at the cap with no level-up to consume it, so the same-level delta is
+incrementing the within-level exp at the cap with no level-up to consume it, so the same-level delta is
 PHANTOM XP: a hero at the cap gains 0; crossing INTO the cap banks only up to the threshold."""
 
 import json
@@ -167,12 +175,14 @@ def party_progress(acc, party):
     """Per-hero LIVE leveling snapshot for the overlay's time-to-level: {heroKey: {level, exp, gain}}.
 
     Assembles ALREADY-read values (no memory, no clock):
-      - `level`/`exp`: within-level live values from read_live_party (HeroRuntime LEVEL_FAKE/EXP_FAKE).
-        `exp` resets on level-up, so the app's "remaining to next level" is curve[level] - exp.
+      - `level`/`exp`: within-level values from read_live_party. `exp` resets on level-up, so the app's
+        "remaining to next level" is curve[level] - exp. SINCE 1.00.20 read_live_party yields exp=None
+        (the live within-level exp died — see the module docstring), so this loop SKIPS every hero and
+        returns {} → the overlay shows no live ETA (HONEST: there is no live rate to project). It
+        re-activates automatically if a future build restores a readable within-level exp.
       - `gain`: the run's accumulated XP for that hero (PartyXpAccumulator.gain, level-up-bridged), from
         which the app derives the live rate (delta gain / delta t) and the ETA. 0.0 = seen with no gain
-        yet (just-deployed, or AT the cap where gain is phantom-suppressed) -> the app shows "-"/"MAX";
-        never None here (the hero is in `party`, so the accumulator saw it this very tick).
+        yet (just-deployed, or AT the cap where gain is phantom-suppressed) -> the app shows "-"/"MAX".
 
     Keyed by the CURRENT snapshot (`party` == read_live_party): the heroes deployed RIGHT NOW. A hero in
     the accumulator but absent from `party` (dead/dropped) gets no entry (no live rate to project).

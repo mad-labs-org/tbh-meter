@@ -93,7 +93,7 @@ TRAILING_BOX_TIERS = (EMonsterLogType.Boss, EMonsterLogType.ActBoss)
 # inside the window loses that record. See docs/invariants/run-lifecycle.
 PENDING_CLOSE_GRACE = 3.0
 
-GAME_VERSION = "1.00.19"   # FALLBACK: the GameAssembly.dll build the reader was made against; the INSTALLED version comes from the game's Version.txt (_detect_game_version)
+GAME_VERSION = "1.00.20"   # FALLBACK: the GameAssembly.dll build the reader was made against; the INSTALLED version comes from the game's Version.txt (_detect_game_version)
 # raw/<id>.json: the LIVE format the reader emits (1 file per run). Bump ONLY when the SHAPE of the
 # output changes — NOT per game build (re-seed/address doesn't count). The converter (app) dispatches
 # on this value. Mirrors app/src/shared/raw-types.ts::RawRunV2. See [[invariants/schema-versioning]].
@@ -835,19 +835,31 @@ def run(hz, output_dir, debug=False):
         print("\n[error] incomplete resolution. Try again with the game in combat.")
         diag(f"[resolve] INCOMPLETE → abort (msm={bool(msm)} lm={bool(lm)} "
              f"sc={bool(sc_class)} sf={bool(sf_class)})")
+        # Revert the splash to a DEADLINE-PROTECTED phase before exiting. The last marker emitted
+        # was `scanning`/`resolving`, which the app's splash has NO dismiss timeout for (only
+        # `searching` does) — and this path PERSISTS NOTHING (resolve_all skips calibrate on an
+        # incomplete scan), so the supervisor re-spawns and cold-scans AGAIN every launch. Without
+        # this the splash hangs forever on "First time on this version — mapping memory" (the
+        # cold-scan-every-launch symptom: a scan run outside combat never completes the managers).
+        # `searching` is the honest state (reader not ready, will retry) AND the one the app can
+        # time out. Re-uses the existing marker vocabulary → no app-side change required.
+        _emit_status("searching")
         return
 
     csd = save.pick_live_csd(reader, csd_list, stage_info)
-    sm = save.pick_live_sm(reader, sm_list)
+    # The live party IDENTITY (heroKeys) gates on hero_cat (the ghost discriminator since 1.00.20 — see
+    # build.read_live_party); level/exp come from the save (the live decoy died). pick_live_sm gets
+    # hero_cat so pick<->read agree on the carrier.
+    sm = save.pick_live_sm(reader, sm_list, hero_cat)
     print(f"[live party] StageManager {'ok' if sm else 'NOT found (live xp off, uses save)'}"
-          f" — {len(build.read_live_party(reader, sm))} heroes deployed.")
-    # infra-log: the pick decision in detail — candidates, REAL carriers vs ghosts (heroKey ok but
-    # read_live_party empty), which one was picked + a sample of ghosts. THIS was missing in the 1.00.13 debug:
-    # "carriers=0 picked=0x.. party_read=0" + a ghost with lvl=0 would have pointed at the cause on the spot.
-    _smd = build.describe_sm_candidates(reader, sm_list, sm)
+          f" — {len(build.read_live_party(reader, sm, hero_cat))} heroes deployed.")
+    # infra-log: the pick decision in detail — candidates, REAL carriers vs ghosts (heroKey ok but not a
+    # catalog hero), which one was picked + a sample of ghosts. THIS was missing in the 1.00.13 debug:
+    # "carriers=0 picked=0x.. party_read=0" would have pointed at the cause on the spot.
+    _smd = build.describe_sm_candidates(reader, sm_list, sm, hero_cat)
     diag(f"[party-pick] startup candidates={_smd['total']} hk-accept={_smd['hk_accept']} "
          f"carriers={_smd['carriers']} picked={hex(_smd['picked']) if _smd['picked'] else None} "
-         f"party_read={len(build.read_live_party(reader, sm))}")
+         f"party_read={len(build.read_live_party(reader, sm, hero_cat))}")
     for _ga, _gh in _smd["ghosts"]:
         diag(f"[party-pick]   ghost {hex(_ga)} heroes(hk,lvl,exp)={_gh}")
     # infra-log: the SAVE pick — PSD (the build's gold/heroes source) and CSD (current stage). PSD None was
@@ -903,9 +915,12 @@ def run(hz, output_dir, debug=False):
         # every run to grab the PARTY-CARRYING instance as soon as a party is deployed. Without
         # this, sm stays None the whole session if startup was out of combat → live party/XP off.
         if not sm:
-            sm = save.pick_live_sm(reader, sm_list)
+            sm = save.pick_live_sm(reader, sm_list, hero_cat)
         p = save.pick_live_psd(reader, psd_list)
-        pl0 = build.read_live_party(reader, sm)
+        # LIVE party identity (heroKeys, gated on hero_cat); level/exp from the save snapshot (the live
+        # decoy died in 1.00.20). save_heroes = {heroKey: (level, exp)} for the deployed heroes.
+        _sh = save.read_heroes(reader, p)
+        pl0 = build.read_live_party(reader, sm, hero_cat, _sh)
         # LIVE per-hero xp accumulator (metrics.xp.PartyXpAccumulator) — the primary LIVE of the
         # xp chain. Run state is born HERE (never only at close — that would leak the previous run) and is
         # SEEDED with the t=0 party. Whoever enters LATER (late deploy / a dead hero from the previous run who
@@ -919,7 +934,7 @@ def run(hz, output_dir, debug=False):
                 # + the save baseline as fallback (if the live one doesn't resolve). All via gold.py.
                 "gold_live_start": combat_gold_live(reader, gold_klass),
                 "gold_save_start": combat_gold_save(reader, p),
-                "heroes_start": {k: v[1] for k, v in save.read_heroes(reader, p).items()},
+                "heroes_start": {k: v[1] for k, v in _sh.items()},
                 "party_live_start": pl0,
                 "xp_acc": xpacc,
                 "build": build.read_build(reader, p, item_cat, hero_cat),
@@ -1028,14 +1043,18 @@ def run(hz, output_dir, debug=False):
                       for k, v in heroes_end.items()}
         xp_gain = sum(xp_by_hero.values())
         # LIVE XP = the per-hero ACCUMULATOR (metrics.xp.PartyXpAccumulator), which integrated the
-        # within-level (EXP_FAKE) tick-by-tick the WHOLE run (seeded in new_run, fed by the
-        # 1s snapshot). Here only: 1 FINAL tick (banks the last ≤1s) + reading the finished records.
-        # Replaces the endpoint delta (t=0 baseline → read at close), which gave +0 to a hero
-        # OUTSIDE the baseline (late deploy / a dead hero from the previous run revived: gain=None → +0 in the
-        # app) and required re-reading the dead hero's uf — the accumulator already banked the gain of whoever died
-        # (a dead hero accumulates 0 while dead, the game's real behavior, preserved).
+        # within-level exp tick-by-tick the WHOLE run (seeded in new_run, fed by the 1s snapshot). Here
+        # only: 1 FINAL tick (banks the last ≤1s) + reading the finished records. Replaces the endpoint
+        # delta (t=0 baseline → read at close), which gave +0 to a hero OUTSIDE the baseline (late deploy
+        # / a dead hero from the previous run revived: gain=None → +0 in the app) — the accumulator banks
+        # the gain of whoever died (a dead hero accumulates 0 while dead, real game behavior, preserved).
+        # 1.00.20: the live within-level exp DIED (EXP_FAKE decoy zeroed; the real value is behind the
+        # off-limits cipher), so read_live_party yields exp=None → the accumulator sees nobody →
+        # xp_live_ok=False → xp falls back to xp_gain (the per-hero SAVE delta) tagged xp_source="save".
         xpacc = R["xp_acc"]
-        pl_end = build.read_live_party(reader, sm)     # never-raises -> {} on failure
+        # LIVE party identity (gated on hero_cat); level/exp from heroes_end (the save snapshot already
+        # read above) since the live decoy died in 1.00.20. never-raises -> {} on failure.
+        pl_end = build.read_live_party(reader, sm, hero_cat, heroes_end)
         xpacc.update(pl_end)
         R["party_seen"].update(dict.fromkeys(pl_end))  # live at close = seen (live_keys ⊇ acc)
         # XP per-run = the LIVE one (real-time, exact). The save is a lagging snapshot (useless delta: 0 or a
@@ -1081,14 +1100,20 @@ def run(hz, output_dir, debug=False):
                 if hk not in pl_end:
                     hh["died"] = True   # absent from the HeroList at close (dead with no revive)
             else:
-                # In live_keys but the accumulator never saw it — should not happen (the acc eats the
-                # SAME reads that feed pl_start/party_seen). Per-hero SAVE fallback
-                # (xp_by_hero), NEVER None/+0 (the boundary-death bug) nor the roster. A ⚠ in the log
-                # makes the invariant OBSERVABLE (instead of assumed): if it fires, sum(heroes.xp)
-                # exceeds the run total (acc excludes this save-sourced hero) — a regression signal.
+                # No live accumulator record for this hero -> per-hero SAVE fallback (xp_by_hero),
+                # NEVER None/+0 (the boundary-death bug) nor the roster.
+                # Two cases:
+                #  - LIVE xp source DEAD build-wide (1.00.20: within-level exp behind the cipher ->
+                #    read_live_party yields exp=None -> the acc saw NOBODY, xp_live_ok=False). This is
+                #    the EXPECTED honest "live xp off" degradation (the whole run is already tagged
+                #    xp_source="save") — NOT an anomaly, so no ⚠ (it would fire for every hero, every run).
+                #  - The acc saw SOMEONE but missed THIS hero (xp_live_ok=True): a real regression (the acc
+                #    eats the SAME reads that feed pl_start/party_seen) -> ⚠ makes it OBSERVABLE: if it
+                #    fires, sum(heroes.xp) exceeds the run total (acc excludes this save-sourced hero).
                 hh["xp_gained"] = round(xp_by_hero.get(hk, 0.0), 2)
-                print(f"⚠ xp acc-miss hero={hk} (in live_keys with no acc record) "
-                      f"-> save fallback +{hh['xp_gained']}")
+                if xp_live_ok:
+                    print(f"⚠ xp acc-miss hero={hk} (in live_keys with no acc record) "
+                          f"-> save fallback +{hh['xp_gained']}")
             # Per-hero survival (from the HeroDie/Resurrection logs): deaths, revives, who killed.
             deaths_h = R["deaths"].get(hk, 0)
             if deaths_h:
@@ -1224,8 +1249,8 @@ def run(hz, output_dir, debug=False):
                                  stage_info, item_cat, hero_cat, sm_list, gold_klass, gb_class,
                                  die_class, res_class) = rr
                                 csd = save.pick_live_csd(reader, csd_list, stage_info)
-                                sm = save.pick_live_sm(reader, sm_list)
-                                _smd = build.describe_sm_candidates(reader, sm_list, sm)
+                                sm = save.pick_live_sm(reader, sm_list, hero_cat)
+                                _smd = build.describe_sm_candidates(reader, sm_list, sm, hero_cat)
                                 diag(f"[party-pick] re-attach candidates={_smd['total']} "
                                      f"hk-accept={_smd['hk_accept']} carriers={_smd['carriers']} "
                                      f"picked={hex(_smd['picked']) if _smd['picked'] else None}")
@@ -1393,20 +1418,23 @@ def run(hz, output_dir, debug=False):
                 # (None/empty) -> disappears in the app (degrades cleanly on a reader without this). The live party
                 # is read ONCE here and reused for xp + frame. The build stays only at close.
                 if not sm:  # found lazily when the player enters a stage
-                    sm = save.pick_live_sm(reader, sm_list)
-                pl_end = build.read_live_party(reader, sm)   # never-raises -> {} on failure
+                    sm = save.pick_live_sm(reader, sm_list, hero_cat)
+                # Live save (for level/exp + the gold/xp fallback). Picked BEFORE the party so
+                # read_live_party can source level from it (the live decoy died in 1.00.20).
+                psd = save.pick_live_psd(reader, psd_list)
+                heroes_now = save.read_heroes(reader, psd) if psd else {}
+                # LIVE party identity (heroKeys, gated on hero_cat); level from heroes_now, exp None
+                # (live within-level exp is gone -> the accumulator stays empty -> honest save fallback).
+                pl_end = build.read_live_party(reader, sm, hero_cat, heroes_now)
                 R["party_seen"].update(dict.fromkeys(pl_end))
                 # LIVE xp accumulator (the SAME object that closes the run in close_run): integrates the
                 # per-hero tick — the 1st sighting seeds the baseline; then sums increments > 0
-                # (level-up by the curve). Dead/absent doesn't move (the accumulated total stays banked).
+                # (level-up by the curve). Since 1.00.20 read_live_party yields exp=None, so the acc sees
+                # nobody and total() stays None -> the overlay xp uses the SAVE fallback below (honest).
                 R["xp_acc"].update(pl_end)
                 # 64 live FINAL stats per hero (same read as the close). Additive in live.json:
                 # feeds the per-hero effective-resistance tooltip in the overlay. never-raises -> {}.
                 live_stats = build.read_live_stats_by_hero(reader, sm)
-                # Live preferred; falls back to the SAVE when the live one doesn't resolve (e.g. StageManager NOT
-                # found -> no live party/xp) — the SAME data the run record uses, so the overlay
-                # isn't empty. Best-effort: any read failure just omits the line.
-                psd = save.pick_live_psd(reader, psd_list)
                 # The EXACT same source as the close (gold.py): live cumulative - the start baseline.
                 g_gain = run_gain(R.get("gold_live_start"), combat_gold_live(reader, gold_klass))
                 if g_gain is None:
@@ -1420,9 +1448,9 @@ def run(hz, output_dir, debug=False):
                 x_gain = R["xp_acc"].total()
                 if x_gain is None:
                     try:
-                        heroes_now = save.read_heroes(reader, psd)
                         # Hero at the CAP: the save delta is phantom (HeroExp never resets) -> 0.0,
-                        # the SAME rule as close_run's xp_by_hero (overlay/record parity).
+                        # the SAME rule as close_run's xp_by_hero (overlay/record parity). heroes_now
+                        # was already read above (reused — same snapshot that fed the party's level).
                         x_gain = (sum(0.0 if xp.level_capped(v[0])
                                       else max(0.0, v[1] - R["heroes_start"].get(k, 0.0))
                                       for k, v in heroes_now.items()) if heroes_now else None)

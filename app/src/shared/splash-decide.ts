@@ -50,3 +50,33 @@ export function shouldDismissStalledSplash(update: UpdateStatus, reader: ReaderS
   }
   return true;
 }
+
+/**
+ * HARD ceiling for the splash, independent of the reader phase — the fifth and last-resort dismissal.
+ *
+ * {@link shouldDismissStalledSplash} only fires while the reader is parked on "searching". A reader
+ * STUCK mid-bring-up — "resolving" or "scanning" that never completes (e.g. a cold value-scan on a
+ * build the seed doesn't cover, where the managers only resolve in active combat, so the scan loops
+ * and the splash hangs) — yields none of the four dismiss signals: no live snapshot, never "ready",
+ * never "blocked", never back to "searching". Past this ceiling we dismiss REGARDLESS of phase and
+ * hand off to the overlay's own "starting up" message, so the user is never trapped behind a frozen
+ * splash. (The reader also now emits "searching" when it abandons an incomplete scan, which the
+ * searching deadline catches far sooner; this ceiling backstops the cases where it never gets there.)
+ *
+ * 6 min is chosen WELL beyond the splash's own "first launch 1–2 min, up to 5" promise, so a
+ * legitimately slow first-time bring-up is never cut short — only a genuinely stuck reader reaches it.
+ * An update being applied still defers (the app is about to relaunch into the new build anyway).
+ */
+export const SPLASH_HARD_DISMISS_MS = 360_000;
+
+export function shouldForceDismissSplash(update: UpdateStatus, msSinceArmed: number): boolean {
+  if (msSinceArmed < SPLASH_HARD_DISMISS_MS) return false;
+  if (
+    update.state === "available" ||
+    update.state === "downloading" ||
+    update.state === "downloaded"
+  ) {
+    return false;
+  }
+  return true;
+}
