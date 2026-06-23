@@ -20,7 +20,18 @@ import { createTray, destroyTray, refreshTrayMenu } from "./tray.js";
 import { getRunsSource } from "./sources/runs-source.js";
 import { getLiveSource } from "./sources/live-source.js";
 import { logsDir } from "./logs-archive.js";
-import { getIngestor } from "./converter/ingest.js";
+// getIngestor() is lazy-imported during startup to prevent a static import of
+// converter/ingest.js from pulling the full ingest -> legacy -> runs-source
+// chain into the main chunk. The dynamic import in runs-source.ts avoids a
+// static cycle, but only when nothing ELSE statically imports ingest.ts.
+import type { Ingestor } from "./converter/ingest.js";
+let _ingestor: Ingestor | null = null;
+async function getIngestor(): Promise<Ingestor> {
+  if (!_ingestor) {
+    _ingestor = (await import("./converter/ingest.js")).getIngestor();
+  }
+  return _ingestor;
+}
 import {
   startReader,
   stopReader,
@@ -532,8 +543,9 @@ app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
   // so the Ingestor — not the old runs.jsonl mirror — OWNS logs/. On boot it ingests raw/ ->
   // logs/ (converting any run with no/stale structured log) AND migrates the legacy runs.jsonl into
   // logs/ preserving each external_id; it then watches raw/ for new runs. App-read of logs/ is PR4.
-  getIngestor().setDir(dir);
-  getIngestor().start();
+  const ingestor = await getIngestor();
+  ingestor.setDir(dir);
+  ingestor.start();
 
   // Check GitHub for a newer release, download in the background, install on quit.
   // No-op unless this is the packaged Windows NSIS install (see auto-update.ts).
@@ -578,6 +590,6 @@ app.on("will-quit", () => runIfPrimary(isPrimaryInstance, () => {
   stopAutoUpload();
   getRunsSource().stop();
   getLiveSource().stop();
-  getIngestor().stop();
+  _ingestor?.stop();
   destroyTray();
 }));
