@@ -41,9 +41,20 @@ fix is to **re-seed**, not to touch `offsets.py`. This guide tells you how to be
 2. **Self-heals** — `fingerprint`, `anchor_rva`, `indices`, `idx_ut`, catalogs: change on **every**
    update, but the scan rediscovers and the re-seed recaptures. **Zero code edits** — just re-seed.
    See [[invariants/cache-management]] and [[invariants/rva-index-resolution]].
-3. **Breaks silently** — field offsets + enums in `config/offsets.py`: change **rarely**
+3. **Breaks silently (offset/enum)** — field offsets + enums in `config/offsets.py`: change **rarely**
    (only when the devs add/reorder fields/members in those classes), but when they do the reader reads
-   **garbage/empty WITHOUT an error**. It's the only bucket that needs watching — and step 3 below is the tripwire.
+   **garbage/empty WITHOUT an error**. Step 3 below is the tripwire for this bucket.
+4. **Breaks silently (encoding change) — caught ONLY by the live gate (step 6), invisible to step 3.**
+   The anti-cheat/Obscured *encoding* can change with **zero offset movement**. Nailed in **1.00.20**: the
+   ACTk `fakeValue` PLAIN decoy (how the reader legally read live `HeroRuntime` level/exp) was **zeroed
+   build-wide** — every offset/enum/index unchanged (static preflight FULLY GREEN), the reseed correct, yet
+   the live read returned 0 → `read_live_party` rejected every real deployed hero → party/xp/stats broke.
+   The diff **cannot** see this (it is not an offset). The fix is **NOT a reseed nor an offset edit**: you
+   cannot legally decode the cipher ([[invariants/obscured-data-offlimits]]), so **degrade the dead value to
+   a legal source** (the save) while keeping the LIVE *identity*, and replace any discriminator that leaned
+   on the dead value (the `lvl>0` ghost filter → a catalog-heroKey check — [[invariants/party-live-resolution]]).
+   **Takeaway: a GREEN step 3 is necessary but NEVER sufficient — step 6 (`validate_live`, ALL metrics) is the
+   only catcher for bucket 4.**
 
 ## Checklist (in order)
 
@@ -66,7 +77,9 @@ fix is to **re-seed**, not to touch `offsets.py`. This guide tells you how to be
    VALUE, and the seed's `TypeDefIndex`/`idx_ut`), and at the end PRINTS the `validate_live.py`
    command (the live layer of step 6, which it CANNOT run). **Always pass `--seed config/calib_seed.json`** —
    without it, index/`idx_ut` drift stays invisible until you re-seed.
-   - **Exit 0** → every static layer passed; nothing the reader tracks has shifted. You can proceed to the re-seed.
+   - **Exit 0** → every static layer passed; nothing the reader tracks *by offset/index* has shifted. Proceed
+     to the re-seed — but green here only rules out buckets 2–3; a **bucket-4 encoding change** (e.g. 1.00.20's
+     dead `fakeValue` decoy) stays invisible until **step 6**. NEVER ship on a green preflight alone.
    - **Non-zero** → STOP. A `✗` in the diff = update the shifted symbol in `config/offsets.py` (the
      single source — [[invariants/offsets-single-source]]) from `dump.cs` and re-run until it's clean;
      a ruff/pytest failure = a code regression. A missing dump FAILS on purpose (no diff = no
