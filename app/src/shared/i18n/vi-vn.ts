@@ -288,10 +288,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   // ── Sign-in prompt modal ──
   "signin.title": "Chia sẻ lượt chơi của bạn lên bảng xếp hạng",
   "signin.body":
-    "Bạn chưa đăng nhập. Lượt chơi vẫn được tải lên ẩn danh nên trang phiên của bạn trên TBH Helper hoạt động — nhưng chúng chỉ tính cho bảng xếp hạng và hồ sơ sau khi bạn đăng nhập bằng Discord. Đăng nhập cũng nhận lại các lượt đã tải từ máy này.",
+    "Bạn chưa đăng nhập, nên các lượt chơi của bạn ở lại trên máy này và không lên bảng xếp hạng. Đăng nhập bằng Discord để đồng bộ chúng và được tính vào bảng xếp hạng và hồ sơ của bạn.",
   "signin.dontShow": "Đừng hiện lại",
   "signin.notNow": "Để sau",
 
+  "signin.pendingTitle": "Lượt chơi của bạn không được đồng bộ",
+  "signin.pendingBody":
+    "Bạn đang đăng xuất, nên các lượt chơi đã hoàn thành ngừng lên bảng xếp hạng ({count} đang chờ cục bộ). Đăng nhập để đồng bộ chúng.",
   "signin.expiredTitle": "Phiên của bạn đã hết hạn",
   "signin.expiredBody":
     "Bạn đã bị đăng xuất, nên lượt chơi của bạn ngừng đồng bộ lên bảng xếp hạng. Chúng vẫn được lưu cục bộ. Đăng nhập lại để tiếp tục.",

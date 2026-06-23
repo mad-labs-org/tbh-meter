@@ -288,10 +288,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   // ── Sign-in prompt modal ──
   "signin.title": "Udostępniaj swoje przejścia w rankingu",
   "signin.body":
-    "Nie jesteś zalogowany(-a). Przejścia i tak wysyłają się anonimowo, więc twoja strona sesji na TBH Helper działa — ale do rankingu i profilu liczą się dopiero po zalogowaniu przez Discorda. Logowanie przejmuje też przejścia wysłane już z tego komputera.",
+    "Nie jesteś zalogowany, więc twoje przejścia zostają na tym komputerze i nie trafiają do rankingu. Zaloguj się przez Discord, aby je zsynchronizować i liczyły się w rankingu oraz twoim profilu.",
   "signin.dontShow": "Nie pokazuj ponownie",
   "signin.notNow": "Nie teraz",
 
+  "signin.pendingTitle": "Twoje przejścia nie są synchronizowane",
+  "signin.pendingBody":
+    "Jesteś wylogowany, więc ukończone przejścia przestały trafiać do rankingu ({count} oczekuje lokalnie). Zaloguj się, aby je zsynchronizować.",
   "signin.expiredTitle": "Twoja sesja wygasła",
   "signin.expiredBody":
     "Zostałeś wylogowany, więc twoje przejścia przestały synchronizować się z rankingiem. Są zapisywane lokalnie. Zaloguj się ponownie, aby wznowić.",
