@@ -202,7 +202,7 @@ export function ago(tsMs: number, t: Translate = tEn): string {
   return t("ago.y", { n: Math.floor(days / 365) });
 }
 
-/** Absolute local date+time in short style. `lang` (BCP47, from useI18n) follows the app
+/** Absolute local date+time: short date, medium time (includes seconds). `lang` (BCP47, from useI18n) follows the app
  *  language; undefined falls back to the OS locale's conventions (DD/MM vs MM/DD, 12/24h).
  *  Takes an epoch in MILLISECONDS (Redesign 2: run ts is ms; loadStructured normalizes
  *  legacy seconds -> ms). */
@@ -210,6 +210,6 @@ export function formatDateTime(tsMs: number, lang?: string): string {
   if (!Number.isFinite(tsMs) || tsMs <= 0) return "";
   return new Date(tsMs).toLocaleString(lang, {
     dateStyle: "short",
-    timeStyle: "short",
+    timeStyle: "medium",
   });
 }
