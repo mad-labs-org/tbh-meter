@@ -24,6 +24,7 @@ code_anchors:
 guarded_by:
   - tests/test_save.py::test_pick_live_sm_finds_carrier_beyond_600_candidates
   - tests/test_save.py::test_pick_live_sm_skips_ghost_and_picks_carrier
+  - tests/test_save.py::test_pick_live_sm_real_hero_accepted_without_live_level
   - tests/test_save.py::test_describe_sm_candidates_classifies_carrier_vs_ghost
   - tests/test_save.py::TestHeroInRun::test_no_live_party_includes_nobody
   - tests/test_raw_record.py::test_party_off_makes_heroes_err
@@ -31,10 +32,23 @@ guarded_by:
 
 # Resolving a run's party (live, not roster)
 
-A run's canonical party is the **DEPLOYED** heroes — read LIVE from `StageManager.HeroList`
-(`read_live_party`), on the instance chosen by `pick_live_sm`. The save lists the **roster** (every hero
-above level 1): playing solo with the Ranger, the save lists all 6, but only the Ranger is on the field.
-Confusing roster with party means showing unplayed heroes (the symptom: several with `+0xp`).
+A run's canonical party is the **DEPLOYED** heroes — their IDENTITY (the heroKeys) read LIVE from
+`StageManager.HeroList` (`read_live_party`), on the instance chosen by `pick_live_sm`. The save lists the
+**roster** (every hero above level 1): playing solo with the Ranger, the save lists all 6, but only the
+Ranger is on the field. Confusing roster with party means showing unplayed heroes (the symptom: several
+with `+0xp`).
+
+**Identity is LIVE; level/exp degrade to the save (1.00.20).** Through 1.00.19, `read_live_party` also
+read each deployed hero's live within-level level/exp from the ACTk `fakeValue` PLAIN decoy
+(`HeroRuntime.LEVEL_FAKE`/`EXP_FAKE`). The 1.00.20 recompile ZEROED that decoy build-wide; the real live
+level/exp moved behind the ObscuredInt/Float cipher, which is **off-limits**
+([[invariants/obscured-data-offlimits]] — decoding `hidden^key` is forbidden and would re-break every
+build). So `read_live_party` now sources level from the **save** and forces **exp = None**. This keeps the
+PARTY fully LIVE (membership is still `StageManager.HeroList`); only the level/exp *values* fall back to
+the save (LIVE→SAVE, [[invariants/metric-fallback-chains]]) — it NEVER lets the roster define the party.
+`exp = None` is deliberate: feeding the stale save exp into the live xp accumulator would make the SAVE
+fallback masquerade as `xp_source="live"` (forbidden), so the accumulator stays empty, `xp_total_live`
+is `None`, and `close_run` honestly tags the run's xp `save` (capped heroes → 0, as ever).
 
 ## `pick_live_sm`: NO cap, and the SAME validation as `read_live_party`
 
@@ -45,16 +59,28 @@ carrier can be at ANY index. A fixed cap lost the carrier whenever the backref r
 limit — nailed in 1.00.11: **1162 instances** of StageManager (vs ~450 in older builds), the carrier
 beyond 600 → `StageManager NOT found` EVEN in combat → the party fell back to the roster.
 
-**Why pick and read MUST agree (the 1.00.13 regression).** Before, pick used a WEAKER check (only a
-valid `heroKey`) than read (which ALSO requires `lvl`/`exp`). Among the candidates there are **ghost**
-instances — torn-down/template StageManagers, with a valid `heroKey` but `lvl=0` — the SAME family as
-[[invariants/instance-selection]] (the scan finds the K-class in dozens of slots that are not the live
-object). The weak check accepted a ghost, the meter FROZE on it (`if not sm` in the loop) and
-`read_live_party` read `{}` the whole session → `StageManager ok — 0 heroes deployed`, every run
-`heroes:err`, invalid runs with no team. It only hit anyone who had a ghost BEFORE the carrier in memory
-order (hence "worked on the dev's machine" and passed `validate_live`). `describe_sm_candidates`
-(in `reader-diag.log`) logs candidates / carriers-vs-ghosts / chosen — the data the debug was missing.
-With no readable candidate → `None` (degrade honestly, NEVER a ghost that read can't read).
+**The ghost discriminator (and why it changed in 1.00.20).** Among the candidates there are **ghost**
+instances — torn-down/template StageManagers, the SAME family as [[invariants/instance-selection]] (the
+scan finds the K-class in dozens of slots that are not the live object). `read_live_party` must reject a
+ghost while accepting every real deployed hero. The discriminator is the deployed **heroKey resolving a
+real class in `hero_cat`**: a real hero carries one of the catalog keys; a ghost carries a stale/garbage
+key that doesn't. (Through 1.00.19 the discriminator was a valid `heroKey` with `lvl>0`; 1.00.20 killed
+the live level decoy, so a `lvl>0` gate would reject EVERY real hero — empty party → `sm` NOT found →
+`hero-class`/`xp-live`/`stats` cascade-fail. Verified in 1.00.20: among ALL StageManager instances ONLY
+the deployed ones carry a catalog heroKey, so the catalog check is a clean, name-free replacement.)
+`pick_live_sm` takes `hero_cat` and applies the SAME discriminator.
+
+**Why pick and read MUST agree (the 1.00.13 regression).** `pick_live_sm` returns the first candidate
+`read_live_party` extracts a party from — it CALLS `read_live_party`, so pick and read use the SAME
+validation by construction. The 1.00.13 bug was a pick that used a WEAKER check than read: it accepted a
+ghost, the meter FROZE on it (`if not sm` in the loop) and `read_live_party` read `{}` the whole session →
+`StageManager ok — 0 heroes deployed`, every run `heroes:err`, invalid runs with no team. It only hit
+anyone who had a ghost BEFORE the carrier in memory order (hence "worked on the dev's machine" and passed
+`validate_live`). The fix is that pick and read share the discriminator (today: heroKey + `hero_cat`); the
+level/exp source NEVER gates — it only fills values — so the two can't drift apart again.
+`describe_sm_candidates` (in `reader-diag.log`) logs candidates / carriers-vs-ghosts / chosen — the data
+the debug was missing. With no readable candidate → `None` (degrade honestly, NEVER a ghost that read
+can't read).
 
 ## Honest degradation: party off becomes `err`, NEVER the roster
 

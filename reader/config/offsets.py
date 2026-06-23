@@ -91,8 +91,12 @@ class Singleton:
     INSTANCE = 0x0                     # bbwf (the singleton)
 
 
-# ACTk Obscured (this build): the REAL value is the PLAIN `fakeValue` at base+0xC
-# (ObscuredInt/Float). hidden^key gives GARBAGE. ObscuredLong: fake probably @+0x18.
+# ACTk Obscured struct layout (CodeStage.AntiCheat.ObscuredTypes): hash@0x0, hiddenValue@0x4,
+# currentCryptoKey@0x8, fakeValue@0xC. Through 1.00.19 the PLAIN `fakeValue` decoy was kept in sync
+# with the real value, so reading it was legal. hidden^key gives GARBAGE (off-limits — see
+# docs/invariants/obscured-data-offlimits). 1.00.20 KILLED the fakeValue decoy build-wide (reads 0):
+# the only remaining source is the cipher, which is off-limits. Live values that used the decoy
+# (HeroRuntime level/exp) now degrade to the save — see HeroRuntime below + game/build.read_live_party.
 ACTK_FAKE = 0xC
 
 
@@ -275,10 +279,17 @@ class StageInfoData:                   # catalog (currentStageKey encodes the mo
 
 # ----- hero progression runtime (reached via Unit.CACHE) -----
 class HeroRuntime:                     # `uf` (uf : uo)
-    INFO = 0x30                        # beew -> HeroInfoData (for HeroKey/class)
-    STATS_HOLDER = 0x10                # behg -> xd (holder of the 64 stats)
-    LEVEL_FAKE = 0xD8                  # befp.fakeValue = LIVE HeroLevel (PLAIN)
-    EXP_FAKE = 0x118                   # beft.fakeValue = HeroExp within the level (LIVE)
+    INFO = 0x30                        # beew -> HeroInfoData (for HeroKey/class) — reads LIVE, the
+                                       # live party IDENTITY (game/build.read_live_party).
+    STATS_HOLDER = 0x10                # behg -> xd (holder of the 64 stats) — reads LIVE.
+    # DEAD since 1.00.20: these are the ACTk `fakeValue` decoy (ObscuredInt/Float base+0xC). The
+    # recompile zeroed the decoy build-wide -> they READ 0; the real live level/exp moved behind the
+    # cipher (hiddenValue/currentCryptoKey @ base+0x4/+0x8), which is OFF-LIMITS
+    # (docs/invariants/obscured-data-offlimits). read_live_party no longer reads them — it sources
+    # level/exp from the save. KEPT as dump history + for the _raw_hero_list diagnostic; DO NOT revive
+    # them as a live source (a 0 gate rejects every real hero; decoding the cipher is forbidden).
+    LEVEL_FAKE = 0xD8                  # befp.fakeValue (DEAD: reads 0 since 1.00.20)
+    EXP_FAKE = 0x118                   # beft.fakeValue (DEAD: reads 0 since 1.00.20)
 
 
 class StatsHolder:                     # `xd` (dump.cs:342026)
