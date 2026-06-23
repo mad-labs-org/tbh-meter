@@ -143,6 +143,11 @@ export function reportError(
   for (const [name, value] of Object.entries(extra ?? {})) {
     if (value !== undefined) extraOut[name.slice(0, 40)] = String(value).slice(0, MAX_EXTRA_VALUE);
   }
+  // Always carry the Electron/Chromium build — the GPU/renderer process-gone crashes are
+  // version-specific (the transparent-overlay GPU issue is an Electron-version trait), so this is
+  // load-bearing debug context on EVERY report. (Absent when not running under Electron, e.g. tests.)
+  if (process.versions.electron) extraOut["electron"] = process.versions.electron;
+  if (process.versions.chrome) extraOut["chromium"] = process.versions.chrome;
 
   // The relay rides Electron's net stack (net.fetch — honors the system proxy and
   // OS cert store, unlike Node's undici). net.fetch THROWS if called before the app
@@ -173,16 +178,24 @@ export function reportError(
   });
 }
 
-/** Install the global hooks. Call once, as early as possible in main/index.ts. */
-export function installGlobalErrorReporting(): void {
+/**
+ * Install the global hooks. Call once, as early as possible in main/index.ts.
+ *
+ * `getReaderLogsTail` (optional) supplies the on-disk reader log tail (reader-diag.log + meter.log +
+ * live.json) that rides along as the report's `logs` attachment. Injected (not imported) to avoid an
+ * import cycle with reader-process.ts, which depends on this module. Without it the global crash
+ * reports — including the GPU/renderer `*-process-gone` ones — carry NO logs, which made them
+ * un-debuggable from the Discord post alone (you couldn't see the build fingerprint or resolve path).
+ */
+export function installGlobalErrorReporting(getReaderLogsTail?: () => string): void {
   // Monitor variant: observes the exception without preventing the default
   // crash handling, so reporting never masks a genuinely fatal state.
   process.on("uncaughtExceptionMonitor", (err) => {
-    reportError("main:uncaughtException", err);
+    reportError("main:uncaughtException", err, undefined, getReaderLogsTail?.());
   });
   process.on("unhandledRejection", (reason) => {
     console.error("[error-report] unhandled rejection:", reason);
-    reportError("main:unhandledRejection", reason);
+    reportError("main:unhandledRejection", reason, undefined, getReaderLogsTail?.());
   });
   // Suppress process-gone reports once the app is quitting: child-process teardown
   // during shutdown is expected, not a fault. (Own flag — independent of index.ts.)
@@ -191,12 +204,15 @@ export function installGlobalErrorReporting(): void {
   });
   app.on("render-process-gone", (_event, _webContents, details) => {
     if (quitting || details.reason === "clean-exit") return;
-    reportError("renderer:process-gone", details.reason, { exitCode: details.exitCode });
+    reportError("renderer:process-gone", details.reason, { exitCode: details.exitCode }, getReaderLogsTail?.());
   });
   app.on("child-process-gone", (_event, details) => {
     if (quitting || details.reason === "clean-exit") return;
-    reportError(`child:${details.type}:process-gone`, details.reason, {
-      exitCode: details.exitCode,
-    });
+    reportError(
+      `child:${details.type}:process-gone`,
+      details.reason,
+      { exitCode: details.exitCode },
+      getReaderLogsTail?.(),
+    );
   });
 }

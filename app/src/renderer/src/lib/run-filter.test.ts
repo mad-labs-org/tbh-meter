@@ -54,13 +54,16 @@ describe("clampMinDuration", () => {
 });
 
 describe("passesRunFilter — quality gate", () => {
-  it("DEFAULT (hideNonCounted): a counted run is shown", () => {
+  it("DEFAULT (hideNonCounted): counted AND partial runs are shown", () => {
+    // A partial run is a REAL successful clear the reader joined mid-way — it stays visible (badged),
+    // so the list never looks empty after the slow first-launch attach (the "not recording my runs"
+    // report). Only skipped/degraded are hidden.
     expect(passesRunFilter(run({ quality: "counted" }), DEFAULT)).toBe(true);
+    expect(passesRunFilter(run({ quality: "partial" }), DEFAULT)).toBe(true);
   });
 
-  it("DEFAULT: skipped / partial / degraded are hidden", () => {
+  it("DEFAULT: only skipped / degraded are hidden", () => {
     expect(passesRunFilter(run({ quality: "skipped" }), DEFAULT)).toBe(false);
-    expect(passesRunFilter(run({ quality: "partial" }), DEFAULT)).toBe(false);
     expect(passesRunFilter(run({ quality: "degraded" }), DEFAULT)).toBe(false);
   });
 
@@ -156,6 +159,14 @@ describe("applyRunFilter", () => {
     const runs = [run({ quality: "counted" }), run({ quality: "degraded" })];
     expect(applyRunFilter(runs, SHOW_ALL)).toHaveLength(2);
   });
+
+  it("regression: a session of only PARTIAL runs is NOT emptied by the default filter", () => {
+    // The reported bug (ariaa): the reader joins the first runs of a session mid-way during the slow
+    // first-launch calibration, so they seal `partial`. Before the fix the default filter hid them
+    // all → "No runs match your filter" → "the tracker only records my failed run". Now they show.
+    const partials = [run({ quality: "partial" }), run({ quality: "partial" })];
+    expect(applyRunFilter(partials, DEFAULT)).toHaveLength(2);
+  });
 });
 
 describe("countQualityHidden", () => {
@@ -166,14 +177,14 @@ describe("countQualityHidden", () => {
     expect(countQualityHidden(runs, { hideNonCounted: false, minDurationSec: null })).toBe(0);
   });
 
-  it("counts only non-counted verdicts when hiding (the gate the toggle controls)", () => {
+  it("counts only the HIDDEN verdicts (skipped/degraded) — a shown partial is not counted", () => {
     const runs = [
-      run({ quality: "counted" }),
-      run({ quality: "skipped" }),
-      run({ quality: "partial" }),
-      run({ quality: "degraded" }),
+      run({ quality: "counted" }), // shown
+      run({ quality: "skipped" }), // hidden
+      run({ quality: "partial" }), // shown (real clear) → not a hidden run
+      run({ quality: "degraded" }), // hidden
     ];
-    expect(countQualityHidden(runs, HIDE)).toBe(3);
+    expect(countQualityHidden(runs, HIDE)).toBe(2);
   });
 
   it("ignores the duration gate — a counted-but-short run is NOT quality-hidden", () => {

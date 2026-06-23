@@ -835,6 +835,15 @@ def run(hz, output_dir, debug=False):
         print("\n[error] incomplete resolution. Try again with the game in combat.")
         diag(f"[resolve] INCOMPLETE → abort (msm={bool(msm)} lm={bool(lm)} "
              f"sc={bool(sc_class)} sf={bool(sf_class)})")
+        # Revert the splash to a DEADLINE-PROTECTED phase before exiting. The last marker emitted
+        # was `scanning`/`resolving`, which the app's splash has NO dismiss timeout for (only
+        # `searching` does) — and this path PERSISTS NOTHING (resolve_all skips calibrate on an
+        # incomplete scan), so the supervisor re-spawns and cold-scans AGAIN every launch. Without
+        # this the splash hangs forever on "First time on this version — mapping memory" (the
+        # cold-scan-every-launch symptom: a scan run outside combat never completes the managers).
+        # `searching` is the honest state (reader not ready, will retry) AND the one the app can
+        # time out. Re-uses the existing marker vocabulary → no app-side change required.
+        _emit_status("searching")
         return
 
     csd = save.pick_live_csd(reader, csd_list, stage_info)

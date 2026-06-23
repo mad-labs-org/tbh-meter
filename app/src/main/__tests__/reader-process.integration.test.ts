@@ -12,9 +12,19 @@ import { EventEmitter } from "node:events";
 const mockSpawn = vi.fn();
 const mockExecFileSync = vi.fn();
 const mockReportError = vi.fn();
+// Backing for the mocked fs.readFileSync — readReaderLogs() tails the output-dir log files by
+// basename. Empty by default, so existing tests (which don't read files) behave as before:
+// readReaderLogs returns "" because every read throws ENOENT.
+const mockFiles = new Map<string, string>();
 
 vi.mock("node:child_process", () => ({ spawn: mockSpawn, execFileSync: mockExecFileSync }));
-vi.mock("node:fs", () => ({ existsSync: () => true }));
+vi.mock("node:fs", () => ({
+  existsSync: () => true,
+  readFileSync: (p: unknown) => {
+    if (typeof p === "string") for (const [name, content] of mockFiles) if (p.endsWith(name)) return content;
+    throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
+  },
+}));
 vi.mock("electron", () => ({ app: { isPackaged: true } }));
 vi.mock("../settings.js", () => ({ resolveOutputDir: () => "/tmp/out" }));
 vi.mock("../error-report.js", () => ({ reportError: mockReportError }));
@@ -43,6 +53,7 @@ beforeEach(async () => {
   mockSpawn.mockReset();
   mockExecFileSync.mockReset();
   mockReportError.mockReset();
+  mockFiles.clear();
   mockSpawn.mockImplementation(() => makeFakeChild());
   vi.useFakeTimers();
 
@@ -244,5 +255,40 @@ describe("reader supervisor — single-writer (kill before spawn, kill on quit)"
     });
     expect(() => mod.startReader()).not.toThrow();
     expect(mockSpawn).toHaveBeenCalledTimes(1); // still spawned ours after the futile kill
+  });
+});
+
+describe("readReaderLogs — the error-report attachment", () => {
+  it("includes reader-diag.log (the build fingerprint) and LEADS with it, then meter.log + live.json", () => {
+    // reader-diag.log is the decision spine — it carries `fp=<build>`, the piece missing when a
+    // "can't calibrate on this version" report came in with no way to see the player's game build.
+    mockFiles.set("reader-diag.log", "[attach] pid=4624 fp=1.00.21-0xABCDEF-0x123");
+    mockFiles.set("meter.log", "[ok] attached\n[ok] resolved");
+    mockFiles.set("live.json", '{"stage":"2-6","mode":"Hell"}');
+
+    const out = mod.readReaderLogs();
+
+    expect(out).toContain("=== reader-diag.log ===");
+    expect(out).toContain("fp=1.00.21-0xABCDEF-0x123");
+    expect(out).toContain("=== meter.log ===");
+    expect(out).toContain("=== live.json ===");
+    // reader-diag.log leads so the relay's 50k cap never truncates the most diagnostic file away.
+    expect(out.indexOf("=== reader-diag.log ===")).toBeLessThan(out.indexOf("=== meter.log ==="));
+  });
+
+  it("omits a missing file silently (best-effort — a log-read failure never blocks the report)", () => {
+    mockFiles.set("meter.log", "only meter.log present");
+    const out = mod.readReaderLogs();
+    expect(out).toContain("=== meter.log ===");
+    expect(out).not.toContain("reader-diag.log");
+    expect(out).not.toContain("live.json");
+  });
+
+  it("tails an oversized file to its budget (keeps the most recent bytes)", () => {
+    mockFiles.set("reader-diag.log", "X".repeat(20_000)); // > the 16k budget
+    const out = mod.readReaderLogs();
+    expect(out).toContain("...(truncated)");
+    // the diag section is bounded well under the 50k relay cap (16k budget + header).
+    expect(out.length).toBeLessThan(20_000);
   });
 });
