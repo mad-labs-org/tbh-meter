@@ -66,6 +66,13 @@ let splashWin: BrowserWindow | null = null;
 // While true, the live overlay stays hidden (the startup splash is up) until dismissed.
 let splashActive = false;
 let quitting = false;
+// True only while the user is MOVING the overlay (title-bar drag). A pure reposition can't
+// change the content height, so any pinLiveHeight / bounds-save that fires mid-move is
+// spurious — it's a transient repaint from the OS move on high-DPI, and calling setBounds
+// (or persisting getBounds().width) mid-setPosition re-enters Windows' DIP scaling and
+// drives the width/position drift this bug is made of (#live-drag-width-feedback). We freeze
+// the window geometry for the duration of the move and settle once on release.
+let liveMoveActive = false;
 
 // Single-writer: be the ONE app instance. A second launch of
 // the SAME variant fails to grab the lock and quits here BEFORE we register any
@@ -153,7 +160,12 @@ function createLiveWindow(): BrowserWindow {
     if (!splashActive) win.show();
   });
 
-  win.on("moved", () => saveLiveBounds(win));
+  win.on("moved", () => {
+    // Mid our custom MOVE drag the window is being setPosition'd; getBounds().width can read
+    // transiently inflated on high-DPI, so saving here would persist a bad width that the
+    // next launch reopens at. endWindowDrag saves once on release with stable bounds.
+    if (!liveMoveActive) saveLiveBounds(win);
+  });
   win.on("resized", () => saveLiveBounds(win));
 
   // close -> hide instead of destroy, unless the app is genuinely quitting.
@@ -342,6 +354,11 @@ let lastKnownWidth = DEFAULT_LIVE_WIDTH;
  *  feedback loop during a move drag on high-DPI monitors (see lastKnownWidth). */
 function pinLiveHeight(): void {
   if (!liveWin || liveWin.isDestroyed()) return;
+  // Never resize the overlay mid-MOVE — see liveMoveActive. The drag's setPosition is the
+  // only thing that may touch the window; a setBounds here fights it and, on high-DPI,
+  // re-inflates the width. Content height can't change during a pure move, so nothing is
+  // lost; endWindowDrag re-pins once to settle.
+  if (liveMoveActive) return;
   const scale = clampFontScale(getSettings().liveFontScale);
   const h = Math.max(1, Math.round(liveContentHeight * scale));
   liveWin.setMinimumSize(MIN_LIVE_WIDTH, h);
@@ -472,9 +489,18 @@ app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
     refreshTrayMenu,
     openListWindow,
     setLiveHeight,
-    startWindowDrag: liveDrag.start,
+    startWindowDrag: (mode) => {
+      liveMoveActive = mode === "move";
+      liveDrag.start(mode);
+    },
     moveWindowDrag: liveDrag.move,
-    endWindowDrag: liveDrag.end,
+    endWindowDrag: () => {
+      liveDrag.end();
+      if (!liveMoveActive) return; // resize / idle: per-tick saves already persisted
+      liveMoveActive = false;
+      pinLiveHeight(); // settle: re-pin with a now-stable getBounds (setPosition stopped)
+      if (liveWin && !liveWin.isDestroyed()) saveLiveBounds(liveWin);
+    },
     resetLiveWindow,
   });
 
