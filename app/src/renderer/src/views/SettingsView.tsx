@@ -10,6 +10,7 @@ import {
   Trash2,
   Minus,
   Plus,
+  FileText,
 } from "lucide-react";
 import type { AppSettings, AuthStatus, UpdateStatus } from "../../../shared/ipc-types.js";
 import { FONT_SCALE_MIN, FONT_SCALE_MAX, clampFontScale } from "../../../shared/ipc-types.js";
@@ -28,6 +29,7 @@ import { DiscordIcon } from "~/components/DiscordIcon";
 import { Modal } from "~/components/Modal";
 import { useT } from "~/lib/i18n";
 import { cn } from "~/lib/utils";
+import { DebugLogView } from "./DebugLogView";
 
 interface SettingsViewProps {
   settings: AppSettings;
@@ -36,6 +38,7 @@ interface SettingsViewProps {
 
 export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) {
   const t = useT();
+  const [debugOpen, setDebugOpen] = useState(false);
   const opacityPct = Math.round(settings.opacity * 100);
   const [resolvedDir, setResolvedDir] = useState<string | null>(null);
   const [version, setVersion] = useState<string | null>(null);
@@ -66,6 +69,8 @@ export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) 
       setResolvedDir(picked);
     }
   };
+
+  if (debugOpen) return <DebugLogView onBack={() => setDebugOpen(false)} />;
 
   return (
     <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-3">
@@ -196,6 +201,20 @@ export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) 
             )}
         </div>
         <UpdateRow status={update} />
+      </div>
+
+      {/* Debug log */}
+      <div className="border-t border-surface-600 pt-3">
+        <button
+          onClick={() => setDebugOpen(true)}
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-surface-700 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-surface-600"
+        >
+          <FileText className="size-3.5" />
+          Debug log
+        </button>
+        <p className="mt-1 text-center text-[10px] text-zinc-500">
+          Collect diagnostic info for bug reports. No personal data is included.
+        </p>
       </div>
     </div>
   );

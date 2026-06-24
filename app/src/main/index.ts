@@ -43,6 +43,7 @@ import { startAutoUpload, stopAutoUpload, notifySignedIn } from "./auto-upload.j
 import { onSignedIn } from "./auth.js";
 import { installGlobalErrorReporting } from "./error-report.js";
 import { isRcBuild } from "./variant.js";
+import { collectDebugInfo } from "./debug-info.js";
 import {
   acquireSingleInstanceLock,
   makeSecondInstanceHandler,
@@ -461,6 +462,28 @@ app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
     moveWindowDrag: liveDrag.move,
     endWindowDrag: liveDrag.end,
     resetLiveWindow,
+    debugInfo: async () => {
+      const { getStatus } = await import("./auth.js");
+      return collectDebugInfo({
+        getLiveBounds: () => {
+          if (!liveWin || liveWin.isDestroyed()) return null;
+          return liveWin.getBounds();
+        },
+        isLiveVisible: () => !!(liveWin && !liveWin.isDestroyed() && liveWin.isVisible()),
+        isLiveAlwaysOnTop: () => !!(liveWin && !liveWin.isDestroyed() && liveWin.isAlwaysOnTop()),
+        getListBounds: () => {
+          if (!listWin || listWin.isDestroyed()) return null;
+          return listWin.getBounds();
+        },
+        splashActive,
+        readerState: getReaderState(),
+        updateState: getUpdateStatus(),
+        signedIn: (await getStatus()).signedIn,
+        settings: getSettings(),
+        outputDir: resolveOutputDir(),
+        isRc: isRcBuild(),
+      });
+    },
   });
 
   // Gate the overlay behind the startup splash when a reader will actually run

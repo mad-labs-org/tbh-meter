@@ -180,6 +180,9 @@ export interface MeterApi {
   getCurrentSession(): Promise<string | null>;
   /** Forward a renderer error to the main process's Discord error reporting. */
   reportError(context: string, message: string, stack?: string): void;
+  /** Collect diagnostic info (environment, app state, reader, settings, log tails)
+   *  for bug reports. Returns a plaintext block with no PII or tokens. */
+  debugInfo(): Promise<string>;
   windowControls: { minimize(): void; close(): void };
 }
 declare global { interface Window { meter: MeterApi } }
