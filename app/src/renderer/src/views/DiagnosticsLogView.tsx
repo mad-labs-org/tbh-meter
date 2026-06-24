@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { Copy, Check, Loader2, ArrowLeft } from "lucide-react";
 import { cn } from "~/lib/utils";
+import { useT } from "~/lib/i18n";
 
 interface DiagnosticsLogViewProps {
   onBack: () => void;
 }
 
 export function DiagnosticsLogView({ onBack }: DiagnosticsLogViewProps) {
+  const t = useT();
   const [info, setInfo] = useState<string | "loading" | "error">("loading");
   const [copied, setCopied] = useState(false);
 
@@ -33,7 +35,7 @@ export function DiagnosticsLogView({ onBack }: DiagnosticsLogViewProps) {
           className="flex cursor-pointer items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
         >
           <ArrowLeft className="size-3" />
-          Back to Settings
+          {t("diagnostics.backToSettings")}
         </button>
         {typeof info === "string" && (
           <button
@@ -48,12 +50,12 @@ export function DiagnosticsLogView({ onBack }: DiagnosticsLogViewProps) {
             {copied ? (
               <>
                 <Check className="size-3.5" />
-                Copied!
+                {t("diagnostics.copied")}
               </>
             ) : (
               <>
                 <Copy className="size-3.5" />
-                Copy to clipboard
+                {t("diagnostics.copyToClipboard")}
               </>
             )}
           </button>
@@ -65,11 +67,11 @@ export function DiagnosticsLogView({ onBack }: DiagnosticsLogViewProps) {
         {info === "loading" ? (
           <div className="flex h-full items-center justify-center gap-2 text-sm text-zinc-500">
             <Loader2 className="size-4 animate-spin" />
-            Collecting diagnostics...
+            {t("diagnostics.collecting")}
           </div>
         ) : info === "error" ? (
           <div className="flex h-full items-center justify-center text-sm text-red-400">
-            Failed to collect diagnostics.
+            {t("diagnostics.failed")}
           </div>
         ) : (
           <pre className="select-all whitespace-pre-wrap break-all p-4 font-mono text-xs text-zinc-300">

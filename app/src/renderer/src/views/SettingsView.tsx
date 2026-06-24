@@ -766,10 +766,10 @@ function UsageStatsRow({
         className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-surface-700 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-surface-600"
       >
         <FileText className="size-3.5" />
-        Diagnostics log
+        {t("settings.diagnosticsLog")}
       </button>
       <p className="mt-1 text-center text-[10px] text-zinc-500">
-        Collect diagnostic info for bug reports. No personal data is included.
+        {t("settings.diagnosticsLogDesc")}
       </p>
     </div>
   );
