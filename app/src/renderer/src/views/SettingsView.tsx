@@ -29,7 +29,7 @@ import { DiscordIcon } from "~/components/DiscordIcon";
 import { Modal } from "~/components/Modal";
 import { useT } from "~/lib/i18n";
 import { cn } from "~/lib/utils";
-import { DebugLogView } from "./DebugLogView";
+import { DiagnosticsLogView } from "./DiagnosticsLogView";
 
 interface SettingsViewProps {
   settings: AppSettings;
@@ -38,7 +38,7 @@ interface SettingsViewProps {
 
 export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) {
   const t = useT();
-  const [debugOpen, setDebugOpen] = useState(false);
+  const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
   const opacityPct = Math.round(settings.opacity * 100);
   const [resolvedDir, setResolvedDir] = useState<string | null>(null);
   const [version, setVersion] = useState<string | null>(null);
@@ -70,7 +70,7 @@ export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) 
     }
   };
 
-  if (debugOpen) return <DebugLogView onBack={() => setDebugOpen(false)} />;
+  if (diagnosticsOpen) return <DiagnosticsLogView onBack={() => setDiagnosticsOpen(false)} />;
 
   return (
     <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-3">
@@ -162,7 +162,7 @@ export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) 
       </div>
 
       <div className="border-t border-surface-600 pt-3">
-        <UsageStatsRow settings={settings} onSettingsChange={onSettingsChange} />
+        <UsageStatsRow settings={settings} onSettingsChange={onSettingsChange} onOpenDiagnostics={() => setDiagnosticsOpen(true)} />
       </div>
 
       <div className="border-t border-surface-600 pt-3">
@@ -201,20 +201,6 @@ export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) 
             )}
         </div>
         <UpdateRow status={update} />
-      </div>
-
-      {/* Debug log */}
-      <div className="border-t border-surface-600 pt-3">
-        <button
-          onClick={() => setDebugOpen(true)}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-surface-700 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-surface-600"
-        >
-          <FileText className="size-3.5" />
-          Debug log
-        </button>
-        <p className="mt-1 text-center text-[10px] text-zinc-500">
-          Collect diagnostic info for bug reports. No personal data is included.
-        </p>
       </div>
     </div>
   );
@@ -753,9 +739,11 @@ function BlueChestTrackerRow({
 function UsageStatsRow({
   settings,
   onSettingsChange,
+  onOpenDiagnostics,
 }: {
   settings: AppSettings;
   onSettingsChange: (partial: Partial<AppSettings>) => void;
+  onOpenDiagnostics: () => void;
 }) {
   const t = useT();
   return (
@@ -773,6 +761,16 @@ function UsageStatsRow({
           <span className="block text-[11px] text-zinc-500">{t("settings.usageStatsDesc")}</span>
         </span>
       </label>
+      <button
+        onClick={onOpenDiagnostics}
+        className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-surface-700 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-surface-600"
+      >
+        <FileText className="size-3.5" />
+        Diagnostics log
+      </button>
+      <p className="mt-1 text-center text-[10px] text-zinc-500">
+        Collect diagnostic info for bug reports. No personal data is included.
+      </p>
     </div>
   );
 }

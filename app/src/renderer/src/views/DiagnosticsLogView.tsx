@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { Copy, Check, Loader2, ArrowLeft } from "lucide-react";
 import { cn } from "~/lib/utils";
 
-interface DebugLogViewProps {
+interface DiagnosticsLogViewProps {
   onBack: () => void;
 }
 
-export function DebugLogView({ onBack }: DebugLogViewProps) {
+export function DiagnosticsLogView({ onBack }: DiagnosticsLogViewProps) {
   const [info, setInfo] = useState<string | "loading" | "error">("loading");
   const [copied, setCopied] = useState(false);
 
@@ -65,11 +65,11 @@ export function DebugLogView({ onBack }: DebugLogViewProps) {
         {info === "loading" ? (
           <div className="flex h-full items-center justify-center gap-2 text-sm text-zinc-500">
             <Loader2 className="size-4 animate-spin" />
-            Collecting debug info...
+            Collecting diagnostics...
           </div>
         ) : info === "error" ? (
           <div className="flex h-full items-center justify-center text-sm text-red-400">
-            Failed to collect debug info.
+            Failed to collect diagnostics.
           </div>
         ) : (
           <pre className="select-all whitespace-pre-wrap break-all p-4 font-mono text-xs text-zinc-300">
