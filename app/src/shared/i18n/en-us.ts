@@ -103,7 +103,7 @@ export const DICT = {
     "Choose which runs show in your list. This is local only — it never changes the leaderboard.",
   "settings.hideIgnored": "Hide ignored runs",
   "settings.hideIgnoredDesc":
-    "Skipped, partial and incomplete-data runs stay hidden. They still count toward your session and can be revealed from the runs list anytime.",
+    "Skipped and unreadable-data runs stay hidden; partial clears (the meter joined mid-run) still show. Hidden runs still count toward your session and can be revealed from the runs list anytime.",
   "settings.hideShorter": "Hide runs shorter than",
   "settings.seconds": "seconds",
   "settings.minDurationDesc":
@@ -157,9 +157,9 @@ export const DICT = {
   "runs.hideIgnoredBtn": "Hide ignored",
   "runs.showIgnoredBtn": "Show ignored ({count})",
   "runs.hideIgnoredTitle":
-    "Hide skipped, partial and degraded runs (they still count toward your session)",
+    "Hide skipped and degraded runs (partial clears still show; everything still counts toward your session)",
   "runs.showIgnoredTitle":
-    "Show runs the meter ignored — too short, partial captures, or with unreadable data",
+    "Show runs the meter ignored — too short or with unreadable data",
   "runs.columns": "Columns",
   "runs.columnsTitle": "Show / hide / reorder columns",
   "runs.newSession": "New session",
@@ -294,10 +294,13 @@ export const DICT = {
   // ── Sign-in prompt modal ──
   "signin.title": "Share your runs on the leaderboard",
   "signin.body":
-    "You are not signed in. Your runs still upload anonymously, so your session page on TBH Helper works — but they only count for the leaderboard and your profile after you sign in with Discord. Signing in also claims the runs already uploaded from this computer.",
+    "You're not signed in, so your runs stay on this computer and never reach the leaderboard. Sign in with Discord to sync them so they count for the leaderboard and your profile.",
   "signin.dontShow": "Don't show this again",
   "signin.notNow": "Not now",
 
+  "signin.pendingTitle": "Your runs aren't syncing",
+  "signin.pendingBody":
+    "You're signed out, so finished runs stopped reaching the leaderboard ({count} waiting locally). Sign in to sync them.",
   "signin.expiredTitle": "Your session expired",
   "signin.expiredBody":
     "You were signed out, so your runs stopped syncing to the leaderboard. They're saved locally. Sign in again to resume.",

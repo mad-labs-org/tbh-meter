@@ -287,10 +287,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   // ── Sign-in prompt modal ──
   "signin.title": "Bagikan run-mu di papan peringkat",
   "signin.body":
-    "Kamu belum masuk. Run-mu tetap diunggah anonim, jadi halaman sesimu di TBH Helper jalan — tapi mereka baru dihitung untuk papan peringkat dan profilmu setelah masuk dengan Discord. Masuk juga mengklaim run yang sudah diunggah dari komputer ini.",
+    "Kamu belum masuk, jadi run-mu tetap di komputer ini dan tidak masuk ke papan peringkat. Masuk dengan Discord untuk menyinkronkannya agar dihitung di papan peringkat dan profilmu.",
   "signin.dontShow": "Jangan tampilkan lagi",
   "signin.notNow": "Nanti saja",
 
+  "signin.pendingTitle": "Run-mu tidak tersinkron",
+  "signin.pendingBody":
+    "Kamu keluar, jadi run yang selesai berhenti masuk ke papan peringkat ({count} menunggu di lokal). Masuk untuk menyinkronkannya.",
   "signin.expiredTitle": "Sesimu telah berakhir",
   "signin.expiredBody":
     "Kamu keluar, jadi run-mu berhenti tersinkron ke papan peringkat. Run tetap tersimpan lokal. Masuk lagi untuk melanjutkan.",

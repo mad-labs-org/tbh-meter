@@ -205,6 +205,28 @@ jobs:
           PREV_TAG=$(gh api "repos/$RELEASES_REPO/releases/latest" --jq .tag_name 2>/dev/null || true)
           echo "prev_tag=$PREV_TAG" >> "$GITHUB_OUTPUT"
 
+          # Source tag at the BUILT sha — pushed FIRST, BEFORE the release exists, so the tag is
+          # nailed to the exact commit we built. Do NOT let `gh release` mint the tag at publish
+          # time: a release created without an existing tag anchors to the DEFAULT BRANCH'S HEAD
+          # *at publish*, which has drifted when main advanced during the ~4-min build (e.g. a
+          # Dependabot merge to release-video) — that plants the tag on the wrong commit AND fails
+          # the sha check below, while leaving Latest flipped. Pushing the git tag now changes
+          # nothing players see (/releases/latest still serves the old release until the flip
+          # below). Plain push, never forced. Same-sha = idempotent re-ship; a different sha was
+          # refused in resolve and is rejected here too as a backstop.
+          EXIST_SHA=$(git ls-remote origin "refs/tags/$TAG" | cut -f1)
+          if [ -z "$EXIST_SHA" ]; then
+            git tag "$TAG" "$SHA"
+            git push origin "refs/tags/$TAG"
+            echo "tag_pushed=true" >> "$GITHUB_OUTPUT"
+            echo "Pushed $TAG at ${SHA:0:7}."
+          elif [ "$EXIST_SHA" = "$SHA" ]; then
+            echo "tag_pushed=false" >> "$GITHUB_OUTPUT"
+            echo "$TAG already at ${SHA:0:7} — no tag push (idempotent re-ship)."
+          else
+            echo "::error::$TAG exists at ${EXIST_SHA:0:7} ≠ built ${SHA:0:7} — bump instead of re-shipping."; exit 1
+          fi
+
           # End-user notes: download + SmartScreen + auto changelog from THIS repo at the built sha.
           CHANGELOG=$(GH_TOKEN="$NOTES_TOKEN" gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
             -f tag_name="$TAG" -f target_commitish="$SHA" --jq .body 2>/dev/null || true)
@@ -227,6 +249,8 @@ jobs:
 
           # Draft-FIRST: upload all assets to a draft, THEN flip to published+Latest in one edit,
           # so electron-updater never sees a Latest without latest.yml/installer (no empty window).
+          # The tag already exists at $SHA (pushed above), so GitHub anchors the release to it —
+          # it never re-mints the tag at the default branch's HEAD.
           if gh release view "$TAG" --repo "$RELEASES_REPO" >/dev/null 2>&1; then
             echo "Release $TAG exists — refreshing assets + re-flagging Latest (repair/re-ship)."
             gh release upload "$TAG" dist/*.exe dist/latest.yml dist/*.blockmap --repo "$RELEASES_REPO" --clobber
@@ -238,21 +262,6 @@ jobs:
               --title "tbh-meter v$VERSION" --notes-file release-notes.md
             gh release upload "$TAG" dist/*.exe dist/latest.yml dist/*.blockmap --repo "$RELEASES_REPO" --clobber
             gh release edit "$TAG" --repo "$RELEASES_REPO" --draft=false --prerelease=false --latest
-          fi
-
-          # Source tag at the BUILT sha — plain push, never forced. Same-sha re-push = no-op;
-          # a different sha was refused in resolve (and is rejected here too as a backstop).
-          EXIST_SHA=$(git ls-remote origin "refs/tags/$TAG" | cut -f1)
-          if [ -z "$EXIST_SHA" ]; then
-            git tag "$TAG" "$SHA"
-            git push origin "refs/tags/$TAG"
-            echo "tag_pushed=true" >> "$GITHUB_OUTPUT"
-            echo "Pushed $TAG at ${SHA:0:7}."
-          elif [ "$EXIST_SHA" = "$SHA" ]; then
-            echo "tag_pushed=false" >> "$GITHUB_OUTPUT"
-            echo "$TAG already at ${SHA:0:7} — no tag push (idempotent re-ship)."
-          else
-            echo "::error::$TAG exists at ${EXIST_SHA:0:7} ≠ built ${SHA:0:7}."; exit 1
           fi
 
           # GC: drop every RC/legacy draft whose clean base ≤ the shipped version — clears the
@@ -315,7 +324,12 @@ jobs:
             echo "::warning::latest.yml under $TAG serves '${YML_VER:-nothing}' (expected $VERSION)."
           fi
 
-      - name: Announce on Discord (only when the tag was newly pushed)
+      - name: Announce on Discord (only when this run minted a new stable tag)
+        # tag_pushed is 'true' exactly when THIS run pushed the stable tag (at the built sha, in
+        # the step above) — a genuinely new release, never an idempotent re-ship. Pushing the tag
+        # BEFORE publishing the release is what makes this signal reliable: the earlier flow let
+        # `gh release` mint the tag at publish time, so the later git push was always a no-op,
+        # tag_pushed was never 'true', and this announcement silently never fired.
         if: steps.ship.outputs.tag_pushed == 'true'
         shell: bash
         env:
@@ -327,9 +341,9 @@ jobs:
           if [ -z "$DISCORD_ANNOUNCE_WEBHOOK" ]; then
             echo "DISCORD_ANNOUNCE_WEBHOOK not set — skipping announcement."; exit 0
           fi
-          if ! git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
-            echo "Tag $TAG not in this checkout — skipping announcement."; exit 0
-          fi
+          # We pushed $TAG at the built sha in the previous step, so it is in this checkout. Only
+          # the changelog range needs care: fall back to full history if the previous Latest tag
+          # predates this checkout (fetch-depth:0 fetches all tags, so this is just a guard).
           if [ -n "$PREV_TAG" ] && ! git rev-parse -q --verify "refs/tags/$PREV_TAG" >/dev/null; then
             echo "Previous tag $PREV_TAG not in this checkout — announcing full history."
             PREV_TAG=""
@@ -376,7 +390,9 @@ jobs:
           TAG_PUSHED: ${{ steps.ship.outputs.tag_pushed }}
         run: |
           {
-            echo "## 🚀 Shipped to players"
+            echo "# 🚀 Shipped tbh-meter v$VERSION"
+            echo
+            echo "_Live to players as **\`$STABLE_TAG\`** — installed apps self-update._"
             echo
             echo "| | |"
             echo "|---|---|"

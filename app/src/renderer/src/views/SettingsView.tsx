@@ -376,8 +376,10 @@ function AlwaysOnTopRow({
 /**
  * Run-filter section (PR6) — the LOCAL display filter for the runs list (layer 3 of the 3-layer
  * status model; never touches the leaderboard). Two prefs, both persisted to settings.json:
- *   - hideNonCounted (default on): hide skipped / partial / degraded runs (a clean list of runs
- *     that count). Mirrors the runs-list "show ignored" toggle — same setting, two entry points.
+ *   - hideNonCounted (default on): hide skipped / degraded runs. `counted` and `partial` (a real
+ *     clear joined mid-way, under-counted but badged) stay visible — hiding partials made the list
+ *     look empty after the slow first-launch attach. Mirrors the runs-list "show ignored" toggle —
+ *     same setting, two entry points.
  *   - minDurationSec (default off): hide runs shorter than N seconds. The minimum the user can pick
  *     is the SYSTEM floor (COUNT_FLOOR_SEC) — runs under it never count anyway — so the input is
  *     clamped to it before persisting; x-10 boss clears are always exempt. The floor is a converter

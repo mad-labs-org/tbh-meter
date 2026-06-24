@@ -281,10 +281,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   // ── Sign-in prompt modal ──
   "signin.title": "把你的挑战分享到排行榜",
   "signin.body":
-    "你尚未登录。挑战仍会匿名上传，所以你在 TBH Helper 的会话页面可用 — 但只有使用 Discord 登录后才计入排行榜和你的个人资料。登录还会认领此电脑已上传的挑战。",
+    "你尚未登录，挑战只保存在本机，不会进入排行榜。使用 Discord 登录即可同步，并计入排行榜和你的个人资料。",
   "signin.dontShow": "不再显示",
   "signin.notNow": "暂不",
 
+  "signin.pendingTitle": "你的挑战未在同步",
+  "signin.pendingBody":
+    "你已退出登录，已完成的挑战因此停止上传到排行榜（本地有 {count} 个待同步）。登录即可同步。",
   "signin.expiredTitle": "你的登录已过期",
   "signin.expiredBody":
     "你已退出登录，挑战因此停止同步到排行榜。挑战仍保存在本地。重新登录即可继续同步。",

@@ -43,6 +43,7 @@ function reportBody(
 
 let fetchMock: ReturnType<typeof vi.fn>;
 let reportError: typeof import("../error-report.js").reportError;
+let installGlobalErrorReporting: typeof import("../error-report.js").installGlobalErrorReporting;
 
 beforeEach(async () => {
   // Fresh module each test so the module-level seen/sent/quitting state resets.
@@ -54,7 +55,10 @@ beforeEach(async () => {
 
   const mod = await import("../error-report.js");
   reportError = mod.reportError;
-  mod.installGlobalErrorReporting();
+  installGlobalErrorReporting = mod.installGlobalErrorReporting;
+  // NB: each test installs explicitly (the process-gone tests below). We DON'T install here so the
+  // per-test process.on hooks don't accumulate across the suite (vi.resetModules makes a fresh module
+  // but can't unregister listeners already added to the real `process`) → no MaxListeners warning.
 });
 
 afterEach(() => {
@@ -63,24 +67,41 @@ afterEach(() => {
 
 describe("installGlobalErrorReporting — process-gone reporting", () => {
   it("relays a non-clean child-process crash while the app is running", () => {
+    installGlobalErrorReporting();
     fire("child-process-gone", {}, { type: "GPU", reason: "crashed", exitCode: 2 });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(reportBody(fetchMock).context).toBe("child:GPU:process-gone");
   });
 
   it("never relays a clean exit (renderer or child)", () => {
+    installGlobalErrorReporting();
     fire("render-process-gone", {}, {}, { reason: "clean-exit", exitCode: 0 });
     fire("child-process-gone", {}, { type: "Utility", reason: "clean-exit", exitCode: 0 });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("suppresses process-gone once the app is quitting — shutdown teardown is not a fault", () => {
+    installGlobalErrorReporting();
     fire("before-quit");
     // These are exactly the shutdown-time events that used to spam #log-error
     // (renderer killed = DBG_TERMINATE_PROCESS, utility killed during teardown).
     fire("render-process-gone", {}, {}, { reason: "killed", exitCode: 1073807364 });
     fire("child-process-gone", {}, { type: "Utility", reason: "killed", exitCode: -1073741205 });
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("attaches the injected reader-logs tail to a process-gone report (debuggable from the post)", () => {
+    // The GPU/renderer crashes seen in #log-error carried NO logs — no way to see the player's build
+    // fingerprint or resolve path. The injected provider's tail must ride along as the `logs`
+    // attachment so the Discord post is self-sufficient to debug.
+    installGlobalErrorReporting(
+      () => "=== reader-diag.log ===\nfp=1.00.21-0xDEADBEEF-0x123\n=== meter.log ===\n[ok] attached",
+    );
+    fire("render-process-gone", {}, {}, { reason: "crashed", exitCode: 34 });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const body = reportBody(fetchMock) as { logs?: string };
+    expect(body.logs).toContain("reader-diag.log");
+    expect(body.logs).toContain("fp=1.00.21-0xDEADBEEF-0x123");
   });
 });
 

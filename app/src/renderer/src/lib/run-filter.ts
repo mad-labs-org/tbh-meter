@@ -36,12 +36,15 @@ function runSeconds(run: Pick<RunIndexEntry, "duration" | "clearTime">): number 
 }
 
 /** Whether a single run passes the display filter given the user's settings.
- *  - QUALITY: when `hideNonCounted`, only a `counted` run passes. A run with no verdict (a
- *    legacy-mirror log from before the converter, `quality` undefined) has no quality to gate on,
- *    so it falls back to the PRE-PR6 default — hide it unless it was a `success`. That preserves the
- *    old `status === "success"` table behaviour for the brief window before the boot ingest
- *    re-converts the mirror log (which then seals fail/abandoned as `skipped`). When off, quality
- *    never filters.
+ *  - QUALITY: when `hideNonCounted`, a run is hidden ONLY when its verdict is `skipped` (too short /
+ *    not a clean success) or `degraded` (a critical field was unreadable). `counted` AND `partial`
+ *    both stay VISIBLE: a `partial` run is a REAL successful clear the reader merely joined mid-way,
+ *    so its totals are under-counted (it is badged + tinted amber in the list) but it is still the
+ *    player's run. Hiding partials made the list look empty after the slow first-launch attach — the
+ *    reader joins the first run(s) of a session mid-way — so players reported the meter "wasn't
+ *    recording their runs". A run with no verdict (a legacy-mirror log from before the converter,
+ *    `quality` undefined) has no quality to gate on, so it falls back to the PRE-PR6 default — hide
+ *    it unless it was a `success`. When off, quality never filters.
  *  - DURATION: when `minDurationSec` is set, a run shorter than it (clamped to the floor) is hidden
  *    — UNLESS it is x-10 (stageNo === ACT_BOSS_STAGE_NO), which is always exempt. */
 export function passesRunFilter(
@@ -50,7 +53,9 @@ export function passesRunFilter(
 ): boolean {
   if (settings.hideNonCounted) {
     if (run.quality !== undefined) {
-      if (run.quality !== "counted") return false;
+      // Hide only the runs that aren't worth showing: `skipped` (too short / not a clean success) and
+      // `degraded` (corrupt read). `counted` + `partial` (a real, if under-counted, clear) stay shown.
+      if (run.quality === "skipped" || run.quality === "degraded") return false;
     } else if (run.status !== "success") {
       // Un-sealed legacy-mirror log: no quality verdict yet → fall back to the old success-only gate.
       return false;
