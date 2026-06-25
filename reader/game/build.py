@@ -1,6 +1,6 @@
 """build.py — reads the hero's BUILD: equips/mods/skills (from the save) + the 64 live
 FINAL stats (id-only) + the LIVE deployed party identity (heroKeys from StageManager.HeroList;
-level/exp degrade to the save since 1.00.20 killed the ACTk live decoy — see read_live_party).
+level/exp read LIVE by decoding the ACTk cipher in place since 1.00.20 — see read_live_party).
 Mirrors the monolith.
 
 The 64 stats come out keyed by statId int (id-only; the front resolves the name). The
@@ -16,6 +16,7 @@ from config.offsets import (HeroRuntime, StatsHolder, Dict, DictFloat, Array, Li
                             AttributeSaveData, ItemSaveData, ItemEnchant, name_map,
                             EItemParts, EGradeType, EEquipClassType, ERecipeType, StatType,
                             RuneSaveData, InventorySaveData, StashSaveData)
+from game import obscured
 from shared.utils import resource_path
 
 _PARTS = name_map(EItemParts)
@@ -81,20 +82,19 @@ def read_attribute_levels(reader, psd):
 
 def read_live_party(reader, sm, hero_cat=None, save_heroes=None):
     """{heroKey: (level, exp)} for the LIVE DEPLOYED party (StageManager.HeroList). The party
-    IDENTITY (which heroKeys are on the field) is read LIVE — the invariant party source — and the
-    per-hero level/exp are sourced from `save_heroes` (the live within-level decoy died, see below).
+    IDENTITY (which heroKeys are on the field) AND the per-hero level/exp are all read LIVE.
     Never raises -> {} on any failure.
 
-    1.00.20 — why level/exp no longer come from memory here. Through 1.00.19 the live level/exp were
-    the ACTk `fakeValue` PLAIN decoys (HeroRuntime.LEVEL_FAKE/EXP_FAKE @ base+0xC of the ObscuredInt/
-    Float), kept in sync with the real value, so reading them was legal. In 1.00.20 the recompile
-    KILLED those decoys build-wide (they read 0); the real live level/exp moved BEHIND the ObscuredInt
-    cipher (hiddenValue/currentCryptoKey @ base+0x4/+0x8) — and decoding the cipher is exactly what
-    [[invariants/obscured-data-offlimits]] forbids (hidden^key is garbage; ACTk rotates the key + the
-    decode-method name every build). The decoy can't be revived. So the live WITHIN-LEVEL exp is gone:
-    level/exp degrade to the SAVE (`save_heroes`, the lagging within-level snapshot — the same fallback
-    the xp chain already uses). This keeps the party LIVE while only the level/exp VALUES degrade
-    (LIVE->SAVE, [[invariants/metric-fallback-chains]]); it NEVER lets the roster define the party.
+    1.00.20 — level/exp are decoded from the ACTk cipher IN PLACE. Through 1.00.19 the live level/exp
+    were the ACTk `fakeValue` PLAIN decoys (@ base+0xC of the ObscuredInt/Float). In 1.00.20 the
+    recompile KILLED those decoys build-wide (they read 0); the real live values stayed in the cipher
+    (hiddenValue @ base+0x4, currentCryptoKey @ base+0x8). Rather than degrade to the lagging save (the
+    per-run save delta jumps ~2× — the bug players reported), we RECOVER the live values by decoding the
+    cipher read-only (game/obscured.py — algorithm read from the binary, not guessed; ObscuredInt level =
+    (hidden-key)^key, ObscuredFloat xp = float(key ^ byteswap(hidden))). The key is read live each tick
+    (handles ACTk rotation). LEVEL falls back to the save on an unreadable cipher; EXP stays None on a bad
+    read so the xp chain degrades honestly ([[invariants/metric-fallback-chains]] rule 2), never the
+    roster. The decode is gated by the validate_live oracle — see [[invariants/obscured-data-offlimits]].
 
     Ghost discriminator (replaces the dead `lvl>0` filter). The scan/backref returns torn-down/template
     StageManager 'ghosts' alongside the live carrier ([[invariants/instance-selection]] family). The
@@ -132,15 +132,19 @@ def read_live_party(reader, sm, hero_cat=None, save_heroes=None):
             # carries a stale/garbage key that doesn't. heroKey-plausibility only when hero_cat is absent.
             if hero_cat is not None and hk not in hero_cat:
                 continue
-            # LEVEL from the SAVE (the live decoy is dead; the live level is behind the cipher, off-
-            # limits) — informative for the overlay/diagnostics. EXP is FORCED None: the live WITHIN-
-            # LEVEL exp is gone, and feeding the stale SAVE exp into the live xp accumulator would make
-            # the SAVE fallback silently report as LIVE (xp_source="live") — forbidden by
-            # [[invariants/metric-fallback-chains]] rule 2. None keeps the accumulator EMPTY, so close_run
-            # honestly tags the run's xp `save` and uses the per-hero save delta (capped→0). The party
-            # IDENTITY stays fully LIVE; only level/exp degrade.
-            lvl = (save_heroes or {}).get(hk, (None, None))[0]
-            res[hk] = (lvl, None)
+            # LEVEL + EXP read LIVE by decoding the ACTk cipher in place (the +0xC decoy died in
+            # 1.00.20). game/obscured.py reimplements the decode read from the binary. LEVEL falls back
+            # to the save snapshot on an unreadable/implausible cipher (stable, context only). EXP stays
+            # None on a bad read — NEVER the stale save exp — so close_run degrades to the per-hero save
+            # delta honestly ([[invariants/metric-fallback-chains]] rule 2), instead of reporting save as
+            # live. The party IDENTITY remains the live heroKey gate above.
+            lvl = obscured.decode_obscured_int(reader.ru32(uf + HeroRuntime.LEVEL_HIDDEN),
+                                               reader.ru32(uf + HeroRuntime.LEVEL_KEY))
+            if lvl is None or not (0 < lvl <= 200):
+                lvl = (save_heroes or {}).get(hk, (None, None))[0]
+            exp = obscured.decode_obscured_float(reader.ru32(uf + HeroRuntime.EXP_HIDDEN),
+                                                 reader.ru32(uf + HeroRuntime.EXP_KEY))
+            res[hk] = (lvl, exp)
     except Exception:
         return {}
     return res

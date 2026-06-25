@@ -265,6 +265,19 @@ class TestPartyXpAccumulator:
         assert rec["exp_start"] == pytest.approx(1000.0)
         assert rec["exp_end"] == pytest.approx(2500.0)       # raw observation keeps moving
 
+    def test_absent_tick_banks_gain_then_resumes_on_revive(self):
+        """Death/revive in the per-run gain: a hero that DROPS from the snapshot (dies) banks its
+        gain — nothing lost, nothing double-counted — and RESUMES from the banked baseline on revive.
+        The dead ticks (absent from the snapshot) move nothing; the revive tick continues."""
+        acc = PartyXpAccumulator()
+        acc.update({601: (10, 100.0)})           # deployed
+        acc.update({601: (10, 150.0)})           # +50 before death
+        acc.update({})                           # DEAD: absent from the snapshot
+        acc.update({})                           # still dead -> banked, no change
+        acc.update({601: (10, 150.0)})           # REVIVED (a dead hero gained 0 while dead)
+        acc.update({601: (10, 230.0)})           # +80 after revive
+        assert acc.gain(601) == pytest.approx(130.0)   # 50 + 80; nothing lost or double-counted
+
     def test_solo_capped_hero_total_zero_not_none(self, real_curve):
         """REGRESSION (production, meter v0.31.0 / game v1.00.11, player denny8126): SOLO
         runs with just one Ranger lv101 (cap) racked up ~39M xpGained EACH (e.g. run

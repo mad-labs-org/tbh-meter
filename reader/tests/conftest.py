@@ -28,6 +28,9 @@ class MockReader:
     def rf32(self, addr):
         return self._mem.get(addr)
 
+    def ru32(self, addr):
+        return self._mem.get(addr)
+
     def rptr(self, addr):
         return self._mem.get(addr)
 
