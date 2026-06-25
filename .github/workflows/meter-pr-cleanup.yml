@@ -1,0 +1,112 @@
+# TBH Meter / PR cleanup — housekeeping when a PR closes. NOT a release step you click.
+#
+# A merge fires TWO events at once: a `push` to main (meter-1-stage.yml stages the version tag)
+# and this `pull_request: closed`. They are separate files ON PURPOSE — each run stays
+# single-purpose (no confusing "skipped" job), and the run named after YOUR PR is the one that
+# tells you the staged version.
+#
+# Two jobs:
+#  • clean-pr-slot (on ANY close): deletes that PR's throwaway draft build (`tbh-meter-pr-<N>`) on
+#    the releases repo, so a merged/closed PR never leaves a stale installer behind. No paths
+#    filter on purpose — it must fire even for a PR that never touched the meter but got a build.
+#  • report-staged (MERGE only): finds the RC tag the parallel stage run minted for this merge
+#    commit and shows it — version + one-click build link — right on the run you just merged.
+name: Release · PR cleanup
+
+run-name: "${{ github.event.pull_request.merged && format('PR #{0} merged — staged version + cleanup', github.event.pull_request.number) || format('PR #{0} closed — cleanup', github.event.pull_request.number) }}"
+
+on:
+  pull_request:
+    types: [closed]
+
+concurrency:
+  # Per-PR: two rapid closes of the same PR serialize; different PRs run in parallel.
+  # cancel-in-progress:false so a running cleanup is never aborted mid-delete.
+  group: meter-pr-cleanup-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  clean-pr-slot:
+    name: Delete the closed PR's test build
+    runs-on: ubuntu-latest
+    # Same-repo: drafts live here now, so the default token deletes them (no cross-repo PAT).
+    permissions:
+      contents: write
+    timeout-minutes: 10
+    steps:
+      - name: Delete draft slot tbh-meter-pr-<N> (if any)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR="${{ github.event.pull_request.number }}"
+          RELEASES_REPO="$GITHUB_REPOSITORY"
+          TAG="tbh-meter-pr-$PR"
+          # Drafts aren't returned by get-release-by-tag, so find the id via the list endpoint.
+          ID=$(gh api "repos/$RELEASES_REPO/releases" --paginate \
+            --jq "[.[] | select(.tag_name==\"$TAG\" and .draft==true)] | .[0].id // empty")
+          if [ -n "$ID" ]; then
+            gh api -X DELETE "repos/$RELEASES_REPO/releases/$ID" && echo "Deleted test build $TAG (id $ID)."
+          else
+            echo "No test build for PR #$PR — nothing to clean."
+          fi
+
+  report-staged:
+    name: Show the version this merge staged
+    # Only a MERGE can stage a version; a closed-unmerged PR stages nothing.
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 5
+    steps:
+      - name: Find + show the RC tag staged at the merge commit
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          REPO: ${{ github.repository }}
+          ACTIONS_URL: ${{ github.server_url }}/${{ github.repository }}/actions
+        run: |
+          # The version tag is minted by the PARALLEL "Release · 1 · version tag" run (push to
+          # main): it tags THIS merge commit `tbh-meter-v<ver>-rc.N` — but only if the merge
+          # touched the meter (app/, reader/, data/). That run races us, so poll the tags API for
+          # a tbh-meter rc tag whose object points exactly at this merge commit.
+          REF=""
+          for _ in $(seq 1 18); do # up to ~90s; the stage run normally finishes within ~15s
+            REF=$(gh api "repos/$REPO/git/matching-refs/tags/tbh-meter-v" --paginate \
+              --jq ".[] | select(.object.sha==\"$MERGE_SHA\") | .ref" \
+              | grep -E 'rc\.[0-9]+$' | head -n1 || true)
+            [ -n "$REF" ] && break
+            sleep 5
+          done
+
+          if [ -n "$REF" ]; then
+            VERSION="${REF#refs/tags/tbh-meter-v}"
+            TAG="tbh-meter-v$VERSION"
+            {
+              echo "# 🏷️ This merge staged tbh-meter v$VERSION"
+              echo
+              echo "| | |"
+              echo "|---|---|"
+              echo "| **Version** | \`$VERSION\` |"
+              echo "| **Tag** | \`$TAG\` |"
+              echo "| **Merge commit** | \`${MERGE_SHA:0:7}\` |"
+              echo
+              echo "### ➡️ Build it"
+              echo "**[TBH Meter / 2. Build test version]($ACTIONS_URL/workflows/meter-2-build.yml)** — no input needed (builds this newest RC). Then **Meter 3** to ship to players."
+              echo
+              echo "_The tag itself was pushed by the parallel **Release · 1 · version tag** run on \`main\`; this run is just the heads-up on the PR you merged._"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::notice title=Staged $TAG::Build it with Meter 2 → $ACTIONS_URL/workflows/meter-2-build.yml"
+          else
+            {
+              echo "# 🟢 Merged — no version staged"
+              echo
+              echo "This merge didn't change the meter (\`app/\`, \`reader/\`, \`data/\`), so no RC was minted — that's correct, not an error."
+              echo "If you expected one, open the **Release · 1 · version tag** run for this commit (staging may still be finishing)."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi

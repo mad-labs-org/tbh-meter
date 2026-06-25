@@ -156,8 +156,8 @@ Tag-driven, in the Actions tab (the build only runs on demand):
 1. **Create version tag** (`meter-1-stage`) — automatic on push to `main` touching `app/`, `reader/`,
    or `data/`. Computes the next RC version from the commits and pushes a marker tag
    `tbh-meter-v<ver>-rc.<N>`. No build. It is a **green no-op when nothing under `app/`, `reader/`, or
-   `data/` changed** (the same "refuse on empty" guard `compute-version.mjs` enforces), and on any PR
-   close it deletes that PR's throwaway test-build draft. You never click this one.
+   `data/` changed** (the same "refuse on empty" guard `compute-version.mjs` enforces). You never click
+   this one.
 2. **Build test version** (`meter-2-build`) — manual. Builds the **RC variant** and publishes a **draft
    release** here for smoke-testing (invisible to anonymous users and to the in-app updater). Inputs:
    blank = the newest staged RC; `candidate=<ver>` = a specific RC; `pr=<N>` = a throwaway pre-merge
@@ -172,6 +172,11 @@ Tag-driven, in the Actions tab (the build only runs on demand):
 
 `meter-build-core` is the internal Windows build (reader exe + `--selftest` + electron-builder) shared
 by 2 and 3.
+
+`meter-pr-cleanup` runs automatically when a PR closes (you never click it): it deletes that PR's
+throwaway test-build draft and, on a **merge**, shows the version the push just staged — with a
+one-click build link — right on the run named after your PR. A merge fires both a `push` and a
+`pull_request` event, so staging (Meter 1) and this cleanup land in two separate, single-purpose runs.
 
 **The RC variant installs side by side.** `meter-2` (and PR builds) set `TBH_BUILD_VARIANT=rc`, so the
 RC installs as `tbh-meter-rc` in its own folder, stores its data in `~/tbh-meter-rc`, and has auto-update
