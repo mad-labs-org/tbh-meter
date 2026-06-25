@@ -1,27 +1,26 @@
 # TBH Meter / 1. Create version tag (AUTOMATIC — you never click this).
 #
-# Two cheap, build-free housekeeping jobs:
+# On every push to main that touches the meter (app/, reader/, data/), this computes the next RC
+# version from conventional commits and pushes a marker tag `tbh-meter-v<ver>-rc.<N>` at the
+# commit. NO build — the Windows build happens on demand in Meter 2 / Meter 3. If NOTHING under
+# the meter build inputs changed since the last release, compute-version refuses (exit 2) and
+# this is a green no-op ("nothing staged") — the P1 guard: a version exists only when the meter
+# actually changed. (Re-calibrating the reader after a game patch writes
+# reader/config/calib_seed.json, which IS a meter change, so it stages normally.)
 #
-#  • stage  (on push to main touching the meter): computes the next RC version from
-#    conventional commits and pushes a marker tag `tbh-meter-v<ver>-rc.<N>` at the commit.
-#    NO build — the Windows build happens on demand in Meter 2 / Meter 3. If NOTHING under
-#    the meter build inputs (app/, reader/, data/) changed since the last release,
-#    compute-version refuses (exit 2) and this is a green no-op ("nothing staged") — that is the
-#    P1 guard: a version exists only when the meter actually changed. (Re-calibrating the reader
-#    after a game patch writes reader/config/calib_seed.json, which IS a meter change, so it
-#    stages normally.)
+# Staging lives on `push` (NOT on the PR-merge event) on purpose: pushing a tag needs a
+# write-scoped token, and a merged PR from a FORK fires a read-only `pull_request` event with no
+# secrets — staging there would fail. The push to `main` always runs with full permissions.
 #
-#  • clean-pr-slot  (on ANY PR close): deletes that PR's throwaway draft build
-#    (`tbh-meter-pr-<N>`) on the releases repo, so a merged/closed PR never leaves a stale
-#    installer behind. No paths filter on purpose — it must fire even for a PR that never
-#    touched the meter but got a test build.
+# Closing/merging a PR also cleans up that PR's throwaway test build and surfaces the staged
+# version — that lives in its own file, `.github/workflows/meter-pr-cleanup.yml`. A merge fires
+# BOTH a push and a pull_request event; splitting them by file keeps each run single-purpose
+# instead of one file showing a confusing "skipped" job in the run named after the PR.
 #
 # `-rc.N` tags never become the version base (only clean X.Y.Z tags do — compute-version.mjs),
 # so every RC keeps targeting the same stable version until Meter 3 ships it. Re-runs are
 # idempotent: a commit already staged reuses its tag instead of minting a new rc number.
 name: Release · 1 · version tag
-
-run-name: "${{ github.event_name == 'pull_request' && format('Clean up PR #{0} test build', github.event.pull_request.number) || '' }}"
 
 on:
   push:
@@ -32,15 +31,13 @@ on:
       - "data/**"
       - ".github/workflows/meter-1-stage.yml"
       - ".github/workflows/meter-build-core.yml"
-  pull_request:
-    types: [closed]
 
 concurrency:
-  # Push-stages serialize together; PR-close cleanups serialize per-PR. cancel-in-progress:false
-  # so a running stage is never aborted. (GitHub keeps one pending run per group, so a 3-push
-  # burst may supersede the middle PENDING run — that is fine: the surviving run stages the
-  # newest commit, which covers the whole range, and rc numbers are recomputed from the tags.)
-  group: meter-stage-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'main' }}
+  # Push-stages serialize together. cancel-in-progress:false so a running stage is never aborted.
+  # (GitHub keeps one pending run per group, so a 3-push burst may supersede the middle PENDING
+  # run — fine: the surviving run stages the newest commit, which covers the whole range, and rc
+  # numbers are recomputed from the tags.)
+  group: meter-stage-main
   cancel-in-progress: false
 
 permissions:
@@ -49,7 +46,6 @@ permissions:
 jobs:
   stage:
     name: Compute + push the next RC tag
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     # Only this job needs the token to push the version tag.
     permissions:
@@ -139,29 +135,3 @@ jobs:
             echo
             echo "Builds land on [tbh-meter](https://github.com/mad-labs-org/tbh-meter/releases)."
           } >> "$GITHUB_STEP_SUMMARY"
-
-  clean-pr-slot:
-    name: Delete the closed PR's test build
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    # Same-repo: drafts live here now, so the default token deletes them (no cross-repo PAT).
-    permissions:
-      contents: write
-    timeout-minutes: 10
-    steps:
-      - name: Delete draft slot tbh-meter-pr-<N> (if any)
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR="${{ github.event.pull_request.number }}"
-          RELEASES_REPO="$GITHUB_REPOSITORY"
-          TAG="tbh-meter-pr-$PR"
-          # Drafts aren't returned by get-release-by-tag, so find the id via the list endpoint.
-          ID=$(gh api "repos/$RELEASES_REPO/releases" --paginate \
-            --jq "[.[] | select(.tag_name==\"$TAG\" and .draft==true)] | .[0].id // empty")
-          if [ -n "$ID" ]; then
-            gh api -X DELETE "repos/$RELEASES_REPO/releases/$ID" && echo "Deleted test build $TAG (id $ID)."
-          else
-            echo "No test build for PR #$PR — nothing to clean."
-          fi
