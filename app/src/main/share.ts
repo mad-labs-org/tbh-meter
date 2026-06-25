@@ -2,7 +2,7 @@ import { app } from "electron";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { getRun } from "./runs-store.js";
-import { getAccessToken, clearSession } from "./auth.js";
+import { getAccessToken, clearSession, refreshAccessToken } from "./auth.js";
 import { getDeviceId } from "./device-id.js";
 import { signRequest } from "./request-signer.js";
 import { API_URL, SITE_URL } from "./config.js";
@@ -39,8 +39,8 @@ export type ShareResult =
  * Report only client-side (4xx) rejections — those mean the API refused what the
  * meter SENT (a payload/contract bug we can actually fix). Suppress the transient
  * or expected states that auto-upload already retries on its own:
- *   - 401 expired token (no refresh token exists — clearSession() drops to signed
- *     out, then anonymous upload / the next sign-in retries),
+ *   - 401 expired token (uploadRun tries a refresh + one retry first; a terminal
+ *     401 then clearSession()s to signed out and the next sign-in retries),
  *   - 408 request timeout, 429 rate-limit (backs off),
  *   - every 5xx server/gateway error (500/502/503/504 and Cloudflare 52x).
  * Relaying those just floods the channel with self-healing infra blips and buries
@@ -306,18 +306,35 @@ export async function uploadRun(run: RunRecord): Promise<ShareResult> {
   const bodyString = JSON.stringify(payload);
   const endpoint = `${API_URL}/runs`;
 
-  let res: GlobalResponse;
-  try {
-    res = await httpFetch(endpoint, {
+  // POST the run with a given bearer. A fresh X-Signature is computed per attempt
+  // (timestamp + nonce must be current; the body string is constant), so the retry
+  // after a refresh is a fully valid signed request — not a replay.
+  const postRun = (bearer: string): Promise<GlobalResponse> =>
+    httpFetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${bearer}`,
         // Ed25519 request signature (always-on; ignored by the API until its flag flips).
         ...signRequest("POST", endpoint, bodyString),
       },
       body: bodyString,
     });
+
+  let res: GlobalResponse;
+  try {
+    res = await postRun(token);
+
+    // 401 = the access token expired / was rejected. With refresh tokens, this is
+    // recoverable: refresh ONCE (single-flight in auth.ts, so a concurrent
+    // getAccessToken refresh is shared, never doubled) and retry the upload exactly
+    // once with the new token. Only if there's no refresh token (legacy session) or
+    // the refresh itself fails do we fall through to the terminal 401 handling below.
+    // (No loop: a second 401 after a successful refresh is terminal.)
+    if (res.status === 401 && (await refreshAccessToken())) {
+      const refreshed = await getAccessToken();
+      if (refreshed) res = await postRun(refreshed);
+    }
   } catch (err) {
     // The transport reason (AV TLS interception, proxy, DNS) is buried in
     // err.cause — surface its message + code so the Discord report is diagnosable
@@ -346,12 +363,13 @@ export async function uploadRun(run: RunRecord): Promise<ShareResult> {
 
   if (!res.ok) {
     const errBody = body as ApiErrorBody | null;
-    // 401 = the JWT expired / session invalid. There is no refresh token (the API
-    // mints a ~30d HS256 token, no refresh), so this is terminal for the session:
-    // clear it as "expired" (broadcasts meter:session-expired so the renderer prompts
-    // a re-sign-in instead of going silently OFFLINE) + ping telemetry (the 401 is
-    // suppressed from the relay below). The run is NOT marked failed — it stays queued
-    // and uploads on the next sign-in.
+    // A 401 still here means the session is genuinely dead: either there was no
+    // refresh token (legacy ~30d HS256 token expired) or the refresh + retry above
+    // already failed. Terminal for the session: clear it as "expired" (broadcasts
+    // meter:session-expired so the renderer prompts a re-sign-in instead of going
+    // silently OFFLINE) + ping telemetry (the 401 is suppressed from the relay
+    // below). The run is NOT marked failed — it stays queued and uploads on the
+    // next sign-in.
     //
     // ONLY 401 clears the session. A run-signature rejection comes back as 403
     // (signature.ts), NOT 401 — a bad/expired/clock-skewed signature on an
@@ -419,21 +437,32 @@ export async function claimDeviceRuns(): Promise<void> {
     // Claim is Bearer-only (the JWT is the real lock) and unsigned: it only re-attributes
     // the caller's own legacy anonymous runs, and request signing is scoped to the run
     // ingest path (POST /runs). Don't sign here — the API never verifies it on /claim.
-    const res = await httpFetch(`${API_URL}/runs/claim`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ deviceId: getDeviceId() }),
-    });
+    const postClaim = (bearer: string): Promise<GlobalResponse> =>
+      httpFetch(`${API_URL}/runs/claim`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${bearer}`,
+        },
+        body: JSON.stringify({ deviceId: getDeviceId() }),
+      });
+
+    let res = await postClaim(token);
+    // Same recoverable-401 path as uploadRun: refresh once (single-flight) and retry
+    // before treating the session as dead.
+    if (res.status === 401 && (await refreshAccessToken())) {
+      const refreshed = await getAccessToken();
+      if (refreshed) res = await postClaim(refreshed);
+    }
+
     if (res.ok) {
       const data = (await res.json().catch(() => null)) as { claimed?: number } | null;
       if (data?.claimed) console.log(`[share] claimed ${data.claimed} anonymous run(s)`);
     } else {
-      // 401 = the JWT was rejected (expired, or JWT_SECRET rotated — no refresh
-      // token). Treat the session as gone, surface it (claim runs at startup, so this
-      // is often the FIRST path to detect a dead restored token), and ping telemetry.
+      // A 401 still here means the session is dead: no refresh token (legacy token
+      // expired / JWT_SECRET rotated) or the refresh + retry above failed. Treat the
+      // session as gone, surface it (claim runs at startup, so this is often the FIRST
+      // path to detect a dead restored token), and ping telemetry.
       if (res.status === 401) {
         clearSession("expired");
         reportError(SESSION_EXPIRED_CONTEXT, SESSION_EXPIRED_MESSAGE, { phase: "claim" });

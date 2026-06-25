@@ -20,7 +20,6 @@ import { createTray, destroyTray, refreshTrayMenu } from "./tray.js";
 import { getRunsSource } from "./sources/runs-source.js";
 import { getLiveSource } from "./sources/live-source.js";
 import { logsDir } from "./logs-archive.js";
-import { getIngestor } from "./converter/ingest.js";
 import {
   startReader,
   stopReader,
@@ -54,6 +53,19 @@ import {
   runIfPrimary,
 } from "./single-instance.js";
 
+// getIngestor() is lazy-imported during startup to prevent a static import of
+// converter/ingest.js from pulling the full ingest -> legacy -> runs-source
+// chain into the main chunk. The dynamic import in runs-source.ts avoids a
+// static cycle, but only when nothing ELSE statically imports ingest.ts.
+import type { Ingestor } from "./converter/ingest.js";
+let _ingestor: Ingestor | null = null;
+async function getIngestor(): Promise<Ingestor> {
+  if (!_ingestor) {
+    _ingestor = (await import("./converter/ingest.js")).getIngestor();
+  }
+  return _ingestor;
+}
+
 // Side-by-side RC variant: claim its own app identity BEFORE anything reads a name-derived
 // path, so userData (settings, auth, uploads) lands in %APPDATA%\tbh-meter-rc and never
 // mixes with the real install (which would otherwise share settings.json — including a
@@ -72,6 +84,13 @@ let splashWin: BrowserWindow | null = null;
 // While true, the live overlay stays hidden (the startup splash is up) until dismissed.
 let splashActive = false;
 let quitting = false;
+// True only while the user is MOVING the overlay (title-bar drag). A pure reposition can't
+// change the content height, so any pinLiveHeight / bounds-save that fires mid-move is
+// spurious — it's a transient repaint from the OS move on high-DPI, and calling setBounds
+// (or persisting getBounds().width) mid-setPosition re-enters Windows' DIP scaling and
+// drives the width/position drift this bug is made of (#live-drag-width-feedback). We freeze
+// the window geometry for the duration of the move and settle once on release.
+let liveMoveActive = false;
 
 // Single-writer: be the ONE app instance. A second launch of
 // the SAME variant fails to grab the lock and quits here BEFORE we register any
@@ -126,6 +145,10 @@ function createLiveWindow(): BrowserWindow {
   const settings = getSettings();
   const b = settings.liveBounds;
 
+  // Seed the stable width tracker from the SAME restored bounds the window opens at,
+  // so the first pinLiveHeight doesn't overwrite the user's custom width with the default.
+  lastKnownWidth = b?.width && b.width >= MIN_LIVE_WIDTH ? b.width : DEFAULT_LIVE_WIDTH;
+
   const win = new BrowserWindow({
     x: b?.x,
     y: b?.y,
@@ -159,7 +182,12 @@ function createLiveWindow(): BrowserWindow {
     if (!splashActive) win.show();
   });
 
-  win.on("moved", () => saveLiveBounds(win));
+  win.on("moved", () => {
+    // Mid our custom MOVE drag the window is being setPosition'd; getBounds().width can read
+    // transiently inflated on high-DPI, so saving here would persist a bad width that the
+    // next launch reopens at. endWindowDrag saves once on release with stable bounds.
+    if (!liveMoveActive) saveLiveBounds(win);
+  });
   win.on("resized", () => saveLiveBounds(win));
 
   // close -> hide instead of destroy, unless the app is genuinely quitting.
@@ -331,16 +359,34 @@ function loadRenderer(win: BrowserWindow, hash: "list" | "splash" | null): void 
 // when the zoomed layout actually reflows, which is not guaranteed.
 let liveContentHeight = 48;
 
+// The last known-good width, in DIP. Stored separately from the live window's bounds
+// because getBounds().width can return transient inflated values on Windows while a
+// transparent frameless window is being dragged via setPosition() on high-DPI monitors
+// (200 % / 4K). When pinLiveHeight fires mid-drag and re-applies that transient width
+// via setBounds, it creates a feedback loop that drives the width upward every tick of
+// the move — the overlay keeps growing while the user drags (#live-drag-width-feedback).
+// Keeping the width in a stable variable breaks the loop: the pin never feeds the bad
+// value back. The explicit resize (right-edge drag → setLiveWidth) updates this variable
+// normally, so user-driven resize is unaffected.
+let lastKnownWidth = DEFAULT_LIVE_WIDTH;
+
 /** Pin the live window's height to the renderer-measured content height × the live
- *  font scale (the zoom factor makes window px = CSS px × scale). Width stays free. */
+ *  font scale (the zoom factor makes window px = CSS px × scale). Width is kept from
+ *  the last known-good value — NOT from getBounds().width — to avoid a destructive
+ *  feedback loop during a move drag on high-DPI monitors (see lastKnownWidth). */
 function pinLiveHeight(): void {
   if (!liveWin || liveWin.isDestroyed()) return;
+  // Never resize the overlay mid-MOVE — see liveMoveActive. The drag's setPosition is the
+  // only thing that may touch the window; a setBounds here fights it and, on high-DPI,
+  // re-inflates the width. Content height can't change during a pure move, so nothing is
+  // lost; endWindowDrag re-pins once to settle.
+  if (liveMoveActive) return;
   const scale = clampFontScale(getSettings().liveFontScale);
   const h = Math.max(1, Math.round(liveContentHeight * scale));
   liveWin.setMinimumSize(MIN_LIVE_WIDTH, h);
   liveWin.setMaximumSize(0, h); // width 0 => unlimited; height locked to content
   const b = liveWin.getBounds();
-  const w = Math.max(b.width, MIN_LIVE_WIDTH); // never let a transient 0 width stick
+  const w = Math.max(lastKnownWidth, MIN_LIVE_WIDTH); // NOT b.width — see lastKnownWidth doc
   if (b.height !== h || b.width !== w) {
     liveWin.setBounds({ x: b.x, y: b.y, width: w, height: h });
   }
@@ -365,6 +411,7 @@ function setLiveWidth(width: number): void {
   const b = liveWin.getBounds();
   if (b.width !== w) {
     liveWin.setBounds({ x: b.x, y: b.y, width: w, height: b.height });
+    lastKnownWidth = w;
   }
 }
 
@@ -379,6 +426,7 @@ function resetLiveWindow(): void {
   const x = Math.round(workArea.x + (workArea.width - width) / 2);
   const y = Math.round(workArea.y + 24);
   liveWin.setBounds({ x, y, width, height });
+  lastKnownWidth = width;
   if (!liveWin.isVisible()) liveWin.show();
   saveLiveBounds(liveWin);
 }
@@ -463,9 +511,18 @@ app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
     refreshTrayMenu,
     openListWindow,
     setLiveHeight,
-    startWindowDrag: liveDrag.start,
+    startWindowDrag: (mode) => {
+      liveMoveActive = mode === "move";
+      liveDrag.start(mode);
+    },
     moveWindowDrag: liveDrag.move,
-    endWindowDrag: liveDrag.end,
+    endWindowDrag: () => {
+      liveDrag.end();
+      if (!liveMoveActive) return; // resize / idle: per-tick saves already persisted
+      liveMoveActive = false;
+      pinLiveHeight(); // settle: re-pin with a now-stable getBounds (setPosition stopped)
+      if (liveWin && !liveWin.isDestroyed()) saveLiveBounds(liveWin);
+    },
     resetLiveWindow,
   });
 
@@ -547,8 +604,9 @@ app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
   // so the Ingestor — not the old runs.jsonl mirror — OWNS logs/. On boot it ingests raw/ ->
   // logs/ (converting any run with no/stale structured log) AND migrates the legacy runs.jsonl into
   // logs/ preserving each external_id; it then watches raw/ for new runs. App-read of logs/ is PR4.
-  getIngestor().setDir(dir);
-  getIngestor().start();
+  const ingestor = await getIngestor();
+  ingestor.setDir(dir);
+  ingestor.start();
 
   // Check GitHub for a newer release, download in the background, install on quit.
   // No-op unless this is the packaged Windows NSIS install (see auto-update.ts).
@@ -593,6 +651,6 @@ app.on("will-quit", () => runIfPrimary(isPrimaryInstance, () => {
   stopAutoUpload();
   getRunsSource().stop();
   getLiveSource().stop();
-  getIngestor().stop();
+  _ingestor?.stop();
   destroyTray();
 }));

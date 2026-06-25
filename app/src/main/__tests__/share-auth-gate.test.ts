@@ -23,6 +23,9 @@ const authState: { token: string | null } = { token: null };
 vi.mock("../auth.js", () => ({
   getAccessToken: async () => authState.token,
   clearSession: () => {},
+  // Never reached in these cases (signed-out makes no call; signed-in 200s), but the
+  // share.ts import binding must exist or vitest throws on resolve.
+  refreshAccessToken: async () => false,
 }));
 vi.mock("../device-id.js", () => ({ getDeviceId: () => "device-uuid-fixed" }));
 vi.mock("../runs-store.js", () => ({ getRun: () => null }));
