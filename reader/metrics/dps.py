@@ -20,6 +20,7 @@ class DpsTracker:
         self.total_damage: float = 0.0         # run accumulator
         self.peak_dps: float = 0.0
         self.alive: int = 0                     # mobs alive on the last tick (for kill counting)
+        self.kills: int = 0                     # kill count this tick (monsters removed from dict)
 
     def update(self, monsters, timestamp: float | None = None) -> None:
         """`monsters` = iterable of (addr, current_hp, hp_max) tuples for the live mobs
@@ -38,9 +39,11 @@ class DpsTracker:
                 damage += (prev - hp)   # took damage
 
         # monsters gone since the previous tick = died -> killing blow
+        self.kills = 0
         for addr, prev_hp in self._last_hp.items():
             if addr not in current and prev_hp > 0:
                 damage += prev_hp
+                self.kills += 1
 
         self._last_hp = current
         self.alive = len(current)
@@ -64,3 +67,4 @@ class DpsTracker:
         self.total_damage = 0.0
         self.peak_dps = 0.0
         self.alive = 0
+        self.kills = 0

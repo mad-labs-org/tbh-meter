@@ -952,7 +952,6 @@ def run(hz, output_dir, debug=False):
     # run_num is NOT reset here — it's resumed from resume_session (above) so as not to recycle an id.
     _ll0 = reader.rptr(lm + LogManager.LOG_LIST)
     last_size = (reader.ri32(_ll0 + List.SIZE) or 0) if _ll0 else 0
-    last_alive = 0
     prev_dead = None    # previous DeadMonsterUnit size (to detect a stage reload)
     dead_reads = 0      # consecutive failing reads = game closed/restarted (re-attach)
     last_snap = 0.0
@@ -1275,7 +1274,6 @@ def run(hz, output_dir, debug=False):
                                 R = new_run()
                                 _ll = reader.rptr(lm + LogManager.LOG_LIST)
                                 last_size = (reader.ri32(_ll + List.SIZE) or 0) if _ll else 0
-                                last_alive = 0
                                 prev_dead = None
                                 cur_key = reader.ri32(csd + CommonSaveData.CURRENT_STAGE_KEY) if csd else None
                                 dead_reads = 0
@@ -1292,10 +1290,7 @@ def run(hz, output_dir, debug=False):
             # meter's: kill count (drop in the live count) and the smoothed DPS for the screen.
             dps_t = R["dps"]
             dps_t.update(read_live_monsters(reader, msm), now)
-            alive = dps_t.alive
-            if alive < last_alive:
-                R["mobs"] += (last_alive - alive)
-            last_alive = alive
+            R["mobs"] += dps_t.kills
             dps_live = dps_t.dps(now)
 
             if now - last_refresh >= REFRESH:
