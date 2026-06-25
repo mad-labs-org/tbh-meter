@@ -230,8 +230,9 @@ jobs:
             GH_TOKEN="$NOTES_TOKEN" gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --edit-last --body "$BODY" 2>/dev/null \
               || GH_TOKEN="$NOTES_TOKEN" gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "$BODY"
 
-            # Race guard: if the PR already closed during this build, Meter 1's PR-close cleanup
-            # may have run before this draft existed — delete it now so no stale slot is orphaned.
+            # Race guard: if the PR already closed during this build, the PR-cleanup workflow's
+            # clean-pr-slot may have run before this draft existed — delete it now so no stale
+            # slot is orphaned.
             STATE=$(GH_TOKEN="$NOTES_TOKEN" gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json state --jq '.state' 2>/dev/null || true)
             if [ "$STATE" = "MERGED" ] || [ "$STATE" = "CLOSED" ]; then
               DID=$(gh api "repos/$RELEASES_REPO/releases" --paginate \

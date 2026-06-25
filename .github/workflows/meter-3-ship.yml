@@ -266,8 +266,8 @@ jobs:
 
           # GC: drop every RC/legacy draft whose clean base ≤ the shipped version — clears the
           # promoted stream AND abandoned ones (e.g. 0.24.1-rc.* once 0.25.0 ships, and the old
-          # sha-suffixed throwaway drafts). PR slots (tbh-meter-pr-*) are left for Meter 1's
-          # PR-close cleanup. Newer staged streams (> shipped) are preserved.
+          # sha-suffixed throwaway drafts). PR slots (tbh-meter-pr-*) are left for the PR-cleanup
+          # workflow (meter-pr-cleanup.yml). Newer staged streams (> shipped) are preserved.
           # Best-effort, fully wrapped: the ship is already complete (tag pushed, Latest flipped),
           # so NOTHING here may fail the step — a red step would also skip the Discord announce.
           {
