@@ -8,6 +8,7 @@ item/mod/class labels are still filled in (via the offsets enums) so the output 
 the monolith byte-for-byte at cutover; dropping them is a future schema-bump."""
 
 import json
+import math
 import os
 import struct
 
@@ -79,6 +80,35 @@ def read_attribute_levels(reader, psd):
     return res
 
 
+def read_live_exp(reader, uf):
+    """Decode live within-level EXP from the ACTk ObscuredFloat at HeroRuntime.
+
+    1.00.20 killed the PLAIN fakeValue decoy; the real value moved behind
+    the Obscured cipher. This decodes it using the byte-swap algorithm
+    discovered via disassembly of GameAssembly.dll.
+
+    Algorithm: swap_b23(hiddenValue) XOR currentCryptoKey -> float32
+
+    Returns float EXP or None if any read fails or result is invalid.
+    Specific to 1.00.20 - cipher rotates per game build."""
+    try:
+        if not uf:
+            return None
+        hidden = reader.ri32(uf + 0x110)
+        key = reader.ri32(uf + 0x114)
+        if hidden is None or key is None:
+            return None
+        b = struct.pack('<I', hidden)
+        swapped = b[0] | (b[2] << 8) | (b[1] << 16) | (b[3] << 24)
+        raw = swapped ^ key
+        exp = struct.unpack('f', struct.pack('I', raw))[0]
+        if math.isfinite(exp) and exp >= 0.0 and exp < 1e12:
+            return round(exp, 2)
+        return None
+    except Exception:
+        return None
+
+
 def read_live_party(reader, sm, hero_cat=None, save_heroes=None):
     """{heroKey: (level, exp)} for the LIVE DEPLOYED party (StageManager.HeroList). The party
     IDENTITY (which heroKeys are on the field) is read LIVE — the invariant party source — and the
@@ -132,15 +162,11 @@ def read_live_party(reader, sm, hero_cat=None, save_heroes=None):
             # carries a stale/garbage key that doesn't. heroKey-plausibility only when hero_cat is absent.
             if hero_cat is not None and hk not in hero_cat:
                 continue
-            # LEVEL from the SAVE (the live decoy is dead; the live level is behind the cipher, off-
-            # limits) — informative for the overlay/diagnostics. EXP is FORCED None: the live WITHIN-
-            # LEVEL exp is gone, and feeding the stale SAVE exp into the live xp accumulator would make
-            # the SAVE fallback silently report as LIVE (xp_source="live") — forbidden by
-            # [[invariants/metric-fallback-chains]] rule 2. None keeps the accumulator EMPTY, so close_run
-            # honestly tags the run's xp `save` and uses the per-hero save delta (capped→0). The party
-            # IDENTITY stays fully LIVE; only level/exp degrade.
+            # LEVEL from the SAVE (live decoy dead). EXP from LIVE ObscuredFloat
+            # decode; None on failure -> honest save fallback.
             lvl = (save_heroes or {}).get(hk, (None, None))[0]
-            res[hk] = (lvl, None)
+            exp = read_live_exp(reader, uf)
+            res[hk] = (lvl, exp)
     except Exception:
         return {}
     return res
