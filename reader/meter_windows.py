@@ -92,6 +92,11 @@ TRAILING_BOX_TIERS = (EMonsterLogType.Boss, EMonsterLogType.ActBoss)
 # bug); only the file WRITE is deferred. ACCEPTED trade-off: a hard kill (e.g. AV SIGKILL)
 # inside the window loses that record. See docs/invariants/run-lifecycle.
 PENDING_CLOSE_GRACE = 3.0
+# Minimum fraction of the official clear time the meter must have captured for a SUCCESS to count:
+# below this it joined too late and the totals are undercounts (partial). MUST stay in sync with the
+# converter's app/src/main/converter/helpers.ts::PARTIAL_CAPTURE_MIN (same number on both sides — the
+# reader only logs/diags `partial`; the converter is the persisted spec). See docs/invariants/run-lifecycle.
+PARTIAL_CAPTURE_MIN = 0.95
 
 GAME_VERSION = "1.00.21"   # FALLBACK: the GameAssembly.dll build the reader was made against; the INSTALLED version comes from the game's Version.txt (_detect_game_version)
 # raw/<id>.json: the LIVE format the reader emits (1 file per run). Bump ONLY when the SHAPE of the
@@ -577,12 +582,12 @@ def _should_skip_run(measured, clear_time, stage):
 
 
 def _is_partial(status, clear_time, measured, total_damage):
-    """PARTIAL capture: the meter joined a run already in progress (<80% of the official clear) ->
-    undercount. Gated on clear_time>=30 so x-10 runs (boss, seconds) aren't mis-flagged.
-    EXCEPTION: a success with measured damage <=0 is always a missed capture (covers x-10 with clear<30s
-    that skipped the check and pushed all-zeros to the leaderboard, #163)."""
+    """PARTIAL capture: the meter joined a run already in progress (< PARTIAL_CAPTURE_MIN of the
+    official clear, i.e. <95%) -> undercount. Gated on clear_time>=30 so x-10 runs (boss, seconds)
+    aren't mis-flagged. EXCEPTION: a success with measured damage <=0 is always a missed capture
+    (covers x-10 with clear<30s that skipped the check and pushed all-zeros to the leaderboard, #163)."""
     return bool(status == "success" and (
-        (clear_time >= 30 and measured < clear_time * 0.8) or total_damage <= 0))
+        (clear_time >= 30 and measured < clear_time * PARTIAL_CAPTURE_MIN) or total_damage <= 0))
 
 
 def _box_belongs_to_pending(mt, has_pending):
@@ -1126,7 +1131,7 @@ def run(hz, output_dir, debug=False):
             # gold_ok=False -> the envelope marks err and the converter degrades the run, honestly.
             gold_ok = save_delta is not None
             gold_gain, ge_src = (save_delta if gold_ok else 0), "save"
-        # PARTIAL capture: the meter joined a run already in progress (saw < 80% of the official clear) ->
+        # PARTIAL capture: the meter joined a run already in progress (saw < 95% of the official clear) ->
         # damage/gold/xp undercounted. An EXPLICIT flag so the app discards by the flag, instead of inferring
         # "partial" from gold==0 (which silently hid COMPLETE runs whenever the live gold read
         # failed). Only on a clear (clear_time = official duration); gated on >=30s so x-10 runs

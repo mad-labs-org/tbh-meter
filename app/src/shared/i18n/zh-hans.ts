@@ -233,6 +233,23 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "quality.skippedTitle":
     "该挑战不是有效通关（太短，或以失败/放弃结束），因此不计入，也未上传到排行榜。",
 
+  // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
+  "outcome.buggedLabel": "Bugged",
+  "outcome.buggedTitle":
+    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+  "outcome.failedLabel": "Failed (wipe)",
+  "outcome.failedTitle":
+    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+  "outcome.abandonedLabel": "Abandoned",
+  "outcome.abandonedTitle":
+    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+  "outcome.partialLabel": "Partial",
+  "outcome.partialTitle":
+    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+  "outcome.tooShortLabel": "Too short",
+  "outcome.tooShortTitle":
+    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+
   // ── Blue-chest tracker ──
   "cooldowns.title": "蓝宝箱追踪器",
   "cooldowns.desc": "自动检测掉落并追踪每个宝箱等级的冷却时间 — 无需点击。",

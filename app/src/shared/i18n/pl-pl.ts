@@ -240,6 +240,23 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "quality.skippedTitle":
     "To przejście nie jest ważnym ukończeniem (za krótkie, porażka albo porzucenie), więc się nie liczy i nie trafiło do rankingu.",
 
+  // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
+  "outcome.buggedLabel": "Bugged",
+  "outcome.buggedTitle":
+    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+  "outcome.failedLabel": "Failed (wipe)",
+  "outcome.failedTitle":
+    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+  "outcome.abandonedLabel": "Abandoned",
+  "outcome.abandonedTitle":
+    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+  "outcome.partialLabel": "Partial",
+  "outcome.partialTitle":
+    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+  "outcome.tooShortLabel": "Too short",
+  "outcome.tooShortTitle":
+    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+
   // ── Blue-chest tracker ──
   "cooldowns.title": "Tracker niebieskiej skrzyni",
   "cooldowns.desc": "Automatycznie wykrywa dropy i śledzi cooldown każdego poziomu skrzyni — bez klikania.",

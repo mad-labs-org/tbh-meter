@@ -238,6 +238,21 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "quality.skippedLabel": "Inválida",
   "quality.skippedTitle":
     "Esta run não é uma conclusão válida (curta demais, ou terminou em derrota ou abandono), então não conta e não foi enviada para o ranking.",
+  "outcome.buggedLabel": "Com bug",
+  "outcome.buggedTitle":
+    "Alguns valores não puderam ser lidos nesta run, então os números podem estar errados. Ela não foi enviada para o ranking.",
+  "outcome.failedLabel": "Derrota (wipe)",
+  "outcome.failedTitle":
+    "A party foi exterminada antes de concluir o estágio, então esta run não conta e não foi enviada para o ranking.",
+  "outcome.abandonedLabel": "Abandonada",
+  "outcome.abandonedTitle":
+    "Esta run foi deixada antes de o estágio ser concluído, então não conta e não foi enviada para o ranking.",
+  "outcome.partialLabel": "Parcial",
+  "outcome.partialTitle":
+    "O meter entrou nesta run com ela já em andamento, então os totais estão subcontados. Ela não foi enviada para o ranking.",
+  "outcome.tooShortLabel": "Curta demais",
+  "outcome.tooShortTitle":
+    "Esta conclusão ficou abaixo da duração mínima para contar, então não conta e não foi enviada para o ranking.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "Tracker de baú azul",
