@@ -41,6 +41,23 @@ function run(overrides: Partial<RunRecord> = {}): RunRecord {
   } as RunRecord;
 }
 
+// A complete RunHero, optionally carrying the reader's live FINAL stats.
+function hero(stats: Record<string, number>): RunRecord["heroes"][number] {
+  return { heroKey: 201, class: "Knight", classId: null, level: 80, exp: 0, skills: [], items: [], stats };
+}
+
+describe("buildPayload hero stats passthrough", () => {
+  it("forwards the reader's live FINAL stats when the run carries them", () => {
+    const payload = buildPayload(run({ heroes: [hero({ "1": 4184.82, "2": 1.11 })] }));
+    expect(payload.party[0]!.stats).toEqual({ "1": 4184.82, "2": 1.11 });
+  });
+
+  it("omits stats when the reader provided none — reverting the passthrough would fail here", () => {
+    const payload = buildPayload(run({ heroes: [hero({})] }));
+    expect(payload.party[0]!.stats).toBeUndefined();
+  });
+});
+
 describe("buildPayload endedAt", () => {
   it("converts the reader's epoch-seconds ts to epoch ms", () => {
     expect(buildPayload(run()).endedAt).toBe(1_750_000_000_000);

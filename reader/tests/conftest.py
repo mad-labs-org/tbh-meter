@@ -15,9 +15,11 @@ class MockReader:
     lists: {list_ptr: [entry_addr, ...]} — list_iter iterates over that list.
     """
 
-    def __init__(self, mem=None, lists=None):
+    def __init__(self, mem=None, lists=None, arrs=None):
         self._mem = dict(mem or {})
         self._lists = dict(lists or {})
+        # arrs: {array_ptr: [values]} — backs arr_u64/arr_i32 (e.g. equippedItemIds).
+        self._arrs = dict(arrs or {})
 
     def ri32(self, addr):
         return self._mem.get(addr)
@@ -25,7 +27,13 @@ class MockReader:
     def ri64(self, addr):
         return self._mem.get(addr)
 
+    def ru64(self, addr):
+        return self._mem.get(addr)
+
     def rf32(self, addr):
+        return self._mem.get(addr)
+
+    def ru32(self, addr):
         return self._mem.get(addr)
 
     def rptr(self, addr):
@@ -35,6 +43,12 @@ class MockReader:
         if not ptr:
             return iter([])
         return iter(self._lists.get(ptr, [])[:cap])
+
+    def arr_u64(self, ptr, cap=64):
+        return list(self._arrs.get(ptr, []))[:cap] if ptr else []
+
+    def arr_i32(self, ptr, cap=64):
+        return list(self._arrs.get(ptr, []))[:cap] if ptr else []
 
     def read_string(self, addr):
         return self._mem.get(addr)

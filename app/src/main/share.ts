@@ -78,6 +78,12 @@ interface IngestRunHero {
   skillLevels?: Record<string, number>;
   gear?: Record<string, IngestGearSlot>;
   runeKeys?: number[];
+  /** The reader's live FINAL stats, keyed by StatType id (e.g. "1" AttackDamage). Read 100%
+   *  faithfully from game memory — the hero's OWN, UNBUFFED values (reader 0x18 FINAL_STATS;
+   *  party buffs like the Priest's Blessing of Might live only in the 0x20 dict). The site
+   *  displays them directly and re-applies party buffs itself when deriving Basic Attack DPS,
+   *  instead of recomputing from the build (the recompute can't reproduce account-wide stats). */
+  stats?: Record<string, number>;
 }
 interface IngestRunBody {
   externalId: string;
@@ -186,6 +192,9 @@ function mapHero(hero: RunHero): IngestRunHero {
   if (skillLevels && Object.keys(skillLevels).length > 0) out.skillLevels = skillLevels;
   const gear = mapGear(hero.items);
   if (gear) out.gear = gear;
+  // The reader's live FINAL stats (keyed by StatType id) — uploaded so the site can show the
+  // real in-game values instead of recomputing them from the build.
+  if (hero.stats && Object.keys(hero.stats).length > 0) out.stats = hero.stats;
   return out;
 }
 

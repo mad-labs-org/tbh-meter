@@ -20,8 +20,8 @@ VALIDATES (with the game OPEN and IN COMBAT on a stage):
   [build-record] read_build (the heroes[] the run UPLOADS) >=1 hero AND >=1 with items[] OR skills[]
                  (proves ATTRIBUTES/ITEMS/EQUIPPED_* — not just HEROES) + read_account_snapshot
                  (runes/inventory/stash) not-all-None (proves RUNES/INVENTORY/STASH/ITEMS)
-  [xp-live]     the deployed heroes carry a plausible save LEVEL (the live within-level exp died in
-                1.00.20 → xp degrades to the save; read_live_party returns exp=None by design)
+  [xp-live]     each deployed hero's level+xp DECODE from the ACTk cipher and the decoded LEVEL matches
+                the save (the per-build tripwire: a moved/changed cipher diverges from the save → FAIL)
   [dps]         MonsterSpawnManager + UnitHealthController: >=1 live monster with hp_max>0
   [stats]       StatsHolder.FINAL_STATS (DictFloat): >=1 hero with a dict of ~64 live stats
   [stage]       the LIVE stage key (Monster.STAGE_KEY) resolves an entry in the StageInfoData catalog
@@ -32,6 +32,7 @@ USAGE (Windows, ADMIN, game open and IN COMBAT):  python reader\\scripts\\valida
 Exit 0 = all PASS (safe to ship). Exit != 0 = some metric FAILed (do NOT ship). Tees to
 validate_live_out.txt next to the file. Does NOT write to the game or the real resolve_cache.
 """
+import math
 import os
 import sys
 import time
@@ -52,8 +53,9 @@ import meter_windows as mw                                       # noqa: E402
 from shared.memory import Reader, find_pid, open_process         # noqa: E402
 from il2cpp import typeinfo                                      # noqa: E402
 from metrics import gold                                         # noqa: E402
-from game import save, build, models                             # noqa: E402
-from config.offsets import CommonSaveData, List, LogManager, EEquipClassType, MonsterSpawnManager, Unit  # noqa: E402
+from game import save, build, models, obscured                   # noqa: E402
+from config.offsets import (CommonSaveData, List, LogManager, EEquipClassType, MonsterSpawnManager,  # noqa: E402
+                            Unit, StageManager, Array, HeroRuntime, HeroInfoData)
 
 # Valid classId range = the REAL members of EEquipClassType (single-source: derived from the enum,
 # not a literal). CLASS_TYPE is EEquipClassType, NEVER EHeroType (orphan) — see the obscured invariant.
@@ -119,8 +121,8 @@ def main():
 
     # [party-live] StageManager resolves + 1..12 DEPLOYED heroes (the REAL party, not the save roster).
     # The party IDENTITY is read LIVE and gated on hero_cat (the ghost discriminator since 1.00.20 — the
-    # ACTk live level decoy died, so the old lvl>0 gate would reject every real hero). Level/exp degrade
-    # to the save inside read_live_party; here we pass save_heroes so the keys carry their save level.
+    # ACTk live level decoy died, so the old lvl>0 gate would reject every real hero). Level/exp are
+    # decoded live inside read_live_party; save_heroes is passed for the level fallback on a bad decode.
     sm = save.pick_live_sm(reader, sm_list, hero_cat)
     save_heroes_live = save.read_heroes(reader, save.pick_live_psd(reader, psd_list))
     party = build.read_live_party(reader, sm, hero_cat, save_heroes_live) if sm else {}
@@ -186,17 +188,33 @@ def main():
                    f"heroes={len(build_recs)} withGearOrSkills={geared} "
                    f"snapshot(runes/inv/stash)={[None if x is None else len(x) for x in snap]}"))
 
-    # [xp-live] xp is sourced for the deployed heroes. 1.00.20: the live within-level exp DIED (the ACTk
-    # decoy zeroed; the real value is behind the off-limits cipher — obscured-data-offlimits), so the live
-    # xp accumulator can't run and xp HONESTLY degrades to the per-hero SAVE delta (xp_source="save", per
-    # metric-fallback-chains). read_live_party now returns (save_level, None). So the live-XP precondition is:
-    # the party resolves AND every deployed hero has a plausible LEVEL from the save (the save xp fallback's
-    # input). exp is None by design (NOT a failure) — asserting "live exp > 0" would assert a value the build
-    # no longer exposes. The save-XP delta itself is exercised by [save-build]/[build-record].
-    xp_ok = bool(party) and all(lvl is not None and 0 < lvl <= 999 for lvl, _exp in party.values())
-    checks.append(("xp-live", xp_ok,
-                   (f"{len(party)} heroes w/ save level (live within-level exp dead since 1.00.20 → xp via save)"
-                    if party else "no live party (in combat?)")))
+    # [xp-live] LIVE level + within-level xp recovered by decoding the ACTk cipher in HeroRuntime
+    # (1.00.20+: the PLAIN +0xC decoy was zeroed). THE ORACLE: decode each deployed hero's level
+    # DIRECTLY here (NOT via read_live_party, which masks a bad decode with the save fallback) and
+    # require it to match the SAVE level (±1 for autosave lag), with xp decoding to a finite, ≥0 float.
+    # A moved/changed cipher makes the decoded level DIVERGE from the save → FAIL: the per-build tripwire
+    # that lets us re-find the value on every update (game/obscured.py + obscured-data-offlimits).
+    xp_oracle = []
+    hl = reader.rptr(sm + StageManager.HERO_LIST) if sm else None
+    nslots = reader.ri32(hl + Array.MAX_LENGTH) if hl else None
+    for i in range(nslots if (nslots is not None and 0 < nslots <= 12) else 0):
+        h = reader.rptr(hl + Array.DATA + i * 8)
+        uf = reader.rptr(h + Unit.CACHE) if h else None
+        hi = reader.rptr(uf + HeroRuntime.INFO) if uf else None
+        hk = reader.ri32(hi + HeroInfoData.HERO_KEY) if hi else None
+        if hk is None or hk not in hero_cat:
+            continue
+        dec_lvl = obscured.decode_obscured_int(reader.ru32(uf + HeroRuntime.LEVEL_HIDDEN),
+                                               reader.ru32(uf + HeroRuntime.LEVEL_KEY))
+        dec_xp = obscured.decode_obscured_float(reader.ru32(uf + HeroRuntime.EXP_HIDDEN),
+                                                reader.ru32(uf + HeroRuntime.EXP_KEY))
+        save_lvl = save_heroes_live.get(hk, (None,))[0]
+        ok = (dec_lvl is not None and save_lvl is not None and abs(dec_lvl - save_lvl) <= 1
+              and dec_xp is not None and math.isfinite(dec_xp) and dec_xp >= 0.0)
+        xp_oracle.append((hk, dec_lvl, save_lvl, dec_xp, ok))
+    checks.append(("xp-live", bool(xp_oracle) and all(o[4] for o in xp_oracle),
+                   " ".join(f"hk{hk}:lv{dl}=save{sl}? xp={dx:.4g}" for hk, dl, sl, dx, _ in xp_oracle)
+                   or "no live party (in combat?)"))
 
     # [dps] MonsterSpawnManager + UnitHealthController: DPS = Σ of monster HP drops. models.live_monsters
     # iterates (unit, hp_cur, hp_max) reading MONSTER_LIST/SUMMONED_LIST + Unit.HEALTH_CONTROLLER + HP@0x40/0x4C.

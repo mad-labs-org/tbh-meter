@@ -56,7 +56,8 @@ delta (`CurrencySaveData.QUANTITY`): it includes sale and idle, so `gold_end −
 symptoms: frozen cell → **gold 0**; heap garbage → **1.97T**.
 
 **XP.** LIVE = the **per-hero ACCUMULATOR** (`PartyXpAccumulator` in `metrics/xp.py`): it integrates
-the within-level increments (`HeroRuntime.EXP_FAKE`) **tick-by-tick** (snapshot ~1s + a final tick
+the within-level increments (the live exp decoded from the ACTk ObscuredFloat, `game/obscured.py` —
+since 1.00.20 the `EXP_FAKE` decoy is dead) **tick-by-tick** (snapshot ~1s + a final tick
 at close), keyed by IDENTITY (heroKey) — the 1st sighting seeds the baseline, the level-up bridges
 across the curve (`per_hero_gain`), and late-deploy/death/dropout **do not lose the accumulated
 total** (banked; a dead hero accumulates 0 while dead — real game behavior, preserved). It replaced
@@ -68,8 +69,8 @@ level-up). The choice lives in the orchestrator (`close_run` in `meter_windows.p
 SAVE, never to a silent 0.
 
 **XP at cap.** The curve DEFINES the cap: a level with no entry has no progression (`level_capped`) —
-but the game keeps incrementing `EXP_FAKE` (and the save's `HeroExp`) on a hero AT cap, with no
-level-up to consume/reset → the same-level delta is **PHANTOM XP**. A hero at cap gains **0** (a VALID
+but the game keeps incrementing the within-level exp (and the save's `HeroExp`) on a hero AT cap, with
+no level-up to consume/reset → the same-level delta is **PHANTOM XP**. A hero at cap gains **0** (a VALID
 zero gain in `per_hero_gain`, never `None` — `None` would silently degrade to SAVE, which has the SAME
 hole, so `close_run` also zeroes the save-side delta of a capped hero); crossing INTO the cap banks
 only up to the threshold (`xp_through_levelup` counts `exp1` only if the final level is on the curve);

@@ -7,12 +7,12 @@ the curve (config/level_curve.json = ExpForLevelUp per level) fills the wrap. Va
 across 3 level-ups the sum matched with diff 0. Within-level is MONOTONIC outside level-up
 (the dip detector ran many runs with a death and never fired) — death only PAUSES the gain.
 
-1.00.20: the live within-level exp DIED (the EXP_FAKE decoy zeroed build-wide; the real value moved
-behind the off-limits ObscuredFloat cipher — see config/offsets.HeroRuntime + obscured-data-offlimits).
-build.read_live_party now yields exp=None, so the accumulator sees NOBODY (total()->None) and the
-orchestrator falls back to the per-hero SAVE delta, honestly tagging xp_source="save"
-([[invariants/metric-fallback-chains]]). The accumulator logic below is unchanged — it just no longer
-gets fed a live exp until/unless a future build restores a readable one.
+1.00.20: the live within-level exp was hidden behind the ACTk ObscuredFloat cipher (the PLAIN
+EXP_FAKE decoy was zeroed build-wide). It is now RECOVERED — build.read_live_party decodes the cipher
+in place (game/obscured.py, algorithm read from the binary), so the accumulator is fed a clean live
+exp again and the run tags xp_source="live" (confirmed: gain matches the screen ~749K/run). The SAVE
+delta remains the honest fallback if the decode ever fails ([[invariants/metric-fallback-chains]] /
+[[invariants/obscured-data-offlimits]]). The accumulator logic below is unchanged.
 
 CAP: a level with no curve entry has no defined progression (level_capped) — the game keeps
 incrementing the within-level exp at the cap with no level-up to consume it, so the same-level delta is
@@ -176,10 +176,9 @@ def party_progress(acc, party):
 
     Assembles ALREADY-read values (no memory, no clock):
       - `level`/`exp`: within-level values from read_live_party. `exp` resets on level-up, so the app's
-        "remaining to next level" is curve[level] - exp. SINCE 1.00.20 read_live_party yields exp=None
-        (the live within-level exp died — see the module docstring), so this loop SKIPS every hero and
-        returns {} → the overlay shows no live ETA (HONEST: there is no live rate to project). It
-        re-activates automatically if a future build restores a readable within-level exp.
+        "remaining to next level" is curve[level] - exp. Since 1.00.20 these come from decoding the ACTk
+        cipher in read_live_party (the live ETA works again); a hero whose cipher read fails is skipped
+        (exp None) — HONEST: no live rate to project for it — and re-appears once readable.
       - `gain`: the run's accumulated XP for that hero (PartyXpAccumulator.gain, level-up-bridged), from
         which the app derives the live rate (delta gain / delta t) and the ETA. 0.0 = seen with no gain
         yet (just-deployed, or AT the cap where gain is phantom-suppressed) -> the app shows "-"/"MAX".

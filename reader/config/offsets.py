@@ -93,10 +93,11 @@ class Singleton:
 
 # ACTk Obscured struct layout (CodeStage.AntiCheat.ObscuredTypes): hash@0x0, hiddenValue@0x4,
 # currentCryptoKey@0x8, fakeValue@0xC. Through 1.00.19 the PLAIN `fakeValue` decoy was kept in sync
-# with the real value, so reading it was legal. hidden^key gives GARBAGE (off-limits — see
-# docs/invariants/obscured-data-offlimits). 1.00.20 KILLED the fakeValue decoy build-wide (reads 0):
-# the only remaining source is the cipher, which is off-limits. Live values that used the decoy
-# (HeroRuntime level/exp) now degrade to the save — see HeroRuntime below + game/build.read_live_party.
+# with the real value, so reading it was legal; 1.00.20 KILLED the decoy build-wide (reads 0). The live
+# HeroRuntime level/exp are now RECOVERED by decoding the cipher in game/obscured.py (algorithm read
+# from the binary: int = (hidden-key)^key, float = f32(key^byteswap(hidden)) — note a plain hidden^key is
+# GARBAGE, the refuted first guess). The Unit/Monster CORE-STAT ciphers stay off-limits (no validated
+# decode + a PLAIN substitute already exists) — see docs/invariants/obscured-data-offlimits.
 ACTK_FAKE = 0xC
 
 
@@ -278,18 +279,24 @@ class StageInfoData:                   # catalog (currentStageKey encodes the mo
 
 
 # ----- hero progression runtime (reached via Unit.CACHE) -----
-class HeroRuntime:                     # `uf` (uf : uo)
-    INFO = 0x30                        # beew -> HeroInfoData (for HeroKey/class) — reads LIVE, the
-                                       # live party IDENTITY (game/build.read_live_party).
-    STATS_HOLDER = 0x10                # behg -> xd (holder of the 64 stats) — reads LIVE.
-    # DEAD since 1.00.20: these are the ACTk `fakeValue` decoy (ObscuredInt/Float base+0xC). The
-    # recompile zeroed the decoy build-wide -> they READ 0; the real live level/exp moved behind the
-    # cipher (hiddenValue/currentCryptoKey @ base+0x4/+0x8), which is OFF-LIMITS
-    # (docs/invariants/obscured-data-offlimits). read_live_party no longer reads them — it sources
-    # level/exp from the save. KEPT as dump history + for the _raw_hero_list diagnostic; DO NOT revive
-    # them as a live source (a 0 gate rejects every real hero; decoding the cipher is forbidden).
-    LEVEL_FAKE = 0xD8                  # befp.fakeValue (DEAD: reads 0 since 1.00.20)
-    EXP_FAKE = 0x118                   # beft.fakeValue (DEAD: reads 0 since 1.00.20)
+class HeroRuntime:                     # hero progression runtime (1.00.20 dump: class `vc`,
+                                       # TypeDefIndex 2797), reached via Unit.CACHE.
+    INFO = 0x30                        # -> HeroInfoData (HeroKey/class) — LIVE party IDENTITY.
+    STATS_HOLDER = 0x10                # -> xd (holder of the 64 stats) — LIVE.
+    # LIVE level/exp. 1.00.20 moved them behind the ACTk cipher (the PLAIN `fakeValue` decoy @ +0xC was
+    # zeroed build-wide). RECOVERED read-only by decoding the cipher IN PLACE — the algorithm was read
+    # from the binary (disasm of op_Implicit in GameAssembly.dll) and reimplemented in game/obscured.py:
+    #   ObscuredInt level  (record @0xCC)  = (hidden - key) ^ key
+    #   ObscuredFloat xp   (record @0x10C) = float32(key ^ byteswap_1_2(hidden))
+    # hidden @ base+0x4, key @ base+0x8; the key is read live each tick (handles ACTk key-rotation).
+    # Gated by the validate_live oracle (decoded == save level/xp) — see obscured-data-offlimits.
+    # Confirmed live (1.00.20): level 91/94/101 == save; xp gain Sorcerer ~749K/run == measured 748K.
+    LEVEL_HIDDEN = 0xD0                # ObscuredInt level (record 0xCC): hiddenValue   @ +0x4
+    LEVEL_KEY = 0xD4                   #                                  currentCryptoKey @ +0x8
+    EXP_HIDDEN = 0x110                 # ObscuredFloat xp (record 0x10C): hiddenValue   @ +0x4
+    EXP_KEY = 0x114                    #                                  currentCryptoKey @ +0x8
+    LEVEL_FAKE = 0xD8                  # ObscuredInt level fakeValue (DEAD: reads 0 since 1.00.20) — kept
+    EXP_FAKE = 0x118                   # ObscuredFloat xp fakeValue  (DEAD: reads 0)  for _raw_hero_list
 
 
 class StatsHolder:                     # `xd` (dump.cs:342026)

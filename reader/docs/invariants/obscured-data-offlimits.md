@@ -16,6 +16,7 @@ code_anchors:
   - config/offsets.py::Monster.CACHE_OBSCURED
   - config/offsets.py::EEquipClassType
   - config/offsets.py::StatsHolder.FINAL_STATS
+  - game/obscured.py::decode_obscured_float
 asserts:
   - config.offsets.Unit.CORE_STATS_OBSCURED == 0x104
   - config.offsets.Monster.CACHE_OBSCURED == 0x3B8
@@ -49,18 +50,44 @@ anchor on them and the test can guard them. They **must not be referenced by any
 (`metrics/`, `game/`) — if a module cites `CORE_STATS_OBSCURED`/`CACHE_OBSCURED`, it's because someone is
 about to read there, and `guarded_by` fails on purpose.
 
-## The dead `fakeValue` decoy is NOT a back door (1.00.20)
+## The dead `fakeValue` decoy is recovered by decoding the cipher (1.00.20+)
 
 ACTk keeps each Obscured value as `hash / hiddenValue / currentCryptoKey / fakeValue` (the cipher fields +
-a PLAIN `fakeValue` decoy at base+`ACTK_FAKE`). When the build keeps the decoy in sync with the real value
-(through 1.00.19), reading the decoy is legal — that is how the live hero level/exp were read
-(`HeroRuntime.LEVEL_FAKE`/`EXP_FAKE`). **1.00.20 zeroed the decoy build-wide** (it reads 0). The tempting
-"fix" is to read `hiddenValue ^ currentCryptoKey` instead — that is **reading the cipher, forbidden by
-this invariant** (ObscuredFloat decodes that way, ObscuredInt uses a heavier transform; either way ACTk
-rotates the key and the decode-method name every build, so it re-breaks). When a decoy dies, the value is
-**gone** — degrade to the PLAIN substitute (the save), never decode. See `HeroRuntime` in `config/offsets.py`
-(the dead offsets are kept as dump history, marked DO-NOT-REVIVE) and `game/build.read_live_party`
-([[invariants/party-live-resolution]]).
+a PLAIN `fakeValue` decoy at base+`ACTK_FAKE`). Through 1.00.19 the decoy was kept in sync with the real
+value, so reading it was legal — that is how the live hero level/exp were read. **1.00.20 zeroed the decoy
+build-wide** (it reads 0). Degrading to the PLAIN substitute (the save) is *visibly* wrong for xp — the
+per-run save delta jumps ~2× ([[invariants/metric-fallback-chains]]), the bug players reported. So for the
+hero level/exp we now RECOVER the live value by decoding the cipher in place. The value is NOT gone: ACTk
+keeps the key (`currentCryptoKey @ +0x8`) right next to `hiddenValue @ +0x4`, so a reader with both words
+can invert it.
+
+**The decode was READ FROM THE BINARY, not guessed.** A first guess (`hidden ^ key`) was REFUTED live
+(garbage that jittered ±5M). Disassembling the `op_Implicit` accessors in `GameAssembly.dll` gave the real
+algorithms, reimplemented in `game/obscured.py`:
+- **ObscuredInt** (RVA 0x6E6CA0): `value = (hidden - key) ^ key`.
+- **ObscuredFloat** (RVA 0x6E4C00): `value = float32(key ^ byteswap_1_2(hidden))` (bytes [1],[2] of
+  `hidden` swapped — the ACTkByte4 shuffle — before the XOR).
+
+Why this is recoverable WITHOUT the fragility the old guidance feared:
+- **Build-independent algorithm.** We reimplement it in Python; we never resolve/call the game's decrypt
+  method (its IL2CPP name is obfuscated and drifts per build — the math does not).
+- **Key rotation is handled.** The caller reads `currentCryptoKey` live every tick next to `hiddenValue`;
+  the key is never cached.
+- **Never a silent wrong number.** the decoders return `None` if either word was unreadable (mirrors
+  `ru32`→None), so the caller degrades to SAVE rather than emitting garbage (None-vs-0 discipline,
+  [[invariants/metric-fallback-chains]]).
+
+LIVE now: `game/build.read_live_party` decodes the hero LEVEL (`HeroRuntime.LEVEL_HIDDEN`/`_KEY`) and the
+within-level XP (`EXP_HIDDEN`/`_KEY`); the dead `fakeValue` offsets stay only as `_raw_hero_list` history.
+
+**What stays guarded.** The algorithm is build-INDEPENDENT, but the struct BASE can move on a recompile
+(like every offset in 1.00.14) and the dev could swap the cipher. Both are caught LOUDLY by the oracle
+(decoded == real level/xp) — `tests/test_obscured.py` pins the math + GOLDEN LIVE VECTORS (level 91/94/101
+== save; Ranger xp exact at the cap), and `scripts/validate_live.py` should re-check it per build. That
+tripwire is the "find it again, always" guarantee: a cipher change fails the gate loudly, never silently
+wrong. The `Unit.CORE_STATS_OBSCURED` / `Monster.CACHE_OBSCURED` markers below remain DO-NOT-READ: those
+are different Obscured fields with no validated decode and a PLAIN substitute that is already correct —
+decode is only worth it where the PLAIN/SAVE substitute is visibly wrong (xp), not a blanket license.
 
 ## Orphan enum: hero class identity
 

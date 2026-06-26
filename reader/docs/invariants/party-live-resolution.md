@@ -38,17 +38,16 @@ A run's canonical party is the **DEPLOYED** heroes — their IDENTITY (the heroK
 Ranger is on the field. Confusing roster with party means showing unplayed heroes (the symptom: several
 with `+0xp`).
 
-**Identity is LIVE; level/exp degrade to the save (1.00.20).** Through 1.00.19, `read_live_party` also
-read each deployed hero's live within-level level/exp from the ACTk `fakeValue` PLAIN decoy
-(`HeroRuntime.LEVEL_FAKE`/`EXP_FAKE`). The 1.00.20 recompile ZEROED that decoy build-wide; the real live
-level/exp moved behind the ObscuredInt/Float cipher, which is **off-limits**
-([[invariants/obscured-data-offlimits]] — decoding `hidden^key` is forbidden and would re-break every
-build). So `read_live_party` now sources level from the **save** and forces **exp = None**. This keeps the
-PARTY fully LIVE (membership is still `StageManager.HeroList`); only the level/exp *values* fall back to
-the save (LIVE→SAVE, [[invariants/metric-fallback-chains]]) — it NEVER lets the roster define the party.
-`exp = None` is deliberate: feeding the stale save exp into the live xp accumulator would make the SAVE
-fallback masquerade as `xp_source="live"` (forbidden), so the accumulator stays empty, `xp_total_live`
-is `None`, and `close_run` honestly tags the run's xp `save` (capped heroes → 0, as ever).
+**Identity AND level/exp are LIVE (1.00.20+).** Through 1.00.19, `read_live_party` read each deployed
+hero's level/exp from the ACTk `fakeValue` PLAIN decoy (`HeroRuntime.LEVEL_FAKE`/`EXP_FAKE`). The 1.00.20
+recompile ZEROED that decoy build-wide; rather than degrade to the lagging save (whose per-run delta jumps
+~2× — the bug players reported), `read_live_party` now RECOVERS the values by decoding the ObscuredInt
+level + ObscuredFloat xp in place (`game/obscured.py`; the algorithm was read from the binary, gated by
+the validate_live oracle — see [[invariants/obscured-data-offlimits]]). The party stays fully LIVE
+(membership is `StageManager.HeroList`); LEVEL falls back to the save on an unreadable cipher, and EXP
+stays `None` on a bad read so the xp chain degrades HONESTLY (never the stale save exp masquerading as
+`xp_source="live"`, [[invariants/metric-fallback-chains]]) — it NEVER lets the roster define the party.
+Capped heroes → 0 xp, as ever.
 
 ## `pick_live_sm`: NO cap, and the SAME validation as `read_live_party`
 
