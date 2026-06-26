@@ -25,6 +25,12 @@ _CLAZZ = name_map(EEquipClassType)
 _RECIPE = name_map(ERecipeType)
 _STAT = name_map(StatType)
 
+# Sentinel itemKey for an equipped slot whose handle (uniqueId) couldn't be resolved to an item.
+# A real itemKey is a positive int and an EMPTY slot is omitted entirely, so -1 unambiguously means
+# "equipped but unknown" — the front renders it as a clear "unknown" in that slot. The ingest schema
+# (@tbh/shared build-payload: `itemKey: z.number().int().nullable()`) accepts it as-is.
+UNKNOWN_ITEM_KEY = -1
+
 _SKILL_ATTR = None
 _PASSIVE_KEYS = None
 
@@ -325,11 +331,21 @@ def read_build(reader, psd, item_cat, hero_cat):
             continue
         cls = hero_cat.get(hk)
         items = []
-        for uid in reader.arr_u64(reader.rptr(h + HeroSaveData.EQUIPPED_ITEMS)):
+        for pos, uid in enumerate(reader.arr_u64(reader.rptr(h + HeroSaveData.EQUIPPED_ITEMS))):
             if not uid:
-                continue
+                continue                                  # uniqueId 0 = an honestly-empty slot
             it = uid2item.get(uid)
             if not it:
+                # The equipped handle (uniqueId) isn't in itemSaveDatas, so we can't name the item.
+                # DON'T silently drop it (NOT-READ != READ-ZERO): emit it with the UNKNOWN_ITEM_KEY
+                # sentinel so the front renders a clear "unknown" in that slot instead of a
+                # phantom-empty one. equippedItemIds is SLOT-INDEXED (array pos i -> EItemParts i+1,
+                # confirmed live across all 6 classes), so the slot is known even when the item is not.
+                pslot = pos + 1
+                items.append({"slot": _PARTS.get(pslot, "?"),
+                              "slotId": pslot if pslot in _PARTS else None,
+                              "grade": "?", "gradeId": None, "itemKey": UNKNOWN_ITEM_KEY,
+                              "uniqueId": str(uid), "level": None, "mods": []})
                 continue
             ik = reader.ri32(it + ItemSaveData.ITEM_KEY)
             grade, parts, ilvl = item_cat.get(ik, (None, None, None))
