@@ -237,6 +237,23 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "quality.skippedTitle":
     "이 런은 유효한 클리어가 아닙니다 (너무 짧거나, 실패/포기로 끝남). 집계되지 않으며 리더보드에도 업로드되지 않았습니다.",
 
+  // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
+  "outcome.buggedLabel": "Bugged",
+  "outcome.buggedTitle":
+    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+  "outcome.failedLabel": "Failed (wipe)",
+  "outcome.failedTitle":
+    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+  "outcome.abandonedLabel": "Abandoned",
+  "outcome.abandonedTitle":
+    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+  "outcome.partialLabel": "Partial",
+  "outcome.partialTitle":
+    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+  "outcome.tooShortLabel": "Too short",
+  "outcome.tooShortTitle":
+    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+
   // ── Blue-chest tracker ──
   "cooldowns.title": "파란 상자 트래커",
   "cooldowns.desc": "드롭을 자동 감지해 각 상자 레벨의 쿨다운을 추적합니다 — 클릭 없이.",

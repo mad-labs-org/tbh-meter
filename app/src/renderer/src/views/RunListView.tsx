@@ -13,7 +13,6 @@ import {
   Eye,
   EyeOff,
   Star,
-  AlertTriangle,
   X,
 } from "lucide-react";
 import type { RunIndexEntry, RunColumnConfig } from "../../../shared/ipc-types.js";
@@ -27,7 +26,7 @@ import {
   modeTextClass,
   modeLabel,
   statusLabel,
-  qualityBadge,
+  runOutcomeBadge,
 } from "~/lib/format";
 import { ChestDrops } from "~/components/ChestDrops";
 import { HeroPortrait } from "~/components/HeroPortrait";
@@ -117,10 +116,11 @@ const COLUMNS: RunColumn[] = [
     track: "8.5rem",
     cell: (r, { t }) => {
       // A run revealed by "show ignored" looks identical to a clean run in the table, so flag it
-      // with a warning icon next to the stage chip (the whole row is also tinted — see RunRow). The
-      // compact icon keeps the narrow column readable; the tooltip + detail-view banner carry the
-      // full reason.
-      const badge = qualityBadge(r.quality, t);
+      // with an outcome-specific icon next to the stage chip (the whole row is also tinted — see
+      // RunRow). The icon + colour say WHY it didn't count (wipe / abandon / too short / partial /
+      // bugged); the tooltip + detail-view banner carry the full reason. The compact icon keeps the
+      // narrow column readable.
+      const badge = runOutcomeBadge(r.status, r.quality, t);
       return (
         <span className="inline-flex min-w-0 items-center gap-1">
           {/* Stage + mode as one chip, like the web leaderboard's stage cell. */}
@@ -134,7 +134,7 @@ const COLUMNS: RunColumn[] = [
           </span>
           {badge && (
             <span title={badge.title} className="inline-flex shrink-0">
-              <AlertTriangle
+              <badge.Icon
                 aria-label={t("runs.flaggedRun", { label: badge.label })}
                 className={cn("size-3", badge.iconClass)}
               />
@@ -991,10 +991,11 @@ interface RunRowProps {
 }
 
 function RunRow({ run, cols, i18n, gridTemplateColumns, zebra, onSelect, onToggleFavorite }: RunRowProps) {
-  // Tint the whole row when the run did not count (red = invalid/unreliable, amber = partial). This
-  // is the at-a-glance "this is not a real run" signal; rowClass wins the bg conflict over zebra via
-  // tailwind-merge (last class), so an ignored run never reads as a normal striped row.
-  const rowClass = qualityBadge(run.quality)?.rowClass;
+  // Tint the whole row when the run did not count, in the outcome's colour family (red = wipe, slate
+  // = abandon, zinc = too short, amber = partial, rose = bugged). This is the at-a-glance "this is
+  // not a real run" signal; rowClass wins the bg conflict over zebra via tailwind-merge (last class),
+  // so an ignored run never reads as a normal striped row.
+  const rowClass = runOutcomeBadge(run.status, run.quality)?.rowClass;
   return (
     <div
       onClick={onSelect}

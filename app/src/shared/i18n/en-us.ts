@@ -246,6 +246,25 @@ export const DICT = {
   "quality.skippedTitle":
     "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count and was not uploaded to the leaderboard.",
 
+  // ── Run-outcome marker (the runs-list icon/tint + detail banner) — distinguishes WHY a run did
+  //    not count by combining status + quality, unlike the quality-only verdict copy above. Purely
+  //    cosmetic; it never changes which runs count, upload, or are hidden. ──
+  "outcome.buggedLabel": "Bugged",
+  "outcome.buggedTitle":
+    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+  "outcome.failedLabel": "Failed (wipe)",
+  "outcome.failedTitle":
+    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+  "outcome.abandonedLabel": "Abandoned",
+  "outcome.abandonedTitle":
+    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+  "outcome.partialLabel": "Partial",
+  "outcome.partialTitle":
+    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+  "outcome.tooShortLabel": "Too short",
+  "outcome.tooShortTitle":
+    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+
   // ── Blue-chest tracker ──
   "cooldowns.title": "Blue-chest tracker",
   "cooldowns.desc": "Auto-detects drops and tracks each chest level's cooldown — no clicks.",
