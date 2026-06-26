@@ -192,11 +192,25 @@ describe("convert — quality verdict", () => {
     expect(convert(rawRun({ run_outcome: "abandoned" })).quality).toBe("skipped");
   });
 
-  it("a success that captured <80% of the clear is partial (joined mid-run)", () => {
-    // clear_time 100, but measured (duration) only 50 -> 50% < 80%.
+  it("a success that captured <95% of the clear is partial (joined mid-run)", () => {
+    // clear_time 100, but measured (duration) only 50 -> 50% < 95%.
     const r = convert(rawRun({ clear_time: { ok: true, value: 100 }, duration: 50 }));
     expect(r.partial).toBe(true);
     expect(r.quality).toBe("partial");
+  });
+
+  it("a success that captured 94% of the clear is partial (just under the 95% bar)", () => {
+    // clear_time 100, measured 94 -> 94% < 95% -> partial. Boundary case for the 95% threshold.
+    const r = convert(rawRun({ clear_time: { ok: true, value: 100 }, duration: 94 }));
+    expect(r.partial).toBe(true);
+    expect(r.quality).toBe("partial");
+  });
+
+  it("a success that captured exactly 95% of the clear is NOT partial (at the bar, it counts)", () => {
+    // clear_time 100, measured 95 -> 95% is NOT < 95% -> counted. Boundary case for the 95% threshold.
+    const r = convert(rawRun({ clear_time: { ok: true, value: 100 }, duration: 95 }));
+    expect(r.partial).toBe(false);
+    expect(r.quality).toBe("counted");
   });
 
   it("a success with non-positive damage is ALWAYS partial (#163; covers short x-10)", () => {
@@ -207,7 +221,7 @@ describe("convert — quality verdict", () => {
     expect(r.quality).toBe("partial");
   });
 
-  it("a short x-10 with damage <80% of a >=30s clear is NOT mis-flagged partial (clear<30 guard)", () => {
+  it("a short x-10 with damage <95% of a >=30s clear is NOT mis-flagged partial (clear<30 guard)", () => {
     // clear_time 20 (< 30) so the first partial clause is gated off; damage > 0 so the second
     // clause does not fire -> a legitimate short boss clear counts.
     const r = convert(
