@@ -1,3 +1,4 @@
+import { Bug, Skull, LogOut, CircleSlash, TimerOff, type LucideIcon } from "lucide-react";
 import type { RunStatus, RunQuality } from "../../../shared/run-types.js";
 import { tFor, type Translate } from "../../../shared/i18n/index.js";
 
@@ -180,6 +181,111 @@ export function qualityBadge(
     iconClass: entry.iconClass,
     rowClass: entry.rowClass,
     noticeClass: entry.noticeClass,
+  };
+}
+
+/** The visual marker for a run that did NOT count, resolved from BOTH the game outcome (`status`)
+ *  and the converter's verdict (`quality`) so each reason reads distinctly — a wipe, an abandon, a
+ *  too-short clear, a partial capture, and a bugged read no longer collapse to one icon/colour. */
+export interface RunOutcomeBadge {
+  /** The lucide icon component for this outcome (rendered as `<badge.Icon … />`). */
+  Icon: LucideIcon;
+  /** Short, self-contained label for the SR hint + detail-banner heading. */
+  label: string;
+  /** Plain-language explanation shown on hover (list) and in the banner (detail). */
+  title: string;
+  /** Text colour for the marker icon in the runs list + detail banner. */
+  iconClass: string;
+  /** Background tint applied to the WHOLE runs-list row, so a non-counted run reads as set-apart. */
+  rowClass: string;
+  /** Border + tinted background + text for the detail-view banner container. */
+  noticeClass: string;
+}
+
+// One marker per run, picked by PRECEDENCE over (status, quality):
+//   bugged (degraded data) > failed (wipe) > abandoned > partial > too-short (skipped) > counted.
+// A clean counted clear (and a legacy run with no verdict) returns null = no marker. This is PURELY
+// COSMETIC — it mirrors, and never alters, the counting/hiding the `quality` verdict drives
+// (qualityBadge stays the source for those). Each entry's icon colour family matches its row tint
+// and banner triple; label/title are dict KEYS so the marker follows the app language.
+type OutcomeStyle = {
+  Icon: LucideIcon;
+  labelKey: Parameters<Translate>[0];
+  titleKey: Parameters<Translate>[0];
+  iconClass: string;
+  rowClass: string;
+  noticeClass: string;
+};
+const OUTCOME_BUGGED: OutcomeStyle = {
+  Icon: Bug,
+  labelKey: "outcome.buggedLabel",
+  titleKey: "outcome.buggedTitle",
+  iconClass: "text-rose-400",
+  rowClass: "bg-rose-500/10",
+  noticeClass: "border-rose-500/30 bg-rose-500/10 text-rose-200",
+};
+const OUTCOME_FAILED: OutcomeStyle = {
+  Icon: Skull,
+  labelKey: "outcome.failedLabel",
+  titleKey: "outcome.failedTitle",
+  iconClass: "text-red-400",
+  rowClass: "bg-red-500/10",
+  noticeClass: "border-red-500/30 bg-red-500/10 text-red-200",
+};
+const OUTCOME_ABANDONED: OutcomeStyle = {
+  Icon: LogOut,
+  labelKey: "outcome.abandonedLabel",
+  titleKey: "outcome.abandonedTitle",
+  iconClass: "text-slate-400",
+  rowClass: "bg-slate-500/10",
+  noticeClass: "border-slate-500/30 bg-slate-500/10 text-slate-200",
+};
+const OUTCOME_PARTIAL: OutcomeStyle = {
+  Icon: CircleSlash,
+  labelKey: "outcome.partialLabel",
+  titleKey: "outcome.partialTitle",
+  iconClass: "text-amber-400",
+  rowClass: "bg-amber-500/10",
+  noticeClass: "border-amber-500/30 bg-amber-500/10 text-amber-200",
+};
+const OUTCOME_TOO_SHORT: OutcomeStyle = {
+  Icon: TimerOff,
+  labelKey: "outcome.tooShortLabel",
+  titleKey: "outcome.tooShortTitle",
+  iconClass: "text-zinc-400",
+  rowClass: "bg-zinc-500/10",
+  noticeClass: "border-zinc-500/30 bg-zinc-500/10 text-zinc-200",
+};
+
+/** Pick the single outcome style for a run by precedence, or null when it is a clean counted clear
+ *  (or a legacy run with no verdict — both render unmarked). Bad data wins over the game outcome,
+ *  which wins over a partial capture, which wins over a too-short clear. */
+function outcomeStyle(status: RunStatus, quality: RunQuality | undefined): OutcomeStyle | null {
+  if (quality === "degraded") return OUTCOME_BUGGED;
+  if (status === "fail") return OUTCOME_FAILED;
+  if (status === "abandoned") return OUTCOME_ABANDONED;
+  if (quality === "partial") return OUTCOME_PARTIAL;
+  if (quality === "skipped") return OUTCOME_TOO_SHORT;
+  return null;
+}
+
+/** The outcome marker (icon + colour + label) for a run, or null for a clean counted clear. Reads
+ *  BOTH `status` and `quality` so a wipe, an abandon, a too-short clear, a partial capture and a
+ *  bugged read are visually distinct in the runs list and the detail banner. */
+export function runOutcomeBadge(
+  status: RunStatus,
+  quality: RunQuality | undefined,
+  t: Translate = tEn,
+): RunOutcomeBadge | null {
+  const style = outcomeStyle(status, quality);
+  if (!style) return null;
+  return {
+    Icon: style.Icon,
+    label: t(style.labelKey),
+    title: t(style.titleKey),
+    iconClass: style.iconClass,
+    rowClass: style.rowClass,
+    noticeClass: style.noticeClass,
   };
 }
 

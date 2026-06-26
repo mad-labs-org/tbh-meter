@@ -13,7 +13,6 @@ import {
   Loader2,
   Upload,
   Star,
-  AlertTriangle,
 } from "lucide-react";
 import type { RunRecord, RunStatus, RunQuality, RunHero } from "../../../shared/run-types.js";
 import type { AuthStatus } from "../../../shared/ipc-types.js";
@@ -25,7 +24,7 @@ import {
   formatDateTime,
   modeBadgeClass,
   modeLabel,
-  qualityBadge,
+  runOutcomeBadge,
 } from "~/lib/format";
 import { heroName } from "~/lib/game-data";
 import { useI18n } from "~/lib/i18n";
@@ -158,9 +157,9 @@ export function RunDetailView({ runId, onBack }: RunDetailViewProps) {
 
       {/* ── Body ────────────────────────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-4 py-3">
-        {/* Quality notice — explains why a partial/degraded run's numbers can't be trusted and why
-            it isn't on the leaderboard, with the per-field read failures (issues) when present. */}
-        <QualityNotice quality={run.quality} issues={run.issues} />
+        {/* Outcome notice — explains why a non-counted run (wipe / abandon / too short / partial /
+            bugged) isn't on the leaderboard, with the per-field read failures (issues) when present. */}
+        <QualityNotice status={run.status} quality={run.quality} issues={run.issues} />
 
         {/* Run metrics */}
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
@@ -342,27 +341,28 @@ function XpHeroRow({ hero, total, t }: { hero: RunHero; total: number; t: Transl
   );
 }
 
-/** Banner shown for a run the converter sealed as partial/degraded: the numbers are incomplete or
- *  unreliable, so the run never reached the leaderboard. For a degraded run, `issues` carries the
- *  per-field read failures (field → reason) — surfaced so the user can see exactly what was lost. */
+/** Banner shown for any run that did not count, labelled by its specific outcome (wipe / abandon /
+ *  too short / partial / bugged) so the reason is explicit — not just "invalid". For a degraded
+ *  (bugged) run, `issues` carries the per-field read failures (field → reason), surfaced so the user
+ *  can see exactly what was lost. Cosmetic only — it never gates the leaderboard or the display. */
 function QualityNotice({
+  status,
   quality,
   issues,
 }: {
+  status: RunStatus;
   quality: RunQuality | undefined;
   issues?: Record<string, string>;
 }) {
   const { t } = useI18n();
-  const badge = qualityBadge(quality, t);
+  const badge = runOutcomeBadge(status, quality, t);
   if (!badge) return null;
   const entries = issues ? Object.entries(issues) : [];
   return (
     <div className={cn("mb-3 rounded-lg border px-3 py-2.5", badge.noticeClass)}>
       <div className="flex items-center gap-2">
-        <AlertTriangle className={cn("size-4 shrink-0", badge.iconClass)} />
-        <span className="text-xs font-semibold">
-          {t("runs.flaggedRun", { label: badge.label })}
-        </span>
+        <badge.Icon className={cn("size-4 shrink-0", badge.iconClass)} />
+        <span className="text-xs font-semibold">{badge.label}</span>
       </div>
       <p className="mt-1 text-xs leading-relaxed opacity-90">{badge.title}</p>
       {entries.length > 0 && (
