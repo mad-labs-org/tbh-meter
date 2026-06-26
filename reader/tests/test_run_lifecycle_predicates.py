@@ -27,11 +27,16 @@ class TestIsPartial:
     def test_failure_is_never_partial(self):
         assert _is_partial("failed", clear_time=100, measured=50, total_damage=5000) is False
 
-    def test_full_clear_with_damage_is_not_partial(self):
+    def test_full_clear_at_95pct_with_damage_is_not_partial(self):
+        # measured == 95% of the official clear: NOT < 95% -> counts. Boundary case for PARTIAL_CAPTURE_MIN.
         assert _is_partial("success", clear_time=100, measured=95, total_damage=5000) is False
 
+    def test_just_under_95pct_is_partial(self):
+        # measured 94 of a 100s clear -> 94% < 95% -> partial. Boundary case for PARTIAL_CAPTURE_MIN.
+        assert _is_partial("success", clear_time=100, measured=94, total_damage=5000) is True
+
     def test_entered_late_is_partial(self):
-        # measured < 80% of the official clear (and clear >= 30) -> joined mid-run -> partial.
+        # measured < 95% of the official clear (and clear >= 30) -> joined mid-run -> partial.
         assert _is_partial("success", clear_time=100, measured=50, total_damage=5000) is True
 
     def test_short_clear_with_damage_is_not_partial(self):

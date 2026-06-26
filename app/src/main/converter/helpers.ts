@@ -74,9 +74,14 @@ export function round(value: number, digits = 2): number {
 // display filter lives in settings.ts, PR6 — never conflate the two).
 // --------------------------------------------------------------------------- //
 
+/** Minimum fraction of the official clear time the meter must have captured for a `success` to count:
+ *  below this it joined too late and the totals are undercounts. MUST stay in sync with the reader's
+ *  `meter_windows.PARTIAL_CAPTURE_MIN` (same number on both sides — see run-lifecycle). */
+const PARTIAL_CAPTURE_MIN = 0.95;
+
 /** PARTIAL capture: the meter joined a run already in progress, so its totals are under-counted.
  *  Ported verbatim from the reader's `_is_partial` (now the converter's spec, run-lifecycle): a
- *  `success` run is partial when it captured < 80% of the official clear time (guarded at
+ *  `success` run is partial when it captured < 95% of the official clear time (guarded at
  *  clear_time >= 30 so a legitimately-short x-10 boss run is never mis-flagged) OR — the exception —
  *  a success with NON-POSITIVE damage, which is ALWAYS a lost capture (the game never clears a stage
  *  with no damage; covers the short x-10 case the first clause skips, #163). Note `<= 0`, not `== 0`.
@@ -88,7 +93,7 @@ export function isPartial(
   totalDamage: number,
 ): boolean {
   if (status !== "success") return false;
-  return (clearTime >= 30 && duration < clearTime * 0.8) || totalDamage <= 0;
+  return (clearTime >= 30 && duration < clearTime * PARTIAL_CAPTURE_MIN) || totalDamage <= 0;
 }
 
 /** SKIP: the run is real but does not count — below the duration floor (and not x-10). The reader

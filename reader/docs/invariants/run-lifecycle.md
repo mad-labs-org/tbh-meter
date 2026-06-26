@@ -1,6 +1,6 @@
 ---
 type: invariant
-description: "Run lifecycle: the reader INFERS start/end from memory (LogManager's LOG_LIST grows; closes on StageClearLog/StageFailedLog matched by KLASS-POINTER) — boundary detection is ITS job — and emits EVERY run to raw/<id>.json. The skip (<30s exc. stage 10) and partial (success w/ capture <80% OR damage<=0) predicates became the accounting SPEC applied by the CONVERTER (app); the reader no longer drops (skip ≠ vanish). SUCCESS only delays the WRITE by PENDING_CLOSE_GRACE (pending-close) to absorb the boss box the game logs ~0.6s AFTER the clear — otherwise the chest landed in the NEXT run."
+description: "Run lifecycle: the reader INFERS start/end from memory (LogManager's LOG_LIST grows; closes on StageClearLog/StageFailedLog matched by KLASS-POINTER) — boundary detection is ITS job — and emits EVERY run to raw/<id>.json. The skip (<30s exc. stage 10) and partial (success w/ capture <95% OR damage<=0) predicates became the accounting SPEC applied by the CONVERTER (app); the reader no longer drops (skip ≠ vanish). SUCCESS only delays the WRITE by PENDING_CLOSE_GRACE (pending-close) to absorb the boss box the game logs ~0.6s AFTER the clear — otherwise the chest landed in the NEXT run."
 symptoms:
   - "run does not close"
   - "run does not appear"
@@ -21,6 +21,7 @@ code_anchors:
   - meter_windows.py::close_run
   - meter_windows.py::_should_skip_run
   - meter_windows.py::_is_partial
+  - meter_windows.py::PARTIAL_CAPTURE_MIN
   - meter_windows.py::PENDING_CLOSE_GRACE
   - meter_windows.py::TRAILING_BOX_TIERS
   - meter_windows.py::_new_pending
@@ -30,6 +31,7 @@ code_anchors:
   - meter_windows.py::_drop_counts
   - config/offsets.py::LogManager.LOG_LIST
 asserts:
+  - meter_windows.PARTIAL_CAPTURE_MIN == 0.95
   - meter_windows.PENDING_CLOSE_GRACE == 3.0
 guarded_by:
   - tests/test_run_lifecycle_predicates.py::TestShouldSkipRun::test_stage_x10_under_30s_is_kept
@@ -132,10 +134,15 @@ the summary/console. The real rule (which the converter ports) is:
 
 ```
 status == "success"  AND  (
-    (clear_time >= 30 AND measured < clear_time * 0.8)   # joined mid-run
-    OR total_damage <= 0                                  # success with no damage = lost capture
+    (clear_time >= 30 AND measured < clear_time * PARTIAL_CAPTURE_MIN)   # joined mid-run (<95%)
+    OR total_damage <= 0                                                 # success with no damage = lost capture
 )
 ```
+
+`PARTIAL_CAPTURE_MIN` is **0.95** — a clear counts only if the meter captured **≥95%** of it. The
+reader (`meter_windows.PARTIAL_CAPTURE_MIN`) and the converter
+(`app/src/main/converter/helpers.ts::PARTIAL_CAPTURE_MIN`) **MUST hold the same number**; the
+converter is the persisted spec, the reader only annotates `meter.log` / the `[run-close]` diag.
 
 Two points the skill drifted on that the TRUTH (the code + `tests/test_run_lifecycle_predicates.py`)
 contradicts:

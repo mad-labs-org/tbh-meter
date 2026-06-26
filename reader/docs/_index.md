@@ -36,7 +36,7 @@ How it works and how to maintain it: [README](README.md).
 
 - [[invariants/instance-selection]] — structural pick of the singleton (managers); avoids dead-list → runs that never close · `meter_windows.py`
 - [[invariants/schema-versioning]] — bump `RAW_SCHEMA_VERSION` (raw/<id>.json) + normalize app-side when adding a field; `SCHEMA_VERSION` is the frozen marker (11) of the legacy runs.jsonl · `meter_windows.py`
-- [[invariants/run-lifecycle]] — start via `LOG_LIST`; end by `StageClearLog`/`StageFailedLog`; skip <30s except `stage != 10`; partial = success + (<80% clear OR damage ≤ 0); boss box post-clear → pending-close · `meter_windows.py`
+- [[invariants/run-lifecycle]] — start via `LOG_LIST`; end by `StageClearLog`/`StageFailedLog`; skip <30s except `stage != 10`; partial = success + (<95% clear OR damage ≤ 0); boss box post-clear → pending-close · `meter_windows.py`
 - [[invariants/orchestration-purity]] — `meter_windows.py` is a thin orchestrator (zero inline reads outside the scaffolding); new metric/capture → `metrics/` or `game/` · `meter_windows.py`
 - [[invariants/offsets-single-source]] — offset/enum/stride → `config/offsets.py`; business rule (e.g. `COMBAT_SUBKEY`) → the logic module; `SCHEMA_VERSION` → `meter_windows.py` · `config/offsets.py`
 - [[invariants/rva-index-resolution]] — PRIMARY class resolution by `TypeDefIndex`+calib, gated by a name round-trip; the scan is FALLBACK; new class → `TARGETS` · `il2cpp/resolver.py`
