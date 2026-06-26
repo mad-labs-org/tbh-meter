@@ -37,6 +37,15 @@ import os
 import sys
 import time
 
+# Force UTF-8 on stdout/stderr so a diagnostic glyph (e.g. "↳") never crashes print() on a Windows
+# console/redirect that defaults to cp1252 — without this the gate dies with UnicodeEncodeError before
+# it can print the PASS/FAIL summary. The file tee (validate_live_out.txt) is already UTF-8.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):
+    pass
+
 # bootstrap identical to seed_calib_capture.py: finds reader/ from the share root or from reader/scripts/.
 _here = os.path.dirname(os.path.abspath(__file__))
 _reader_root = next(
