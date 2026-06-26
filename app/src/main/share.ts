@@ -78,6 +78,10 @@ interface IngestRunHero {
   skillLevels?: Record<string, number>;
   gear?: Record<string, IngestGearSlot>;
   runeKeys?: number[];
+  /** The reader's live FINAL stats, keyed by StatType id (e.g. "1" AttackDamage). These are
+   *  read 100% faithfully from game memory; the site displays them directly instead of
+   *  recomputing from the build (the recompute can't reproduce account-wide stats). */
+  stats?: Record<string, number>;
 }
 interface IngestRunBody {
   externalId: string;
@@ -186,6 +190,9 @@ function mapHero(hero: RunHero): IngestRunHero {
   if (skillLevels && Object.keys(skillLevels).length > 0) out.skillLevels = skillLevels;
   const gear = mapGear(hero.items);
   if (gear) out.gear = gear;
+  // The reader's live FINAL stats (keyed by StatType id) — uploaded so the site can show the
+  // real in-game values instead of recomputing them from the build.
+  if (hero.stats && Object.keys(hero.stats).length > 0) out.stats = hero.stats;
   return out;
 }
 
