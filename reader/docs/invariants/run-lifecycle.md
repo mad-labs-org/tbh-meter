@@ -28,6 +28,7 @@ code_anchors:
   - meter_windows.py::_box_belongs_to_pending
   - meter_windows.py::_absorb_drop
   - meter_windows.py::_drop_counts
+  - meter_windows.py::LogScanCursor
   - config/offsets.py::LogManager.LOG_LIST
 asserts:
   - meter_windows.PENDING_CLOSE_GRACE == 3.0
@@ -38,6 +39,8 @@ guarded_by:
   - tests/test_meter_windows.py::TestNewPending::test_deadline_is_now_plus_grace
   - tests/test_meter_windows.py::TestFlushPendingRec::test_flushed_json_contains_absorbed_boxes
   - tests/test_raw_record.py::test_absorbed_boss_box_lands_inside_drops_envelope_without_shape_change
+  - tests/test_log_scan.py::TestCapRotation::test_rotation_with_size_pinned_detects_new_tail_entry
+  - tests/test_log_scan.py::TestClearThenBoxOrderingAcrossRotation::test_clear_then_box_separate_rotated_ticks
 ---
 
 # Run lifecycle
@@ -45,13 +48,27 @@ guarded_by:
 A **run** is one stage attempt. The reader gets no "started/ended" event: it
 **infers the lifecycle from memory**, watching the game's log list every tick.
 
-## Boundary: LogManager's LOG_LIST grows
+## Boundary: new LogManager.LOG_LIST entries (tracked by OBJECT POINTER, rotation-aware)
 
-Each tick the loop reads the list's `size` at `LogManager.LOG_LIST` (the "bible" `offsets.py`
-marks this offset as the *run boundary*). When `size` **grows**, the reader scans only the
-NEW entries (`[last_size, size)`) and looks at each one's **klass-pointer** (the entry's first
-qword = pointer to its class). It's this growth that carries the terminal events — there is no
-separate "start" signal: the next run simply begins when the previous one closes.
+Each tick the loop reads `LogManager.LOG_LIST` (the "bible" `offsets.py` marks this offset as the
+*run boundary*) and asks `LogScanCursor` for the **NEW entries** since the previous tick; it then
+looks at each one's **klass-pointer** (the entry's first qword = pointer to its class). These new
+entries carry the terminal events — there is no separate "start" signal: the next run simply begins
+when the previous one closes.
+
+**Identity is the entry's OBJECT POINTER, never its index.** The list is **capped at 2000** (see
+[[invariants/log-event-detection]] / `metrics/events.py`); once full the game evicts from the **HEAD**
+to stay at the cap, so absolute indices shift DOWN on every append. The original absolute-index cursor
+(`[last_size, size)`, fired only while `size` grew) desynced PERMANENTLY at saturation: with `size`
+pinned at the cap it never fired again, so every `StageClearLog` was missed — runs closed only via the
+`abandoned` path (`clear_time=0`) and one open run accrued several stages (live `mobs` far above the
+stage total). A reader/game **restart did NOT fix it** (the game process keeps the saturated list; an
+index cursor just re-seeds to the cap). `LogScanCursor` instead tracks the last-processed entry by its
+heap pointer: each tick it scans the tail backward, collecting unseen pointers and stopping at the first
+already-seen one (bounded per tick by the scan cap), so head-eviction can't desync it and a tail append
+is detected even when `size` never changes. `seed()` establishes the baseline at attach/re-attach
+WITHOUT replaying the pre-existing backlog. The cursor yields **oldest→newest**, which is what the
+pending-close below relies on (the `StageClearLog` is processed BEFORE its trailing boss `GetBoxLog`).
 
 ## End: StageClearLog (success) / StageFailedLog (fail) by klass-pointer
 
