@@ -2,11 +2,13 @@
 // function with zero static dependencies on index.ts internals. All state
 // is read from OS APIs, the filesystem, or the opts parameter passed by
 // the caller (index.ts). Returns a plaintext block safe to paste in
-// GitHub Issues or Discord. No PII, no tokens, no raw run data.
+// GitHub Issues or Discord. Paths are redacted. No tokens, no raw run data.
 import { app, screen } from "electron";
 import { platform, release } from "node:os";
 import { statSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "path";
+import { existsSync } from "node:fs";
+import { openSync, readSync, closeSync } from "node:fs";
 import type { AppSettings } from "../shared/ipc-types.js";
 
 export interface DebugInfoOpts {
@@ -148,7 +150,7 @@ export async function collectDebugInfo(opts: DebugInfoOpts): Promise<string> {
   w("liveExpanded", s.liveExpanded);
   w("alwaysOnTop", s.alwaysOnTop);
   w("liveBounds", s.liveBounds ? JSON.stringify(s.liveBounds) : "none");
-  w("outputDir", s.outputDir || "default (~/tbh-meter)");
+  w("outputDir", redactPath(s.outputDir || "default (~/tbh-meter)"));
   w("RC variant", opts.isRc ? "yes" : "no");
   w("Launch on startup", s.launchOnStartup ?? false);
   w("opacity", s.opacity);
@@ -177,9 +179,13 @@ async function checkNetwork(): Promise<NetworkReport> {
     const t0 = Date.now();
     try {
       const ctrl = new AbortController();
-      setTimeout(() => ctrl.abort(), 3000);
-      await fetch(url, { method: "HEAD", signal: ctrl.signal });
-      return Date.now() - t0;
+      const timer = setTimeout(() => ctrl.abort(), 3000);
+      try {
+        await fetch(url, { method: "HEAD", signal: ctrl.signal });
+        return Date.now() - t0;
+      } finally {
+        clearTimeout(timer);
+      }
     } catch {
       return -1;
     }
@@ -206,15 +212,48 @@ async function appendLogTail(
   label: string,
   maxLines: number,
 ): Promise<void> {
+  // Byte budget: read only the tail of large files rather than the whole
+  // file synchronously on the main process.  64 KB covers well over 50 lines.
+  const BYTE_BUDGET = 64 * 1024;
   try {
-    const text = readFileSync(path, "utf-8");
-    const all = text.split("\n").filter(Boolean);
-    const tail = all.slice(-maxLines);
-    lines.push(`\n--- ${label} (last ${tail.length} lines) ---`);
-    for (const line of tail) lines.push(line);
+    if (!existsSync(path)) {
+      lines.push(`\n--- ${label} (not found) ---`);
+      return;
+    }
+    const size = statSync(path).size;
+    const fd = openSync(path, "r");
+    try {
+      const readSize = Math.min(size, BYTE_BUDGET);
+      const buf = Buffer.alloc(readSize);
+      const startPos = size > readSize ? size - readSize : 0;
+      readSync(fd, buf, 0, readSize, startPos);
+      let text = buf.toString("utf-8");
+      // Discard the partial first line when we didn't start at byte 0
+      if (startPos > 0) {
+        const nl = text.indexOf("\n");
+        if (nl >= 0) text = text.slice(nl + 1);
+      }
+      const all = text.split("\n").filter(Boolean);
+      const tail = all.slice(-maxLines);
+      lines.push(`\n--- ${label} (last ${tail.length} lines) ---`);
+      for (const line of tail) lines.push(redactPath(line));
+    } finally {
+      closeSync(fd);
+    }
   } catch {
     lines.push(`\n--- ${label} (not found) ---`);
   }
+}
+
+// ── Path redaction ──────────────────────────────────────────────────────
+// Strips Windows user directory patterns from paths and stashes the
+// home/user prefix, so the output is safe to paste publicly.
+
+const WIN_USER_RE = /C:\\Users\\[^\\]+/gi;
+const WIN_DOCS_RE = /(?:\\|%USERPROFILE%)(?:Documents|Downloads|Desktop|AppData)(?:\\[^ ]+)*/gi;
+
+function redactPath(text: string): string {
+  return text.replace(WIN_USER_RE, "C:\\Users\\<user>").replace(WIN_DOCS_RE, "");
 }
 
 function formatUptime(seconds: number): string {
