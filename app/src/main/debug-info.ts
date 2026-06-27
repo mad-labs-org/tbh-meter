@@ -5,10 +5,8 @@
 // GitHub Issues or Discord. Paths are redacted. No tokens, no raw run data.
 import { app, screen } from "electron";
 import { platform, release } from "node:os";
-import { statSync, readFileSync, readdirSync } from "node:fs";
+import { statSync, readFileSync, readdirSync, existsSync, openSync, readSync, closeSync } from "node:fs";
 import { join } from "path";
-import { existsSync } from "node:fs";
-import { openSync, readSync, closeSync } from "node:fs";
 import type { AppSettings } from "../shared/ipc-types.js";
 
 export interface DebugInfoOpts {
