@@ -16,6 +16,7 @@ code_anchors:
   - meter_windows.py::TARGETS
   - meter_windows.py::run
   - meter_windows.py::BOX_KEY_BY_TIER
+  - meter_windows.py::LogScanCursor
   - config/offsets.py::GetBoxLog
   - config/offsets.py::ELogType
   - metrics/events.py::EventFeed
@@ -25,15 +26,24 @@ guarded_by:
   - tests/test_meter_windows.py::TestBoxKeyByTier::test_three_tiers_map_to_canonical_box_keys
   - tests/test_meter_windows.py::TestSuffixInt::test_no_numeric_suffix
   - tests/test_events.py::TestEventFeed::test_first_update_is_baseline_no_events
+  - tests/test_log_scan.py::TestCapRotation::test_repeated_rotation_each_new_tail_detected_once
 ---
 
 # Log event detection (by klass-pointer, not by ELogType)
 
 `LogManager` keeps a `List<LogData>` (`LogManager.LOG_LIST`) where the game pushes **one
 entry per event** — stage end (success/failure), box drop, hero death/revive. The loop
-in `run` reads the new entries from the **previous `size` to the current one** each tick and
-decides what each one is. Each `LogData` is a managed object, so its **first field (offset 0) is the
-pointer to the Il2CppClass** — the "K-class" of the log's concrete type.
+in `run` asks `LogScanCursor` for the **new entries** each tick and decides what each one is.
+Each `LogData` is a managed object, so its **first field (offset 0) is the pointer to the
+Il2CppClass** — the "K-class" of the log's concrete type — which is also the cursor's stable
+**identity** for that entry.
+
+The list is **capped at 2000** and evicts from the HEAD when full, so a `[previous_size, size)`
+absolute-index scan desyncs once the cap saturates (it stops firing — every event then missed; see
+the boundary section of [[invariants/run-lifecycle]]). `LogScanCursor` therefore tracks the
+last-processed entry by its **object pointer**, scanning the tail backward and stopping at the first
+already-seen pointer — rotation-aware, immune to head-eviction. Detection (which entries are new) is
+the cursor's job; **labeling** (what each one is) is the klass-pointer comparison below.
 
 **The hard rule: the event type is decided by KLASS-POINTER EQUALITY, never by a type
 field.** The loop does `kl = reader.rptr(e)` (the entry's klass) and compares `kl == sc_class`,
@@ -77,9 +87,12 @@ success, not to the run the close just opened — see [[invariants/run-lifecycle
 
 `metrics.events.EventFeed` is independent of the labeling loop above: it only counts **how many new
 entries** appeared (delta of `size`, re-anchoring when the list truncates), without looking at any
-type. It is not the event-detection path — it is a counter. **Labeling** (knowing WHICH event it is)
-requires the klass-pointer, as described above; the "read each event's type" TODO in the `events.py`
-header was resolved in the `run` loop precisely by klass-pointer, not by dumping the `ELogType` field.
+type. It is not the event-detection path — it is a counter, and its size-delta is NOT how the run-close
+path survives the 2000-cap: that path uses `LogScanCursor` (pointer identity, above), because a
+size-delta on a head-evicting list pinned at the cap reads zero new entries and misses the clear.
+**Labeling** (knowing WHICH event it is) requires the klass-pointer, as described above; the "read each
+event's type" TODO in the `events.py` header was resolved in the `run` loop precisely by klass-pointer,
+not by dumping the `ELogType` field.
 
 ## Related
 - [[invariants/offsets-single-source]]
