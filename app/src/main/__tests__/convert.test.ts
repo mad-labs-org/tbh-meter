@@ -313,6 +313,42 @@ describe("convert — heroes & drops", () => {
     expect(r.heroes[0].skillLevels).toEqual({ "7001": 5 });
   });
 
+  it("carries a known party slot through to the hero (incl. slot 0), absent when unknown", () => {
+    const r = convert(
+      rawRun({
+        heroes: {
+          ok: true,
+          value: [
+            // slot 0 is a real slot — must survive (a falsy-truthy guard would drop it)
+            { heroKey: 1, classId: null, class: "", slot: 0, level: 1, exp: 0, items: [], skills: [], stats: {} },
+            { heroKey: 2, classId: null, class: "", slot: 2, level: 1, exp: 0, items: [], skills: [], stats: {} },
+          ],
+        },
+      }),
+    );
+    expect(r.heroes[0].slot).toBe(0);
+    expect(r.heroes[1].slot).toBe(2);
+  });
+
+  it("leaves slot undefined when the raw hero has no slot (legacy / unknown), incl. explicit null", () => {
+    const r = convert(
+      rawRun({
+        heroes: {
+          ok: true,
+          value: [
+            { heroKey: 1, classId: null, class: "", level: 1, exp: 0, items: [], skills: [], stats: {} },
+            // an explicit null slot (reader couldn't resolve it) is treated as unknown -> no key
+            { heroKey: 2, classId: null, class: "", slot: null, level: 1, exp: 0, items: [], skills: [], stats: {} },
+          ],
+        },
+      }),
+    );
+    expect(r.heroes[0].slot).toBeUndefined();
+    expect("slot" in r.heroes[0]).toBe(false);
+    expect(r.heroes[1].slot).toBeUndefined();
+    expect("slot" in r.heroes[1]).toBe(false);
+  });
+
   it("leaves killedBy undefined for a hero with no killed_by", () => {
     const r = convert(
       rawRun({

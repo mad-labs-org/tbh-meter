@@ -41,6 +41,33 @@ function run(overrides: Partial<RunRecord> = {}): RunRecord {
   } as RunRecord;
 }
 
+describe("buildPayload party slot", () => {
+  it("forwards a known party slot (incl. slot 0) to the ingest party member", () => {
+    const payload = buildPayload(
+      run({
+        heroes: [
+          { heroKey: 201, class: "Knight", classId: 5, slot: 0, level: 80, exp: 0, skills: [], items: [], stats: {} },
+          { heroKey: 202, class: "Mage", classId: 6, slot: 2, level: 80, exp: 0, skills: [], items: [], stats: {} },
+        ],
+      }),
+    );
+    expect(payload.party[0].slot).toBe(0);
+    expect(payload.party[1].slot).toBe(2);
+  });
+
+  it("omits slot for a hero without one (legacy run / unknown slot)", () => {
+    const payload = buildPayload(
+      run({
+        heroes: [
+          { heroKey: 201, class: "Knight", classId: 5, level: 80, exp: 0, skills: [], items: [], stats: {} },
+        ],
+      }),
+    );
+    expect(payload.party[0].slot).toBeUndefined();
+    expect("slot" in payload.party[0]).toBe(false);
+  });
+});
+
 describe("buildPayload endedAt", () => {
   it("converts the reader's epoch-seconds ts to epoch ms", () => {
     expect(buildPayload(run()).endedAt).toBe(1_750_000_000_000);

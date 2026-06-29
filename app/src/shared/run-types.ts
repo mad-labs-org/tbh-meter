@@ -28,7 +28,7 @@ export interface RunItem { slot: string; slotId: number | null; grade: string; g
 /** A hero skill: `key` = skill key (equipped active: skillKey; invested passive: attributeKey == refKey); `lv` = invested level (null when unknown — e.g. an unmapped or innate active). v9+ `skills` includes invested passives alongside equipped actives; pre-v9 held equipped actives only. */
 export interface RunSkill { key: number; lv: number | null; }
 /** The hero's full invested skill tree (v8+): { [attributeKey]: level } for every node with points (actives + passives). Absent in pre-v8 runs (use `skills`). */
-export interface RunHero { heroKey: number; class: string; classId: number | null; level: number; exp: number; items: RunItem[]; skills: RunSkill[]; skillLevels?: Record<string, number>; stats: Record<string, number>; expStart?: number; expEnd?: number; levelup?: boolean; xpGained?: number; deaths?: number; revives?: number; killedBy?: number[]; }
+export interface RunHero { heroKey: number; class: string; classId: number | null; slot?: number; level: number; exp: number; items: RunItem[]; skills: RunSkill[]; skillLevels?: Record<string, number>; stats: Record<string, number>; expStart?: number; expEnd?: number; levelup?: boolean; xpGained?: number; deaths?: number; revives?: number; killedBy?: number[]; }
 /** A finished run. The structured artifact the app reads from `logs/<id>.json` (produced by the
  *  converter, PR3) and the shape `normalizeRecord` still emits from the legacy `runs.jsonl` until
  *  PR4. The converter-only fields below are optional: absent on the legacy normalize path, always

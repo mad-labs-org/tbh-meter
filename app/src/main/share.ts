@@ -62,6 +62,9 @@ type UploadMap = Record<string, UploadEntry>;
 interface IngestRunHero {
   heroKey: number;
   classType: string;
+  /** 0-based party slot (0/1/2) so the site can position heroes — incl. empty slots. Sent only
+   *  when the run carries a known slot; omitted for legacy/unknown (never defaulted). */
+  slot?: number;
   dps: number;
   damage: number;
   level?: number;
@@ -164,6 +167,7 @@ function mapHero(hero: RunHero): IngestRunHero {
     dps: 0,
     damage: 0,
   };
+  if (typeof hero.slot === "number") out.slot = hero.slot;
   if (Number.isFinite(hero.level) && hero.level >= 1) {
     out.level = Math.min(99999, Math.trunc(hero.level));
   }

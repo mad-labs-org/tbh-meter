@@ -132,6 +132,9 @@ function mapHero(raw: RawHero): RunHero {
     }
     if (Object.keys(sl).length > 0) hero.skillLevels = sl;
   }
+  // slot: 0-based party slot the reader emits only when known (absent/null = unknown). Carry the
+  // number through verbatim (incl. 0); never default it — an unknown slot stays absent downstream.
+  if (typeof raw.slot === "number") hero.slot = raw.slot;
   if (typeof raw.exp_start === "number") hero.expStart = raw.exp_start;
   if (typeof raw.exp_end === "number") hero.expEnd = raw.exp_end;
   if (typeof raw.xp_gained === "number") hero.xpGained = raw.xp_gained;
