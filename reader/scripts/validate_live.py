@@ -204,6 +204,7 @@ def main():
     # A moved/changed cipher makes the decoded level DIVERGE from the save → FAIL: the per-build tripwire
     # that lets us re-find the value on every update (game/obscured.py + obscured-data-offlimits).
     xp_oracle = []
+    raw_slots = {}                       # {heroKey: HeroList index} re-derived here = the [party-slots] oracle
     hl = reader.rptr(sm + StageManager.HERO_LIST) if sm else None
     nslots = reader.ri32(hl + Array.MAX_LENGTH) if hl else None
     for i in range(nslots if (nslots is not None and 0 < nslots <= 12) else 0):
@@ -213,6 +214,7 @@ def main():
         hk = reader.ri32(hi + HeroInfoData.HERO_KEY) if hi else None
         if hk is None or hk not in hero_cat:
             continue
+        raw_slots[hk] = i                # this deployed hero's formation slot = its HeroList index
         dec_lvl = obscured.decode_obscured_int(reader.ru32(uf + HeroRuntime.LEVEL_HIDDEN),
                                                reader.ru32(uf + HeroRuntime.LEVEL_KEY))
         dec_xp = obscured.decode_obscured_float(reader.ru32(uf + HeroRuntime.EXP_HIDDEN),
@@ -224,6 +226,15 @@ def main():
     checks.append(("xp-live", bool(xp_oracle) and all(o[4] for o in xp_oracle),
                    " ".join(f"hk{hk}:lv{dl}=save{sl}? xp={dx:.4g}" for hk, dl, sl, dx, _ in xp_oracle)
                    or "no live party (in combat?)"))
+
+    # [party-slots] read_party_slots maps each DEPLOYED hero to its HeroList INDEX (the formation
+    # position 0/1/2 — the run record's per-hero `slot` and the party order). THE ORACLE: it must equal
+    # the indices re-derived INDEPENDENTLY above (raw_slots); a shifted/dropped slot (formation order
+    # silently lost) → FAIL. It shares _iter_party_slots with read_live_party, so this also re-confirms
+    # membership (the same family as party-live). See [[invariants/party-live-resolution]].
+    party_slots = build.read_party_slots(reader, sm, hero_cat) if sm else {}
+    checks.append(("party-slots", bool(party_slots) and party_slots == raw_slots,
+                   f"slots={party_slots} herolist_index={raw_slots}"))
 
     # [dps] MonsterSpawnManager + UnitHealthController: DPS = Σ of monster HP drops. models.live_monsters
     # iterates (unit, hp_cur, hp_max) reading MONSTER_LIST/SUMMONED_LIST + Unit.HEALTH_CONTROLLER + HP@0x40/0x4C.
