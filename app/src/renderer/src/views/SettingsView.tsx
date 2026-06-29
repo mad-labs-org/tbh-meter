@@ -10,6 +10,7 @@ import {
   Trash2,
   Minus,
   Plus,
+  FileText,
 } from "lucide-react";
 import type { AppSettings, AuthStatus, UpdateStatus } from "../../../shared/ipc-types.js";
 import { FONT_SCALE_MIN, FONT_SCALE_MAX, clampFontScale } from "../../../shared/ipc-types.js";
@@ -28,6 +29,7 @@ import { DiscordIcon } from "~/components/DiscordIcon";
 import { Modal } from "~/components/Modal";
 import { useT } from "~/lib/i18n";
 import { cn } from "~/lib/utils";
+import { DiagnosticsLogView } from "./DiagnosticsLogView";
 
 interface SettingsViewProps {
   settings: AppSettings;
@@ -36,6 +38,7 @@ interface SettingsViewProps {
 
 export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) {
   const t = useT();
+  const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
   const opacityPct = Math.round(settings.opacity * 100);
   const [resolvedDir, setResolvedDir] = useState<string | null>(null);
   const [version, setVersion] = useState<string | null>(null);
@@ -66,6 +69,8 @@ export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) 
       setResolvedDir(picked);
     }
   };
+
+  if (diagnosticsOpen) return <DiagnosticsLogView onBack={() => setDiagnosticsOpen(false)} />;
 
   return (
     <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-3">
@@ -157,7 +162,7 @@ export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) 
       </div>
 
       <div className="border-t border-surface-600 pt-3">
-        <UsageStatsRow settings={settings} onSettingsChange={onSettingsChange} />
+        <UsageStatsRow settings={settings} onSettingsChange={onSettingsChange} onOpenDiagnostics={() => setDiagnosticsOpen(true)} />
       </div>
 
       <div className="border-t border-surface-600 pt-3">
@@ -736,9 +741,11 @@ function BlueChestTrackerRow({
 function UsageStatsRow({
   settings,
   onSettingsChange,
+  onOpenDiagnostics,
 }: {
   settings: AppSettings;
   onSettingsChange: (partial: Partial<AppSettings>) => void;
+  onOpenDiagnostics: () => void;
 }) {
   const t = useT();
   return (
@@ -756,6 +763,16 @@ function UsageStatsRow({
           <span className="block text-[11px] text-zinc-500">{t("settings.usageStatsDesc")}</span>
         </span>
       </label>
+      <button
+        onClick={onOpenDiagnostics}
+        className="mt-2 flex cursor-pointer items-center gap-1.5 rounded bg-surface-700 px-2 py-1 text-xs text-zinc-300 transition-colors hover:bg-surface-600 hover:text-white"
+      >
+        <FileText className="size-3" />
+        {t("settings.diagnosticsLog")}
+      </button>
+      <p className="mt-1.5 text-[11px] text-zinc-500">
+        {t("settings.diagnosticsLogDesc")}
+      </p>
     </div>
   );
 }

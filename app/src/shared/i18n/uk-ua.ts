@@ -116,6 +116,14 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.usageStatsLabel": "Ділитися анонімною статистикою використання",
   "settings.usageStatsDesc":
     "Допомагає нам бачити, скільки людей використовують метер (анонімно, через Google Analytics). Жодних особистих даних і деталей забігів. Вимкніть, щоб повністю відмовитися.",
+  "settings.diagnosticsLog": "Журнал діагностики",
+  "settings.diagnosticsLogDesc": "Збір діагностичної інформації для звітів про помилки. Особисті дані не включаються.",
+  "diagnostics.collecting": "Збір діагностики...",
+  "diagnostics.failed": "Не вдалося зібрати діагностику.",
+  "diagnostics.copyToClipboard": "Копіювати в буфер обміну",
+  "diagnostics.copied": "Скопійовано!",
+  "diagnostics.copyFailed": "Не вдалося скопіювати — перевірте дозволи буфера обміну.",
+  "diagnostics.backToSettings": "Повернутися до налаштувань",
   "settings.runHistory": "Історія забігів",
   "settings.runHistoryDesc":
     "Видаляє всі забіги, збережені на цьому комп'ютері. Забіги, вже надіслані до таблиці лідерів, не зачіпаються й лишаються в мережі.",

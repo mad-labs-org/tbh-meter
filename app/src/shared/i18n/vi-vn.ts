@@ -116,6 +116,14 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.usageStatsLabel": "Chia sẻ thống kê sử dụng ẩn danh",
   "settings.usageStatsDesc":
     "Giúp chúng tôi biết bao nhiêu người dùng meter (ẩn danh, qua Google Analytics). Không có dữ liệu cá nhân hay chi tiết lượt chạy. Tắt để từ chối hoàn toàn.",
+    "settings.diagnosticsLog": "Nhật ký chẩn đoán",
+  "settings.diagnosticsLogDesc": "Thu thập thông tin chẩn đoán cho báo cáo lỗi. Không bao gồm dữ liệu cá nhân.",
+  "diagnostics.collecting": "Đang thu thập chẩn đoán...",
+  "diagnostics.failed": "Không thể thu thập chẩn đoán.",
+  "diagnostics.copyToClipboard": "Sao chép vào clipboard",
+  "diagnostics.copied": "Đã sao chép!",
+  "diagnostics.copyFailed": "Sao chép thất bại — kiểm tra quyền clipboard.",
+  "diagnostics.backToSettings": "Quay lại Cài đặt",
   "settings.runHistory": "Lịch sử lượt chơi",
   "settings.runHistoryDesc":
     "Xóa toàn bộ lượt chơi lưu trên máy này. Lượt đã chia sẻ lên bảng xếp hạng không bị ảnh hưởng và vẫn còn trên web.",

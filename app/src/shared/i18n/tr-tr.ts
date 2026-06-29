@@ -116,6 +116,14 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.usageStatsLabel": "Anonim kullanım istatistiklerini paylaş",
   "settings.usageStatsDesc":
     "Kaç kişinin meter kullandığını görmemize yardımcı olur (anonim, Google Analytics aracılığıyla). Kişisel veri veya koşu ayrıntısı yok. Tamamen çıkmak için kapatın.",
+    "settings.diagnosticsLog": "Tanı günlüğü",
+  "settings.diagnosticsLogDesc": "Hata raporları için tanı bilgilerini toplar. Kişisel veri içermez.",
+  "diagnostics.collecting": "Tanı bilgileri toplanıyor...",
+  "diagnostics.failed": "Tanı bilgileri toplanamadı.",
+  "diagnostics.copyToClipboard": "Panoya kopyala",
+  "diagnostics.copied": "Kopyalandı!",
+  "diagnostics.copyFailed": "Kopyalama başarısız — pano izinlerini kontrol edin.",
+  "diagnostics.backToSettings": "Ayarlara dön",
   "settings.runHistory": "Run geçmişi",
   "settings.runHistoryDesc":
     "Bu bilgisayardaki tüm runları siler. Lider tablosuna zaten paylaşılan runlar etkilenmez ve webde kalır.",

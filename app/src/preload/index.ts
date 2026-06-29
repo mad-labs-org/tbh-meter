@@ -135,6 +135,8 @@ const meter: MeterApi = {
   reportError: (context, message, stack) =>
     ipcRenderer.send("meter:report-error", context, message, stack),
 
+  debugInfo: () => ipcRenderer.invoke("meter:debug-info"),
+
   windowControls: {
     minimize: () => ipcRenderer.send("meter:minimize"),
     close: () => ipcRenderer.send("meter:close"),

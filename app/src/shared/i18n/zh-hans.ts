@@ -113,6 +113,14 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.usageStatsLabel": "分享匿名使用统计",
   "settings.usageStatsDesc":
     "帮助我们了解有多少人在使用 meter（匿名，通过 Google Analytics）。没有个人数据，没有挑战详情。关闭以完全退出。",
+    "settings.diagnosticsLog": "诊断日志",
+  "settings.diagnosticsLogDesc": "收集诊断信息用于错误报告。不包含个人数据。",
+  "diagnostics.collecting": "正在收集诊断信息...",
+  "diagnostics.failed": "诊断信息收集失败。",
+  "diagnostics.copyToClipboard": "复制到剪贴板",
+  "diagnostics.copied": "已复制！",
+  "diagnostics.copyFailed": "复制失败 — 请检查剪贴板权限。",
+  "diagnostics.backToSettings": "返回设置",
   "settings.runHistory": "挑战历史",
   "settings.runHistoryDesc":
     "删除本机保存的全部挑战。已分享到排行榜的挑战不受影响，仍保留在网页上。",

@@ -115,6 +115,14 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.usageStatsLabel": "แชร์สถิติการใช้งานแบบไม่ระบุตัวตน",
   "settings.usageStatsDesc":
     "ช่วยให้เราเห็นว่ามีคนใช้มิเตอร์กี่คน (ไม่ระบุตัวตน ผ่าน Google Analytics) ไม่มีข้อมูลส่วนตัวหรือรายละเอียดรัน ปิดเพื่อยกเลิกการเข้าร่วมทั้งหมด",
+  "settings.diagnosticsLog": "บันทึกการวินิจฉัย",
+  "settings.diagnosticsLogDesc": "รวบรวมข้อมูลการวินิจฉัยสำหรับรายงานบั๊ก ไม่มีข้อมูลส่วนบุคคลรวมอยู่ด้วย",
+  "diagnostics.collecting": "กำลังรวบรวมข้อมูลการวินิจฉัย...",
+  "diagnostics.failed": "ไม่สามารถรวบรวมข้อมูลการวินิจฉัยได้",
+  "diagnostics.copyToClipboard": "คัดลอกไปยังคลิปบอร์ด",
+  "diagnostics.copied": "คัดลอกแล้ว!",
+  "diagnostics.copyFailed": "คัดลอกไม่สำเร็จ — ตรวจสอบสิทธิ์คลิปบอร์ด",
+  "diagnostics.backToSettings": "กลับไปที่การตั้งค่า",
   "settings.runHistory": "ประวัติรัน",
   "settings.runHistoryDesc":
     "ลบรันทั้งหมดในเครื่องนี้ รันที่แชร์ขึ้นลีดเดอร์บอร์ดแล้วไม่ถูกกระทบและยังอยู่บนเว็บ",
