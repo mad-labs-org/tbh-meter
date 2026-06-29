@@ -1584,9 +1584,10 @@ def run(hz, output_dir, debug=False):
                 pl0 = R.get("party_live_start") or {}
                 party_keys = list(pl0) + [k for k in R["party_seen"] if k not in pl0]
                 # Order the overlay party by formation slot (0/1/2) — the in-game team order; falls back
-                # to first-seen order when a slot didn't resolve. The {heroKey: slot} map rides alongside
-                # in live.json (additive) so the overlay can place by exact position (gaps included).
-                party_keys.sort(key=lambda k: (slot_map.get(k) is None, slot_map.get(k) or 0))
+                # to first-seen order when a slot didn't resolve. SAME rule as the run record
+                # (build.slot_sort_key) so overlay and record never drift. The {heroKey: slot} map rides
+                # alongside in live.json (additive) so the overlay can place by exact position (gaps included).
+                party_keys.sort(key=lambda k: build.slot_sort_key(slot_map.get(k)))
                 # Live loot: chest count per EMonsterLogType (index = the enum value) —
                 # CURRENT run + those absorbed by the pending-close (the trailing boss box RAISES the
                 # count while the live stage_key is still the cleared one; it's that rising-edge that

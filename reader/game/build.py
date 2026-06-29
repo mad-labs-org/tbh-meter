@@ -250,13 +250,21 @@ def hero_in_run(hero_key, live_keys):
     return bool(live_keys) and hero_key in live_keys
 
 
+def slot_sort_key(slot):
+    """Sort key for the formation `slot` (0/1/2): a hero/heroKey with NO slot (None — a degraded
+    read, or an older record) sorts LAST; otherwise by slot, with 0 a REAL first position (NOT
+    falsy-coalesced away — the trap). The single source for the party-ordering rule, shared by
+    order_party_by_slot (run record) and the live-overlay sort (meter_windows) so the two never drift."""
+    return (slot is None, slot or 0)
+
+
 def order_party_by_slot(heroes):
     """Stable-sort the run's heroes by their formation `slot` (0/1/2) so the run record emits the
     party in IN-GAME FORMATION order — it used to come out in SAVE-ROSTER order (the order
     PlayerSaveData.HEROES happened to iterate), with the live HeroList slot index discarded. A hero
     with no resolved slot (rare: included via a degraded read) trails, keeping its relative order.
     Pure/testable, mirrors hero_in_run."""
-    return sorted(heroes, key=lambda h: (h.get("slot") is None, h.get("slot") or 0))
+    return sorted(heroes, key=lambda h: slot_sort_key(h.get("slot")))
 
 
 def read_stats_dict(reader, uf):

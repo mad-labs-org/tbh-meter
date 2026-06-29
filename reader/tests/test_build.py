@@ -152,3 +152,12 @@ def test_order_party_by_slot_missing_slot_trails_in_order():
     # A hero with no resolved slot (None or absent — a degraded read) trails, keeping relative order.
     heroes = [{"heroKey": 301, "slot": None}, {"heroKey": 101, "slot": 0}, {"heroKey": 401}]
     assert [h["heroKey"] for h in build.order_party_by_slot(heroes)] == [101, 301, 401]
+
+
+def test_slot_sort_key_zero_is_real_and_none_trails():
+    # The single party-ordering rule (shared by order_party_by_slot + the live overlay sort): slot 0
+    # is a REAL first position (NOT coalesced to "missing"), and a None slot trails everything.
+    assert build.slot_sort_key(0) == (False, 0)
+    assert build.slot_sort_key(2) == (False, 2)
+    assert build.slot_sort_key(None) == (True, 0)
+    assert sorted([2, None, 0, 1], key=build.slot_sort_key) == [0, 1, 2, None]
