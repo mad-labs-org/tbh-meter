@@ -58,6 +58,37 @@ describe("buildPayload hero stats passthrough", () => {
   });
 });
 
+describe("buildPayload formation slot", () => {
+  it("forwards each hero's formation slot (0/1/2), preserving exact positions incl. a gap", () => {
+    const payload = buildPayload(
+      run({
+        heroes: [
+          { heroKey: 201, class: "Knight", classId: null, level: 80, exp: 0, skills: [], items: [], stats: {}, slot: 0 },
+          { heroKey: 301, class: "Mage", classId: null, level: 80, exp: 0, skills: [], items: [], stats: {}, slot: 2 },
+        ],
+      }),
+    );
+    expect(payload.party.map((h) => h.slot)).toEqual([0, 2]); // slot 1 empty — the gap survives
+  });
+
+  it("keeps the party in the reader's formation order (the upload never reorders)", () => {
+    const payload = buildPayload(
+      run({
+        heroes: [
+          { heroKey: 301, class: "Mage", classId: null, level: 80, exp: 0, skills: [], items: [], stats: {}, slot: 0 },
+          { heroKey: 201, class: "Knight", classId: null, level: 80, exp: 0, skills: [], items: [], stats: {}, slot: 1 },
+        ],
+      }),
+    );
+    expect(payload.party.map((h) => h.heroKey)).toEqual([301, 201]);
+  });
+
+  it("omits slot when the run carries none (older, pre-slot runs)", () => {
+    const payload = buildPayload(run({ heroes: [hero({})] }));
+    expect(payload.party[0]!.slot).toBeUndefined();
+  });
+});
+
 describe("buildPayload endedAt", () => {
   it("converts the reader's epoch-seconds ts to epoch ms", () => {
     expect(buildPayload(run()).endedAt).toBe(1_750_000_000_000);

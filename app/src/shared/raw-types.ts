@@ -84,6 +84,9 @@ export interface RawHero {
   deaths?: number;
   revives?: number;
   killed_by?: number[];
+  /** Formation slot (0/1/2) = the hero's position in the live StageManager.HeroList (the in-game
+   *  team order the player set). `null` on a degraded read; absent on pre-slot reader runs. */
+  slot?: number | null;
 }
 
 /** A rune node from the account-wide rune tree (`PlayerSaveData.RUNES`). `key` matches

@@ -143,6 +143,9 @@ function mapHero(raw: RawHero): RunHero {
     const kb = raw.killed_by.filter((k): k is number => typeof k === "number" && Number.isFinite(k));
     if (kb.length > 0) hero.killedBy = kb;
   }
+  // Formation slot (0/1/2) — the hero's position in the live party. The reader may emit null on a
+  // degraded read, so only a finite number counts as a real slot. Absent on pre-slot reader runs.
+  if (typeof raw.slot === "number" && Number.isFinite(raw.slot)) hero.slot = raw.slot;
   return hero;
 }
 

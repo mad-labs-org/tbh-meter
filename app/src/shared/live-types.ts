@@ -56,4 +56,9 @@ export interface RawLive {
    *  reader omits it; the app detects it by presence and the time-to-level chip simply doesn't render.
    *  Empty `{}` = no live party. Powers the overlay's "time to next level". */
   party_progress?: Record<string, { level: number; exp: number; gain: number }>;
+  /** Live formation slot per deployed hero — `{heroKey: slot}` (heroKey is a JSON string; slot is
+   *  0/1/2 = its position in StageManager.HeroList). `party` above is already ordered by it; this
+   *  rides alongside so a consumer can place by EXACT position (gaps included). ADDITIVE (no schema
+   *  bump): an older reader omits it. Empty `{}` = no live party. */
+  party_slots?: Record<string, number>;
 }
