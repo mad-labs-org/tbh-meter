@@ -1055,6 +1055,11 @@ def run(hz, output_dir, debug=False):
         pl_start = R.get("party_live_start", {})
         live_keys = set(pl_start) | set(R.get("party_seen") or ())
         party_degraded = not live_keys
+        # Persisted party slot per hero ({heroKey: slotIndex}) from the LIVE CommonSaveData (`csd`,
+        # the highest-playTime instance picked by pick_live_csd). ADDITIVE: never-raises -> {} when
+        # unreadable, so `slot` is simply absent (current behavior preserved). Only attached to heroes
+        # actually in the run (the hero_in_run filter below is unchanged). See game/build.read_arranged_slots.
+        arranged = build.read_arranged_slots(reader, csd)
         heroes_out = []
         for h in R["build"]:
             hk = h["heroKey"]
@@ -1094,6 +1099,10 @@ def run(hz, output_dir, debug=False):
             killed_by = R["killers"].get(hk)
             if killed_by:
                 hh["killed_by"] = killed_by                            # monsterKeys that killed this hero
+            # 0-based party slot (index in CommonSaveData.arrangedHeroKey). OPTIONAL: only when a slot
+            # is known for this hero — absence means "slot unknown" (additive; no empty-slot entries).
+            if hk in arranged:
+                hh["slot"] = arranged[hk]
             heroes_out.append(hh)
         ref = clear_time if clear_time else max(measured, 1)
         total_damage = R["dps"].total_damage

@@ -13,6 +13,7 @@ code_anchors:
   - game/models.py::live_monsters
   - game/save.py::read_gold
   - game/build.py::read_build
+  - game/build.py::read_arranged_slots
   - game/build.py::read_account_snapshot
   - metrics/dps.py::DpsTracker
   - metrics/progress.py::ProgressTracker
@@ -72,6 +73,7 @@ chosen by HIGHEST gold (`game/save.py::pick_live_psd`):
 | XP/level per hero from the save (fallback) | `HeroSaveData.HERO_KEY` / `LEVEL` / `EXP`, via `PlayerSaveData.HEROES` | `game/save.py::read_heroes` | `EXP` resets on level-up (lagging); used only if the live XP didn't run |
 | Per-run XP (live accumulator, curve-handled) | (derived from the live/save XP above) | `metrics/xp.py::PartyXpAccumulator` (level-up bridge via `per_hero_gain`) | level-up "wraps around" via the curve (`config/level_curve.json`); dead/late-deploy keep the accumulated banked value (no re-read of `uf`) |
 | Per-hero build: class / level / exp | `HeroSaveData.LEVEL`/`EXP` + `HeroInfoData.CLASS_TYPE` (catalog `hero_cat`) | `game/build.py::read_build` | only the heroes REALLY deployed (filtered by `live_keys`) |
+| Per-hero party SLOT (0-based) | `CommonSaveData.ARRANGED_HERO_KEY` (int[]: slot→heroKey; 4B/element), via the LIVE CSD `pick_live_csd` picks | `game/build.py::read_arranged_slots` | emitted as the hero's `slot` (the array INDEX of its heroKey); empty entries (≤0) skipped. OPTIONAL/additive (no `RAW_SCHEMA_VERSION` bump) → absent when unreadable. SHAPE (fixed-with-sentinel vs compacted) is logged once (`arranged_slots raw=`) for live validation |
 | Equipped items + rarity/slot/level | `HeroSaveData.EQUIPPED_ITEMS` → `ItemSaveData.ITEM_KEY`/`UNIQUE_ID` → `ItemInfoData.GRADE`/`PARTS`/`LEVEL` | `game/build.py::read_build` | catalog `item_cat` keyed by itemKey; matched by `UNIQUE_ID` |
 | Rolled item mods (enchants/decoration/…) | `ItemSaveData.ENCHANT_DATA` → `ItemEnchant.STAT_TYPE`/`VALUE`/`TIER`/`RECIPE` (PLAIN struct, `STRIDE`) | `game/build.py::read_mods` | the SAVE version is PLAIN; the runtime mirror (`te`) is Obscured → prefer the save |
 | Equipped skills + levels (actives + passives) | `HeroSaveData.EQUIPPED_SKILLS` + `PlayerSaveData.ATTRIBUTES` → `AttributeSaveData.KEY`/`LEVEL` | `game/build.py::read_build` / `read_attribute_levels` | the skill level comes from the tree node (`attributeKey`); passives live only in the tree |

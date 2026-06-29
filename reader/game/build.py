@@ -11,9 +11,9 @@ import struct
 
 from config.offsets import (HeroRuntime, StatsHolder, Dict, DictFloat, Array, List, Unit,
                             StageManager, HeroInfoData, HeroSaveData, PlayerSaveData,
-                            AttributeSaveData, ItemSaveData, ItemEnchant, name_map,
-                            EItemParts, EGradeType, EEquipClassType, ERecipeType, StatType,
-                            RuneSaveData, InventorySaveData, StashSaveData)
+                            CommonSaveData, AttributeSaveData, ItemSaveData, ItemEnchant,
+                            name_map, EItemParts, EGradeType, EEquipClassType, ERecipeType,
+                            StatType, RuneSaveData, InventorySaveData, StashSaveData)
 from shared.utils import resource_path
 
 _PARTS = name_map(EItemParts)
@@ -106,6 +106,44 @@ def read_live_party(reader, sm):
             if lvl is None or exp is None or not (0 < lvl <= 999) or exp < 0:
                 continue
             res[hk] = (lvl, exp)
+    except Exception:
+        return {}
+    return res
+
+
+def read_arranged_slots(reader, csd):
+    """{heroKey: slotIndex} for the persisted party arrangement (CommonSaveData.arrangedHeroKey, an
+    int[] of party slot -> heroKey). slotIndex = the ARRAY INDEX of the hero's key. Skips empty slots
+    (value <= 0). Used to attach the 0-based `slot` to each run-hero so the leaderboard renders the
+    party in the player's slotted order. Mirrors read_live_party's defensive style: never raises -> {}
+    on any failure (additive — a missing slot just isn't emitted, current behavior preserved).
+
+    ⚠ SHAPE UNCONFIRMED at runtime: we don't yet know if arrangedHeroKey is FIXED-length-3 with a
+    sentinel for empty slots ([0, heroX, 0] -> slot 1) or COMPACTED (only filled heroes, so indices
+    don't encode real slots). Only the fixed-with-sentinel shape encodes gaps like EMPTY|hero|empty.
+    The raw array is LOGGED once per read (greppable `arranged_slots raw=`) so the maintainer can run a
+    KNOWN arrangement on a live game and confirm the shape before trusting the slot semantics."""
+    res = {}
+    try:
+        if not csd:
+            return res
+        arr = reader.rptr(csd + CommonSaveData.ARRANGED_HERO_KEY)
+        if not arr:
+            return res
+        n = reader.ri32(arr + Array.MAX_LENGTH)
+        if n is None or not (0 < n <= 12):
+            return res
+        raw = []
+        for i in range(n):
+            # int[] -> 4 bytes per element (NOT 8 — that stride is for pointer arrays).
+            hk = reader.ri32(arr + Array.DATA + i * 4)
+            raw.append(hk)
+            if hk is None or hk <= 0:
+                continue                                   # empty/vacant slot — not emitted
+            res.setdefault(hk, i)                          # first occurrence wins (defensive vs dupes)
+        # Validation log (greppable): the full raw array + length, so a KNOWN live arrangement
+        # (e.g. EMPTY|hero|empty) reveals whether the array is fixed-with-sentinel or compacted.
+        print(f"arranged_slots raw={raw} len={n} -> {res}")
     except Exception:
         return {}
     return res
