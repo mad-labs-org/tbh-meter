@@ -421,6 +421,7 @@ function projectIndex(r: RunRecord): RunIndexEntry {
     duration: r.duration,
     clearTime: r.clearTime,
     schemaVersion: r.schemaVersion,
+    // r.heroes is already in formation order (reader emits the party by slot); slice keeps the top 3.
     party: r.heroes.slice(0, 3).map((h) => ({
       heroKey: h.heroKey,
       class: h.class,
@@ -428,6 +429,8 @@ function projectIndex(r: RunRecord): RunIndexEntry {
       // Per-hero run XP — the Leveling Planner's measured-XP source (only emitted when present so the
       // index stays minimal; older records without per-hero gain simply omit it).
       ...(typeof h.xpGained === "number" ? { xpGained: h.xpGained } : {}),
+      // Formation slot (0/1/2) — the in-game team position; absent on older (pre-slot) runs.
+      ...(typeof h.slot === "number" ? { slot: h.slot } : {}),
     })),
     // Carry drops so the list's Drops column renders without fetching full records.
     ...(r.drops && r.drops.length > 0 ? { drops: r.drops } : {}),

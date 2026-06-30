@@ -85,6 +85,22 @@ describe("buildPayload hero stats passthrough", () => {
   });
 });
 
+describe("buildPayload party order", () => {
+  it("keeps the party in the reader's formation order (the upload never reorders)", () => {
+    // The reader emits heroes already ordered by formation slot; buildPayload must preserve that
+    // order into the payload (slice, no sort) so the leaderboard shows the team as deployed.
+    const payload = buildPayload(
+      run({
+        heroes: [
+          { heroKey: 301, class: "Mage", classId: null, level: 80, exp: 0, skills: [], items: [], stats: {}, slot: 0 },
+          { heroKey: 201, class: "Knight", classId: null, level: 80, exp: 0, skills: [], items: [], stats: {}, slot: 1 },
+        ],
+      }),
+    );
+    expect(payload.party.map((h) => h.heroKey)).toEqual([301, 201]);
+  });
+});
+
 describe("buildPayload endedAt", () => {
   it("converts the reader's epoch-seconds ts to epoch ms", () => {
     expect(buildPayload(run()).endedAt).toBe(1_750_000_000_000);

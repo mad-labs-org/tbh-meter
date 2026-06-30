@@ -13,7 +13,7 @@ code_anchors:
   - game/models.py::live_monsters
   - game/save.py::read_gold
   - game/build.py::read_build
-  - game/build.py::read_arranged_slots
+  - game/build.py::read_party_slots
   - game/build.py::read_account_snapshot
   - metrics/dps.py::DpsTracker
   - metrics/progress.py::ProgressTracker
@@ -50,8 +50,9 @@ reads" — the full index of what can and can't be read is [[reference/value-inv
 | Number of mobs killed (for kills) | `MonsterSpawnManager.DEAD_MONSTER_LIST` → `List.SIZE` | `metrics/progress.py::ProgressTracker`, and the loop for `R["mobs"]` | cumulative delta = kills; drops on a reload of the SAME stage (signal of an abandoned run) |
 | LIVE stageKey | `Monster.STAGE_KEY` (mode of the first reads) | `game/models.py::live_stage_key` | preferred over `CommonSaveData.CURRENT_STAGE_KEY` (the save's freezes on the swap) |
 | LIVE cumulative COMBAT gold | `AggregateManager.AGGREGATES` → `EAggregateType.GoldEarn` → SubKey 1 (`Dict8B` geometry) | `metrics/gold.py::combat_gold_live` | PRIMARY. Baseline at `new_run`, delta at close. `COMBAT_SUBKEY=1` is a business rule (lives in gold.py, not in offsets) |
-| LIVE within-level XP per hero + level | `HeroRuntime.EXP_FAKE` / `LEVEL_FAKE` (FLAT fakeValue), via `StageManager.HERO_LIST` → `Unit.CACHE` | `game/build.py::read_live_party` → `metrics/xp.py::PartyXpAccumulator` | ACTk fakeValue (FLAT, not the XOR). ACCUMULATED tick-by-tick per heroKey (first sighting seeds the baseline; level-up via the curve); death/dropout keep the banked value |
+| LIVE within-level XP per hero + level | `HeroRuntime.LEVEL_HIDDEN`/`LEVEL_KEY` (ObscuredInt) + `EXP_HIDDEN`/`EXP_KEY` (ObscuredFloat), via `StageManager.HERO_LIST` → `Unit.CACHE` | `game/build.py::read_live_party` (decode in `game/obscured.py`) → `metrics/xp.py::PartyXpAccumulator` | DECODED from the ACTk cipher in place — 1.00.20 zeroed the +0xC `EXP_FAKE`/`LEVEL_FAKE` decoy build-wide (see [[invariants/obscured-data-offlimits]]). ACCUMULATED tick-by-tick per heroKey (first sighting seeds the baseline; level-up via the curve); death/dropout keep the banked value |
 | Identity of the deployed hero (heroKey) | `HeroInfoData.HERO_KEY`, via `HeroRuntime.INFO` | `game/build.py::read_live_party` | `party_seen` accumulates who was seen in the field (covers `sm` that resolves late) |
+| Formation slot (team position 0/1/2) of the deployed hero | `StageManager.HERO_LIST` INDEX (the hero's position in the fixed-3 array; empty slots are null) | `game/build.py::read_party_slots` → `order_party_by_slot` (record) / `meter_windows.py` (live) | emitted per hero (`slot`) AND the party is ordered by it; was LOST before (save-roster order). Additive, no schema bump |
 | New events this tick (which log) | `LogManager.LOG_LIST` → `List.SIZE`/`List.ITEMS`; type via the entry's `Obj.KLASS` | the `meter_windows.py` loop | classifies by class-pointer (ELogType is not a readable field) |
 | StageClear: act / stage / clear_time | `StageClearLog.ACT` / `STAGE` / `CLEAR_TIME` | `meter_windows.py::close_run` | triggers a "success" close; `CLEAR_TIME` = official duration in seconds |
 | StageFailed: act / stage / current wave / total | `StageFailedLog.ACT` / `STAGE` / `NOW_WAVE` / `TOTAL_WAVE` | `meter_windows.py::close_run` | triggers a "fail" close; reveals how far the run got |
@@ -73,7 +74,6 @@ chosen by HIGHEST gold (`game/save.py::pick_live_psd`):
 | XP/level per hero from the save (fallback) | `HeroSaveData.HERO_KEY` / `LEVEL` / `EXP`, via `PlayerSaveData.HEROES` | `game/save.py::read_heroes` | `EXP` resets on level-up (lagging); used only if the live XP didn't run |
 | Per-run XP (live accumulator, curve-handled) | (derived from the live/save XP above) | `metrics/xp.py::PartyXpAccumulator` (level-up bridge via `per_hero_gain`) | level-up "wraps around" via the curve (`config/level_curve.json`); dead/late-deploy keep the accumulated banked value (no re-read of `uf`) |
 | Per-hero build: class / level / exp | `HeroSaveData.LEVEL`/`EXP` + `HeroInfoData.CLASS_TYPE` (catalog `hero_cat`) | `game/build.py::read_build` | only the heroes REALLY deployed (filtered by `live_keys`) |
-| Per-hero party SLOT (0-based) | `CommonSaveData.ARRANGED_HERO_KEY` (int[]: slot→heroKey; 4B/element), via the LIVE CSD `pick_live_csd` picks | `game/build.py::read_arranged_slots` | emitted as the hero's `slot` (the array INDEX of its heroKey); empty entries (≤0) skipped. OPTIONAL/additive (no `RAW_SCHEMA_VERSION` bump) → absent when unreadable. SHAPE (fixed-with-sentinel vs compacted) is logged once (`arranged_slots raw=`) for live validation |
 | Equipped items + rarity/slot/level | `HeroSaveData.EQUIPPED_ITEMS` → `ItemSaveData.ITEM_KEY`/`UNIQUE_ID` → `ItemInfoData.GRADE`/`PARTS`/`LEVEL` | `game/build.py::read_build` | catalog `item_cat` keyed by itemKey; matched by `UNIQUE_ID`. A handle absent from `itemSaveDatas` (unresolvable) is surfaced as `itemKey == UNKNOWN_ITEM_KEY` (-1), slot from the array position — NOT dropped (NOT-READ != READ-ZERO); the front shows it as "unknown" |
 | Rolled item mods (enchants/decoration/…) | `ItemSaveData.ENCHANT_DATA` → `ItemEnchant.STAT_TYPE`/`VALUE`/`TIER`/`RECIPE` (PLAIN struct, `STRIDE`) | `game/build.py::read_mods` | the SAVE version is PLAIN; the runtime mirror (`te`) is Obscured → prefer the save |
 | Equipped skills + levels (actives + passives) | `HeroSaveData.EQUIPPED_SKILLS` + `PlayerSaveData.ATTRIBUTES` → `AttributeSaveData.KEY`/`LEVEL` | `game/build.py::read_build` / `read_attribute_levels` | the skill level comes from the tree node (`attributeKey`); passives live only in the tree |

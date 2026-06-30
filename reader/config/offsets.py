@@ -182,8 +182,6 @@ class ResurrectionLog:                 # hero revive (ELogType=5). LIVE-CRACKED:
 
 class CommonSaveData:
     PLAYTIME = 0x20                    # float
-    ARRANGED_HERO_KEY = 0x48          # int[]: party slot -> heroKey (0/empty = vacant slot). Persisted
-                                       # party arrangement; the slot is the array INDEX of the hero's key.
     CURRENT_STAGE_KEY = 0x58          # STALE/snapshot (prefer Monster.STAGE_KEY)
     CURRENT_STAGE_WAVE = 0x5C
 

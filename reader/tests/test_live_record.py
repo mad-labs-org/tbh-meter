@@ -85,6 +85,15 @@ def test_party_progress_pass_through_and_default_empty():
     assert _live(party_progress=prog)["party_progress"] == prog
 
 
+def test_party_slots_pass_through_and_default_empty():
+    # {heroKey: slot} = each deployed hero's formation position (0/1/2). `party` is already ordered
+    # by it; this rides alongside so the overlay can place by EXACT position (gaps included). Default
+    # {} (reader without the param / no live party) — the overlay falls back to array order.
+    assert _live()["party_slots"] == {}
+    slots = {101: 0, 301: 2}   # a 2-hero team with a gap at slot 1
+    assert _live(party_slots=slots)["party_slots"] == slots
+
+
 def test_no_envelope_no_outcome_no_cooked_fields():
     # RAW: NO envelope (ephemeral, not audited), NO run_outcome (run in progress), and ZERO
     # cooked presentation (dps/label/mode/stage-string) — the app cooks it.

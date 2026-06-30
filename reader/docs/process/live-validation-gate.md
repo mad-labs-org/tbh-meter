@@ -27,7 +27,8 @@ not just the one that changed. Every mutable-per-build surface that the run reco
 PASS/FAIL + detail: `calib/seed`, `gold`, `party-live`, `hero-class` (EEquipClassType, not EHeroType),
 `save-build` (pick_live_psd+read_gold+read_heroes — the path that broke in 1.00.12), `build-record`
 (the `read_build` that the run UPLOADS: gear/skills via ATTRIBUTES/ITEMS/EQUIPPED_* + `read_account_snapshot`
-runes/inventory/stash), `xp-live`, `dps` (MonsterSpawnManager+HP), `stats` (StatsHolder.FINAL_STATS),
+runes/inventory/stash), `xp-live`, `party-slots` (read_party_slots == the raw HeroList indices — the
+formation position 0/1/2 the run record emits), `dps` (MonsterSpawnManager+HP), `stats` (StatsHolder.FINAL_STATS),
 `stage`, `run-cycle` (LogManager.LOG_LIST readable — the run-close boundary) and `catalogs`. A non-zero
 exit = DO NOT ship. Run it with the game IN COMBAT on a stage (almost every check needs the party
 deployed). The OBFUSCATED/HP-only surfaces (gold, party/xp from `HeroRuntime`, `StatsHolder`, monsters) can only be measured

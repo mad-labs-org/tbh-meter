@@ -1017,9 +1017,15 @@ function RunRow({ run, cols, i18n, gridTemplateColumns, zebra, onSelect, onToggl
 
 function Team({ party, t }: { party: RunIndexEntry["party"]; t: Translate }) {
   if (party.length === 0) return <span className="text-zinc-600">—</span>;
+  // Render in IN-GAME FORMATION order: by slot (0/1/2) when the run carries it, else the stored
+  // order. The index is already slot-ordered for new runs; sorting here makes it robust to any
+  // reordering and to mixed records, and unslotted heroes (older runs) keep their relative order.
+  const ordered = [...party].sort(
+    (a, b) => (a.slot ?? Number.MAX_SAFE_INTEGER) - (b.slot ?? Number.MAX_SAFE_INTEGER),
+  );
   return (
     <div className="flex items-center gap-1">
-      {party.map((h, i) => (
+      {ordered.map((h, i) => (
         <span
           key={i}
           title={t("runs.teamTooltip", { class: h.class, level: h.level })}

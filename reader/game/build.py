@@ -13,7 +13,7 @@ import struct
 
 from config.offsets import (HeroRuntime, StatsHolder, Dict, DictFloat, Array, List, Unit,
                             StageManager, HeroInfoData, HeroSaveData, PlayerSaveData,
-                            CommonSaveData, AttributeSaveData, ItemSaveData, ItemEnchant,
+                            AttributeSaveData, ItemSaveData, ItemEnchant,
                             name_map, EItemParts, EGradeType, EEquipClassType, ERecipeType,
                             StatType, RuneSaveData, InventorySaveData, StashSaveData)
 from game import obscured
@@ -86,6 +86,44 @@ def read_attribute_levels(reader, psd):
     return res
 
 
+def _iter_party_slots(reader, sm, hero_cat=None):
+    """Yields (slot, heroKey, uf) for each VALID deployed hero in StageManager.HeroList — the
+    SHARED walk behind read_live_party AND read_party_slots, so membership, the ghost discriminator
+    and the slot index are defined in ONE place; pick<->read<->slot agree by construction (the
+    1.00.13 invariant — see [[invariants/party-live-resolution]]).
+
+    `slot` is the hero's index in the fixed 3-slot formation array: empty slots are null and skipped,
+    so the index IS the in-game formation position (0/1/2, gaps included; verified live — HeroList
+    len=3, a solo hero sits at its own slot with the others null). GHOST discriminator: a real deployed
+    hero resolves a class in `hero_cat`; a ghost carries a stale/garbage key that doesn't
+    (hero_cat=None -> heroKey-plausibility only). NEVER raises -> yields nothing on any failure."""
+    try:
+        if not sm:
+            return
+        hl = reader.rptr(sm + StageManager.HERO_LIST)
+        if not hl:
+            return
+        n = reader.ri32(hl + Array.MAX_LENGTH)
+        if n is None or not (0 < n <= 12):
+            return
+        for i in range(n):
+            h = reader.rptr(hl + Array.DATA + i * 8)
+            if not h:
+                continue
+            uf = reader.rptr(h + Unit.CACHE)
+            if not uf:
+                continue
+            hi = reader.rptr(uf + HeroRuntime.INFO)
+            hk = reader.ri32(hi + HeroInfoData.HERO_KEY) if hi else None
+            if hk is None or not (0 < hk < 10_000_000):
+                continue
+            if hero_cat is not None and hk not in hero_cat:
+                continue
+            yield i, hk, uf
+    except Exception:
+        return
+
+
 def read_live_party(reader, sm, hero_cat=None, save_heroes=None):
     """{heroKey: (level, exp)} for the LIVE DEPLOYED party (StageManager.HeroList). The party
     IDENTITY (which heroKeys are on the field) AND the per-hero level/exp are all read LIVE.
@@ -115,35 +153,13 @@ def read_live_party(reader, sm, hero_cat=None, save_heroes=None):
     — so pick and read never disagree on which slot is a carrier."""
     res = {}
     try:
-        if not sm:
-            return res
-        hl = reader.rptr(sm + StageManager.HERO_LIST)
-        if not hl:
-            return res
-        n = reader.ri32(hl + Array.MAX_LENGTH)
-        if n is None or not (0 < n <= 12):
-            return res
-        for i in range(n):
-            h = reader.rptr(hl + Array.DATA + i * 8)
-            if not h:
-                continue
-            uf = reader.rptr(h + Unit.CACHE)
-            if not uf:
-                continue
-            hi = reader.rptr(uf + HeroRuntime.INFO)
-            hk = reader.ri32(hi + HeroInfoData.HERO_KEY) if hi else None
-            if hk is None or not (0 < hk < 10_000_000):
-                continue
-            # GHOST discriminator: a real deployed hero resolves a class in the catalog; a ghost
-            # carries a stale/garbage key that doesn't. heroKey-plausibility only when hero_cat is absent.
-            if hero_cat is not None and hk not in hero_cat:
-                continue
+        for _slot, hk, uf in _iter_party_slots(reader, sm, hero_cat):
             # LEVEL + EXP read LIVE by decoding the ACTk cipher in place (the +0xC decoy died in
             # 1.00.20). game/obscured.py reimplements the decode read from the binary. LEVEL falls back
             # to the save snapshot on an unreadable/implausible cipher (stable, context only). EXP stays
             # None on a bad read — NEVER the stale save exp — so close_run degrades to the per-hero save
             # delta honestly ([[invariants/metric-fallback-chains]] rule 2), instead of reporting save as
-            # live. The party IDENTITY remains the live heroKey gate above.
+            # live. The party IDENTITY (which slots count) is the shared _iter_party_slots gate.
             lvl = obscured.decode_obscured_int(reader.ru32(uf + HeroRuntime.LEVEL_HIDDEN),
                                                reader.ru32(uf + HeroRuntime.LEVEL_KEY))
             if lvl is None or not (0 < lvl <= 200):
@@ -156,42 +172,15 @@ def read_live_party(reader, sm, hero_cat=None, save_heroes=None):
     return res
 
 
-def read_arranged_slots(reader, csd):
-    """{heroKey: slotIndex} for the persisted party arrangement (CommonSaveData.arrangedHeroKey, an
-    int[] of party slot -> heroKey). slotIndex = the ARRAY INDEX of the hero's key. Skips empty slots
-    (value <= 0). Used to attach the 0-based `slot` to each run-hero so the leaderboard renders the
-    party in the player's slotted order. Mirrors read_live_party's defensive style: never raises -> {}
-    on any failure (additive — a missing slot just isn't emitted, current behavior preserved).
-
-    ⚠ SHAPE UNCONFIRMED at runtime: we don't yet know if arrangedHeroKey is FIXED-length-3 with a
-    sentinel for empty slots ([0, heroX, 0] -> slot 1) or COMPACTED (only filled heroes, so indices
-    don't encode real slots). Only the fixed-with-sentinel shape encodes gaps like EMPTY|hero|empty.
-    The raw array is LOGGED once per read (greppable `arranged_slots raw=`) so the maintainer can run a
-    KNOWN arrangement on a live game and confirm the shape before trusting the slot semantics."""
-    res = {}
-    try:
-        if not csd:
-            return res
-        arr = reader.rptr(csd + CommonSaveData.ARRANGED_HERO_KEY)
-        if not arr:
-            return res
-        n = reader.ri32(arr + Array.MAX_LENGTH)
-        if n is None or not (0 < n <= 12):
-            return res
-        raw = []
-        for i in range(n):
-            # int[] -> 4 bytes per element (NOT 8 — that stride is for pointer arrays).
-            hk = reader.ri32(arr + Array.DATA + i * 4)
-            raw.append(hk)
-            if hk is None or hk <= 0:
-                continue                                   # empty/vacant slot — not emitted
-            res.setdefault(hk, i)                          # first occurrence wins (defensive vs dupes)
-        # Validation log (greppable): the full raw array + length, so a KNOWN live arrangement
-        # (e.g. EMPTY|hero|empty) reveals whether the array is fixed-with-sentinel or compacted.
-        print(f"arranged_slots raw={raw} len={n} -> {res}")
-    except Exception:
-        return {}
-    return res
+def read_party_slots(reader, sm, hero_cat=None):
+    """{heroKey: slot} for the LIVE DEPLOYED party — `slot` = the hero's FORMATION position (its
+    index in StageManager.HeroList; empty slots are null, so the index IS the in-game position
+    0/1/2, gaps included). Shares membership + the ghost discriminator with read_live_party (the
+    same _iter_party_slots), so the slot map and the party never disagree. The run record carries
+    this per hero so the team's in-game order/position survives to the app and the leaderboard — it
+    was previously LOST (heroes came out in SAVE-ROSTER order and the HeroList slot index was
+    discarded). NEVER raises -> {}."""
+    return {hk: slot for slot, hk, _uf in _iter_party_slots(reader, sm, hero_cat)}
 
 
 def _raw_hero_list(reader, sm):
@@ -259,6 +248,48 @@ def hero_in_run(hero_key, live_keys):
     the leaderboard; shows in the app, flagged). NEVER the raw save roster nor a proxy-guess (e.g.
     xp>0 would include a hero that only earned idle xp, re-introducing the bug). Pure/testable."""
     return bool(live_keys) and hero_key in live_keys
+
+
+def slot_sort_key(slot):
+    """Sort key for the formation `slot` (0/1/2): a hero/heroKey with NO slot (None — a degraded
+    read, or an older record) sorts LAST; otherwise by slot, with 0 a REAL first position (NOT
+    falsy-coalesced away — the trap). The single source for the party-ordering rule, shared by
+    order_party_by_slot (run record) and the live-overlay sort (meter_windows) so the two never drift."""
+    return (slot is None, slot or 0)
+
+
+def order_party_by_slot(heroes):
+    """Stable-sort the run's heroes by their formation `slot` (0/1/2) so the run record emits the
+    party in IN-GAME FORMATION order — it used to come out in SAVE-ROSTER order (the order
+    PlayerSaveData.HEROES happened to iterate), with the live HeroList slot index discarded. A hero
+    with no resolved slot (rare: included via a degraded read) trails, keeping its relative order.
+    Pure/testable, mirrors hero_in_run."""
+    return sorted(heroes, key=lambda h: slot_sort_key(h.get("slot")))
+
+
+def resolve_party_slots(hero_keys, slots_now, slots_seen=None):
+    """Coherent {heroKey: slot} for a run's heroes from ONE at-close HeroList read (`slots_now`,
+    UNIQUE by construction — each deployed hero sits at a distinct index). A hero ABSENT from
+    `slots_now` (deployed earlier but dead/dropped by close) falls back to its last-seen slot
+    (`slots_seen`, the run accumulator) ONLY when that slot is still FREE — a STALE fallback that
+    would collide with a live hero is dropped to None (it trails). Resolving from one coherent read
+    (not the merged accumulator) guarantees UNIQUE slots, so order_party_by_slot can't tie into the
+    surface-dependent insertion order; and the run record AND the live overlay both run this over
+    read_party_slots, so they can't disagree ("live ok, saved wrong"). Pure/testable."""
+    seen = slots_seen or {}
+    used = set(slots_now.values())            # the live (authoritative) slots are taken first
+    out = {}
+    for hk in hero_keys:
+        if hk in slots_now:
+            out[hk] = slots_now[hk]
+        else:
+            s = seen.get(hk)
+            if s is not None and s not in used:   # last-seen slot, but only if still free (no stale dup)
+                out[hk] = s
+                used.add(s)
+            else:
+                out[hk] = None
+    return out
 
 
 def read_stats_dict(reader, uf):
