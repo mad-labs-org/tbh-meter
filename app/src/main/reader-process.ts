@@ -92,7 +92,14 @@ function forEachLine(stream: NodeJS.ReadableStream | null, fn: (line: string) =>
  */
 export function readerExePath(): string | null {
   if (!app.isPackaged) return null;
-  return join(process.resourcesPath, "reader", "tbh-reader.exe");
+  if (process.platform === "win32") return join(process.resourcesPath, "reader", "tbh-reader.exe");
+  if (process.platform === "linux") return join(process.resourcesPath, "reader", "meter_windows.py");
+  return null;
+}
+
+function readerInvocation(exe: string): { file: string; prefixArgs: string[] } {
+  if (process.platform === "linux") return { file: "python3", prefixArgs: [exe] };
+  return { file: exe, prefixArgs: [] };
 }
 
 let child: ChildProcess | null = null;
@@ -309,7 +316,8 @@ function attemptSpawn(): void {
   try {
     // spawn(file, argsArray) bypasses the shell, so an outputDir containing spaces
     // (e.g. C:\Users\First Last\tbh-meter) is passed as a single argv element safely.
-    proc = spawn(exe, ["--output", resolveOutputDir(), "--hz", READER_HZ], {
+    const { file, prefixArgs } = readerInvocation(exe);
+    proc = spawn(file, [...prefixArgs, "--output", resolveOutputDir(), "--hz", READER_HZ], {
       windowsHide: true, // no console/terminal window flashes for the user
       stdio: ["ignore", "pipe", "pipe"], // capture stdout/stderr for diagnostics; no stdin
       // NOT detached: this is a managed child we kill on quit.
@@ -367,7 +375,7 @@ function onHealthy(proc: ChildProcess): void {
 
 /** Start (and keep alive) the reader. No-op off-win32 or when the exe is absent. */
 export function startReader(): void {
-  if (process.platform !== "win32") return;
+  if (process.platform !== "win32" && process.platform !== "linux") return;
   if (managing) return; // already managing a reader — never run two
   const exe = readerExePath();
   if (!exe || !existsSync(exe)) {
