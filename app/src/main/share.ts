@@ -72,6 +72,9 @@ type UploadMap = Record<string, UploadEntry>;
 interface IngestRunHero {
   heroKey: number;
   classType: string;
+  /** 0-based party slot (0/1/2) so the site can position heroes — incl. empty slots. Sent only
+   *  when the run carries a known slot; omitted for legacy/unknown (never defaulted). */
+  slot?: number;
   dps: number;
   damage: number;
   level?: number;
@@ -84,10 +87,6 @@ interface IngestRunHero {
    *  displays them directly and re-applies party buffs itself when deriving Basic Attack DPS,
    *  instead of recomputing from the build (the recompute can't reproduce account-wide stats). */
   stats?: Record<string, number>;
-  /** Formation slot (0/1/2) — the hero's position in the in-game team. The site renders the party
-   *  by it (the `party` array is also emitted in slot order). Older meters omit it; the ingest
-   *  schema strips it harmlessly until the site adopts the field. */
-  slot?: number;
 }
 interface IngestRunBody {
   externalId: string;
@@ -184,6 +183,7 @@ function mapHero(hero: RunHero): IngestRunHero {
     dps: 0,
     damage: 0,
   };
+  if (typeof hero.slot === "number") out.slot = hero.slot;
   if (Number.isFinite(hero.level) && hero.level >= 1) {
     out.level = Math.min(99999, Math.trunc(hero.level));
   }
@@ -199,9 +199,6 @@ function mapHero(hero: RunHero): IngestRunHero {
   // The reader's live FINAL stats (keyed by StatType id) — uploaded so the site can show the
   // real in-game values instead of recomputing them from the build.
   if (hero.stats && Object.keys(hero.stats).length > 0) out.stats = hero.stats;
-  // Formation slot (0/1/2) — the in-game team position, so the leaderboard renders the party in the
-  // order the player set (the `party` array is emitted in slot order too). Omitted on older runs.
-  if (typeof hero.slot === "number") out.slot = hero.slot;
   return out;
 }
 

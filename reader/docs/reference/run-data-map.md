@@ -13,6 +13,7 @@ code_anchors:
   - game/models.py::live_monsters
   - game/save.py::read_gold
   - game/build.py::read_build
+  - game/build.py::read_party_slots
   - game/build.py::read_account_snapshot
   - metrics/dps.py::DpsTracker
   - metrics/progress.py::ProgressTracker

@@ -13,9 +13,9 @@ import struct
 
 from config.offsets import (HeroRuntime, StatsHolder, Dict, DictFloat, Array, List, Unit,
                             StageManager, HeroInfoData, HeroSaveData, PlayerSaveData,
-                            AttributeSaveData, ItemSaveData, ItemEnchant, name_map,
-                            EItemParts, EGradeType, EEquipClassType, ERecipeType, StatType,
-                            RuneSaveData, InventorySaveData, StashSaveData)
+                            AttributeSaveData, ItemSaveData, ItemEnchant,
+                            name_map, EItemParts, EGradeType, EEquipClassType, ERecipeType,
+                            StatType, RuneSaveData, InventorySaveData, StashSaveData)
 from game import obscured
 from shared.utils import resource_path
 

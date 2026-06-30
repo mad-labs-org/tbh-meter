@@ -121,6 +121,15 @@ export const DICT = {
   "settings.usageStatsLabel": "Share anonymous usage statistics",
   "settings.usageStatsDesc":
     "Helps us see how many people use the meter (anonymous, via Google Analytics). No personal data, no run details. Turn this off to opt out completely.",
+  "settings.diagnosticsLog": "Diagnostics log",
+  "settings.diagnosticsLogDesc":
+    "Collect diagnostic info for bug reports. No personal data is included.",
+  "diagnostics.collecting": "Collecting diagnostics...",
+  "diagnostics.failed": "Failed to collect diagnostics.",
+  "diagnostics.copyToClipboard": "Copy to clipboard",
+  "diagnostics.copied": "Copied!",
+  "diagnostics.copyFailed": "Copy failed — check clipboard permissions.",
+  "diagnostics.backToSettings": "Back to Settings",
   "settings.runHistory": "Run history",
   "settings.runHistoryDesc":
     "Delete all runs stored on this computer. Runs already shared to the leaderboard are not affected and stay on the web.",

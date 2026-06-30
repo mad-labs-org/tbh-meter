@@ -115,6 +115,14 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.usageStatsLabel": "Bagikan statistik penggunaan anonim",
   "settings.usageStatsDesc":
     "Membantu kami melihat berapa banyak orang yang menggunakan meter (anonim, melalui Google Analytics). Tidak ada data pribadi, tidak ada detail run. Matikan untuk keluar sepenuhnya.",
+  "settings.diagnosticsLog": "Log diagnostik",
+  "settings.diagnosticsLogDesc": "Kumpulkan info diagnostik untuk laporan bug. Tidak ada data pribadi yang disertakan.",
+  "diagnostics.collecting": "Mengumpulkan diagnostik...",
+  "diagnostics.failed": "Gagal mengumpulkan diagnostik.",
+  "diagnostics.copyToClipboard": "Salin ke papan klip",
+  "diagnostics.copied": "Tersalin!",
+  "diagnostics.copyFailed": "Gagal menyalin — periksa izin papan klip.",
+  "diagnostics.backToSettings": "Kembali ke Pengaturan",
   "settings.runHistory": "Riwayat run",
   "settings.runHistoryDesc":
     "Hapus semua run yang tersimpan di komputer ini. Run yang sudah dibagikan ke papan peringkat tidak terpengaruh dan tetap ada di web.",

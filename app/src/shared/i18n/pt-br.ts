@@ -115,6 +115,14 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.usageStatsLabel": "Compartilhar estatísticas de uso anônimas",
   "settings.usageStatsDesc":
     "Nos ajuda a ver quantas pessoas usam o meter (anônimo, via Google Analytics). Nenhum dado pessoal nem detalhes de runs. Desligue para sair completamente.",
+    "settings.diagnosticsLog": "Registro de diagnóstico",
+  "settings.diagnosticsLogDesc": "Coleta informações de diagnóstico para relatórios de bugs. Nenhum dado pessoal é incluído.",
+  "diagnostics.collecting": "Coletando diagnóstico...",
+  "diagnostics.failed": "Falha ao coletar diagnóstico.",
+  "diagnostics.copyToClipboard": "Copiar para área de transferência",
+  "diagnostics.copied": "Copiado!",
+  "diagnostics.copyFailed": "Falha ao copiar — verifique as permissões da área de transferência.",
+  "diagnostics.backToSettings": "Voltar para Configurações",
   "settings.runHistory": "Histórico de runs",
   "settings.runHistoryDesc":
     "Apaga todas as runs guardadas neste computador. Runs já compartilhadas no ranking não são afetadas e continuam na web.",

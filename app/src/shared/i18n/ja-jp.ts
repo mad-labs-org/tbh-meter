@@ -115,6 +115,14 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.usageStatsLabel": "匿名の利用統計を共有する",
   "settings.usageStatsDesc":
     "何人がメーターを使っているかを把握するのに役立ちます（匿名、Google Analytics 経由）。個人データやランの詳細は含まれません。完全にオプトアウトするにはオフにしてください。",
+    "settings.diagnosticsLog": "診断ログ",
+  "settings.diagnosticsLogDesc": "バグ報告用の診断情報を収集します。個人データは含まれません。",
+  "diagnostics.collecting": "診断情報を収集中...",
+  "diagnostics.failed": "診断情報の収集に失敗しました。",
+  "diagnostics.copyToClipboard": "クリップボードにコピー",
+  "diagnostics.copied": "コピーしました！",
+  "diagnostics.copyFailed": "コピーに失敗しました — クリップボードの権限を確認してください。",
+  "diagnostics.backToSettings": "設定に戻る",
   "settings.runHistory": "ラン履歴",
   "settings.runHistoryDesc":
     "このPCに保存された全ランを削除します。リーダーボードに共有済みのランは影響を受けず、Web上に残ります。",

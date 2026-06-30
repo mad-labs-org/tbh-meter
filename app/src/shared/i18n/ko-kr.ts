@@ -115,6 +115,14 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.usageStatsLabel": "익명 사용 통계 공유",
   "settings.usageStatsDesc":
     "얼마나 많은 사람들이 미터를 사용하는지 파악하는 데 도움이 됩니다(익명, Google Analytics 사용). 개인 정보나 런 세부 정보는 없습니다. 완전히 거부하려면 끄세요.",
+    "settings.diagnosticsLog": "진단 로그",
+  "settings.diagnosticsLogDesc": "버그 보고용 진단 정보를 수집합니다. 개인 데이터는 포함되지 않습니다.",
+  "diagnostics.collecting": "진단 정보 수집 중...",
+  "diagnostics.failed": "진단 정보 수집 실패.",
+  "diagnostics.copyToClipboard": "클립보드에 복사",
+  "diagnostics.copied": "복사됨!",
+  "diagnostics.copyFailed": "복사 실패 — 클립보드 권한을 확인하세요.",
+  "diagnostics.backToSettings": "설정으로 돌아가기",
   "settings.runHistory": "런 기록",
   "settings.runHistoryDesc":
     "이 컴퓨터에 저장된 모든 런을 삭제합니다. 리더보드에 공유된 런은 영향받지 않고 웹에 남습니다.",

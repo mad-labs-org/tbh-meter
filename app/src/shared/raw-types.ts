@@ -70,6 +70,9 @@ export interface RawHero {
   heroKey: number;
   classId: number | null;
   class: string;
+  /** 0-based party slot (0/1/2 = the three visible slots). The reader emits it ONLY when the
+   *  slot is known; absent/null = unknown (legacy raw or unresolved) — never synthesized here. */
+  slot?: number | null;
   level: number | null;
   exp: number | null;
   items: RawItem[];
@@ -84,9 +87,6 @@ export interface RawHero {
   deaths?: number;
   revives?: number;
   killed_by?: number[];
-  /** Formation slot (0/1/2) = the hero's position in the live StageManager.HeroList (the in-game
-   *  team order the player set). `null` on a degraded read; absent on pre-slot reader runs. */
-  slot?: number | null;
 }
 
 /** A rune node from the account-wide rune tree (`PlayerSaveData.RUNES`). `key` matches

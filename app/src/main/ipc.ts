@@ -55,6 +55,8 @@ interface IpcDeps {
   endWindowDrag(): void;
   /** Recenter the live overlay on-screen at the default size (lost-window recovery). */
   resetLiveWindow(): void;
+  /** Collect diagnostic info for bug reports. Returns a plaintext block. */
+  debugInfo(): Promise<string>;
 }
 
 /** Re-point the file sources at the currently-resolved output directory. */
@@ -324,4 +326,7 @@ export function registerIpcHandlers(deps: IpcDeps): void {
   // Reader bring-up phase -> the startup splash (own channel, distinct from the
   // readerStatus() invoke on "meter:reader-status").
   readerEvents.on("status", (status: ReaderStatus) => broadcast("meter:reader-phase", status));
+
+  // Debug info — collected on demand from the live process state.
+  ipcMain.handle("meter:debug-info", () => deps.debugInfo());
 }

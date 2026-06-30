@@ -116,6 +116,14 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.usageStatsLabel": "Udostępniaj anonimowe statystyki użytkowania",
   "settings.usageStatsDesc":
     "Pomaga nam zobaczyć, ile osób korzysta z metra (anonimowo, przez Google Analytics). Żadnych danych osobowych ani szczegółów runów. Wyłącz, aby całkowicie zrezygnować.",
+    "settings.diagnosticsLog": "Dziennik diagnostyczny",
+  "settings.diagnosticsLogDesc": "Zbiera informacje diagnostyczne do zgłoszeń błędów. Nie zawiera danych osobowych.",
+  "diagnostics.collecting": "Zbieranie diagnostyki...",
+  "diagnostics.failed": "Nie udało się zebrać diagnostyki.",
+  "diagnostics.copyToClipboard": "Kopiuj do schowka",
+  "diagnostics.copied": "Skopiowano!",
+  "diagnostics.copyFailed": "Kopiowanie nie powiodło się — sprawdź uprawnienia schowka.",
+  "diagnostics.backToSettings": "Powrót do ustawień",
   "settings.runHistory": "Historia przejść",
   "settings.runHistoryDesc":
     "Usuwa wszystkie przejścia zapisane na tym komputerze. Przejścia udostępnione już do rankingu pozostają w sieci.",

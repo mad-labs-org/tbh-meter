@@ -41,6 +41,33 @@ function run(overrides: Partial<RunRecord> = {}): RunRecord {
   } as RunRecord;
 }
 
+describe("buildPayload party slot", () => {
+  it("forwards a known party slot (incl. slot 0) to the ingest party member", () => {
+    const payload = buildPayload(
+      run({
+        heroes: [
+          { heroKey: 201, class: "Knight", classId: 5, slot: 0, level: 80, exp: 0, skills: [], items: [], stats: {} },
+          { heroKey: 202, class: "Mage", classId: 6, slot: 2, level: 80, exp: 0, skills: [], items: [], stats: {} },
+        ],
+      }),
+    );
+    expect(payload.party[0].slot).toBe(0);
+    expect(payload.party[1].slot).toBe(2);
+  });
+
+  it("omits slot for a hero without one (legacy run / unknown slot)", () => {
+    const payload = buildPayload(
+      run({
+        heroes: [
+          { heroKey: 201, class: "Knight", classId: 5, level: 80, exp: 0, skills: [], items: [], stats: {} },
+        ],
+      }),
+    );
+    expect(payload.party[0].slot).toBeUndefined();
+    expect("slot" in payload.party[0]).toBe(false);
+  });
+});
+
 // A complete RunHero, optionally carrying the reader's live FINAL stats.
 function hero(stats: Record<string, number>): RunRecord["heroes"][number] {
   return { heroKey: 201, class: "Knight", classId: null, level: 80, exp: 0, skills: [], items: [], stats };
@@ -58,20 +85,10 @@ describe("buildPayload hero stats passthrough", () => {
   });
 });
 
-describe("buildPayload formation slot", () => {
-  it("forwards each hero's formation slot (0/1/2), preserving exact positions incl. a gap", () => {
-    const payload = buildPayload(
-      run({
-        heroes: [
-          { heroKey: 201, class: "Knight", classId: null, level: 80, exp: 0, skills: [], items: [], stats: {}, slot: 0 },
-          { heroKey: 301, class: "Mage", classId: null, level: 80, exp: 0, skills: [], items: [], stats: {}, slot: 2 },
-        ],
-      }),
-    );
-    expect(payload.party.map((h) => h.slot)).toEqual([0, 2]); // slot 1 empty — the gap survives
-  });
-
+describe("buildPayload party order", () => {
   it("keeps the party in the reader's formation order (the upload never reorders)", () => {
+    // The reader emits heroes already ordered by formation slot; buildPayload must preserve that
+    // order into the payload (slice, no sort) so the leaderboard shows the team as deployed.
     const payload = buildPayload(
       run({
         heroes: [
@@ -81,11 +98,6 @@ describe("buildPayload formation slot", () => {
       }),
     );
     expect(payload.party.map((h) => h.heroKey)).toEqual([301, 201]);
-  });
-
-  it("omits slot when the run carries none (older, pre-slot runs)", () => {
-    const payload = buildPayload(run({ heroes: [hero({})] }));
-    expect(payload.party[0]!.slot).toBeUndefined();
   });
 });
 

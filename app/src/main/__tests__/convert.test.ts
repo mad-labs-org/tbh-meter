@@ -327,6 +327,42 @@ describe("convert — heroes & drops", () => {
     expect(r.heroes[0].skillLevels).toEqual({ "7001": 5 });
   });
 
+  it("carries a known party slot through to the hero (incl. slot 0), absent when unknown", () => {
+    const r = convert(
+      rawRun({
+        heroes: {
+          ok: true,
+          value: [
+            // slot 0 is a real slot — must survive (a falsy-truthy guard would drop it)
+            { heroKey: 1, classId: null, class: "", slot: 0, level: 1, exp: 0, items: [], skills: [], stats: {} },
+            { heroKey: 2, classId: null, class: "", slot: 2, level: 1, exp: 0, items: [], skills: [], stats: {} },
+          ],
+        },
+      }),
+    );
+    expect(r.heroes[0].slot).toBe(0);
+    expect(r.heroes[1].slot).toBe(2);
+  });
+
+  it("leaves slot undefined when the raw hero has no slot (legacy / unknown), incl. explicit null", () => {
+    const r = convert(
+      rawRun({
+        heroes: {
+          ok: true,
+          value: [
+            { heroKey: 1, classId: null, class: "", level: 1, exp: 0, items: [], skills: [], stats: {} },
+            // an explicit null slot (reader couldn't resolve it) is treated as unknown -> no key
+            { heroKey: 2, classId: null, class: "", slot: null, level: 1, exp: 0, items: [], skills: [], stats: {} },
+          ],
+        },
+      }),
+    );
+    expect(r.heroes[0].slot).toBeUndefined();
+    expect("slot" in r.heroes[0]).toBe(false);
+    expect(r.heroes[1].slot).toBeUndefined();
+    expect("slot" in r.heroes[1]).toBe(false);
+  });
+
   it("leaves killedBy undefined for a hero with no killed_by", () => {
     const r = convert(
       rawRun({
@@ -337,25 +373,6 @@ describe("convert — heroes & drops", () => {
       }),
     );
     expect(r.heroes[0].killedBy).toBeUndefined();
-  });
-
-  it("carries the formation slot (0/1/2); null (degraded) and absent (older runs) mean no slot", () => {
-    const r = convert(
-      rawRun({
-        heroes: {
-          ok: true,
-          value: [
-            // slot 0 must survive — guards the falsy-0 trap (a real first position, not "no slot")
-            { heroKey: 1, classId: null, class: "", level: 1, exp: 0, items: [], skills: [], stats: {}, slot: 0 },
-            { heroKey: 2, classId: null, class: "", level: 1, exp: 0, items: [], skills: [], stats: {}, slot: null },
-            { heroKey: 3, classId: null, class: "", level: 1, exp: 0, items: [], skills: [], stats: {} },
-          ],
-        },
-      }),
-    );
-    expect(r.heroes[0].slot).toBe(0); // finite slot preserved (exact position, incl. 0)
-    expect(r.heroes[1].slot).toBeUndefined(); // null = degraded read -> not a slot
-    expect(r.heroes[2].slot).toBeUndefined(); // absent = pre-slot run -> not a slot
   });
 
   it("sums run-level deaths/revives from the per-hero counts", () => {

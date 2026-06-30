@@ -79,8 +79,8 @@ You need **no access to this repo** to contribute — the standard open-source f
 
 1. **Fork** the repository (UI "Fork" button, or `gh repo fork mad-labs-org/tbh-meter --clone`).
 2. In your fork, branch off `main` (`fix/…`, `feat/…`) and commit your work.
-3. **Open a pull request** against `main` here. Start every change from an issue and reference it
-   (`Closes #123` in the PR description).
+3. **Open a pull request** against `main` here. If it addresses an existing issue, link it
+   (`Closes #123` in the PR description) — encouraged, but not required.
 
 Because your branch lives in **your** fork, the main repo stays clean and you keep full control of
 your own work — you can update or close your PR, and close the issue you opened, any time. CI (the
