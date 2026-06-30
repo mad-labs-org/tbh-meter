@@ -267,6 +267,31 @@ def order_party_by_slot(heroes):
     return sorted(heroes, key=lambda h: slot_sort_key(h.get("slot")))
 
 
+def resolve_party_slots(hero_keys, slots_now, slots_seen=None):
+    """Coherent {heroKey: slot} for a run's heroes from ONE at-close HeroList read (`slots_now`,
+    UNIQUE by construction — each deployed hero sits at a distinct index). A hero ABSENT from
+    `slots_now` (deployed earlier but dead/dropped by close) falls back to its last-seen slot
+    (`slots_seen`, the run accumulator) ONLY when that slot is still FREE — a STALE fallback that
+    would collide with a live hero is dropped to None (it trails). Resolving from one coherent read
+    (not the merged accumulator) guarantees UNIQUE slots, so order_party_by_slot can't tie into the
+    surface-dependent insertion order; and the run record AND the live overlay both run this over
+    read_party_slots, so they can't disagree ("live ok, saved wrong"). Pure/testable."""
+    seen = slots_seen or {}
+    used = set(slots_now.values())            # the live (authoritative) slots are taken first
+    out = {}
+    for hk in hero_keys:
+        if hk in slots_now:
+            out[hk] = slots_now[hk]
+        else:
+            s = seen.get(hk)
+            if s is not None and s not in used:   # last-seen slot, but only if still free (no stale dup)
+                out[hk] = s
+                used.add(s)
+            else:
+                out[hk] = None
+    return out
+
+
 def read_stats_dict(reader, uf):
     """64 live FINAL stats: uf->xd->bets = Dict<StatType,float> (DictFloat). id-only:
     {statId int: value}. {} on failure."""

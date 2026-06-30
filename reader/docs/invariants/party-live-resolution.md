@@ -21,6 +21,7 @@ code_anchors:
   - game/build.py::read_live_party
   - game/build.py::_iter_party_slots
   - game/build.py::read_party_slots
+  - game/build.py::resolve_party_slots
   - game/build.py::order_party_by_slot
   - game/build.py::hero_in_run
   - game/build.py::describe_sm_candidates
@@ -32,6 +33,7 @@ guarded_by:
   - tests/test_save.py::TestHeroInRun::test_no_live_party_includes_nobody
   - tests/test_build.py::test_read_party_slots_preserves_gaps
   - tests/test_build.py::test_order_party_by_slot_slot_zero_sorts_first
+  - tests/test_build.py::test_resolve_party_slots_drops_a_stale_slot_that_collides_with_a_live_one
   - tests/test_raw_record.py::test_party_off_makes_heroes_err
 ---
 
@@ -109,12 +111,23 @@ position — an empty slot is null (a solo hero parked in slot 2 leaves 0 and 1 
 live level/exp) and `read_party_slots` (`{heroKey: slot}`); the single walk keeps the slot map and the
 party in lockstep — the same pick<->read agreement, now extended to the slot.
 
-`close_run` stamps each hero's `slot` and emits the party via `order_party_by_slot` — in FORMATION
-order, NOT the SAVE-ROSTER order `read_build` (PlayerSaveData.HEROES) happens to iterate. Before this
-the slot index was DISCARDED and the run record's order WAS the save roster's, so the in-game team
-order/position was lost through the app and up to the leaderboard. `slot` is ADDITIVE (no
-`RAW_SCHEMA_VERSION` bump, [[invariants/schema-versioning]]); the live overlay emits it too
-(`party_slots` in live.json) alongside the already-slot-ordered `party`.
+`close_run` stamps each hero's `slot` via `resolve_party_slots` and emits the party via
+`order_party_by_slot` — in FORMATION order, NOT the SAVE-ROSTER order `read_build`
+(PlayerSaveData.HEROES) happens to iterate. Before this the slot index was DISCARDED and the run
+record's order WAS the save roster's, so the in-game team order/position was lost through the app and
+up to the leaderboard. `slot` is ADDITIVE (no `RAW_SCHEMA_VERSION` bump,
+[[invariants/schema-versioning]]); the live overlay emits it too (`party_slots` in live.json)
+alongside the already-slot-ordered `party`.
+
+**Resolve from ONE coherent read, not the merged accumulator.** The slot is stamped by
+`resolve_party_slots(hero_keys, slots_now, slots_seen)`: `slots_now` is a SINGLE at-close (or
+per-tick) `read_party_slots`, UNIQUE by construction (each deployed hero at a distinct index); the
+run-long accumulator (`party_slots`) is only the FALLBACK for a hero dead/dropped before close, and a
+stale fallback slot that collides with a live one is dropped to `None` (it trails). This guarantees
+UNIQUE slots, so `order_party_by_slot` can't tie into the surface-dependent insertion order — and the
+run record AND the live overlay both resolve this way, so they can't disagree ("live ok, saved
+wrong"). Reusing the merged accumulator directly was the risk #89's review flagged: a mid-run
+re-index (death/revive) could leave a stale or duplicate index.
 
 ## Related
 - [[invariants/instance-selection]] — picking the right live instance of a class (same bug family)

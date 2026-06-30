@@ -161,3 +161,55 @@ def test_slot_sort_key_zero_is_real_and_none_trails():
     assert build.slot_sort_key(2) == (False, 2)
     assert build.slot_sort_key(None) == (True, 0)
     assert sorted([2, None, 0, 1], key=build.slot_sort_key) == [0, 1, 2, None]
+
+
+# --------------------------------------------------------------------------- #
+# resolve_party_slots — ONE coherent at-close read (unique), accumulator fallback #
+# only for a hero dead-at-close, deduped. Guards the review's "live ok, saved   #
+# wrong" / stale-or-duplicate-index concern (#89).                              #
+# --------------------------------------------------------------------------- #
+
+def test_resolve_party_slots_prefers_the_at_close_read():
+    # slots_now is authoritative — each hero gets its CURRENT formation index, never the stale accumulator.
+    assert build.resolve_party_slots([101, 201, 301], {101: 0, 201: 1, 301: 2}, {101: 9, 201: 9}) == {
+        101: 0, 201: 1, 301: 2}
+
+
+def test_resolve_party_slots_falls_back_for_a_hero_dead_at_close():
+    # 301 isn't on the field at close (dead/dropped); its last-seen slot 2 is still free -> use it.
+    assert build.resolve_party_slots([101, 301], {101: 0}, {101: 0, 301: 2}) == {101: 0, 301: 2}
+
+
+def test_resolve_party_slots_drops_a_stale_slot_that_collides_with_a_live_one():
+    # 999 is gone at close; its last-seen slot 0 is now held by the LIVE hero 101 -> drop the stale
+    # 999 to None (it trails). NEVER a duplicate index that would tie order_party_by_slot.
+    assert build.resolve_party_slots([101, 999], {101: 0}, {101: 0, 999: 0}) == {101: 0, 999: None}
+
+
+def test_resolve_party_slots_dedups_among_fallbacks():
+    # two dead heroes both last-seen at slot 1 -> first (by hero_keys order) keeps it, the other trails.
+    assert build.resolve_party_slots([5, 6], {}, {5: 1, 6: 1}) == {5: 1, 6: None}
+
+
+def test_resolve_party_slots_none_when_unknown():
+    assert build.resolve_party_slots([101, 202], {101: 0}, {}) == {101: 0, 202: None}
+
+
+def test_resolve_then_order_is_formation_order_end_to_end():
+    # close_run's ordering PIPELINE end to end (resolve -> stamp -> order), not just order_party_by_slot.
+    # Heroes arrive in SAVE-ROSTER order [201, 401, 601]; the live formation is 601@0, 201@1, 401@2.
+    heroes = [{"heroKey": 201}, {"heroKey": 401}, {"heroKey": 601}]
+    slot_by_hero = build.resolve_party_slots([h["heroKey"] for h in heroes], {601: 0, 201: 1, 401: 2}, {})
+    for h in heroes:
+        h["slot"] = slot_by_hero.get(h["heroKey"])
+    assert [h["heroKey"] for h in build.order_party_by_slot(heroes)] == [601, 201, 401]
+
+
+def test_resolve_then_order_dead_hero_does_not_tie_into_roster_order():
+    # A dead-at-close hero with a COLLIDING stale slot must not tie the live heroes into roster order.
+    # Roster order [10, 20, 30]; live formation 20@0, 10@1; dead 30's stale slot 0 collides -> dropped.
+    heroes = [{"heroKey": 10}, {"heroKey": 20}, {"heroKey": 30}]
+    slot_by_hero = build.resolve_party_slots([h["heroKey"] for h in heroes], {20: 0, 10: 1}, {30: 0})
+    for h in heroes:
+        h["slot"] = slot_by_hero.get(h["heroKey"])
+    assert [h["heroKey"] for h in build.order_party_by_slot(heroes)] == [20, 10, 30]

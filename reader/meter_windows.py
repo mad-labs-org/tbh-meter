@@ -1171,7 +1171,10 @@ def run(hz, output_dir, debug=False):
         pl_end = build.read_live_party(reader, sm, hero_cat, heroes_end)
         xpacc.update(pl_end)
         R["party_seen"].update(dict.fromkeys(pl_end))  # live at close = seen (live_keys ⊇ acc)
-        R["party_slots"].update(build.read_party_slots(reader, sm, hero_cat))  # latest formation slot per hero
+        # ONE coherent at-close HeroList read (unique slots) — the PRIMARY source of each hero's slot;
+        # also banked into the accumulator (the fallback for a hero deployed mid-run, dead by close).
+        slots_now = build.read_party_slots(reader, sm, hero_cat)
+        R["party_slots"].update(slots_now)
         # XP per-run = the LIVE one (real-time, exact). The save is a lagging snapshot (useless delta: 0 or a
         # ~10M jump depending on where the save-write falls in the run = jitter) -> NO longer recorded; only a silent
         # fallback if the live one didn't happen (the accumulator never saw anyone = sm off the whole run), so as to never
@@ -1203,9 +1206,6 @@ def run(hz, output_dir, debug=False):
             if not build.hero_in_run(hk, live_keys):
                 continue
             hh = dict(h)
-            # Formation slot (0/1/2) = the hero's position in the live HeroList — the team order the
-            # player set. None only on a degraded read (hero in live_keys but absent from party_slots).
-            hh["slot"] = (R.get("party_slots") or {}).get(hk)
             hh["stats"] = live_stats.get(hk, {})
             xrec = xpacc.record(hk)
             if xrec is not None:
@@ -1242,9 +1242,15 @@ def run(hz, output_dir, debug=False):
             if killed_by:
                 hh["killed_by"] = killed_by                            # monsterKeys that killed this hero
             heroes_out.append(hh)
-        # Emit the party in IN-GAME FORMATION order (StageManager.HeroList slot) instead of the
-        # save-roster order R["build"] happens to iterate — the team order/position the player sees.
-        # Each hero carries its explicit `slot`; the app + leaderboard render by it.
+        # Stamp each hero's coherent formation slot — from the ONE at-close read (slots_now, unique),
+        # falling back to the accumulator only for a hero dead-by-close (deduped: a stale slot that
+        # collides with a live one is dropped). Then emit the party in FORMATION order (was SAVE-ROSTER
+        # order R["build"] iterates). resolve_party_slots guarantees unique slots, so the order can't tie
+        # into the roster order and can't diverge from the live overlay (which runs the same resolution).
+        slot_by_hero = build.resolve_party_slots([hh["heroKey"] for hh in heroes_out],
+                                                 slots_now, R.get("party_slots"))
+        for hh in heroes_out:
+            hh["slot"] = slot_by_hero.get(hh["heroKey"])
         heroes_out = build.order_party_by_slot(heroes_out)
         ref = clear_time if clear_time else max(measured, 1)
         total_damage = R["dps"].total_damage
@@ -1547,7 +1553,8 @@ def run(hz, output_dir, debug=False):
                 # in read_live_party (heroes_now is the save snapshot, for the level fallback on a bad decode).
                 pl_end = build.read_live_party(reader, sm, hero_cat, heroes_now)
                 R["party_seen"].update(dict.fromkeys(pl_end))
-                R["party_slots"].update(build.read_party_slots(reader, sm, hero_cat))  # formation slot per hero
+                slots_now_live = build.read_party_slots(reader, sm, hero_cat)  # this tick's coherent read
+                R["party_slots"].update(slots_now_live)
                 # LIVE xp accumulator (the SAME object that closes the run in close_run): integrates the
                 # per-hero tick — the 1st sighting seeds the baseline; then sums increments > 0 (level-up by
                 # the curve). Fed the live decoded exp → drives the overlay's live xp/ETA; the SAVE fallback
@@ -1580,14 +1587,14 @@ def run(hz, output_dir, debug=False):
                 # Party keys: whoever ENTERED the run (start) + whoever was SEEN deployed later
                 # (party_seen; a dead hero doesn't drop from the frame) — NEVER the save's roster (it would show
                 # non-deployed heroes). Empty -> line omitted -> frame disappears in the app.
-                slot_map = R.get("party_slots") or {}
                 pl0 = R.get("party_live_start") or {}
                 party_keys = list(pl0) + [k for k in R["party_seen"] if k not in pl0]
-                # Order the overlay party by formation slot (0/1/2) — the in-game team order; falls back
-                # to first-seen order when a slot didn't resolve. SAME rule as the run record
-                # (build.slot_sort_key) so overlay and record never drift. The {heroKey: slot} map rides
-                # alongside in live.json (additive) so the overlay can place by exact position (gaps included).
-                party_keys.sort(key=lambda k: build.slot_sort_key(slot_map.get(k)))
+                # Coherent slot per hero via the SAME resolution as the run record (build.resolve_party_slots):
+                # this tick's read (slots_now_live, unique) primary, accumulator fallback for whoever isn't on
+                # the field right now, deduped — so the overlay and the saved record can't diverge. Then order
+                # by formation slot (0/1/2) and ride the {heroKey: slot} map alongside in live.json (additive).
+                slot_by_hero = build.resolve_party_slots(party_keys, slots_now_live, R.get("party_slots"))
+                party_keys.sort(key=lambda k: build.slot_sort_key(slot_by_hero.get(k)))
                 # Live loot: chest count per EMonsterLogType (index = the enum value) —
                 # CURRENT run + those absorbed by the pending-close (the trailing boss box RAISES the
                 # count while the live stage_key is still the cleared one; it's that rising-edge that
@@ -1614,7 +1621,8 @@ def run(hz, output_dir, debug=False):
                     party=party_keys, drops=[dc[0], dc[1], dc[2]],
                     party_stats=live_stats,
                     party_progress=live_progress,
-                    party_slots={hk: slot_map[hk] for hk in party_keys if hk in slot_map})
+                    party_slots={hk: slot_by_hero[hk] for hk in party_keys
+                                 if slot_by_hero.get(hk) is not None})
                 _write_atomic(live_path, json.dumps(live_rec))
                 last_snap = now
             time.sleep(interval)
