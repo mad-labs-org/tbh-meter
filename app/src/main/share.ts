@@ -6,7 +6,7 @@ import { getAccessToken, clearSession, refreshAccessToken } from "./auth.js";
 import { getDeviceId } from "./device-id.js";
 import { signRequest } from "./request-signer.js";
 import { API_URL, SITE_URL } from "./config.js";
-import { reportError, describeCause } from "./error-report.js";
+import { reportError, describeCause, type ErrorCause } from "./error-report.js";
 import { httpFetch } from "./net-fetch.js";
 import { mapGear, mapSkillLevels, type IngestGearSlot } from "./ingest-map.js";
 import { tsToMs } from "./sources/runs-source.js";
@@ -49,6 +49,65 @@ export type ShareResult =
  */
 export function isReportableUploadFailure(status: number): boolean {
   return status < 500 && status !== 401 && status !== 408 && status !== 429;
+}
+
+/**
+ * Transient-connectivity fingerprints — the upload transport `catch` reasons that are
+ * the USER's own network (offline, flaky Wi-Fi, DNS not resolving), not something the
+ * meter can fix. Matched case-insensitively against BOTH the cause code and the error
+ * message, because the reason surfaces in two shapes: Node/undici raises `.code`s
+ * (ENOTFOUND, ECONNREFUSED, …) while Electron's net stack (net.fetch) puts its reason
+ * in the MESSAGE as a Chromium `net::ERR_*` string (net-fetch.ts rides net.fetch). The
+ * tokens are distinctive enough to substring-match safely.
+ */
+const TRANSIENT_NETWORK_FINGERPRINTS = [
+  // Node / undici (DNS, socket, routing).
+  "ENOTFOUND",
+  "EAI_AGAIN",
+  "ECONNREFUSED",
+  "ECONNRESET",
+  "ETIMEDOUT",
+  "ECONNABORTED",
+  "ENETUNREACH",
+  "ENETDOWN",
+  "EHOSTUNREACH",
+  "EPIPE",
+  // Chromium net:: errors (Electron net.fetch).
+  "ERR_NAME_NOT_RESOLVED",
+  "ERR_INTERNET_DISCONNECTED",
+  "ERR_NETWORK_CHANGED",
+  "ERR_CONNECTION_REFUSED",
+  "ERR_CONNECTION_RESET",
+  "ERR_CONNECTION_CLOSED",
+  "ERR_CONNECTION_TIMED_OUT",
+  "ERR_CONNECTION_ABORTED",
+  "ERR_ADDRESS_UNREACHABLE",
+  "ERR_TIMED_OUT",
+  // Generic catch-all some layers emit.
+  "OFFLINE",
+];
+
+/**
+ * Whether an upload TRANSPORT failure (the fetch itself threw — no HTTP response) is
+ * worth relaying to the #log-error channel. Mirrors {@link isReportableUploadFailure}'s
+ * noise policy for the sibling HTTP-error path: relay only what's actionable, suppress
+ * the self-healing transient states auto-upload already retries.
+ *
+ * Suppress (false) a transient-connectivity failure — offline / flaky network / DNS
+ * (the 61 `share:upload-network` reports were dominated by `net::ERR_NAME_NOT_RESOLVED`).
+ * Reporting these loses nothing: the caller still returns `code: "network"`, which
+ * auto-upload retries on its next tick (auto-upload.ts), so the run uploads later; the
+ * report was pure noise about the user's own connection, which we can't fix.
+ *
+ * Report (true) everything else — crucially TLS / certificate failures
+ * (UNABLE_TO_VERIFY_LEAF_SIGNATURE, SELF_SIGNED_CERT_IN_CHAIN, DEPTH_ZERO_SELF_SIGNED_CERT,
+ * CERT_*), which signal AV / corporate-proxy TLS interception (a MITM'd cert chain — the
+ * whole reason describeCause captures `.cause` here), and any unknown/empty reason (keep
+ * visibility on failures we haven't classified). When in doubt, report.
+ */
+export function isReportableNetworkError(cause: ErrorCause, topMessage: string): boolean {
+  const haystack = `${cause.code ?? ""} ${cause.message ?? ""} ${topMessage}`.toUpperCase();
+  return !TRANSIENT_NETWORK_FINGERPRINTS.some((fp) => haystack.includes(fp));
 }
 
 // Telemetry for the involuntary-logout (401) path. 401 is deliberately suppressed
@@ -353,12 +412,18 @@ export async function uploadRun(run: RunRecord): Promise<ShareResult> {
     // err.cause — surface its message + code so the Discord report is diagnosable
     // instead of just "fetch failed".
     const cause = describeCause(err);
-    reportError("share:upload-network", err, {
-      externalId: payload.externalId,
-      causeCode: cause.code,
-      causeMessage: cause.message,
-    });
     const detail = err instanceof Error ? err.message : "unknown";
+    // Relay only actionable transport failures (TLS/cert interception, unknown reasons);
+    // suppress transient offline/DNS/network blips. Same noise policy as the HTTP-error
+    // path below: auto-upload already retries the "network" code we return, so silencing
+    // the report loses nothing but the noise (see isReportableNetworkError).
+    if (isReportableNetworkError(cause, detail)) {
+      reportError("share:upload-network", err, {
+        externalId: payload.externalId,
+        causeCode: cause.code,
+        causeMessage: cause.message,
+      });
+    }
     const causeSuffix = cause.message ? ` (${cause.code ?? "cause"}: ${cause.message})` : "";
     return {
       ok: false,
