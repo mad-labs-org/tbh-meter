@@ -46,6 +46,7 @@ import {
 import { startAutoUpload, stopAutoUpload, notifySignedIn } from "./auto-upload.js";
 import { onSignedIn } from "./auth.js";
 import { installGlobalErrorReporting } from "./error-report.js";
+import { installCrashRecovery } from "./crash-recovery.js";
 import { isRcBuild } from "./variant.js";
 import { collectDebugInfo } from "./debug-info.js";
 import {
@@ -78,6 +79,11 @@ app.setName(isRcBuild() ? "tbh-meter-rc" : "tbh-meter");
 // else can fail so startup crashes are reported too. The reader-log tail (reader-diag.log +
 // meter.log + live.json) rides along on every report so a Discord post is self-sufficient to debug.
 installGlobalErrorReporting(readReaderLogs);
+// Recover from renderer-process crashes (Electron-42 transparent-overlay GPU cascade):
+// reload a renderer that died mid-session so the window comes back instead of sitting
+// blank forever. Separate from reporting above — recovery changes crash semantics, which
+// error-report.ts is explicitly not allowed to do. Loop-guarded against a reload storm.
+installCrashRecovery();
 
 let liveWin: BrowserWindow | null = null;
 let listWin: BrowserWindow | null = null;
