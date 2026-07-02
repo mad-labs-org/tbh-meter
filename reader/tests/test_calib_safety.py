@@ -159,7 +159,7 @@ class TestOffsetCorruptionCaught:
 
     def test_hero_list_shift_caught_on_named_class(self, monkeypatch):
         """The save's hero list (HEROES) is the root of the upload breakage (heroes=[] → eligible() skips).
-        Shifting it to 0x48 lands on `mailSaveDatas` (a NON-list field) → WRONG FIELD."""
+        Shifting it to 0x48 lands on `backendPostList` (a DIFFERENT named list, 1.00.23) → WRONG FIELD."""
         monkeypatch.setattr(O.PlayerSaveData, "HEROES", 0x48)
         rc, out = _run_dump()
         assert rc == 1, out
