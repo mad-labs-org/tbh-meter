@@ -158,35 +158,37 @@ def _synth_dump(player_save_lines):
     return "".join(parts)
 
 
-# CORRECT PlayerSaveData body (1.00.19 offsets = the ones offsets.py has today).
+# CORRECT PlayerSaveData body (1.00.23 offsets = the ones offsets.py has today).
 _PSD_OK = "".join([
     _field("commonSaveData", "CommonSaveData", "commonSaveData", 0x10),
-    _field("currenySaveDatas", "List<CurrencySaveData>", "currenySaveDatas", 0x48),
-    _field("heroSaveDatas", "List<HeroSaveData>", "heroSaveDatas", 0x50),
-    _field("attributeSaveDatas", "List<AttributeSaveData>", "attributeSaveDatas", 0x60),
-    _field("RuneSaveData", "List<RuneSaveData>", "RuneSaveData", 0x70),
-    _field("inventorySaveDatas", "List<InventorySaveData>", "inventorySaveDatas", 0x78),
-    _field("stashSaveDatas", "List<StashSaveData>", "stashSaveDatas", 0x80),
-    _field("itemSaveDatas", "List<ItemSaveData>", "itemSaveDatas", 0xA0),
-    _field("aggregateSaveDatas", "List<AggregateSaveData>", "aggregateSaveDatas", 0xA8),
+    _field("backendPostList", "List<BackendPostSaveData>", "backendPostList", 0x48),
+    _field("currenySaveDatas", "List<CurrencySaveData>", "currenySaveDatas", 0x50),
+    _field("heroSaveDatas", "List<HeroSaveData>", "heroSaveDatas", 0x58),
+    _field("attributeSaveDatas", "List<AttributeSaveData>", "attributeSaveDatas", 0x68),
+    _field("RuneSaveData", "List<RuneSaveData>", "RuneSaveData", 0x78),
+    _field("inventorySaveDatas", "List<InventorySaveData>", "inventorySaveDatas", 0x80),
+    _field("stashSaveDatas", "List<StashSaveData>", "stashSaveDatas", 0x88),
+    _field("itemSaveDatas", "List<ItemSaveData>", "itemSaveDatas", 0xA8),
+    _field("aggregateSaveDatas", "List<AggregateSaveData>", "aggregateSaveDatas", 0xB0),
 ])
 
 # Body of a build with an INSERTION NOT accommodated by offsets.py: at the offset offsets.py tracks as
-# CURRENCIES (0x48 since 1.00.19) the dump has the INTRUDING field `BoxBucketUseBoxList`, and the real
-# currency list shifted to 0x58 (untracked). It is the EXACT 1.00.12/1.00.19 class of bug — a field
+# CURRENCIES (0x50 since 1.00.23) the dump has the INTRUDING field `BoxBucketUseBoxList`, and the real
+# currency list shifted to 0x60 (untracked). It is the EXACT 1.00.12/1.00.19/1.00.23 class of bug — a field
 # present at the tracked offset let the presence-only check go green. The other tracked offsets still
 # hold the right field (only CURRENCIES trips → proves the name-check, not a wholesale shift).
 _PSD_SHIFTED = "".join([
     _field("commonSaveData", "CommonSaveData", "commonSaveData", 0x10),
-    _field("BoxBucketUseBoxList", "List<int>", "BoxBucketUseBoxList", 0x48),  # intruder where CURRENCIES goes
-    _field("heroSaveDatas", "List<HeroSaveData>", "heroSaveDatas", 0x50),
-    _field("currenySaveDatas", "List<CurrencySaveData>", "currenySaveDatas", 0x58),  # real currency, shifted
-    _field("attributeSaveDatas", "List<AttributeSaveData>", "attributeSaveDatas", 0x60),
-    _field("RuneSaveData", "List<RuneSaveData>", "RuneSaveData", 0x70),
-    _field("inventorySaveDatas", "List<InventorySaveData>", "inventorySaveDatas", 0x78),
-    _field("stashSaveDatas", "List<StashSaveData>", "stashSaveDatas", 0x80),
-    _field("itemSaveDatas", "List<ItemSaveData>", "itemSaveDatas", 0xA0),
-    _field("aggregateSaveDatas", "List<AggregateSaveData>", "aggregateSaveDatas", 0xA8),
+    _field("backendPostList", "List<BackendPostSaveData>", "backendPostList", 0x48),
+    _field("BoxBucketUseBoxList", "List<int>", "BoxBucketUseBoxList", 0x50),  # intruder where CURRENCIES goes
+    _field("heroSaveDatas", "List<HeroSaveData>", "heroSaveDatas", 0x58),
+    _field("currenySaveDatas", "List<CurrencySaveData>", "currenySaveDatas", 0x60),  # real currency, shifted
+    _field("attributeSaveDatas", "List<AttributeSaveData>", "attributeSaveDatas", 0x68),
+    _field("RuneSaveData", "List<RuneSaveData>", "RuneSaveData", 0x78),
+    _field("inventorySaveDatas", "List<InventorySaveData>", "inventorySaveDatas", 0x80),
+    _field("stashSaveDatas", "List<StashSaveData>", "stashSaveDatas", 0x88),
+    _field("itemSaveDatas", "List<ItemSaveData>", "itemSaveDatas", 0xA8),
+    _field("aggregateSaveDatas", "List<AggregateSaveData>", "aggregateSaveDatas", 0xB0),
 ])
 
 
