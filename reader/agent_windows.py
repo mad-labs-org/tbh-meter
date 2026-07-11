@@ -236,7 +236,7 @@ def op_psd(_):
     for h in READER.list_iter(READER.rptr(p + PlayerSaveData.HEROES), cap=200):
         heroes.append({"key": READER.ri32(h + HeroSaveData.HERO_KEY),
                        "level": READER.ri32(h + HeroSaveData.LEVEL),
-                       "exp": READER.rf32(h + HeroSaveData.EXP), "addr": hex(h)})
+                       "exp": READER.rf64(h + HeroSaveData.EXP), "addr": hex(h)})
     return {"addr": hex(p), "gold": save.read_gold(READER, p), "heroes": heroes}
 
 

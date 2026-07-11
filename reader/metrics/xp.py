@@ -7,10 +7,11 @@ the curve (config/level_curve.json = ExpForLevelUp per level) fills the wrap. Va
 across 3 level-ups the sum matched with diff 0. Within-level is MONOTONIC outside level-up
 (the dip detector ran many runs with a death and never fired) — death only PAUSES the gain.
 
-1.00.20: the live within-level exp was hidden behind the ACTk ObscuredFloat cipher (the PLAIN
-EXP_FAKE decoy was zeroed build-wide). It is now RECOVERED — build.read_live_party decodes the cipher
-in place (game/obscured.py, algorithm read from the binary), so the accumulator is fed a clean live
-exp again and the run tags xp_source="live" (confirmed: gain matches the screen ~749K/run). The SAVE
+1.00.20: the live within-level exp was hidden behind the ACTk cipher (the PLAIN EXP_FAKE decoy was
+zeroed build-wide) — ObscuredFloat then, WIDENED to ObscuredDouble in 1.00.27. It is RECOVERED —
+build.read_live_party decodes the cipher in place (game/obscured.py, algorithm read from the binary),
+so the accumulator is fed a clean live exp again and the run tags xp_source="live" (confirmed: gain
+matches the screen ~749K/run). The SAVE
 delta remains the honest fallback if the decode ever fails ([[invariants/metric-fallback-chains]] /
 [[invariants/obscured-data-offlimits]]). The accumulator logic below is unchanged.
 

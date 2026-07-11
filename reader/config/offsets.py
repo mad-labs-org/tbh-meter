@@ -91,14 +91,16 @@ class Singleton:
     INSTANCE = 0x0                     # bbwf (the singleton)
 
 
-# ACTk Obscured struct layout (CodeStage.AntiCheat.ObscuredTypes): hash@0x0, hiddenValue@0x4,
-# currentCryptoKey@0x8, fakeValue@0xC. Through 1.00.19 the PLAIN `fakeValue` decoy was kept in sync
-# with the real value, so reading it was legal; 1.00.20 KILLED the decoy build-wide (reads 0). The live
-# HeroRuntime level/exp are now RECOVERED by decoding the cipher in game/obscured.py (algorithm read
-# from the binary: int = (hidden-key)^key, float = f32(key^byteswap(hidden)) — note a plain hidden^key is
-# GARBAGE, the refuted first guess). The Unit/Monster CORE-STAT ciphers stay off-limits (no validated
-# decode + a PLAIN substitute already exists) — see docs/invariants/obscured-data-offlimits.
-ACTK_FAKE = 0xC
+# ACTk Obscured struct layout (CodeStage.AntiCheat.ObscuredTypes). 32-bit variants (ObscuredInt/Float):
+# hash@0x0, hiddenValue@0x4, currentCryptoKey@0x8, fakeValue@0xC. 64-bit ObscuredDouble WIDENS them:
+# hash@0x0, hiddenValue@0x8 (long), currentCryptoKey@0x10 (long), fakeValue@0x18 (double). Through 1.00.19
+# the PLAIN `fakeValue` decoy was kept in sync with the real value, so reading it was legal; 1.00.20
+# KILLED the decoy build-wide (reads 0). The live HeroRuntime level/exp are now RECOVERED by decoding the
+# cipher in game/obscured.py (algorithm read from the binary: int = (hidden-key)^key, float =
+# f32(key^byteswap_1_2(hidden)), double = f64(key^byteswap8(hidden)) — each cipher is DIFFERENT, and a
+# plain hidden^key is GARBAGE, the refuted first guess). The Unit/Monster CORE-STAT ciphers stay
+# off-limits (no validated decode + a PLAIN substitute already exists) — see obscured-data-offlimits.
+ACTK_FAKE = 0xC                        # fakeValue offset for the 32-bit ObscuredInt/Float (double = 0x18)
 
 
 # --------------------------------------------------------------------------- #
@@ -107,10 +109,11 @@ ACTK_FAKE = 0xC
 class Unit:                            # base of Hero/Monster (dump.cs ~319277)
     HEALTH_CONTROLLER = 0xB0           # -> UnitHealthController
     IS_HERO = 0x100                    # bool b_isHero
-    CACHE = 0x3A8                      # Hero.cache -> uf (progression wrapper). 1.00.14 inserted
-                                       # `Action OnCrowdControlAppliedAction` @0x3A0 at the END of Unit
-                                       # (base grew +0x8) -> Hero.cache 0x3A0->0x3A8; EVERY Unit
-                                       # subclass field shifted +0x8 (Monster likewise, below).
+    CACHE = 0x3B0                      # Hero.cache -> uf (progression wrapper). Unit's LAST field
+                                       # `Action OnCrowdControlAppliedAction` grows the base on some
+                                       # recompiles: 1.00.14 put it @0x3A0 (Hero.cache 0x3A0->0x3A8), and
+                                       # 1.00.27 grew it again @0x3A0->0x3A8 (base +0x8) -> Hero.cache
+                                       # 0x3A8->0x3B0. EVERY Unit subclass field shifts with it (Monster below).
     CORE_STATS_OBSCURED = 0x104        # 12 core stats: ObscuredFloat (XOR) — DO NOT READ (garbage); use
                                        # xd.FINAL_STATS (Dict<StatType,float> PLAIN). Marker for
                                        # docs/invariants/obscured-data-offlimits (test_obscured_markers).
@@ -121,13 +124,17 @@ class UnitHealthController:            # HP in PURE float (dump.cs ~319894)
     HP_MAX = 0x4C
 
 
-class Monster:                         # extends Unit -> inherited the 1.00.14 +0x8 (see Unit.CACHE)
-    STAGE_KEY = 0x3D4                  # LIVE stageKey (the save's freezes on a stage change). 1.00.14: 0x3CC->0x3D4.
-                                       # ⚠ diff_offsets gave a FALSE-OK (obfuscated-name field, only checks
-                                       # adjacency -> a uniform +0x8 shift passes) — caught in dump.cs
-                                       # vs the 1.00.13 baseline; confirm in validate_live (stage).
-    CACHE_OBSCURED = 0x3B8             # Obscured cache — DO NOT READ; use the Monster PLAIN fields.
-                                       # 1.00.14: 0x3B0->0x3B8. Marker for docs/invariants/obscured-data-offlimits.
+class Monster:                         # extends Unit -> inherits the Unit-base +0x8 growth (see Unit.CACHE)
+    STAGE_KEY = 0x3DC                  # LIVE stageKey (the save's freezes on a stage change).
+                                       # 1.00.14: 0x3CC->0x3D4; 1.00.27: 0x3D4->0x3DC (uniform Unit +0x8).
+                                       # ⚠ diff_offsets gives a FALSE-OK here (obfuscated-name field: the old
+                                       # offset lands on ANOTHER obfuscated field, so a uniform +0x8 passes
+                                       # silently — the documented blind spot). This shift is DERIVED from the
+                                       # confirmed Unit +0x8 (cache 0x3B8->0x3C0) and confirmed live by
+                                       # validate_live (stage); it must be applied by hand.
+    CACHE_OBSCURED = 0x3C0             # Obscured cache — DO NOT READ; use the Monster PLAIN fields.
+                                       # 1.00.14: 0x3B0->0x3B8; 1.00.27: 0x3B8->0x3C0 (uniform Unit +0x8). Marker
+                                       # for docs/invariants/obscured-data-offlimits (also a diff FALSE-OK field).
 
 
 class StageManager:                    # singleton (dump.cs ~327247)
@@ -195,16 +202,19 @@ class PlayerSaveData:                  # plaintext save, snapshot (NOT live)
     # (0x40) — the alchemy feature — between BoxBucketGetBoxList and currenySaveDatas, so ALL save lists
     # below shifted +0x10 once more.
     # 1.00.23 did it a THIRD time: inserted backendPostList (0x48, List<BackendPostSaveData>) directly
-    # above currenySaveDatas → ALL save lists below shifted +0x08. Offsets are PlayerSaveData
-    # TypeDefIndex 2684 in dump.cs (1.00.23).
-    CURRENCIES = 0x50                  # List<CurrencySaveData>   (currenySaveDatas)
-    HEROES = 0x58                      # List<HeroSaveData>       (heroSaveDatas)
-    ATTRIBUTES = 0x68                  # List<AttributeSaveData> (invested skill/passive tree)
-    RUNES = 0x78                       # List<RuneSaveData> — account-wide runes (LIVE-CRACKED 2026-06-09)
-    INVENTORY_SLOTS = 0x80             # List<InventorySaveData> — inventory slot -> item uniqueId
-    STASH = 0x88                       # List<StashSaveData> — stash slot -> item uniqueId (separate from the inv)
-    ITEMS = 0xA8                       # List<ItemSaveData> (item data; the slots above reference by uniqueId)
-    AGGREGATES = 0xB0                  # List<AggregateSaveData> (gold/xp oracle, stale)
+    # above currenySaveDatas → ALL save lists below shifted +0x08.
+    # 1.00.27 did it a FOURTH time (+0x08 again): the dump (PlayerSaveData TypeDefIndex 2680) now carries
+    # pendingEnchantList@0x48 and backendPostList@0x50 directly ABOVE currenySaveDatas@0x58 (vs
+    # backendPostList@0x48 / currenySaveDatas@0x50 in 1.00.23-1.00.25) → ALL save lists below shifted
+    # +0x08 once more (CURRENCIES 0x50→0x58 … AGGREGATES 0xB0→0xB8).
+    CURRENCIES = 0x58                  # List<CurrencySaveData>   (currenySaveDatas)
+    HEROES = 0x60                      # List<HeroSaveData>       (heroSaveDatas)
+    ATTRIBUTES = 0x70                  # List<AttributeSaveData> (invested skill/passive tree)
+    RUNES = 0x80                       # List<RuneSaveData> — account-wide runes (LIVE-CRACKED 2026-06-09)
+    INVENTORY_SLOTS = 0x88             # List<InventorySaveData> — inventory slot -> item uniqueId
+    STASH = 0x90                       # List<StashSaveData> — stash slot -> item uniqueId (separate from the inv)
+    ITEMS = 0xB0                       # List<ItemSaveData> (item data; the slots above reference by uniqueId)
+    AGGREGATES = 0xB8                  # List<AggregateSaveData> (gold/xp oracle, stale)
 
 
 class RuneSaveData:                    # invested rune node (account-wide). NAME-readable class in the save.
@@ -239,9 +249,14 @@ class AggregateSaveData:               # dump.cs:342642
 class HeroSaveData:
     HERO_KEY = 0x10
     LEVEL = 0x14
-    EXP = 0x1C                         # float (resets on level-up; stale)
-    EQUIPPED_ITEMS = 0x28             # ulong[] of UniqueIds
-    EQUIPPED_SKILLS = 0x30           # int[] of SkillKeys (dump:342747)
+    # 1.00.27 restructured HeroSaveData (IsUnLock@0x18 bool inserted + EXP widened): EXP moved 0x1C→0x20
+    # AND its type WIDENED float(4B) → DOUBLE(8B) — the dump declares `public double HeroExp; // 0x20`. It
+    # MUST be read with reader.rf64 (rf32 grabs only the low 32 mantissa bits = garbage; 0 for round
+    # values, which would drop a lvl-1 hero via read_heroes' `lvl>1 or exp>0` gate). The equipped arrays
+    # then shift +0x8 (EQUIPPED_ITEMS 0x28→0x30, EQUIPPED_SKILLS 0x30→0x38).
+    EXP = 0x20                         # DOUBLE within-level exp (stale save snapshot) — read via reader.rf64
+    EQUIPPED_ITEMS = 0x30             # ulong[] of UniqueIds
+    EQUIPPED_SKILLS = 0x38           # int[] of SkillKeys
 
 
 class ItemSaveData:
@@ -282,24 +297,27 @@ class StageInfoData:                   # catalog (currentStageKey encodes the mo
 
 
 # ----- hero progression runtime (reached via Unit.CACHE) -----
-class HeroRuntime:                     # hero progression runtime (1.00.20 dump: class `vc`,
-                                       # TypeDefIndex 2797), reached via Unit.CACHE.
-    INFO = 0x30                        # -> HeroInfoData (HeroKey/class) — LIVE party IDENTITY.
+class HeroRuntime:                     # hero progression runtime (1.00.27 dump: class `uy`,
+                                       # TypeDefIndex 2800; 1.00.20 was `vc`/2797), reached via Unit.CACHE.
+    INFO = 0x30                        # -> HeroInfoData (HeroKey/class) — LIVE party IDENTITY. (bfbm @0x30)
     STATS_HOLDER = 0x10                # -> xd (holder of the 64 stats) — LIVE.
-    # LIVE level/exp. 1.00.20 moved them behind the ACTk cipher (the PLAIN `fakeValue` decoy @ +0xC was
+    # LIVE level/exp. 1.00.20 moved them behind the ACTk cipher (the PLAIN `fakeValue` decoy was
     # zeroed build-wide). RECOVERED read-only by decoding the cipher IN PLACE — the algorithm was read
     # from the binary (disasm of op_Implicit in GameAssembly.dll) and reimplemented in game/obscured.py:
-    #   ObscuredInt level  (record @0xCC)  = (hidden - key) ^ key
-    #   ObscuredFloat xp   (record @0x10C) = float32(key ^ byteswap_1_2(hidden))
-    # hidden @ base+0x4, key @ base+0x8; the key is read live each tick (handles ACTk key-rotation).
-    # Gated by the validate_live oracle (decoded == save level/xp) — see obscured-data-offlimits.
-    # Confirmed live (1.00.20): level 91/94/101 == save; xp gain Sorcerer ~749K/run == measured 748K.
-    LEVEL_HIDDEN = 0xD0                # ObscuredInt level (record 0xCC): hiddenValue   @ +0x4
-    LEVEL_KEY = 0xD4                   #                                  currentCryptoKey @ +0x8
-    EXP_HIDDEN = 0x110                 # ObscuredFloat xp (record 0x10C): hiddenValue   @ +0x4
-    EXP_KEY = 0x114                    #                                  currentCryptoKey @ +0x8
-    LEVEL_FAKE = 0xD8                  # ObscuredInt level fakeValue (DEAD: reads 0 since 1.00.20) — kept
-    EXP_FAKE = 0x118                   # ObscuredFloat xp fakeValue  (DEAD: reads 0)  for _raw_hero_list
+    #   ObscuredInt    level (record `bfcf` @0xCC)  = (hidden - key) ^ key           (hidden@+0x4, key@+0x8)
+    #   ObscuredDouble xp    (record `bfcj` @0x110) = float64(key ^ byteswap8(hidden)) (hidden@+0x8, key@+0x10)
+    # 1.00.27 WIDENED the within-level xp field ObscuredFloat -> ObscuredDouble (was record @0x10C, a 4-byte
+    # ObscuredFloat with hidden@+0x4/key@+0x8/fake@+0xC): the xp hidden/key are now 8-byte `long`s read via
+    # ru64 (rf32/ru32 would grab only the low 32 bits = garbage) and decoded by decode_obscured_double. Same
+    # float->double widening as HeroSaveData.HeroExp. LEVEL is UNCHANGED (still ObscuredInt @0xCC). The key is
+    # read live each tick (handles ACTk key-rotation). Gated by the validate_live oracle (decoded == save
+    # level/xp) — see obscured-data-offlimits. Confirmed live (1.00.20): level 91/94/101 == save.
+    LEVEL_HIDDEN = 0xD0                # ObscuredInt level (record 0xCC): hiddenValue   @ +0x4  (int32)
+    LEVEL_KEY = 0xD4                   #                                  currentCryptoKey @ +0x8  (int32)
+    EXP_HIDDEN = 0x118                 # ObscuredDouble xp (record 0x110): hiddenValue   @ +0x8  (long, ru64)
+    EXP_KEY = 0x120                    #                                   currentCryptoKey @ +0x10 (long, ru64)
+    LEVEL_FAKE = 0xD8                  # ObscuredInt level fakeValue @ +0xC (DEAD: reads 0 since 1.00.20)
+    EXP_FAKE = 0x128                   # ObscuredDouble xp fakeValue @ +0x18 (double, DEAD) for _raw_hero_list
 
 
 class StatsHolder:                     # `xd` (dump.cs:342026)

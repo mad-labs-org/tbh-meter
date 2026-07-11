@@ -321,6 +321,13 @@ class Reader:
         b = self.read(a, 4)
         return struct.unpack("<f", b)[0] if b and len(b) == 4 else None
 
+    def rf64(self, a):
+        """8-byte IEEE-754 double (e.g. HeroSaveData.EXP, widened float->double in 1.00.27).
+        None on a bad read (mirrors rf32). Reading a double with rf32 grabs only the low 32
+        mantissa bits = garbage — see config/offsets.py::HeroSaveData.EXP."""
+        b = self.read(a, 8)
+        return struct.unpack("<d", b)[0] if b and len(b) == 8 else None
+
     def read_cstr(self, a, maxlen=64):
         """ascii C-string (Il2CppClass class name). '' if empty, None if unreadable."""
         if not a:

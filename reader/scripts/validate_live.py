@@ -217,8 +217,9 @@ def main():
         raw_slots[hk] = i                # this deployed hero's formation slot = its HeroList index
         dec_lvl = obscured.decode_obscured_int(reader.ru32(uf + HeroRuntime.LEVEL_HIDDEN),
                                                reader.ru32(uf + HeroRuntime.LEVEL_KEY))
-        dec_xp = obscured.decode_obscured_float(reader.ru32(uf + HeroRuntime.EXP_HIDDEN),
-                                                reader.ru32(uf + HeroRuntime.EXP_KEY))
+        # 1.00.27: within-level xp widened ObscuredFloat -> ObscuredDouble (8-byte ru64 words).
+        dec_xp = obscured.decode_obscured_double(reader.ru64(uf + HeroRuntime.EXP_HIDDEN),
+                                                 reader.ru64(uf + HeroRuntime.EXP_KEY))
         save_lvl = save_heroes_live.get(hk, (None,))[0]
         ok = (dec_lvl is not None and save_lvl is not None and abs(dec_lvl - save_lvl) <= 1
               and dec_xp is not None and math.isfinite(dec_xp) and dec_xp >= 0.0)
