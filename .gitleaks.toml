@@ -17,3 +17,10 @@ paths = [
   # reader/scripts/seed_calib_capture.py and ships inside tbh-reader.exe.
   '''^reader/config/calib_seed\.json$''',
 ]
+
+regexes = [
+  # Synthetic ACTk cipher key used ONLY in reader unit-test vectors
+  # (reader/tests/test_live_xp_integration.py) to encode/decode ObscuredDouble XP — an obvious
+  # placeholder hex sequence, not a credential. generic-api-key flags it because of the `_XKEY =` name.
+  '''0x0123456789ABCDEF''',
+]
