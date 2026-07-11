@@ -26,7 +26,7 @@ def read_heroes(reader, psd):
     for e in reader.list_iter(reader.rptr(psd + PlayerSaveData.HEROES), cap=200):
         k = reader.ri32(e + HeroSaveData.HERO_KEY)
         lvl = reader.ri32(e + HeroSaveData.LEVEL)
-        exp = reader.rf32(e + HeroSaveData.EXP)
+        exp = reader.rf64(e + HeroSaveData.EXP)   # 1.00.27: HeroExp is a double (rf32 = garbage low bits)
         if k is None or lvl is None or exp is None:
             continue
         if lvl > 1 or exp > 0:

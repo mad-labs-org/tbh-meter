@@ -132,10 +132,11 @@ def read_live_party(reader, sm, hero_cat=None, save_heroes=None):
     1.00.20 — level/exp are decoded from the ACTk cipher IN PLACE. Through 1.00.19 the live level/exp
     were the ACTk `fakeValue` PLAIN decoys (@ base+0xC of the ObscuredInt/Float). In 1.00.20 the
     recompile KILLED those decoys build-wide (they read 0); the real live values stayed in the cipher
-    (hiddenValue @ base+0x4, currentCryptoKey @ base+0x8). Rather than degrade to the lagging save (the
-    per-run save delta jumps ~2× — the bug players reported), we RECOVER the live values by decoding the
-    cipher read-only (game/obscured.py — algorithm read from the binary, not guessed; ObscuredInt level =
-    (hidden-key)^key, ObscuredFloat xp = float(key ^ byteswap(hidden))). The key is read live each tick
+    (next to hiddenValue). Rather than degrade to the lagging save (the per-run save delta jumps ~2× —
+    the bug players reported), we RECOVER the live values by decoding the cipher read-only
+    (game/obscured.py — algorithm read from the binary, not guessed; ObscuredInt level = (hidden-key)^key,
+    and since 1.00.27 the xp is an ObscuredDouble = float64(key ^ byteswap8(hidden)), read via ru64 — it
+    widened from the old ObscuredFloat). The key is read live each tick
     (handles ACTk rotation). LEVEL falls back to the save on an unreadable cipher; EXP stays None on a bad
     read so the xp chain degrades honestly ([[invariants/metric-fallback-chains]] rule 2), never the
     roster. The decode is gated by the validate_live oracle — see [[invariants/obscured-data-offlimits]].
@@ -154,18 +155,23 @@ def read_live_party(reader, sm, hero_cat=None, save_heroes=None):
     res = {}
     try:
         for _slot, hk, uf in _iter_party_slots(reader, sm, hero_cat):
-            # LEVEL + EXP read LIVE by decoding the ACTk cipher in place (the +0xC decoy died in
-            # 1.00.20). game/obscured.py reimplements the decode read from the binary. LEVEL falls back
-            # to the save snapshot on an unreadable/implausible cipher (stable, context only). EXP stays
-            # None on a bad read — NEVER the stale save exp — so close_run degrades to the per-hero save
-            # delta honestly ([[invariants/metric-fallback-chains]] rule 2), instead of reporting save as
-            # live. The party IDENTITY (which slots count) is the shared _iter_party_slots gate.
+            # LEVEL + EXP read LIVE by decoding the ACTk cipher in place (the decoy died in 1.00.20).
+            # game/obscured.py reimplements the decode read from the binary (LEVEL = ObscuredInt @0xCC;
+            # EXP = ObscuredDouble @0x110 since the 1.00.27 float->double widening, 8-byte ru64 reads).
+            # LEVEL falls back to the save snapshot on an unreadable/implausible cipher (stable, context
+            # only). EXP stays None on a bad read — NEVER the stale save exp — so close_run degrades to
+            # the per-hero save delta honestly ([[invariants/metric-fallback-chains]] rule 2), instead of
+            # reporting save as live. The party IDENTITY (which slots count) is the shared
+            # _iter_party_slots gate.
             lvl = obscured.decode_obscured_int(reader.ru32(uf + HeroRuntime.LEVEL_HIDDEN),
                                                reader.ru32(uf + HeroRuntime.LEVEL_KEY))
             if lvl is None or not (0 < lvl <= 200):
                 lvl = (save_heroes or {}).get(hk, (None, None))[0]
-            exp = obscured.decode_obscured_float(reader.ru32(uf + HeroRuntime.EXP_HIDDEN),
-                                                 reader.ru32(uf + HeroRuntime.EXP_KEY))
+            # 1.00.27 WIDENED the within-level xp ObscuredFloat -> ObscuredDouble: hidden/key are now
+            # 8-byte `long`s (ru64, not ru32) decoded by decode_obscured_double. None on a bad read ->
+            # honest save-delta fallback downstream (never the stale save exp, never a bogus 0).
+            exp = obscured.decode_obscured_double(reader.ru64(uf + HeroRuntime.EXP_HIDDEN),
+                                                  reader.ru64(uf + HeroRuntime.EXP_KEY))
             res[hk] = (lvl, exp)
     except Exception:
         return {}
@@ -186,8 +192,8 @@ def read_party_slots(reader, sm, hero_cat=None):
 def _raw_hero_list(reader, sm):
     """RAW HeroList (hk, lvl, exp) per slot, WITHOUT read_live_party's validity filter — just for
     diagnostics (describe_sm_candidates), to see WHY an instance is a ghost (e.g. a non-catalog hk).
-    lvl/exp are the DEAD ACTk decoy (LEVEL_FAKE/EXP_FAKE read 0 since 1.00.20) — kept only so the raw
-    sample still shows what those offsets hold; the discriminator is now the heroKey, not lvl.
+    lvl/exp are the DEAD ACTk decoy (LEVEL_FAKE int / EXP_FAKE double read 0 since 1.00.20) — kept only
+    so the raw sample still shows what those offsets hold; the discriminator is now the heroKey, not lvl.
     Never-raises -> [] on any failure."""
     out = []
     try:
@@ -205,7 +211,7 @@ def _raw_hero_list(reader, sm):
             hi = reader.rptr(uf + HeroRuntime.INFO) if uf else None
             hk = reader.ri32(hi + HeroInfoData.HERO_KEY) if hi else None
             lvl = reader.ri32(uf + HeroRuntime.LEVEL_FAKE) if uf else None
-            exp = reader.rf32(uf + HeroRuntime.EXP_FAKE) if uf else None
+            exp = reader.rf64(uf + HeroRuntime.EXP_FAKE) if uf else None   # 1.00.27: xp decoy is a double
             out.append((hk, lvl, exp))
     except Exception:
         return out
@@ -393,7 +399,7 @@ def read_build(reader, psd, item_cat, hero_cat):
     for h in reader.list_iter(reader.rptr(psd + PlayerSaveData.HEROES), cap=200):
         hk = reader.ri32(h + HeroSaveData.HERO_KEY)
         lvl = reader.ri32(h + HeroSaveData.LEVEL)
-        exp = reader.rf32(h + HeroSaveData.EXP)
+        exp = reader.rf64(h + HeroSaveData.EXP)   # 1.00.27: HeroExp is a double (rf32 = garbage low bits)
         if hk is None or lvl is None:
             continue
         if not (lvl > 1 or (exp or 0) > 0):

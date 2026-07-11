@@ -17,9 +17,10 @@ code_anchors:
   - config/offsets.py::EEquipClassType
   - config/offsets.py::StatsHolder.FINAL_STATS
   - game/obscured.py::decode_obscured_float
+  - game/obscured.py::decode_obscured_double
 asserts:
   - config.offsets.Unit.CORE_STATS_OBSCURED == 0x104
-  - config.offsets.Monster.CACHE_OBSCURED == 0x3B8
+  - config.offsets.Monster.CACHE_OBSCURED == 0x3C0
   - config.offsets.EEquipClassType.Knight == 1
   - config.offsets.EEquipClassType.Ranger == 2
 guarded_by:
@@ -63,10 +64,16 @@ can invert it.
 
 **The decode was READ FROM THE BINARY, not guessed.** A first guess (`hidden ^ key`) was REFUTED live
 (garbage that jittered ±5M). Disassembling the `op_Implicit` accessors in `GameAssembly.dll` gave the real
-algorithms, reimplemented in `game/obscured.py`:
+algorithms, reimplemented in `game/obscured.py` — each cipher is DIFFERENT (do not extrapolate one from
+another):
 - **ObscuredInt** (RVA 0x6E6CA0): `value = (hidden - key) ^ key`.
 - **ObscuredFloat** (RVA 0x6E4C00): `value = float32(key ^ byteswap_1_2(hidden))` (bytes [1],[2] of
   `hidden` swapped — the ACTkByte4 shuffle — before the XOR).
+- **ObscuredDouble** (1.00.27 getter `xry` RVA 0x6E40F0): `value = float64(key ^ byteswap8(hidden))` —
+  the 64-bit analog, an ACTkByte8 permutation of the 8-byte `hidden` before the XOR. **1.00.27 WIDENED
+  the HeroRuntime within-level xp `ObscuredFloat → ObscuredDouble`** (`hidden`/`key` are now 8-byte
+  `long`s read via `ru64`, the record moved to `bfcj@0x110`), the same float→double widening seen in
+  `HeroSaveData.HeroExp`. The `LEVEL` field stays `ObscuredInt` (unchanged).
 
 Why this is recoverable WITHOUT the fragility the old guidance feared:
 - **Build-independent algorithm.** We reimplement it in Python; we never resolve/call the game's decrypt
