@@ -63,6 +63,16 @@ describe("migrateChestCooldowns (legacy per-stage → box-keyed)", () => {
     expect(migrateChestCooldowns([{ dropAt: 1 }, null, "nope"], false)).toEqual([]); // no key
     expect(migrateChestCooldowns(undefined, true)).toEqual([]);
   });
+
+  it("preserves a valid detected open time and rejects malformed values", () => {
+    expect(migrateChestCooldowns([
+      { boxKey: 920801, dropAt: 50, openedAt: 75 },
+      { boxKey: 920011, dropAt: 100, openedAt: 99 },
+    ], false)).toEqual([
+      { boxKey: 920801, dropAt: 50, openedAt: 75 },
+      { boxKey: 920011, dropAt: 100 },
+    ]);
+  });
 });
 
 describe("sanitizeRoute", () => {

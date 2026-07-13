@@ -290,6 +290,7 @@ export const DICT = {
   "cooldowns.openStage": "Open this stage on the site",
   "cooldowns.ready": "Ready",
   "cooldowns.readyCheck": "✓ Ready",
+  "cooldowns.openedManually": "opened manually",
   "cooldowns.remove": "Remove (reappears on the next drop)",
   "cooldowns.spots": "spots",
   "cooldowns.notifTitle": "Blue chest ready",

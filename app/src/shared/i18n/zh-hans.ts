@@ -274,6 +274,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.openStage": "在网站上打开此关卡",
   "cooldowns.ready": "就绪",
   "cooldowns.readyCheck": "✓ 就绪",
+  "cooldowns.openedManually": "手动开启",
   "cooldowns.remove": "移除（下次掉落时重新出现）",
   "cooldowns.spots": "刷新点",
   "cooldowns.notifTitle": "蓝宝箱已就绪",

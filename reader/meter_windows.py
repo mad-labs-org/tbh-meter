@@ -42,6 +42,7 @@ from metrics.gold import (resolve_combat_gold_klass, combat_gold_klass_ok,
                           combat_gold_live, combat_gold_save, run_gain,
                           resolve_combat_gold_klass_by_index, gold_index_of_klass,
                           gold_index_by_structure)
+from metrics.boxes import box_open_counts_live
 from metrics import xp
 from metrics.dps import DpsTracker
 from game import build, save
@@ -405,7 +406,7 @@ def build_raw_record(*, ts_ms, run_outcome, game_version, duration,
 
 def build_live_record(*, run, stage_key, act, stage_no, difficulty,
                        mobs, total_mobs, damage_now, elapsed, gold_now, xp_now, party, drops,
-                       party_stats=None, party_progress=None, party_slots=None):
+                       box_opens=None, party_stats=None, party_progress=None, party_slots=None):
     """Builds the RAW LIVE snapshot (live.json, overwritten ~1x/s) from ALREADY-read values —
     RAW observation, NO cooking. The reader STOPPED deriving dps/label/format here: it emits only the
     live numbers/ids and the APP cooks (computeDps/resolveStage/modeName) with the SAME helpers as the
@@ -446,6 +447,7 @@ def build_live_record(*, run, stage_key, act, stage_no, difficulty,
         "xp_now": None if xp_now is None else round(xp_now, 2),
         "party": party,
         "drops": drops,
+        "box_opens": box_opens or [],
         "party_stats": party_stats or {},
         "party_progress": party_progress or {},
         "party_slots": party_slots or {},
@@ -1570,6 +1572,7 @@ def run(hz, output_dir, debug=False):
                         g_gain = run_gain(R.get("gold_save_start"), combat_gold_save(reader, psd))
                     except Exception:
                         g_gain = None
+                box_opens = box_open_counts_live(reader, gold_klass)
                 # the overlay's live xp = the accumulator's total (includes the banked of whoever died and the
                 # of whoever entered late — the overlay doesn't "lose" xp when a hero dies). None =
                 # no hero seen alive yet -> falls back to the SAVE below (never conflate with 0).
@@ -1619,6 +1622,7 @@ def run(hz, output_dir, debug=False):
                     damage_now=dps_t.total_damage, elapsed=elapsed,
                     gold_now=g_gain, xp_now=x_gain,
                     party=party_keys, drops=[dc[0], dc[1], dc[2]],
+                    box_opens=box_opens,
                     party_stats=live_stats,
                     party_progress=live_progress,
                     party_slots={hk: slot_by_hero[hk] for hk in party_keys

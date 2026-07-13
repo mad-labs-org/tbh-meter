@@ -281,6 +281,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.openStage": "Otwórz ten etap na stronie",
   "cooldowns.ready": "Gotowa",
   "cooldowns.readyCheck": "✓ Gotowa",
+  "cooldowns.openedManually": "otwarto ręcznie",
   "cooldowns.remove": "Usuń (wróci przy następnym dropie)",
   "cooldowns.spots": "miejsca",
   "cooldowns.notifTitle": "Niebieska skrzynia gotowa",

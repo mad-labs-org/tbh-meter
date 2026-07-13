@@ -27,6 +27,9 @@ export function cookLive(raw: RawLive): LiveSnapshot {
   const drops = Array.isArray(raw.drops)
     ? raw.drops.map((n) => (typeof n === "number" && Number.isFinite(n) ? n : 0))
     : null;
+  const boxOpens = Array.isArray(raw.box_opens)
+    ? raw.box_opens.map((n) => (typeof n === "number" && Number.isFinite(n) ? n : 0))
+    : null;
   // Per-hero FINAL_STATS: reader sends `{heroKey: {statId: value}}` with JSON-string keys.
   // Re-key to numbers for the renderer; keep only finite numeric stat values. `undefined`
   // (older reader, no field) → null, so the resistance tooltip degrades cleanly.
@@ -52,6 +55,7 @@ export function cookLive(raw: RawLive): LiveSnapshot {
     xpGain: typeof raw.xp_now === "number" && Number.isFinite(raw.xp_now) ? raw.xp_now : null,
     party: party && party.length > 0 ? party : null,
     drops,
+    boxOpens,
     partyStats,
     partyProgress,
     approx: true,

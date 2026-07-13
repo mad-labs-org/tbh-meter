@@ -77,7 +77,7 @@ function baseSettings(over: Partial<AppSettings> = {}): AppSettings {
   } as AppSettings;
 }
 
-function snap(stageKey: number, blueCount: number): LiveSnapshot {
+function snap(stageKey: number, blueCount: number, blueOpenCount: number | null = null): LiveSnapshot {
   return {
     runNumber: 1,
     stage: "Pasture",
@@ -92,6 +92,7 @@ function snap(stageKey: number, blueCount: number): LiveSnapshot {
     xpGain: null,
     party: null,
     drops: [0, blueCount, 0],
+    boxOpens: blueOpenCount == null ? null : [0, 0, blueOpenCount],
     partyStats: null,
     partyProgress: null,
     approx: true,
@@ -220,6 +221,191 @@ describe("cooldown tracker", () => {
       expect(state.settings.chestDropLog).toEqual([]);
       expect(state.settings.chestRoute).toEqual([920651]); // route is config, kept
       expect(broadcast).toHaveBeenCalledWith("meter:cooldowns", expect.anything());
+    });
+  });
+
+  describe("in-game manual open detection", () => {
+    it("clears the active cooldown and marks history ready when BoxOpen rises", () => {
+      liveBus.emit("live", snap(1308, 0, 1000)); // seed open baseline
+      liveBus.emit("live", snap(1308, 1, 1000)); // observe the blue drop in this process
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      liveBus.emit("live", snap(1308, 1, 1001)); // in-game blue chest opened
+      expect(state.settings.chestCooldowns).toEqual([]);
+      expect(state.settings.chestDropLog[0]).toMatchObject({ boxKey: 920301 });
+      expect(typeof state.settings.chestDropLog[0].openedAt).toBe("number");
+      expect(broadcast).toHaveBeenCalledWith("meter:cooldowns", expect.anything());
+    });
+
+    it("does not assign an open to a persisted timer not observed by this process", () => {
+      state.settings = baseSettings({
+        chestCooldowns: [{ boxKey: 920301, dropAt: 1000 }],
+        chestDropLog: [{ boxKey: 920301, dropAt: 1000 }],
+      });
+      liveBus.emit("live", snap(1308, 0, 1000));
+      liveBus.emit("live", snap(1308, 0, 1001));
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      expect(state.settings.chestDropLog[0].openedAt).toBeUndefined();
+      expect(updateSettings).not.toHaveBeenCalled();
+    });
+
+    it("does not clear a blue cooldown when only the regular BoxOpen count rises", () => {
+      state.settings = baseSettings({
+        chestCooldowns: [{ boxKey: 920301, dropAt: 1000 }],
+        chestDropLog: [{ boxKey: 920301, dropAt: 1000 }],
+      });
+      liveBus.emit("live", { ...snap(1308, 0, 1000), boxOpens: [10, 20, 1000] });
+      liveBus.emit("live", { ...snap(1308, 0, 1000), boxOpens: [11, 21, 1000] });
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      expect(state.settings.chestDropLog[0].openedAt).toBeUndefined();
+    });
+
+    it("does not replay an open observed while the tracker was disabled", () => {
+      state.settings = baseSettings({
+        cooldownTrackerEnabled: false,
+        chestCooldowns: [{ boxKey: 920301, dropAt: 1000 }],
+        chestDropLog: [{ boxKey: 920301, dropAt: 1000 }],
+      });
+      liveBus.emit("live", snap(1308, 0, 1000));
+      liveBus.emit("live", snap(1308, 0, 1001));
+      state.settings = { ...state.settings, cooldownTrackerEnabled: true };
+      liveBus.emit("live", snap(1308, 0, 1001));
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      expect(state.settings.chestDropLog[0].openedAt).toBeUndefined();
+      expect(updateSettings).not.toHaveBeenCalled();
+    });
+
+    it("invalidates an observed timer after tracking is disabled", () => {
+      liveBus.emit("live", snap(1308, 0, 1000));
+      liveBus.emit("live", snap(1308, 1, 1000));
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      state.settings = { ...state.settings, cooldownTrackerEnabled: false };
+      liveBus.emit("live", snap(1308, 1, 1000));
+      state.settings = { ...state.settings, cooldownTrackerEnabled: true };
+      liveBus.emit("live", snap(1308, 1, 1001));
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      expect(state.settings.chestDropLog[0].openedAt).toBeUndefined();
+    });
+
+    it("invalidates an observed timer after the live stream has a gap", () => {
+      liveBus.emit("live", snap(1308, 0, 1000));
+      liveBus.emit("live", snap(1308, 1, 1000));
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      liveBus.emit("live", null);
+      liveBus.emit("live", snap(1308, 1, 1001));
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      expect(state.settings.chestDropLog[0].openedAt).toBeUndefined();
+    });
+
+    it("does not guess which level opened when multiple blue timers are active", () => {
+      state.settings = baseSettings({
+        chestCooldowns: [
+          { boxKey: 920301, dropAt: 1000 },
+          { boxKey: 920401, dropAt: 2000 },
+        ],
+        chestDropLog: [
+          { boxKey: 920401, dropAt: 2000 },
+          { boxKey: 920301, dropAt: 1000 },
+        ],
+      });
+      liveBus.emit("live", snap(1308, 0, 1000));
+      liveBus.emit("live", snap(1308, 0, 1001));
+      expect(state.settings.chestCooldowns).toHaveLength(2);
+      expect(state.settings.chestDropLog.every((cd) => cd.openedAt == null)).toBe(true);
+    });
+
+    it("does not infer levels from a multi-open count when multiple blue timers are active", () => {
+      state.settings = baseSettings({
+        chestCooldowns: [
+          { boxKey: 920301, dropAt: 1000 },
+          { boxKey: 920401, dropAt: 2000 },
+        ],
+        chestDropLog: [
+          { boxKey: 920401, dropAt: 2000 },
+          { boxKey: 920301, dropAt: 1000 },
+        ],
+      });
+      liveBus.emit("live", { ...snap(1308, 0, 1000), boxOpens: [2000, 700, 1000] });
+      // Spacebar/open-all can raise total + regular too, but the aggregate still omits levels.
+      liveBus.emit("live", { ...snap(1308, 0, 1002), boxOpens: [2005, 703, 1002] });
+      expect(state.settings.chestCooldowns).toHaveLength(2);
+      expect(state.settings.chestDropLog.every((cd) => cd.openedAt == null)).toBe(true);
+      expect(updateSettings).not.toHaveBeenCalled();
+    });
+
+    it("does not assign opens while the exclusive route filter can leave blue chests untracked", () => {
+      state.settings = baseSettings({
+        trackOutsideRoute: false,
+        chestRoute: [920301],
+        chestCooldowns: [{ boxKey: 920301, dropAt: 1000 }],
+        chestDropLog: [{ boxKey: 920301, dropAt: 1000 }],
+      });
+      liveBus.emit("live", snap(1308, 0, 1000));
+      liveBus.emit("live", snap(1308, 0, 1001));
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      expect(state.settings.chestDropLog[0].openedAt).toBeUndefined();
+      expect(updateSettings).not.toHaveBeenCalled();
+    });
+
+    it("keeps a new timer when a same-level drop and open arrive in one snapshot", () => {
+      state.settings = baseSettings({
+        chestCooldowns: [{ boxKey: 920301, dropAt: 1000 }],
+        chestDropLog: [{ boxKey: 920301, dropAt: 1000 }],
+      });
+      liveBus.emit("live", snap(1308, 0, 1000));
+      liveBus.emit("live", snap(1308, 1, 1001));
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      expect(state.settings.chestCooldowns[0].dropAt).toBeGreaterThan(1000);
+      expect(state.settings.chestDropLog).toHaveLength(2);
+      expect(state.settings.chestDropLog.every((cd) => cd.openedAt == null)).toBe(true);
+    });
+
+    it("marks two same-level history rows when two stacked chests open together", () => {
+      liveBus.emit("live", snap(2301, 0, 1000));
+      liveBus.emit("live", snap(2301, 1, 1000));
+      liveBus.emit("live", snap(2301, 2, 1000));
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      expect(state.settings.chestDropLog).toHaveLength(2);
+      liveBus.emit("live", snap(2301, 2, 1002));
+      expect(state.settings.chestCooldowns).toEqual([]);
+      expect(state.settings.chestDropLog.every((cd) => cd.openedAt != null)).toBe(true);
+    });
+
+    it("keeps the remaining same-level timer when only part of a stack opens", () => {
+      liveBus.emit("live", snap(2301, 0, 1000));
+      liveBus.emit("live", snap(2301, 1, 1000));
+      liveBus.emit("live", snap(2301, 2, 1000));
+      liveBus.emit("live", snap(2301, 3, 1000));
+
+      liveBus.emit("live", snap(2301, 3, 1002));
+
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      expect(state.settings.chestDropLog.filter((cd) => cd.openedAt != null)).toHaveLength(2);
+      expect(state.settings.chestDropLog.filter((cd) => cd.openedAt == null)).toHaveLength(1);
+    });
+
+    it("does not clear a stack when the open delta exceeds observed drops", () => {
+      liveBus.emit("live", snap(2301, 0, 1000));
+      liveBus.emit("live", snap(2301, 1, 1000));
+      liveBus.emit("live", snap(2301, 2, 1000));
+
+      liveBus.emit("live", snap(2301, 2, 1003));
+
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      expect(state.settings.chestDropLog).toHaveLength(2);
+      expect(state.settings.chestDropLog.every((cd) => cd.openedAt == null)).toBe(true);
+    });
+
+    it("uses the full blue delta with no fixed limit when six stacked chests open together", () => {
+      liveBus.emit("live", snap(2301, 0, 1000));
+      for (let count = 1; count <= 6; count += 1) {
+        liveBus.emit("live", snap(2301, count, 1000));
+      }
+      expect(state.settings.chestCooldowns).toHaveLength(1);
+      expect(state.settings.chestDropLog).toHaveLength(6);
+      liveBus.emit("live", snap(2301, 6, 1006));
+      expect(state.settings.chestCooldowns).toEqual([]);
+      expect(state.settings.chestDropLog).toHaveLength(6);
+      expect(state.settings.chestDropLog.every((cd) => cd.openedAt != null)).toBe(true);
     });
   });
 });

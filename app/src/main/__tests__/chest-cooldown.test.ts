@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   observeDrop,
+  observeOpen,
   applyDrop,
+  markObservedOpens,
   clearCooldown,
   hideCooldown,
   appendLog,
@@ -39,10 +41,15 @@ function snap(stageKey: number | null, blueCount: number | null): LiveSnapshot {
     xpGain: null,
     party: null,
     drops: blueCount == null ? null : [0, blueCount, 0],
+    boxOpens: null,
     partyStats: null,
     partyProgress: null,
     approx: true,
   };
+}
+
+function openSnap(stageKey: number | null, blueOpenCount: number | null): LiveSnapshot {
+  return { ...snap(stageKey, 0), boxOpens: blueOpenCount == null ? null : [0, 0, blueOpenCount] };
 }
 
 const event = (boxKey: number, dropAt: number, lastStageKey?: number): ChestCooldown => ({
@@ -107,6 +114,44 @@ describe("observeDrop", () => {
   });
 });
 
+describe("observeOpen", () => {
+  it("fires only when the live blue BoxOpen aggregate rises", () => {
+    const seen: SeenCounts = new Map();
+    expect(observeOpen(seen, openSnap(4309, 2))).toBe(0);
+    expect(observeOpen(seen, openSnap(4309, 3))).toBe(1);
+  });
+
+  it("returns the full blue delta for an open-all jump", () => {
+    const seen: SeenCounts = new Map();
+    expect(observeOpen(seen, openSnap(4309, 10))).toBe(0);
+    expect(observeOpen(seen, openSnap(4309, 14))).toBe(4);
+  });
+
+  it("ignores a regular-chest rise", () => {
+    const seen: SeenCounts = new Map();
+    expect(observeOpen(seen, { ...openSnap(4309, 2), boxOpens: [10, 4, 2] })).toBe(0);
+    expect(observeOpen(seen, { ...openSnap(4309, 2), boxOpens: [11, 5, 2] })).toBe(0);
+  });
+
+  it("returns zero when the reader does not emit box open counts", () => {
+    expect(observeOpen(new Map(), openSnap(4309, null))).toBe(0);
+  });
+
+  it("ignores malformed counts without poisoning the last valid baseline", () => {
+    const seen: SeenCounts = new Map();
+    expect(observeOpen(seen, openSnap(4309, 2))).toBe(0);
+    expect(observeOpen(seen, openSnap(4309, 2.5))).toBe(0);
+    expect(observeOpen(seen, openSnap(4309, 3))).toBe(1);
+  });
+
+  it("re-seeds when the cumulative count resets", () => {
+    const seen: SeenCounts = new Map();
+    expect(observeOpen(seen, openSnap(4309, 10))).toBe(0);
+    expect(observeOpen(seen, openSnap(4309, 0))).toBe(0);
+    expect(observeOpen(seen, openSnap(4309, 1))).toBe(1);
+  });
+});
+
 describe("applyDrop", () => {
   it("adds newest first", () => {
     const out = applyDrop([event(BOX_920011, 100)], event(BOX_920801, 200));
@@ -130,6 +175,30 @@ describe("clearCooldown", () => {
   it("is a no-op for an unknown boxKey", () => {
     const active = [event(BOX_920801, 200)];
     expect(clearCooldown(active, 999999)).toEqual(active);
+  });
+});
+
+describe("markObservedOpens", () => {
+  it("marks only the consumed observed drops and returns the unconsumed stack", () => {
+    const observed = [event(BOX_920801, 100), event(BOX_920801, 300), event(BOX_920801, 400)];
+    const log = [
+      event(BOX_920801, 400),
+      event(BOX_920801, 300),
+      event(BOX_920011, 200),
+      event(BOX_920801, 100),
+    ];
+    const out = markObservedOpens(log, observed, 500, 2);
+
+    expect(out.opened).toBe(2);
+    expect(out.remaining.map((cd) => cd.dropAt)).toEqual([100]);
+    expect(out.log.filter((cd) => cd.openedAt != null).map((cd) => cd.dropAt)).toEqual([400, 300]);
+    expect(out.log.find((cd) => cd.dropAt === 200)?.openedAt).toBeUndefined();
+    expect(out.log.find((cd) => cd.dropAt === 100)?.openedAt).toBeUndefined();
+  });
+
+  it("does nothing when no observed drop can be consumed", () => {
+    const log = [event(BOX_920801, 200)];
+    expect(markObservedOpens(log, [], 500, 1)).toEqual({ log, remaining: [], opened: 0 });
   });
 });
 

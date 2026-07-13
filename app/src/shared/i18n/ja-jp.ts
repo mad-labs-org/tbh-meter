@@ -280,6 +280,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.openStage": "このステージをサイトで開く",
   "cooldowns.ready": "準備完了",
   "cooldowns.readyCheck": "✓ 準備完了",
+  "cooldowns.openedManually": "手動で開封",
   "cooldowns.remove": "削除（次のドロップで再表示）",
   "cooldowns.spots": "スポット",
   "cooldowns.notifTitle": "青宝箱の準備完了",

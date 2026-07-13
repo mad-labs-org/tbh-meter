@@ -32,6 +32,9 @@ export function migrateChestCooldowns(list: unknown, collapse: boolean): ChestCo
     if (lastStageKey != null) cd.lastStageKey = lastStageKey;
     if (typeof raw.mode === "string") cd.mode = raw.mode;
     if (raw.hidden) cd.hidden = true;
+    if (typeof raw.openedAt === "number" && Number.isFinite(raw.openedAt) && raw.openedAt >= raw.dropAt) {
+      cd.openedAt = raw.openedAt;
+    }
     out.push(cd);
   }
   if (!collapse) return out;

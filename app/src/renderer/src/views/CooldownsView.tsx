@@ -22,6 +22,7 @@ function HistoryRow({ cd, now, cooldownMs }: { cd: ChestCooldown; now: number; c
   const code = stageKey != null ? stageCode(stageKey) : null;
   const label = code ? t("cooldowns.stageLabel", { code }) : t("cooldowns.chestLabel", { level: level ?? "?" });
   const rate = stageKey != null ? bossBoxRate(stageKey) : null; // origin stage's base rate
+  const manualOpened = cd.openedAt != null;
   const ready = isReady(cd, now, cooldownMs);
   return (
     <div className="flex items-center gap-2 border-b border-surface-700/60 px-1 py-1.5 text-xs last:border-0">
@@ -45,13 +46,18 @@ function HistoryRow({ cd, now, cooldownMs }: { cd: ChestCooldown; now: number; c
         </button>
       )}
       <DropRatePct rate={rate} className="shrink-0" />
+      {manualOpened && (
+        <span className="min-w-0 truncate text-[10px] font-bold uppercase text-emerald-300">
+          {t("cooldowns.openedManually")}
+        </span>
+      )}
       <span
         className={cn(
           "ml-auto shrink-0 font-mono text-[10px] tabular-nums",
-          ready ? "text-emerald-400" : "text-sky-300/80",
+          ready || manualOpened ? "text-emerald-400" : "text-sky-300/80",
         )}
       >
-        {ready ? t("cooldowns.ready") : formatRemaining(remainingMs(cd, now, cooldownMs))}
+        {ready || manualOpened ? t("cooldowns.ready") : formatRemaining(remainingMs(cd, now, cooldownMs))}
       </span>
     </div>
   );

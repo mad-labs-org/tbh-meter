@@ -278,6 +278,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.openStage": "이 스테이지를 사이트에서 열기",
   "cooldowns.ready": "준비됨",
   "cooldowns.readyCheck": "✓ 준비됨",
+  "cooldowns.openedManually": "수동으로 열림",
   "cooldowns.remove": "제거 (다음 드롭 때 다시 나타남)",
   "cooldowns.spots": "스팟",
   "cooldowns.notifTitle": "파란 상자 준비됨",

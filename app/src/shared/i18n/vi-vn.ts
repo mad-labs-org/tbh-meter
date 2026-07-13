@@ -281,6 +281,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.openStage": "Mở màn này trên trang",
   "cooldowns.ready": "Sẵn sàng",
   "cooldowns.readyCheck": "✓ Sẵn sàng",
+  "cooldowns.openedManually": "đã mở thủ công",
   "cooldowns.remove": "Xóa (sẽ hiện lại ở lần rơi sau)",
   "cooldowns.spots": "điểm farm",
   "cooldowns.notifTitle": "Rương xanh đã sẵn sàng",

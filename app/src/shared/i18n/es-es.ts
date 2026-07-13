@@ -281,6 +281,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.openStage": "Abrir esta fase en el sitio",
   "cooldowns.ready": "Listo",
   "cooldowns.readyCheck": "✓ Listo",
+  "cooldowns.openedManually": "abierto manualmente",
   "cooldowns.remove": "Quitar (reaparece en el próximo drop)",
   "cooldowns.spots": "spots",
   "cooldowns.notifTitle": "Cofre azul listo",

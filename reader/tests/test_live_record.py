@@ -68,6 +68,11 @@ def test_party_and_drops_pass_through():
     assert _live(party=[], drops=[0, 0, 0])["party"] == []
 
 
+def test_box_opens_pass_through_and_default_empty():
+    assert _live()["box_opens"] == []
+    assert _live(box_opens=[0, 2, 1])["box_opens"] == [0, 2, 1]
+
+
 def test_party_stats_pass_through_and_default_empty():
     # 64 live FINAL stats per hero {heroKey: {statId: value}} — feeds the effective-resistance
     # tooltip in the overlay. Default {} (reader without the param / no read) = no tooltip.
