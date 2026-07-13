@@ -94,7 +94,7 @@ let quitting = false;
 // True only while the user is MOVING the overlay (title-bar drag). A pure reposition can't
 // change the content height, so any pinLiveHeight / bounds-save that fires mid-move is
 // spurious — it's a transient repaint from the OS move on high-DPI, and calling setBounds
-// (or persisting getBounds().width) mid-setPosition re-enters Windows' DIP scaling and
+// (or persisting getBounds().width) during a move re-enters Windows' DIP scaling and
 // drives the width/position drift this bug is made of (#live-drag-width-feedback). We freeze
 // the window geometry for the duration of the move and settle once on release.
 let liveMoveActive = false;
@@ -190,12 +190,14 @@ function createLiveWindow(): BrowserWindow {
   });
 
   win.on("moved", () => {
-    // Mid our custom MOVE drag the window is being setPosition'd; getBounds().width can read
+    // During our custom MOVE drag, getBounds().width can read
     // transiently inflated on high-DPI, so saving here would persist a bad width that the
     // next launch reopens at. endWindowDrag saves once on release with stable bounds.
     if (!liveMoveActive) saveLiveBounds(win);
   });
-  win.on("resized", () => saveLiveBounds(win));
+  win.on("resized", () => {
+    if (!liveMoveActive) saveLiveBounds(win);
+  });
 
   // close -> hide instead of destroy, unless the app is genuinely quitting.
   win.on("close", (event) => {
@@ -368,7 +370,7 @@ let liveContentHeight = 48;
 
 // The last known-good width, in DIP. Stored separately from the live window's bounds
 // because getBounds().width can return transient inflated values on Windows while a
-// transparent frameless window is being dragged via setPosition() on high-DPI monitors
+// transparent frameless window is being dragged on high-DPI monitors
 // (200 % / 4K). When pinLiveHeight fires mid-drag and re-applies that transient width
 // via setBounds, it creates a feedback loop that drives the width upward every tick of
 // the move — the overlay keeps growing while the user drags (#live-drag-width-feedback).
@@ -383,8 +385,8 @@ let lastKnownWidth = DEFAULT_LIVE_WIDTH;
  *  feedback loop during a move drag on high-DPI monitors (see lastKnownWidth). */
 function pinLiveHeight(): void {
   if (!liveWin || liveWin.isDestroyed()) return;
-  // Never resize the overlay mid-MOVE — see liveMoveActive. The drag's setPosition is the
-  // only thing that may touch the window; a setBounds here fights it and, on high-DPI,
+  // Never resize the overlay mid-MOVE — see liveMoveActive. The drag's atomic fixed-size bounds
+  // are the only geometry writes allowed here; a second setBounds can fight them and, on high-DPI,
   // re-inflates the width. Content height can't change during a pure move, so nothing is
   // lost; endWindowDrag re-pins once to settle.
   if (liveMoveActive) return;
@@ -527,7 +529,7 @@ app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
       liveDrag.end();
       if (!liveMoveActive) return; // resize / idle: per-tick saves already persisted
       liveMoveActive = false;
-      pinLiveHeight(); // settle: re-pin with a now-stable getBounds (setPosition stopped)
+      pinLiveHeight(); // settle: re-pin with a now-stable getBounds (drag writes stopped)
       if (liveWin && !liveWin.isDestroyed()) saveLiveBounds(liveWin);
     },
     resetLiveWindow,
