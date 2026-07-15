@@ -107,7 +107,7 @@ relying on something half the lines don't have.
   **raw, stable** fields that already exist (`contentSig`) — a new field doesn't enter the
   signature; don't touch it, unless the new field is itself a dedup criterion. The discard of
   `partial`/`skipped` is **not** in the read path — the converter seals the verdict (`convertLegacy`
-  in migration, `convert` on the new raw) and `eligible()` suppresses it at upload; see
+  in migration, `convert` on the new raw) and the UI filter hides it; see
   [[invariants/app-normalization]].
 - The "30s/x-10" rule (skip) and the `partial` flag belong to the lifecycle, not serialization —
   see [[invariants/run-lifecycle]] if the new field interacts with them.

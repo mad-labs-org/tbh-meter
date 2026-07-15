@@ -54,7 +54,7 @@ the existing labels is making a contract change → bump `SCHEMA_VERSION` + coor
 - **The run IDENTITY is its end TIMESTAMP (raw v2: `id = str(ts_ms)`).** Sequential per machine →
   never collides, no session, no counter. (BEFORE: `session_id:run` minted by the reader — it recycled on
   restart and made runs vanish; removed in Redesign 2.) **Session is NO longer the reader's** — the app DERIVES it from the
-  runs (6h gap + cuts). Upload: `external_id = device:ts` (globally unique).
+  runs (6h gap + cuts).
 - **Ids have a sanity range** at the source (`heroKey`/`itemKey` in `0 < k < 10_000_000`, see
   `_read_catalogs`/`read_live_stats_by_hero`) — memory garbage doesn't become an id.
 - **Casing**: the JSON uses the original keys (`heroKey`, `stageKey`); the snake_case normalization

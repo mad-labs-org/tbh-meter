@@ -121,7 +121,7 @@ post-flush it drops (baseline in the app, no event). The pending record's full d
 
 ## SKIP — `_should_skip_run(measured, clear_time, stage)` (now the converter's SPEC)
 
-A short run **does NOT COUNT** on the leaderboard — but **the reader NO LONGER drops it**: it
+A short run **does NOT COUNT** — but **the reader NO LONGER drops it**: it
 emits EVERY run to `raw/<id>.json` (skip ≠ vanish; otherwise the user thinks the meter broke and
 the app can't mark it as "ignored"). The accounting is applied by the **converter** (app), over
 the record's raw fields. `_should_skip_run` stays here as the **canonical drift-tested spec** (the
@@ -166,8 +166,7 @@ contradicts:
 
 - the second clause is **`total_damage <= 0`**, NOT `== 0`. Any non-positive damage in a
   success is a lost capture (the game doesn't clear a stage with no damage). This covers the gap
-  of x-10s with `clear_time < 30` that skipped the 1st clause and pushed all-zeros to the
-  leaderboard (#163).
+  of x-10s with `clear_time < 30` that skipped the 1st clause and recorded all-zero runs (#163).
 - the `clear_time >= 30` gate on the 1st clause is deliberate: x-10 runs (boss, seconds) must
   not be mislabeled as partial — that's why only `<= 0` catches them.
 

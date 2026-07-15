@@ -26,7 +26,7 @@ seed** (the same path as the RC/stable's 1st launch) and requires **PASS on ALL*
 not just the one that changed. Every mutable-per-build surface that the run record uses has a check with
 PASS/FAIL + detail: `calib/seed`, `gold`, `party-live`, `hero-class` (EEquipClassType, not EHeroType),
 `save-build` (pick_live_psd+read_gold+read_heroes — the path that broke in 1.00.12), `build-record`
-(the `read_build` that the run UPLOADS: gear/skills via ATTRIBUTES/ITEMS/EQUIPPED_* + `read_account_snapshot`
+(the `read_build` that the run RECORDS: gear/skills via ATTRIBUTES/ITEMS/EQUIPPED_* + `read_account_snapshot`
 runes/inventory/stash), `xp-live`, `party-slots` (read_party_slots == the raw HeroList indices — the
 formation position 0/1/2 the run record emits), `dps` (MonsterSpawnManager+HP), `stats` (StatsHolder.FINAL_STATS),
 `stage`, `run-cycle` (LogManager.LOG_LIST readable — the run-close boundary) and `catalogs`. A non-zero

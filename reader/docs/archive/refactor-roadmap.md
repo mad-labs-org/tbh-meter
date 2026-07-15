@@ -98,8 +98,8 @@ after a run is byte-identical. This is the only guard against silently corruptin
 - **S12** Move the 12 one-off `*_probe_windows.py` to `tools/probes/`.
 
 ## DATA CONTRACT (id-based; server NEVER stores/returns display names)
-runs.jsonl = append-only event log; DB ingest = idempotent projection. Windows meter stays no-pip; all
-DB/upload/API code is Mac/server-side.
+runs.jsonl = append-only event log. Windows meter stays no-pip; heavier analysis code is
+Mac/server-side. (Historical: the DB/API ingest described here was removed — the meter is local-only.)
 
 **Postgres — HYBRID** (normalize query/aggregate/join dims; JSONB the sparse leaf detail). Full
 normalization = ~375 rows/run for data never sliced in SQL (front holds the enums) → JSONB keeps ~4
