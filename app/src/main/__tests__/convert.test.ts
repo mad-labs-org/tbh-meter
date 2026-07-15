@@ -47,7 +47,7 @@ describe("convert — golden (canonical raw -> canonical structured)", () => {
 });
 
 describe("convert — identity & provenance", () => {
-  it("carries the run id verbatim (external_id continuity, never re-minted)", () => {
+  it("carries the run id verbatim (id continuity, never re-minted)", () => {
     expect(convert(rawRun()).id).toBe("sess-1:3");
   });
 
@@ -125,7 +125,7 @@ describe("convert — envelope unwrapping (couldn't-read != real zero)", () => {
     const r = convert(rawRun({ heroes: { ok: false, error: "party live off (StageManager unresolved)" } }));
     expect(r.heroes).toEqual([]); // fallback: empty, NEVER the save roster
     expect(r.issues!.heroes).toBe("party live off (StageManager unresolved)");
-    expect(r.quality).toBe("degraded"); // shows locally (marked), but auto-upload skips degraded
+    expect(r.quality).toBe("degraded"); // shows (marked); degraded never counts
   });
 
   it('an unresolved stage sub-field shows "?" but does NOT degrade (cosmetic)', () => {
@@ -184,7 +184,7 @@ describe("convert — quality verdict", () => {
     expect(r.quality).toBe("counted");
   });
 
-  it("a fail run is skipped (real history, never leaderboard material)", () => {
+  it("a fail run is skipped (real history, but it never counts)", () => {
     expect(convert(rawRun({ run_outcome: "fail" })).quality).toBe("skipped");
   });
 
@@ -241,7 +241,7 @@ describe("convert — quality verdict", () => {
   it("coerces a garbage run_outcome so a real success is NOT mis-sealed skipped (raw is untrusted)", () => {
     // A hand-edited/corrupt raw with run_outcome "sucesso" (off the EN union) must be repaired to
     // "abandoned" with an issue, NOT trusted verbatim — else classifyQuality would treat it as
-    // status !== "success" and seal this clean clear `skipped` (hidden + non-uploadable).
+    // status !== "success" and seal this clean clear `skipped` (hidden).
     const r = convert(rawRun({ run_outcome: "sucesso" as unknown as "success" }));
     expect(r.status).toBe("abandoned");
     expect(r.issues!.run_outcome).toContain("sucesso");

@@ -2,7 +2,7 @@
 // grind — NOT part of a run's identity (that's the run's own end-ts, raw v2). The reader no longer
 // emits a session; the APP derives it here from the run timestamps + the user's manual "New session"
 // cuts. Pure + deterministic: same runs + same cuts -> same grouping (so re-deriving on every load
-// is stable, and an already-uploaded run keeps the session it had at upload). Redesign 2: the
+// is stable). Redesign 2: the
 // session is DERIVED by the app.
 
 /** Idle gap that starts a new session: 6h with no run. In MILLISECONDS — v2 run timestamps are ms.

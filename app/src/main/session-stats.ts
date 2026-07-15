@@ -1,9 +1,9 @@
-// Pure helpers for the "open session stats" / "reset session" IPC handlers — kept
+// Pure helpers for the "reset session" / current-session IPC handlers — kept
 // separate from the Electron-bound handlers so the logic is unit-testable.
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-/** Upper bound mirrors the website route's zod cap (max 190). */
+/** Upper bound on a sane session id (defensive — real ids are far shorter). */
 const MAX_SESSION_ID_LEN = 190;
 
 /** Control-channel flag file consumed by the reader (meter_windows.py): its presence in
@@ -15,10 +15,8 @@ export const SESSION_FILENAME = "session.json";
 
 /**
  * A sessionId is valid when it is a non-empty, reasonably-short string with no
- * colon. The colon is reserved as the `<sessionId>:<runNo>` separator in
- * external_id, so a session token containing one would let the website's prefix
- * match bleed into another session — the API rejects those, so we never open a URL
- * the server would refuse.
+ * colon. The colon is reserved as the `<sessionId>:<runNo>` separator in legacy
+ * run ids, so a session token containing one would make a run id ambiguous.
  */
 export function isValidSessionId(value: unknown): value is string {
   return (
@@ -27,11 +25,6 @@ export function isValidSessionId(value: unknown): value is string {
     value.length <= MAX_SESSION_ID_LEN &&
     !value.includes(":")
   );
-}
-
-/** Build the website session-stats URL for a (pre-validated) sessionId. */
-export function sessionStatsUrl(siteUrl: string, sessionId: string): string {
-  return `${siteUrl}/meter/session/${encodeURIComponent(sessionId)}`;
 }
 
 /** App-side "New session" cut markers (Redesign 2): the timestamps (ms) at which the user asked for

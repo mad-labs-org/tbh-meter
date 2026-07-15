@@ -6,9 +6,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "common.cancel": "Anuluj",
   "common.close": "Zamknij",
   "common.reset": "Resetuj",
-  "common.signOut": "Wyloguj się",
-  "common.signInDiscord": "Zaloguj się przez Discorda",
-  "common.waitingBrowser": "Czekam na przeglądarkę…",
 
   // ── Live overlay ──
   "live.pillStarting": "Startuje",
@@ -17,10 +14,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.offlineMsg": "Meter offline — otwórz Task Bar Hero",
   "live.blockedMsg": "Czytnik zablokowany — antywirus może go zamykać.",
   "live.retry": "Spróbuj ponownie",
-  "live.statusLive": "Live",
-  "live.statusOffline": "Offline",
-  "live.syncLive": "Live — przejścia trafiają do rankingu",
-  "live.syncOff": "Brak synchronizacji — zaloguj się, aby wysyłać swoje przejścia",
   "live.dps": "DPS",
   "live.mobs": "Moby",
   "live.gold": "Złoto",
@@ -39,7 +32,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.expandTitle": "Rozwiń",
   "live.pinTitle": "Zawsze na wierzchu (kliknij, aby wyłączyć)",
   "live.unpinTitle": "Nie na wierzchu (kliknij, aby przypiąć meter nad innymi oknami)",
-  "live.sessionStats": "Statystyki sesji",
   "live.openLogs": "Otwórz logi",
   "live.dragResize": "Przeciągnij, aby zmienić rozmiar",
   "live.dragScale": "Przeciągnij, aby przeskalować meter",
@@ -55,15 +47,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "splash.tipLabel": "Wskazówka:",
   "splash.tip1": "Przeciągnij meter za uchwyt po lewej, aby go przesunąć.",
   "splash.tip2": "Wejdź do walki, aby zobaczyć swój DPS na żywo.",
-  "splash.tip3": "Po zalogowaniu twoje przejścia trafiają do rankingu automatycznie.",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "Meter tylko CZYTA pamięć gry — nigdy nic nie zapisuje.",
 
   // ── Window headers ──
   "header.tabRuns": "Przejścia",
   "header.tabTracker": "Tracker",
   "header.tabSettings": "Ustawienia",
-  "header.signIn": "Zaloguj się",
-  "header.signedIn": "Zalogowano",
   "header.appVersion": "Wersja aplikacji",
   "header.restartToUpdate": "Uruchom ponownie, aby zaktualizować",
   "header.updateReady": "Aktualizacja v{version} gotowa",
@@ -95,7 +85,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.startupDesc": "Otwiera meter automatycznie przy starcie Windows.",
   "settings.runFilter": "Filtr przejść",
   "settings.runFilterDesc":
-    "Wybierz, które przejścia widać na liście. Działa tylko lokalnie — nigdy nie zmienia rankingu.",
+    "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "Ukryj zignorowane przejścia",
   "settings.hideIgnoredDesc":
     "Pominięte, częściowe i niekompletne przejścia pozostają ukryte. Wciąż liczą się do sesji i można je w każdej chwili odsłonić z listy.",
@@ -107,15 +97,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.maxRunsDesc":
     "Trzyma na tym komputerze najwyżej tyle przejść. Po przekroczeniu limitu najstarsze są usuwane automatycznie. Ulubione przejścia są zawsze zachowywane i nie liczą się do limitu.",
   "settings.maxRunsUnit": "przejść",
-  "settings.leaderboard": "Ranking",
-  "settings.signedInAs": "Zalogowano jako",
-  "settings.uploadAuto": "Udane przejścia wysyłają się automatycznie.",
-  "settings.signInPitch":
-    "Zaloguj się przez Discorda z nagłówka, aby trafić do rankingu TBH Helper. Logowanie przejmuje też przejścia wysłane już anonimowo z tego komputera.",
-  "settings.usageStats": "Statystyki użytkowania",
-  "settings.usageStatsLabel": "Udostępniaj anonimowe statystyki użytkowania",
-  "settings.usageStatsDesc":
-    "Pomaga nam zobaczyć, ile osób korzysta z metra (anonimowo, przez Google Analytics). Żadnych danych osobowych ani szczegółów runów. Wyłącz, aby całkowicie zrezygnować.",
+    "settings.diagnostics": "Diagnostics",
     "settings.diagnosticsLog": "Dziennik diagnostyczny",
   "settings.diagnosticsLogDesc": "Zbiera informacje diagnostyczne do zgłoszeń błędów. Nie zawiera danych osobowych.",
   "diagnostics.collecting": "Zbieranie diagnostyki...",
@@ -126,11 +108,11 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "diagnostics.backToSettings": "Powrót do ustawień",
   "settings.runHistory": "Historia przejść",
   "settings.runHistoryDesc":
-    "Usuwa wszystkie przejścia zapisane na tym komputerze. Przejścia udostępnione już do rankingu pozostają w sieci.",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "Wyczyść historię przejść",
   "settings.clearConfirmTitle": "Wyczyścić historię przejść?",
   "settings.clearConfirmBody":
-    "To usuwa każde przejście z tego metera, łącznie z archiwum logów. Nie da się tego cofnąć.Ulubione przejścia są zachowywane.  Przejścia udostępnione do rankingu tam zostają.",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "Nie udało się wyczyścić historii. Spróbuj ponownie.",
   "settings.clearing": "Czyszczenie…",
   "settings.deleteAll": "Usuń wszystkie przejścia",
@@ -168,13 +150,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "runs.newSession": "Nowa sesja",
   "runs.newSessionConfirm": "Potwierdzić?",
   "runs.newSessionTitle":
-    "Kończy bieżącą sesję. Kolejne przejścia zaczynają nową sesję; wysłane już przejścia zostają na stronie.",
-  "runs.sessionStats": "Statystyki sesji",
-  "runs.sessionStatsTitle": "Otwiera statystyki bieżącej sesji w przeglądarce",
-  "runs.hintNoRunsCurrent":
-    "Brak przejść w bieżącej sesji. Ukończ przejście, a pojawi się na stronie.",
-  "runs.hintNoRuns":
-    "Ukończ przynajmniej jedno przejście. Sesja zapisuje się na stronie, gdy ma ukończone przejście.",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "Żadne przejście nie pasuje do filtra",
   "runs.showIgnoredOne": "Pokaż {count} zignorowane przejście",
   "runs.showIgnoredMany": "Pokaż zignorowane przejścia: {count}",
@@ -220,15 +196,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "detail.drops": "Dropy",
   "detail.chestsOne": "{count} skrzynia",
   "detail.chestsMany": "Skrzynie: {count}",
-  "detail.shareView": "Zobacz na TBH Helper",
-  "detail.sharing": "Udostępnianie…",
-  "detail.shareBtn": "Udostępnij do rankingu",
-  "detail.shareSignIn": "Zaloguj się przez Discorda, aby udostępnić",
-  "detail.shareError": "Coś poszło nie tak. Spróbuj ponownie.",
-  "detail.fullDetails":
-    "Chcesz pełne szczegóły? Drużyna z ekwipunkiem, umiejętnościami i statystykami każdego bohatera jest na stronie przejścia na TBH Helper.",
-  "detail.fullDetailsShare": "Udostępnij przejście, aby zobaczyć je na stronie.",
-  "detail.viewFull": "Zobacz pełne szczegóły",
   "detail.xpByHero": "PD na bohatera",
   "detail.heroLv": "Poz. {level}",
   "detail.levelUp": "Awans poziomu",
@@ -240,30 +207,30 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "status.abandoned": "Porzucone",
   "quality.partialLabel": "Częściowe",
   "quality.partialTitle":
-    "Meter dołączył do tego przejścia w trakcie, więc sumy są zaniżone. Nie zostało wysłane do rankingu.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "Uszkodzone",
   "quality.degradedTitle":
-    "Niektórych wartości nie dało się odczytać, więc liczby mogą być błędne. Nie zostało wysłane do rankingu.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "Nieważne",
   "quality.skippedTitle":
-    "To przejście nie jest ważnym ukończeniem (za krótkie, porażka albo porzucenie), więc się nie liczy i nie trafiło do rankingu.",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "Tracker niebieskiej skrzyni",
@@ -278,7 +245,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.showHistory": "Pokaż historię",
   "cooldowns.showingRecent": "ostatnie {shown} z {total}",
   "cooldowns.stageLabel": "Etap {code}",
-  "cooldowns.openStage": "Otwórz ten etap na stronie",
   "cooldowns.ready": "Gotowa",
   "cooldowns.readyCheck": "✓ Gotowa",
   "cooldowns.remove": "Usuń (wróci przy następnym dropie)",
@@ -310,30 +276,10 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "notifications.actBossTitle": "Wypadła skrzynia bossa aktu",
   "notifications.actBossBody": "{where}: właśnie wypadła skrzynia bossa aktu.",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "Udostępniaj swoje przejścia w rankingu",
-  "signin.body":
-    "Nie jesteś zalogowany, więc twoje przejścia zostają na tym komputerze i nie trafiają do rankingu. Zaloguj się przez Discord, aby je zsynchronizować i liczyły się w rankingu oraz twoim profilu.",
-  "signin.dontShow": "Nie pokazuj ponownie",
-  "signin.notNow": "Nie teraz",
-
-  "signin.pendingTitle": "Twoje przejścia nie są synchronizowane",
-  "signin.pendingBody":
-    "Jesteś wylogowany, więc ukończone przejścia przestały trafiać do rankingu ({count} oczekuje lokalnie). Zaloguj się, aby je zsynchronizować.",
-  "signin.expiredTitle": "Twoja sesja wygasła",
-  "signin.expiredBody":
-    "Zostałeś wylogowany, więc twoje przejścia przestały synchronizować się z rankingiem. Są zapisywane lokalnie. Zaloguj się ponownie, aby wznowić.",
   // ── Tray menu ──
   "tray.showLive": "Pokaż live meter",
   "tray.openRuns": "Otwórz przejścia",
   "tray.quit": "Zakończ",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "Nie jesteś zalogowany(-a)",
-  "dialog.notSignedInMsg": "Twoje przejścia nie są wysyłane na stronę.",
-  "dialog.notSignedInDetail":
-    "Strona sesji będzie pusta. Zaloguj się przez Discorda, aby wysyłać przejścia. Przejścia zrobione bez logowania (także z tej sesji) wyślą się zaraz po zalogowaniu.",
-  "dialog.openAnyway": "Otwórz mimo to",
 
   // ── Chests / drops ──
   "chest.fallback": "Skrzynia",

@@ -346,9 +346,9 @@ describe("RunsSource — surfaces MIGRATED legacy runs (runs.jsonl -> ingest -> 
     writeFileSync(file, prev + JSON.stringify(record) + "\n", "utf-8");
   }
 
-  it("loads a migrated legacy run (external_id preserved) and seals a bugged one as degraded", () => {
+  it("loads a migrated legacy run (id preserved) and seals a bugged one as degraded", () => {
     // One good legacy run + one 1.00.10-bugged run (gold 0 + mode '?'). The migration must surface
-    // BOTH (skip != vanish): the good one with its external_id intact, the bugged one sealed degraded.
+    // BOTH (skip != vanish): the good one with its id intact, the bugged one sealed degraded.
     writeLegacyLine({ ts: 1_700_000_100, session_id: "1700000000-42", run: 5, status: "success", stage: "2-5", stageKey: 2105, mode: "Normal", total_damage: 1_000_000, clear_time: 60, duration: 62, gold_gained: 50_000, schema_version: 11, heroes: [] });
     writeLegacyLine({ ts: 1_700_000_000, session_id: "1700000000-7", run: 3, status: "success", stage: "?", stageKey: null, mode: "?", total_damage: 4_500_000, clear_time: 90, duration: 92, gold_gained: 0, schema_version: 11, heroes: [] });
 
@@ -362,7 +362,7 @@ describe("RunsSource — surfaces MIGRATED legacy runs (runs.jsonl -> ingest -> 
 
       const good = src.getById("1700000000-42:5");
       expect(good).not.toBeNull();
-      expect(good?.id).toBe("1700000000-42:5"); // external_id preserved verbatim (no re-mint)
+      expect(good?.id).toBe("1700000000-42:5"); // id preserved verbatim (no re-mint)
       expect(good?.quality).toBe("counted");
 
       const bugged = src.getById("1700000000-7:3");

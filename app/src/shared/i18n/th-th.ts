@@ -6,9 +6,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "common.cancel": "ยกเลิก",
   "common.close": "ปิด",
   "common.reset": "รีเซ็ต",
-  "common.signOut": "ออกจากระบบ",
-  "common.signInDiscord": "เข้าสู่ระบบด้วย Discord",
-  "common.waitingBrowser": "กำลังรอเบราว์เซอร์…",
 
   // ── Live overlay ──
   "live.pillStarting": "กำลังเริ่ม",
@@ -17,10 +14,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.offlineMsg": "Meter ออฟไลน์ — เปิด Task Bar Hero",
   "live.blockedMsg": "ตัวอ่านถูกบล็อก — แอนตี้ไวรัสอาจกำลังปิดมัน",
   "live.retry": "ลองใหม่",
-  "live.statusLive": "Live",
-  "live.statusOffline": "ออฟไลน์",
-  "live.syncLive": "Live — กำลังอัปโหลดรันขึ้นลีดเดอร์บอร์ด",
-  "live.syncOff": "ไม่ซิงก์ — เข้าสู่ระบบเพื่ออัปโหลดรันของคุณ",
   "live.dps": "DPS",
   "live.mobs": "ม็อบ",
   "live.gold": "ทอง",
@@ -39,7 +32,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.expandTitle": "ขยาย",
   "live.pinTitle": "อยู่บนสุดเสมอ (คลิกเพื่อปิด)",
   "live.unpinTitle": "ไม่อยู่บนสุด (คลิกเพื่อปักหมุด meter ไว้เหนือหน้าต่างอื่น)",
-  "live.sessionStats": "สถิติเซสชัน",
   "live.openLogs": "เปิดบันทึก",
   "live.dragResize": "ลากเพื่อปรับขนาด",
   "live.dragScale": "ลากเพื่อย่อ/ขยาย meter",
@@ -55,15 +47,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "splash.tipLabel": "เคล็ดลับ:",
   "splash.tip1": "ลาก meter ด้วยที่จับด้านซ้ายเพื่อย้ายตำแหน่ง",
   "splash.tip2": "เข้าสู้เพื่อดู DPS ของคุณแบบเรียลไทม์",
-  "splash.tip3": "เมื่อเข้าสู่ระบบ รันของคุณจะอัปขึ้นลีดเดอร์บอร์ดอัตโนมัติ",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "Meter แค่อ่านหน่วยความจำเกมเท่านั้น — ไม่เคยเขียนอะไรเลย",
 
   // ── Window headers ──
   "header.tabRuns": "รัน",
   "header.tabTracker": "ตัวติดตาม",
   "header.tabSettings": "ตั้งค่า",
-  "header.signIn": "เข้าสู่ระบบ",
-  "header.signedIn": "เข้าสู่ระบบแล้ว",
   "header.appVersion": "เวอร์ชันแอป",
   "header.restartToUpdate": "รีสตาร์ตเพื่ออัปเดต",
   "header.updateReady": "อัปเดต v{version} พร้อมแล้ว",
@@ -94,7 +84,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.startupDesc": "เปิด meter อัตโนมัติเมื่อ Windows เริ่มทำงาน",
   "settings.runFilter": "ตัวกรองรัน",
   "settings.runFilterDesc":
-    "เลือกว่ารันไหนจะแสดงในรายการ ใช้แค่ในเครื่อง — ไม่กระทบลีดเดอร์บอร์ด",
+    "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "ซ่อนรันที่ถูกข้าม",
   "settings.hideIgnoredDesc":
     "รันที่ถูกข้าม ไม่ครบ หรือข้อมูลไม่สมบูรณ์จะถูกซ่อน แต่ยังนับรวมในเซสชัน และแสดงได้จากรายการรันทุกเมื่อ",
@@ -106,15 +96,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.maxRunsDesc":
     "เก็บรันบนเครื่องนี้ได้มากสุดเท่านี้ เมื่อเกินจะลบรันเก่าสุดอัตโนมัติ รันรายการโปรดจะถูกเก็บไว้เสมอและไม่นับรวมในขีดจำกัด",
   "settings.maxRunsUnit": "รัน",
-  "settings.leaderboard": "ลีดเดอร์บอร์ด",
-  "settings.signedInAs": "เข้าสู่ระบบเป็น",
-  "settings.uploadAuto": "รันที่สำเร็จจะอัปโหลดอัตโนมัติ",
-  "settings.signInPitch":
-    "เข้าสู่ระบบด้วย Discord ที่แถบบนเพื่อขึ้นลีดเดอร์บอร์ด TBH Helper การเข้าสู่ระบบยังรับรันที่เคยอัปโหลดแบบไม่ระบุตัวจากเครื่องนี้ด้วย",
-  "settings.usageStats": "สถิติการใช้งาน",
-  "settings.usageStatsLabel": "แชร์สถิติการใช้งานแบบไม่ระบุตัวตน",
-  "settings.usageStatsDesc":
-    "ช่วยให้เราเห็นว่ามีคนใช้มิเตอร์กี่คน (ไม่ระบุตัวตน ผ่าน Google Analytics) ไม่มีข้อมูลส่วนตัวหรือรายละเอียดรัน ปิดเพื่อยกเลิกการเข้าร่วมทั้งหมด",
+  "settings.diagnostics": "Diagnostics",
   "settings.diagnosticsLog": "บันทึกการวินิจฉัย",
   "settings.diagnosticsLogDesc": "รวบรวมข้อมูลการวินิจฉัยสำหรับรายงานบั๊ก ไม่มีข้อมูลส่วนบุคคลรวมอยู่ด้วย",
   "diagnostics.collecting": "กำลังรวบรวมข้อมูลการวินิจฉัย...",
@@ -125,11 +107,11 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "diagnostics.backToSettings": "กลับไปที่การตั้งค่า",
   "settings.runHistory": "ประวัติรัน",
   "settings.runHistoryDesc":
-    "ลบรันทั้งหมดในเครื่องนี้ รันที่แชร์ขึ้นลีดเดอร์บอร์ดแล้วไม่ถูกกระทบและยังอยู่บนเว็บ",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "ล้างประวัติรัน",
   "settings.clearConfirmTitle": "ล้างประวัติรัน?",
   "settings.clearConfirmBody":
-    "การทำเช่นนี้จะลบรันทุกรายการของ meter รวมถึงคลังบันทึก ย้อนกลับไม่ได้ รันรายการโปรดจะถูกเก็บไว้ รันที่แชร์ขึ้นลีดเดอร์บอร์ดแล้วยังอยู่",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "ล้างประวัติไม่สำเร็จ ลองอีกครั้ง",
   "settings.clearing": "กำลังล้าง…",
   "settings.deleteAll": "ลบรันทั้งหมด",
@@ -167,11 +149,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "runs.newSession": "เซสชันใหม่",
   "runs.newSessionConfirm": "ยืนยัน?",
   "runs.newSessionTitle":
-    "จบเซสชันปัจจุบัน รันถัดไปจะเริ่มเซสชันใหม่ รันที่อัปโหลดแล้วยังอยู่บนเว็บ",
-  "runs.sessionStats": "สถิติเซสชัน",
-  "runs.sessionStatsTitle": "เปิดสถิติเซสชันปัจจุบันในเบราว์เซอร์",
-  "runs.hintNoRunsCurrent": "เซสชันนี้ยังไม่มีรัน จบรันหนึ่งแล้วจะปรากฏบนเว็บ",
-  "runs.hintNoRuns": "จบอย่างน้อยหนึ่งรัน เซสชันจะถูกบันทึกบนเว็บเมื่อมีรันที่จบแล้ว",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "ไม่มีรันที่ตรงกับตัวกรอง",
   "runs.showIgnoredOne": "แสดง {count} รันที่ถูกข้าม",
   "runs.showIgnoredMany": "แสดง {count} รันที่ถูกข้าม",
@@ -217,15 +195,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "detail.drops": "ของดรอป",
   "detail.chestsOne": "{count} กล่อง",
   "detail.chestsMany": "{count} กล่อง",
-  "detail.shareView": "ดูบน TBH Helper",
-  "detail.sharing": "กำลังแชร์…",
-  "detail.shareBtn": "แชร์ขึ้นลีดเดอร์บอร์ด",
-  "detail.shareSignIn": "เข้าสู่ระบบด้วย Discord เพื่อแชร์",
-  "detail.shareError": "มีบางอย่างผิดพลาด ลองอีกครั้ง",
-  "detail.fullDetails":
-    "อยากเห็นรายละเอียดเต็ม? ทีมพร้อมของสวมใส่ สกิล และค่าสถานะของฮีโร่แต่ละตัวอยู่บนหน้ารันใน TBH Helper",
-  "detail.fullDetailsShare": "แชร์รันเพื่อดูบนเว็บ",
-  "detail.viewFull": "ดูรายละเอียดเต็ม",
   "detail.xpByHero": "XP ต่อฮีโร่",
   "detail.heroLv": "เลเวล {level}",
   "detail.levelUp": "เลเวลอัป",
@@ -237,30 +206,30 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "status.abandoned": "ละทิ้ง",
   "quality.partialLabel": "ไม่ครบ",
   "quality.partialTitle":
-    "Meter เข้าร่วมรันนี้ตอนที่เริ่มไปแล้ว ตัวเลขรวมจึงน้อยกว่าจริง รันนี้ไม่ถูกอัปโหลดขึ้นลีดเดอร์บอร์ด",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "ข้อมูลเสีย",
   "quality.degradedTitle":
-    "บางค่าของรันนี้อ่านไม่ได้ ตัวเลขอาจผิด รันนี้ไม่ถูกอัปโหลดขึ้นลีดเดอร์บอร์ด",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "ไม่ผ่านเกณฑ์",
   "quality.skippedTitle":
-    "รันนี้ไม่ใช่การเคลียร์ที่ถูกต้อง (สั้นเกินไป หรือจบด้วยความล้มเหลว/ละทิ้ง) จึงไม่นับและไม่ถูกอัปโหลดขึ้นลีดเดอร์บอร์ด",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "ตัวติดตามกล่องฟ้า",
@@ -275,7 +244,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.showHistory": "แสดงประวัติ",
   "cooldowns.showingRecent": "แสดง {shown} รายการล่าสุดจาก {total}",
   "cooldowns.stageLabel": "ด่าน {code}",
-  "cooldowns.openStage": "เปิดด่านนี้บนเว็บ",
   "cooldowns.ready": "พร้อม",
   "cooldowns.readyCheck": "✓ พร้อม",
   "cooldowns.remove": "ลบ (จะกลับมาเมื่อดรอปครั้งถัดไป)",
@@ -307,30 +275,10 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "notifications.actBossTitle": "กล่องบอสบทดรอปแล้ว",
   "notifications.actBossBody": "{where}: เพิ่งมีกล่องบอสบทดรอป",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "แชร์รันของคุณขึ้นลีดเดอร์บอร์ด",
-  "signin.body":
-    "คุณยังไม่ได้เข้าสู่ระบบ รันของคุณจึงอยู่ในเครื่องนี้และไม่ขึ้นลีดเดอร์บอร์ด เข้าสู่ระบบด้วย Discord เพื่อซิงค์รันให้นับในลีดเดอร์บอร์ดและโปรไฟล์ของคุณ",
-  "signin.dontShow": "ไม่ต้องแสดงอีก",
-  "signin.notNow": "ยังก่อน",
-
-  "signin.pendingTitle": "รันของคุณไม่ได้ซิงค์",
-  "signin.pendingBody":
-    "คุณออกจากระบบอยู่ รันที่จบแล้วจึงหยุดส่งขึ้นลีดเดอร์บอร์ด ({count} รอซิงค์ในเครื่อง) เข้าสู่ระบบเพื่อซิงค์",
-  "signin.expiredTitle": "เซสชันของคุณหมดอายุ",
-  "signin.expiredBody":
-    "คุณถูกออกจากระบบ รันของคุณจึงหยุดซิงค์กับลีดเดอร์บอร์ด รันยังถูกบันทึกไว้ในเครื่อง เข้าสู่ระบบอีกครั้งเพื่อซิงค์ต่อ",
   // ── Tray menu ──
   "tray.showLive": "แสดง live meter",
   "tray.openRuns": "เปิดรายการรัน",
   "tray.quit": "ออก",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "คุณยังไม่ได้เข้าสู่ระบบ",
-  "dialog.notSignedInMsg": "รันของคุณไม่ได้ถูกอัปโหลดขึ้นเว็บ",
-  "dialog.notSignedInDetail":
-    "หน้าเซสชันจะว่างเปล่า เข้าสู่ระบบด้วย Discord เพื่ออัปโหลดรัน รันที่ทำตอนไม่ได้เข้าสู่ระบบ (รวมถึงของเซสชันนี้) จะอัปโหลดทันทีที่คุณเข้าสู่ระบบ",
-  "dialog.openAnyway": "เปิดต่อไป",
 
   // ── Chests / drops ──
   "chest.fallback": "กล่อง",

@@ -15,15 +15,8 @@ export default defineConfig({
     // Build-time variant flag (see src/main/env.d.ts). The RC build sets
     // TBH_BUILD_VARIANT=rc so the main process isolates its data folder (~/tbh-meter-rc)
     // and disables auto-update; everything else builds "stable".
-    //
-    // __TBH_SIGNING_PRIVATE_KEY__ is the Ed25519 private key the app signs POST /runs
-    // with (request-signer.ts). The production key arrives via the TBH_SIGNING_PRIVATE_KEY
-    // build secret (Phase 3); when unset (dev + tests) it bakes the empty string, and the
-    // signer falls back to the committed DEV-only key. Empty-string default (not undefined)
-    // so the inlined identifier is always a valid string literal.
     define: {
       __TBH_VARIANT__: JSON.stringify(process.env.TBH_BUILD_VARIANT ?? "stable"),
-      __TBH_SIGNING_PRIVATE_KEY__: JSON.stringify(process.env.TBH_SIGNING_PRIVATE_KEY ?? ""),
     },
     resolve: {
       alias: {

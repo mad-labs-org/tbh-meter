@@ -82,7 +82,7 @@ function normalizeStatus(raw: unknown): RunStatus {
 // These are NO LONGER the app's READ path (since PR4 the app reads `logs/`, the
 // pre-converted structured records — see RunsSource below). They survive ONLY as
 // the MIGRATION engine: `converter/legacy.ts` reuses `normalizeRecord` to adopt a
-// pre-redesign `runs.jsonl` line into `logs/` preserving its external_id (then
+// pre-redesign `runs.jsonl` line into `logs/` preserving its run id (then
 // layers the quality verdict on top). Kept here (not moved into the converter) so
 // the migration reuses the battle-tested era field-mapping verbatim.
 // --------------------------------------------------------------------------- //
@@ -244,7 +244,7 @@ export function normalizeRecord(raw: Record<string, unknown>, lineIndex: number)
     goldPerSec: firstNum(raw.gold_per_sec),
     // partial: reader flags a run it joined mid-flight (under-counted). Absent in legacy records
     // (treated as false). The migration's quality verdict (classifyQuality in convertLegacy) and the
-    // upload eligible() gate act on this flag — the read path no longer drops on it.
+    // display filter acts on this flag — the read path no longer drops on it.
     partial: raw.partial === true,
     // wave_now / wave_total only present in old records
     waveNow: numOrNull(raw.wave_now),
@@ -305,7 +305,7 @@ export function loadStructured(raw: Record<string, unknown>): RunRecord | null {
   // id is the one field every structured record MUST have (it is the run identity); without it the
   // file is not a run record — skip it rather than fabricate an id.
   if (typeof raw.id !== "string" || raw.id === "") return null;
-  // ts drives the newest-first sort + the oldest-first upload cycle. A missing/non-finite ts would
+  // ts drives the newest-first sort. A missing/non-finite ts would
   // default to 0 (firstNum) and silently mis-sort the run as epoch-0 — reject it like a missing id
   // (never fabricate a wrong default), so a corrupt log is skipped rather than mis-ordered.
   if (typeof raw.ts !== "number" || !Number.isFinite(raw.ts)) return null;
@@ -583,7 +583,7 @@ export class RunsSource extends EventEmitter {
     return this.records.find((r) => r.id === id) ?? null;
   }
 
-  /** All loaded records (newest-first). Used by the auto-uploader + session-stats. */
+  /** All loaded records (newest-first). Used by the session/current-session lookups. */
   all(): RunRecord[] {
     return this.records;
   }

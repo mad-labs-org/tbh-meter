@@ -6,9 +6,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "common.cancel": "취소",
   "common.close": "닫기",
   "common.reset": "초기화",
-  "common.signOut": "로그아웃",
-  "common.signInDiscord": "Discord로 로그인",
-  "common.waitingBrowser": "브라우저 대기 중…",
 
   // ── Live overlay ──
   "live.pillStarting": "시작 중",
@@ -17,10 +14,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.offlineMsg": "미터 오프라인 — Task Bar Hero를 실행하세요",
   "live.blockedMsg": "리더가 차단됨 — 백신이 종료시키고 있을 수 있습니다.",
   "live.retry": "재시도",
-  "live.statusLive": "Live",
-  "live.statusOffline": "오프라인",
-  "live.syncLive": "Live — 런을 리더보드에 업로드 중",
-  "live.syncOff": "동기화 안 됨 — 로그인하면 런이 업로드됩니다",
   "live.dps": "DPS",
   "live.mobs": "몹",
   "live.gold": "골드",
@@ -39,7 +32,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.expandTitle": "확장",
   "live.pinTitle": "항상 위에 표시 (클릭하면 해제)",
   "live.unpinTitle": "항상 위에 표시 안 함 (클릭하면 미터를 다른 창 위에 고정)",
-  "live.sessionStats": "세션 통계",
   "live.openLogs": "로그 열기",
   "live.dragResize": "드래그로 크기 조절",
   "live.dragScale": "드래그로 미터 크기 조절",
@@ -55,15 +47,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "splash.tipLabel": "팁:",
   "splash.tip1": "왼쪽 손잡이를 드래그해 미터를 옮길 수 있습니다.",
   "splash.tip2": "전투에 들어가면 DPS가 실시간으로 표시됩니다.",
-  "splash.tip3": "로그인 상태에선 런이 자동으로 리더보드에 업로드됩니다.",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "미터는 게임 메모리를 읽기만 합니다 — 절대 쓰지 않습니다.",
 
   // ── Window headers ──
   "header.tabRuns": "런",
   "header.tabTracker": "트래커",
   "header.tabSettings": "설정",
-  "header.signIn": "로그인",
-  "header.signedIn": "로그인됨",
   "header.appVersion": "앱 버전",
   "header.restartToUpdate": "재시작하여 업데이트",
   "header.updateReady": "업데이트 v{version} 준비됨",
@@ -94,7 +84,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.startupDesc": "Windows가 시작될 때 미터를 자동으로 엽니다.",
   "settings.runFilter": "런 필터",
   "settings.runFilterDesc":
-    "목록에 보일 런을 고릅니다. 로컬 전용 — 리더보드는 절대 바뀌지 않습니다.",
+    "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "무시된 런 숨기기",
   "settings.hideIgnoredDesc":
     "건너뛴 런, 부분 측정, 불완전한 데이터의 런은 숨겨집니다. 세션에는 계속 포함되며 언제든 목록에서 다시 볼 수 있습니다.",
@@ -106,15 +96,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.maxRunsDesc":
     "이 컴퓨터에 최대 이만큼의 런만 보관합니다. 넘으면 가장 오래된 런이 자동으로 삭제됩니다. 즐겨찾기 런은 항상 유지되며 제한에 포함되지 않습니다.",
   "settings.maxRunsUnit": "런",
-  "settings.leaderboard": "리더보드",
-  "settings.signedInAs": "로그인 계정:",
-  "settings.uploadAuto": "성공한 런은 자동으로 업로드됩니다.",
-  "settings.signInPitch":
-    "상단에서 Discord로 로그인하면 TBH Helper 리더보드에 랭크됩니다. 로그인하면 이 컴퓨터에서 익명으로 업로드된 런도 내 계정으로 귀속됩니다.",
-  "settings.usageStats": "사용 통계",
-  "settings.usageStatsLabel": "익명 사용 통계 공유",
-  "settings.usageStatsDesc":
-    "얼마나 많은 사람들이 미터를 사용하는지 파악하는 데 도움이 됩니다(익명, Google Analytics 사용). 개인 정보나 런 세부 정보는 없습니다. 완전히 거부하려면 끄세요.",
+    "settings.diagnostics": "Diagnostics",
     "settings.diagnosticsLog": "진단 로그",
   "settings.diagnosticsLogDesc": "버그 보고용 진단 정보를 수집합니다. 개인 데이터는 포함되지 않습니다.",
   "diagnostics.collecting": "진단 정보 수집 중...",
@@ -125,11 +107,11 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "diagnostics.backToSettings": "설정으로 돌아가기",
   "settings.runHistory": "런 기록",
   "settings.runHistoryDesc":
-    "이 컴퓨터에 저장된 모든 런을 삭제합니다. 리더보드에 공유된 런은 영향받지 않고 웹에 남습니다.",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "런 기록 지우기",
   "settings.clearConfirmTitle": "런 기록을 지울까요?",
   "settings.clearConfirmBody":
-    "이 미터의 모든 런을 로그 보관함까지 삭제합니다. 되돌릴 수 없습니다. 즐겨찾기 런은 유지됩니다. 리더보드에 공유된 런은 그대로 남습니다.",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "기록을 지우지 못했습니다. 다시 시도하세요.",
   "settings.clearing": "지우는 중…",
   "settings.deleteAll": "모든 런 삭제",
@@ -167,11 +149,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "runs.newSession": "새 세션",
   "runs.newSessionConfirm": "확인?",
   "runs.newSessionTitle":
-    "현재 세션을 끝냅니다. 다음 런부터 새 세션이 시작되며, 이미 업로드된 런은 사이트에 남습니다.",
-  "runs.sessionStats": "세션 통계",
-  "runs.sessionStatsTitle": "현재 세션 통계를 브라우저에서 엽니다",
-  "runs.hintNoRunsCurrent": "현재 세션에 아직 런이 없습니다. 런을 끝내면 사이트에 나타납니다.",
-  "runs.hintNoRuns": "런을 최소 하나 끝내세요. 완료된 런이 생기면 세션이 사이트에 저장됩니다.",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "필터에 맞는 런이 없습니다",
   "runs.showIgnoredOne": "무시된 런 {count}개 보기",
   "runs.showIgnoredMany": "무시된 런 {count}개 보기",
@@ -217,15 +195,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "detail.drops": "드롭",
   "detail.chestsOne": "상자 {count}개",
   "detail.chestsMany": "상자 {count}개",
-  "detail.shareView": "TBH Helper에서 보기",
-  "detail.sharing": "공유 중…",
-  "detail.shareBtn": "리더보드에 공유",
-  "detail.shareSignIn": "공유하려면 Discord로 로그인",
-  "detail.shareError": "문제가 발생했습니다. 다시 시도하세요.",
-  "detail.fullDetails":
-    "전체 분석이 궁금하세요? 영웅별 장비·스킬·스탯이 담긴 팀 정보는 TBH Helper의 런 페이지에 있습니다.",
-  "detail.fullDetailsShare": "런을 공유하면 사이트에서 볼 수 있습니다.",
-  "detail.viewFull": "전체 상세 보기",
   "detail.xpByHero": "영웅별 XP",
   "detail.heroLv": "Lv {level}",
   "detail.levelUp": "레벨 업",
@@ -237,30 +206,30 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "status.abandoned": "포기",
   "quality.partialLabel": "부분 측정",
   "quality.partialTitle":
-    "미터가 이미 진행 중인 런에 합류해 합계가 적게 측정되었습니다. 리더보드에 업로드되지 않았습니다.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "손상",
   "quality.degradedTitle":
-    "이 런의 일부 값을 읽지 못해 숫자가 틀릴 수 있습니다. 리더보드에 업로드되지 않았습니다.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "무효",
   "quality.skippedTitle":
-    "이 런은 유효한 클리어가 아닙니다 (너무 짧거나, 실패/포기로 끝남). 집계되지 않으며 리더보드에도 업로드되지 않았습니다.",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "파란 상자 트래커",
@@ -275,7 +244,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.showHistory": "기록 보기",
   "cooldowns.showingRecent": "{total}개 중 최근 {shown}개 표시",
   "cooldowns.stageLabel": "스테이지 {code}",
-  "cooldowns.openStage": "이 스테이지를 사이트에서 열기",
   "cooldowns.ready": "준비됨",
   "cooldowns.readyCheck": "✓ 준비됨",
   "cooldowns.remove": "제거 (다음 드롭 때 다시 나타남)",
@@ -307,30 +275,10 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "notifications.actBossTitle": "액트 보스 상자 드롭",
   "notifications.actBossBody": "{where}: 방금 액트 보스 상자가 드롭됐습니다.",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "런을 리더보드에 공유하세요",
-  "signin.body":
-    "로그인하지 않아 런이 이 컴퓨터에만 저장되고 리더보드에 반영되지 않습니다. Discord로 로그인하면 동기화되어 리더보드와 프로필에 반영됩니다.",
-  "signin.dontShow": "다시 표시하지 않기",
-  "signin.notNow": "나중에",
-
-  "signin.pendingTitle": "런이 동기화되지 않고 있습니다",
-  "signin.pendingBody":
-    "로그아웃 상태여서 완료된 런이 리더보드에 반영되지 않습니다(로컬에 {count}개 대기 중). 로그인하여 동기화하세요.",
-  "signin.expiredTitle": "세션이 만료되었습니다",
-  "signin.expiredBody":
-    "로그아웃되어 런이 리더보드 동기화를 멈췄습니다. 런은 로컬에 저장됩니다. 다시 로그인하면 동기화를 재개합니다.",
   // ── Tray menu ──
   "tray.showLive": "라이브 미터 표시",
   "tray.openRuns": "런 목록 열기",
   "tray.quit": "종료",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "로그인하지 않았습니다",
-  "dialog.notSignedInMsg": "런이 사이트에 업로드되지 않고 있습니다.",
-  "dialog.notSignedInDetail":
-    "세션 페이지가 비어 보일 것입니다. Discord로 로그인해 런을 업로드하세요. 로그아웃 상태에서 한 런(이 세션 포함)은 로그인하는 즉시 업로드됩니다.",
-  "dialog.openAnyway": "그냥 열기",
 
   // ── Chests / drops ──
   "chest.fallback": "상자",

@@ -5,14 +5,13 @@ import {
   RefreshCw,
   CheckCircle2,
   AlertCircle,
-  LogOut,
   Loader2,
   Trash2,
   Minus,
   Plus,
   FileText,
 } from "lucide-react";
-import type { AppSettings, AuthStatus, UpdateStatus } from "../../../shared/ipc-types.js";
+import type { AppSettings, UpdateStatus } from "../../../shared/ipc-types.js";
 import { FONT_SCALE_MIN, FONT_SCALE_MAX, clampFontScale } from "../../../shared/ipc-types.js";
 import { COUNT_FLOOR_SEC } from "../../../shared/run-types.js";
 import { AUTO_LOCALE, LOCALES } from "../../../shared/i18n/index.js";
@@ -158,11 +157,7 @@ export function SettingsView({ settings, onSettingsChange }: SettingsViewProps) 
       </div>
 
       <div className="border-t border-surface-600 pt-3">
-        <LeaderboardRow />
-      </div>
-
-      <div className="border-t border-surface-600 pt-3">
-        <UsageStatsRow settings={settings} onSettingsChange={onSettingsChange} onOpenDiagnostics={() => setDiagnosticsOpen(true)} />
+        <DiagnosticsRow onOpenDiagnostics={() => setDiagnosticsOpen(true)} />
       </div>
 
       <div className="border-t border-surface-600 pt-3">
@@ -379,8 +374,8 @@ function AlwaysOnTopRow({
 }
 
 /**
- * Run-filter section (PR6) — the LOCAL display filter for the runs list (layer 3 of the 3-layer
- * status model; never touches the leaderboard). Two prefs, both persisted to settings.json:
+ * Run-filter section (PR6) — the display filter for the runs list (layer 3 of the 3-layer
+ * status model; a view preference only). Two prefs, both persisted to settings.json:
  *   - hideNonCounted (default on): hide skipped / degraded runs. `counted` and `partial` (a real
  *     clear joined mid-way, under-counted but badged) stay visible — hiding partials made the list
  *     look empty after the slow first-launch attach. Mirrors the runs-list "show ignored" toggle —
@@ -731,38 +726,12 @@ function BlueChestTrackerRow({
   );
 }
 
-/**
- * Discord account section for leaderboard sharing.
- *   signed out -> pitch pointing at the header's sign-in button (sign in to upload)
- *   signed in  -> "Signed in as <name>" + sign out
- */
-/** Privacy toggle: opt out of the anonymous usage count (Google Analytics on the
- *  overlay). Always visible (not auth-gated) so anyone can turn it off. */
-function UsageStatsRow({
-  settings,
-  onSettingsChange,
-  onOpenDiagnostics,
-}: {
-  settings: AppSettings;
-  onSettingsChange: (partial: Partial<AppSettings>) => void;
-  onOpenDiagnostics: () => void;
-}) {
+/** Local diagnostics log viewer entry point (for bug reports). */
+function DiagnosticsRow({ onOpenDiagnostics }: { onOpenDiagnostics: () => void }) {
   const t = useT();
   return (
     <div>
-      <p className="text-xs font-medium text-zinc-300">{t("settings.usageStats")}</p>
-      <label className="mt-2 flex cursor-pointer items-start gap-2 text-xs text-zinc-400">
-        <input
-          type="checkbox"
-          checked={settings.analyticsEnabled}
-          onChange={(e) => onSettingsChange({ analyticsEnabled: e.target.checked })}
-          className="mt-0.5 size-3.5 shrink-0 cursor-pointer accent-brand-500"
-        />
-        <span>
-          {t("settings.usageStatsLabel")}
-          <span className="block text-[11px] text-zinc-500">{t("settings.usageStatsDesc")}</span>
-        </span>
-      </label>
+      <p className="text-xs font-medium text-zinc-300">{t("settings.diagnostics")}</p>
       <button
         onClick={onOpenDiagnostics}
         className="mt-2 flex cursor-pointer items-center gap-1.5 rounded bg-surface-700 px-2 py-1 text-xs text-zinc-300 transition-colors hover:bg-surface-600 hover:text-white"
@@ -777,42 +746,7 @@ function UsageStatsRow({
   );
 }
 
-function LeaderboardRow() {
-  const t = useT();
-  const [auth, setAuth] = useState<AuthStatus | null>(null);
-
-  useEffect(() => {
-    window.meter.authGetStatus().then(setAuth);
-    return window.meter.onAuthChanged(setAuth);
-  }, []);
-
-  return (
-    <div>
-      <p className="text-xs font-medium text-zinc-300">{t("settings.leaderboard")}</p>
-      {auth?.signedIn ? (
-        <div className="mt-1.5 flex items-center justify-between gap-2">
-          <p className="min-w-0 flex-1 truncate text-xs text-zinc-500">
-            {t("settings.signedInAs")}{" "}
-            <span className="text-zinc-300">{auth.displayName ?? "Discord"}</span>.{" "}
-            {t("settings.uploadAuto")}
-          </p>
-          <button
-            onClick={() => window.meter.authSignOut()}
-            className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded px-2 py-1 text-xs text-zinc-500 transition-colors hover:text-zinc-300"
-          >
-            <LogOut className="size-3" />
-            {t("common.signOut")}
-          </button>
-        </div>
-      ) : (
-        <p className="mt-0.5 text-xs text-zinc-500">{t("settings.signInPitch")}</p>
-      )}
-    </div>
-  );
-}
-
-/** Local-only destructive action: wipe runs.jsonl + the logs/ mirror behind a
- *  confirm modal. Runs already shared keep living on the web leaderboard. */
+/** Destructive action: wipe runs.jsonl + the logs/ mirror behind a confirm modal. */
 function RunHistoryRow() {
   const t = useT();
   const [confirming, setConfirming] = useState(false);

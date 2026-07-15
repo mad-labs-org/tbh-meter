@@ -164,13 +164,13 @@ describe("ingestPending — raw -> logs pipeline", () => {
 });
 
 describe("ingestPending — legacy runs.jsonl migration", () => {
-  it("migrates a legacy line into logs/ preserving its external_id", () => {
+  it("migrates a legacy line into logs/ preserving its id", () => {
     writeLegacyLine({ ts: 1_700_000_000, session_id: "1700000000-42", run: 5, status: "success", stage: "2-5", stageKey: 2105, mode: "Normal", total_damage: 1_000_000, clear_time: 60, duration: 62, gold_gained: 50_000, schema_version: 11, heroes: [] });
     const counts = ingestPending(dir);
     expect(counts.legacy).toBe(1);
     const logs = readLogs();
     expect(logs).toHaveLength(1);
-    expect(logs[0].id).toBe("1700000000-42:5"); // external_id preserved verbatim
+    expect(logs[0].id).toBe("1700000000-42:5"); // id preserved verbatim
   });
 
   it("seals a bugged legacy record (gold 0 + mode '?') as degraded, never deleting it", () => {
@@ -196,7 +196,7 @@ describe("ingestPending — legacy runs.jsonl migration", () => {
   });
 
   it("a raw WINS over a legacy line for the same id (no duplicate; the raw is the live source)", () => {
-    // Same session+run in both raw/ and runs.jsonl -> the same external_id.
+    // Same session+run in both raw/ and runs.jsonl -> the same id.
     writeRaw(rawRun({ id: "dup-1:1", run: 1, session_id: "dup-1", gold_gained: { ok: true, value: 125_000 } }));
     writeLegacyLine({ ts: 1_700_000_000, session_id: "dup-1", run: 1, status: "success", stage: "3-9", stageKey: 30901, mode: "Hell", total_damage: 4_500_000, clear_time: 90, duration: 92, gold_gained: 50_000, schema_version: 11, heroes: [] });
     const counts = ingestPending(dir);

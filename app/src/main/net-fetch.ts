@@ -7,7 +7,7 @@ import { net } from "electron";
 // WHY: undici does NOT honor the Windows system proxy nor the OS certificate
 // store. Electron's `net` module rides Chromium's network stack — the same one
 // the browser uses — so it DOES honor the system proxy and trusts the OS root
-// store. That fixes uploads for users behind:
+// store. That keeps the update checks working for users behind:
 //   - an antivirus doing TLS/HTTPS interception (its root CA is trusted by
 //     Windows + the browser, but not by Node), and
 //   - a system/corporate proxy.

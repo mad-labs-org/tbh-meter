@@ -49,12 +49,12 @@ export function CooldownCard({ boxKey, cd, now, cooldownMs, variant = "full", on
   const level = chestLevel(boxKey);
   const label = t("cooldowns.chestLabel", { level: level ?? "?" });
   // Where "open stage" points: the box's best farm spot, or the stage the last drop came from.
-  const openStage = cd?.lastStageKey ?? boxBestStage(boxKey);
+  const stageKey = cd?.lastStageKey ?? boxBestStage(boxKey);
   // The chest's CURRENT stage (where this cooldown dropped; the best spot for a pinned
   // placeholder) — shown inline as "<code> <MODE>" so each line says WHICH stage it's for
   // at a glance, in plain weight without the heavier "Stage" label.
-  const stageLabel = openStage != null ? stageCode(openStage) : null;
-  const stageMode = openStage != null ? stageDifficulty(openStage) : null;
+  const stageLabel = stageKey != null ? stageCode(stageKey) : null;
+  const stageMode = stageKey != null ? stageDifficulty(stageKey) : null;
 
   // The hover "X": dismiss a real cooldown, or unpin a placeholder. Absent when neither applies.
   const remove = available ? onUnpin : onDismiss;
@@ -80,7 +80,6 @@ export function CooldownCard({ boxKey, cd, now, cooldownMs, variant = "full", on
     </button>
   );
 
-  const openTitle = t("cooldowns.openStage");
 
   if (variant === "compact") {
     const status = available ? (
@@ -111,14 +110,7 @@ export function CooldownCard({ boxKey, cd, now, cooldownMs, variant = "full", on
           ) : (
             <Package className="size-3.5 shrink-0 text-zinc-400" />
           )}
-          <button
-            type="button"
-            title={openTitle}
-            onClick={() => openStage != null && window.meter.openStagePage(openStage)}
-            className="shrink-0 cursor-pointer font-semibold text-white hover:underline"
-          >
-            {label}
-          </button>
+          <span className="shrink-0 font-semibold text-white">{label}</span>
           {/* Current stage of this cooldown — plain "<code> <MODE>", so the line names the
               stage without the heavier "Stage" label. */}
           {stageLabel && (
@@ -176,14 +168,7 @@ export function CooldownCard({ boxKey, cd, now, cooldownMs, variant = "full", on
         </span>
         <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
           <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              title={openTitle}
-              onClick={() => openStage != null && window.meter.openStagePage(openStage)}
-              className="truncate text-left text-xs font-semibold text-white hover:underline"
-            >
-              {label}
-            </button>
+            <span className="truncate text-left text-xs font-semibold text-white">{label}</span>
             <span className="ml-auto flex items-center gap-1.5">
               {status}
               {dismiss}

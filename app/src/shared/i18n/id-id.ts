@@ -6,9 +6,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "common.cancel": "Batal",
   "common.close": "Tutup",
   "common.reset": "Reset",
-  "common.signOut": "Keluar",
-  "common.signInDiscord": "Masuk dengan Discord",
-  "common.waitingBrowser": "Menunggu browser…",
 
   // ── Live overlay ──
   "live.pillStarting": "Memulai",
@@ -17,10 +14,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.offlineMsg": "Meter offline — buka Task Bar Hero",
   "live.blockedMsg": "Reader terblokir — mungkin ditutup antivirus.",
   "live.retry": "Coba lagi",
-  "live.statusLive": "Live",
-  "live.statusOffline": "Offline",
-  "live.syncLive": "Live — run diunggah ke papan peringkat",
-  "live.syncOff": "Tidak sinkron — masuk untuk mengunggah run-mu",
   "live.dps": "DPS",
   "live.mobs": "Mob",
   "live.gold": "Emas",
@@ -39,7 +32,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.expandTitle": "Perluas",
   "live.pinTitle": "Selalu di atas (klik untuk mematikan)",
   "live.unpinTitle": "Tidak selalu di atas (klik untuk menyematkan meter di atas jendela lain)",
-  "live.sessionStats": "Statistik sesi",
   "live.openLogs": "Buka log",
   "live.dragResize": "Seret untuk mengubah ukuran",
   "live.dragScale": "Seret untuk menskalakan meter",
@@ -55,15 +47,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "splash.tipLabel": "Tips:",
   "splash.tip1": "Seret meter lewat pegangan di kiri untuk memindahkannya.",
   "splash.tip2": "Masuk pertarungan untuk melihat DPS-mu secara real time.",
-  "splash.tip3": "Setelah masuk, run-mu otomatis diunggah ke papan peringkat.",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "Meter hanya MEMBACA memori game — tidak pernah menulis apa pun.",
 
   // ── Window headers ──
   "header.tabRuns": "Run",
   "header.tabTracker": "Tracker",
   "header.tabSettings": "Pengaturan",
-  "header.signIn": "Masuk",
-  "header.signedIn": "Sudah masuk",
   "header.appVersion": "Versi aplikasi",
   "header.restartToUpdate": "Mulai ulang untuk memperbarui",
   "header.updateReady": "Pembaruan v{version} siap",
@@ -94,7 +84,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.startupDesc": "Membuka meter otomatis saat Windows menyala.",
   "settings.runFilter": "Filter run",
   "settings.runFilterDesc":
-    "Pilih run mana yang tampil di daftarmu. Hanya lokal — tidak pernah mengubah papan peringkat.",
+    "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "Sembunyikan run yang diabaikan",
   "settings.hideIgnoredDesc":
     "Run yang dilewati, parsial, dan datanya tak lengkap tetap tersembunyi. Mereka tetap dihitung ke sesimu dan bisa ditampilkan dari daftar kapan saja.",
@@ -106,15 +96,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.maxRunsDesc":
     "Menyimpan paling banyak sekian run di komputer ini. Saat melebihi, run terlama dihapus otomatis. Run favorit selalu disimpan dan tidak dihitung ke batas.",
   "settings.maxRunsUnit": "run",
-  "settings.leaderboard": "Papan peringkat",
-  "settings.signedInAs": "Masuk sebagai",
-  "settings.uploadAuto": "Run yang sukses diunggah otomatis.",
-  "settings.signInPitch":
-    "Masuk dengan Discord dari header untuk masuk papan peringkat TBH Helper. Masuk juga mengklaim run yang sudah diunggah anonim dari komputer ini.",
-  "settings.usageStats": "Statistik penggunaan",
-  "settings.usageStatsLabel": "Bagikan statistik penggunaan anonim",
-  "settings.usageStatsDesc":
-    "Membantu kami melihat berapa banyak orang yang menggunakan meter (anonim, melalui Google Analytics). Tidak ada data pribadi, tidak ada detail run. Matikan untuk keluar sepenuhnya.",
+  "settings.diagnostics": "Diagnostics",
   "settings.diagnosticsLog": "Log diagnostik",
   "settings.diagnosticsLogDesc": "Kumpulkan info diagnostik untuk laporan bug. Tidak ada data pribadi yang disertakan.",
   "diagnostics.collecting": "Mengumpulkan diagnostik...",
@@ -125,11 +107,11 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "diagnostics.backToSettings": "Kembali ke Pengaturan",
   "settings.runHistory": "Riwayat run",
   "settings.runHistoryDesc":
-    "Hapus semua run yang tersimpan di komputer ini. Run yang sudah dibagikan ke papan peringkat tidak terpengaruh dan tetap ada di web.",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "Hapus riwayat run",
   "settings.clearConfirmTitle": "Hapus riwayat run?",
   "settings.clearConfirmBody":
-    "Ini menghapus semua run dari meter ini, termasuk arsip log. Tidak bisa dibatalkan.Run favorit tetap disimpan.  Run yang sudah dibagikan ke papan peringkat tetap di sana.",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "Gagal menghapus riwayat. Coba lagi.",
   "settings.clearing": "Menghapus…",
   "settings.deleteAll": "Hapus semua run",
@@ -167,13 +149,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "runs.newSession": "Sesi baru",
   "runs.newSessionConfirm": "Konfirmasi?",
   "runs.newSessionTitle":
-    "Mengakhiri sesi saat ini. Run berikutnya memulai sesi baru; run yang sudah diunggah tetap di situs.",
-  "runs.sessionStats": "Statistik sesi",
-  "runs.sessionStatsTitle": "Buka statistik sesi saat ini di browser",
-  "runs.hintNoRunsCurrent":
-    "Belum ada run di sesi saat ini. Selesaikan satu run dan ia akan muncul di situs.",
-  "runs.hintNoRuns":
-    "Selesaikan minimal satu run. Sesimu tersimpan di situs begitu punya run yang selesai.",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "Tidak ada run yang lolos filtermu",
   "runs.showIgnoredOne": "Tampilkan {count} run yang diabaikan",
   "runs.showIgnoredMany": "Tampilkan {count} run yang diabaikan",
@@ -219,15 +195,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "detail.drops": "Drop",
   "detail.chestsOne": "{count} peti",
   "detail.chestsMany": "{count} peti",
-  "detail.shareView": "Lihat di TBH Helper",
-  "detail.sharing": "Membagikan…",
-  "detail.shareBtn": "Bagikan ke papan peringkat",
-  "detail.shareSignIn": "Masuk dengan Discord untuk membagikan",
-  "detail.shareError": "Ada yang salah. Coba lagi.",
-  "detail.fullDetails":
-    "Mau rincian lengkap? Tim dengan perlengkapan, skill, dan stat tiap hero ada di halaman run di TBH Helper.",
-  "detail.fullDetailsShare": "Bagikan run untuk melihatnya di situs.",
-  "detail.viewFull": "Lihat detail lengkap",
   "detail.xpByHero": "XP per hero",
   "detail.heroLv": "Lv {level}",
   "detail.levelUp": "Naik level",
@@ -239,30 +206,30 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "status.abandoned": "Ditinggalkan",
   "quality.partialLabel": "Parsial",
   "quality.partialTitle":
-    "Meter bergabung saat run ini sudah berjalan, jadi totalnya kurang dihitung. Tidak diunggah ke papan peringkat.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "Rusak",
   "quality.degradedTitle":
-    "Sebagian nilai run ini tak terbaca, jadi angkanya bisa salah. Tidak diunggah ke papan peringkat.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "Tidak sah",
   "quality.skippedTitle":
-    "Run ini bukan clear yang sah (terlalu pendek, atau berakhir gagal/ditinggalkan), jadi tidak dihitung dan tidak diunggah ke papan peringkat.",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "Tracker peti biru",
@@ -277,7 +244,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.showHistory": "Tampilkan riwayat",
   "cooldowns.showingRecent": "menampilkan {shown} terbaru dari {total}",
   "cooldowns.stageLabel": "Stage {code}",
-  "cooldowns.openStage": "Buka stage ini di situs",
   "cooldowns.ready": "Siap",
   "cooldowns.readyCheck": "✓ Siap",
   "cooldowns.remove": "Hapus (muncul lagi saat drop berikutnya)",
@@ -309,30 +275,10 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "notifications.actBossTitle": "Peti bos act jatuh",
   "notifications.actBossBody": "{where}: peti bos act baru saja jatuh.",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "Bagikan run-mu di papan peringkat",
-  "signin.body":
-    "Kamu belum masuk, jadi run-mu tetap di komputer ini dan tidak masuk ke papan peringkat. Masuk dengan Discord untuk menyinkronkannya agar dihitung di papan peringkat dan profilmu.",
-  "signin.dontShow": "Jangan tampilkan lagi",
-  "signin.notNow": "Nanti saja",
-
-  "signin.pendingTitle": "Run-mu tidak tersinkron",
-  "signin.pendingBody":
-    "Kamu keluar, jadi run yang selesai berhenti masuk ke papan peringkat ({count} menunggu di lokal). Masuk untuk menyinkronkannya.",
-  "signin.expiredTitle": "Sesimu telah berakhir",
-  "signin.expiredBody":
-    "Kamu keluar, jadi run-mu berhenti tersinkron ke papan peringkat. Run tetap tersimpan lokal. Masuk lagi untuk melanjutkan.",
   // ── Tray menu ──
   "tray.showLive": "Tampilkan live meter",
   "tray.openRuns": "Buka run",
   "tray.quit": "Keluar",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "Kamu belum masuk",
-  "dialog.notSignedInMsg": "Run-mu tidak diunggah ke situs.",
-  "dialog.notSignedInDetail":
-    "Halaman sesi akan tampil kosong. Masuk dengan Discord untuk mengunggah run-mu. Run yang dibuat saat belum masuk (termasuk sesi ini) terunggah begitu kamu masuk.",
-  "dialog.openAnyway": "Buka saja",
 
   // ── Chests / drops ──
   "chest.fallback": "Peti",

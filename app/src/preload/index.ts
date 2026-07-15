@@ -1,7 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type {
   AppSettings,
-  AuthStatus,
   MeterApi,
   ReaderStatus,
   UpdateStatus,
@@ -11,8 +10,6 @@ import type { CooldownState } from "../shared/cooldown-types.js";
 
 const meter: MeterApi = {
   getAppVersion: () => ipcRenderer.invoke("meter:get-app-version"),
-
-  getAnalyticsClientId: () => ipcRenderer.invoke("meter:get-analytics-id"),
 
   getSettings: () => ipcRenderer.invoke("meter:get-settings"),
   setSettings: (partial) => ipcRenderer.invoke("meter:set-settings", partial),
@@ -55,7 +52,6 @@ const meter: MeterApi = {
   dismissCooldown: (boxKey) => ipcRenderer.send("meter:dismiss-cooldown", boxKey),
   hideCooldown: (boxKey) => ipcRenderer.send("meter:hide-cooldown", boxKey),
   clearCooldowns: () => ipcRenderer.send("meter:clear-cooldowns"),
-  openStagePage: (stageKey) => ipcRenderer.send("meter:open-stage-page", stageKey),
 
   openListWindow: () => ipcRenderer.invoke("meter:open-list-window"),
 
@@ -94,46 +90,11 @@ const meter: MeterApi = {
 
   quitAndInstall: () => ipcRenderer.send("meter:quit-and-install"),
 
-  authGetStatus: () => ipcRenderer.invoke("meter:auth-get-status"),
-  authSignIn: () => ipcRenderer.invoke("meter:auth-sign-in"),
-  authSignOut: () => ipcRenderer.invoke("meter:auth-sign-out"),
-
-  onAuthChanged: (cb) => {
-    const listener = (_event: Electron.IpcRendererEvent, status: AuthStatus): void => cb(status);
-    ipcRenderer.on("meter:auth-changed", listener);
-    return () => ipcRenderer.off("meter:auth-changed", listener);
-  },
-
-  onSessionExpired: (cb) => {
-    const listener = (): void => cb();
-    ipcRenderer.on("meter:session-expired", listener);
-    return () => ipcRenderer.off("meter:session-expired", listener);
-  },
-
-  getPendingSyncCount: () => ipcRenderer.invoke("meter:get-pending-sync-count"),
-
-  shareRun: (runId) => ipcRenderer.invoke("meter:share-run", runId),
-  getShareStatus: (runId) => ipcRenderer.invoke("meter:get-share-status", runId),
-
-  onShareUpdated: (cb) => {
-    const listener = (
-      _event: Electron.IpcRendererEvent,
-      payload: { runId: string; url: string },
-    ): void => cb(payload);
-    ipcRenderer.on("meter:share-updated", listener);
-    return () => ipcRenderer.off("meter:share-updated", listener);
-  },
-
   openExternal: (url) => ipcRenderer.send("meter:open-external", url),
-
-  openSessionStats: (sessionId) => ipcRenderer.invoke("meter:open-session-stats", sessionId),
 
   resetSession: () => ipcRenderer.invoke("meter:reset-session"),
 
   getCurrentSession: () => ipcRenderer.invoke("meter:get-current-session"),
-
-  reportError: (context, message, stack) =>
-    ipcRenderer.send("meter:report-error", context, message, stack),
 
   debugInfo: () => ipcRenderer.invoke("meter:debug-info"),
 

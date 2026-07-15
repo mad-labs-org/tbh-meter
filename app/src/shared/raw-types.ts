@@ -142,8 +142,8 @@ export interface RawObserved {
 export interface RawRun extends RawObserved {
   /** Bumps ONLY when the reader's output SHAPE changes — never on a game re-seed/address shift. */
   raw_schema_version: 1;
-  /** Canonical run identity, `"<session_id>:<run>"` — equals the upload `external_id` verbatim
-   *  (migration preserves it so uploaded runs never re-dup). NOTE: the raw FILE is
+  /** Canonical run identity, `"<session_id>:<run>"` — preserved verbatim by the migration so a
+   *  re-ingested run never duplicates. NOTE: the raw FILE is
    *  `raw/<session_id>-<run>.json` (`:` → `-`, invalid in Windows filenames). */
   id: string;
   /** Unix SECONDS when the run closed. */
@@ -166,7 +166,7 @@ export interface RawRunV2 extends RawObserved {
   raw_schema_version: 2;
   /** Canonical run identity = the run's end timestamp in MILLISECONDS, as a string (e.g.
    *  "1717800000123"). Unique per machine (stage-plays are sequential → no two share a ms); no
-   *  session, no counter. Upload `external_id` = `<device-id>:<id>` (added app-side at upload). */
+   *  session, no counter. */
   id: string;
   /** Unix MILLISECONDS when the run closed (v1 was seconds). Also the basis of `id`. The UI shows
    *  seconds via a `toSeconds` helper — ms is stored only so the id is collision-proof. */
@@ -178,7 +178,7 @@ export interface RawRunV2 extends RawObserved {
 
   // --- per-run account snapshot (enveloped; SAVE-sourced, written EVERY run since the snapshot PR) ---
   // ⚠ EXPERIMENTAL — the reader EMITS these, but the converter does NOT yet consume them: they never
-  // reach `logs/`, the structured `RunRecord`, the leaderboard, or upload. Safe to READ straight from
+  // reach `logs/` or the structured `RunRecord`. Safe to READ straight from
   // raw; NOT yet validated end-to-end downstream (treat as best-effort vs the battle-tested fields
   // above). v2-ONLY (v1 is frozen legacy — no shipped v1 reader ever wrote them) and OPTIONAL only
   // because v2 raw written BEFORE the snapshot PR lacks them — a consumer must tolerate `undefined`

@@ -4,10 +4,10 @@ import { STRUCTURED_SCHEMA_VERSION } from "../converter/convert.js";
 
 // Legacy runs.jsonl records span eras (schema_version <= 11): PT keys/status (<=v5), EN (v6+),
 // drops (v10+), deaths/revives (v11+). These fixtures exercise the migration branch — its whole job
-// is to adopt them into the structured shape WITHOUT re-minting the external_id and WITHOUT deleting
+// is to adopt them into the structured shape WITHOUT re-minting the id and WITHOUT deleting
 // the bugged ones.
 
-describe("convertLegacy — external_id preservation (the duplicate-upload guard)", () => {
+describe("convertLegacy — id preservation (the duplicate-run guard)", () => {
   it("carries the original session_id:run id verbatim (never re-minted)", () => {
     const r = convertLegacy(
       { ts: 1_700_000_000, session_id: "1700000000-9999", run: 4, status: "success", stage: "2-5", stageKey: 2105, mode: "Normal", total_damage: 1_000_000, clear_time: 60, duration: 62, gold_gained: 50_000, schema_version: 11, heroes: [] },

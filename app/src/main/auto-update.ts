@@ -4,7 +4,6 @@ import { appendFileSync, mkdirSync, renameSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import electronUpdater from "electron-updater";
 import type { UpdateStatus } from "../shared/ipc-types.js";
-import { reportError } from "./error-report.js";
 import { httpFetch } from "./net-fetch.js";
 import { resolveOutputDir } from "./settings.js";
 import { isRcBuild } from "./variant.js";
@@ -222,10 +221,8 @@ async function check(): Promise<void> {
       });
     }
   } catch (err) {
-    // Download-phase failures (status got past "checking") are high-signal: AV
-    // quarantining the installer strands users on old versions. Check-phase failures
-    // are mostly offline machines — status-only, no report.
-    if (status.state === "downloading") reportError("updater:download-failed", err);
+    // setStatus logs the failure to the flight recorder (updater.log) — the durable
+    // local trace for triaging a stranded update.
     setStatus({ state: "error", message: err instanceof Error ? err.message : String(err) });
   }
 }
@@ -447,8 +444,7 @@ export async function runBootUpdateGate(deps: {
     // apply() shares the catch: a synchronous throw out of quitAndInstall must degrade to
     // "proceed" (reader starts, staged update applies on next quit via autoInstallOnAppQuit),
     // never reject the gate — a rejection here would silently abort the caller's whole boot
-    // sequence. onDownloadFail doubles as the generic surfacer (status:error; it only files
-    // an error report while state is still "downloading", so an apply throw doesn't misfile).
+    // sequence. onDownloadFail doubles as the generic surfacer (status:error).
     try {
       await result.download();
       deps.apply();
@@ -553,10 +549,7 @@ export async function checkAndApplyBootUpdate(): Promise<"updated" | "proceed"> 
         ),
       drainBackgroundDownload: (download) =>
         void download().catch((err) => setStatus({ state: "error", message: errMsg(err) })),
-      onDownloadFail: (err) => {
-        if (status.state === "downloading") reportError("updater:download-failed", err);
-        setStatus({ state: "error", message: errMsg(err) });
-      },
+      onDownloadFail: (err) => setStatus({ state: "error", message: errMsg(err) }),
     });
   } catch (err) {
     // Absolute backstop: NOTHING in update-land may stop the reader from starting. Every

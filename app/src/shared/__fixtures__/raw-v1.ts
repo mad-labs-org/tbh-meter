@@ -9,7 +9,7 @@ export const RAW_V1_EXAMPLE: RawRun = {
   ts: 1717800000,
   run: 7,
   run_outcome: "success",
-  session_id: "1717799000-12345", // reader-minted (persistent); external_id = session_id:run
+  session_id: "1717799000-12345", // reader-minted (persistent); run id = session_id:run
   game_version: "1.00.10",
   duration: 92,
 

@@ -4,11 +4,11 @@ export type RunStatus = "success" | "fail" | "abandoned";
 /** The converter's verdict on a run (PR3): `counted` = good data meeting the structural floor;
  *  `skipped` = below floor / not a clear; `partial` = capture incomplete (joined mid-run);
  *  `degraded` = critical fields unreadable (e.g. the 1.00.10 gold:0 bug). Orthogonal to the game
- *  outcome (`status`). Drives the leaderboard gate (backend) + the app's display filter (PR6). */
+ *  outcome (`status`). Drives the app's display filter (PR6). */
 export type RunQuality = "counted" | "skipped" | "partial" | "degraded";
 
 /** SYSTEM rule (versioned, NOT a user setting): below this many seconds a run does NOT count
- *  (the leaderboard floor) — EXCEPT stage x-10. The reader historically used 30s; the redesign
+ *  (the count floor) — EXCEPT stage x-10. The reader historically used 30s; the redesign
  *  lowers it to 15s while KEEPING the x-10 exception (that exception is the true invariant, not the
  *  number — run-lifecycle). Lives in `shared/` because BOTH the converter (`main/converter/helpers.ts`,
  *  which seals the verdict) AND the renderer (PR6's duration filter, which must never let the user set
