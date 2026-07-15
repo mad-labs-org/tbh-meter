@@ -31,8 +31,6 @@ cd app
 pnpm install
 pnpm dev      # launch the overlay. On macOS this renders the UI only (no game attach) —
               # feed fake artifacts into your ~/tbh-meter folder to exercise the watchers.
-pnpm dev:mock # same as `pnpm dev`, but runs against a mocked API with NO backend (MSW) —
-              # auth/upload/error-relay all complete locally; see src/mocks/.
 pnpm check    # eslint + tsc (both tsconfigs) — must pass
 pnpm test     # vitest — must pass
 ```
@@ -59,7 +57,7 @@ Windows + the game running.
 ## Refreshing game data after a patch (maintainers)
 
 When Task Bar Hero updates and the bundled metadata goes stale, regenerate the `data/` snapshot from
-a [Task Bar Hero Wiki](https://tbherohelper.com) checkout (which runs the datamine pipeline):
+a `tbh-wiki` checkout (the separate project that runs the datamine pipeline):
 
 ```bash
 node scripts/refresh-game-data.mjs --wiki /path/to/tbh-wiki

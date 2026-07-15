@@ -31,7 +31,6 @@ body:
         - Not sure
         - App / overlay UI
         - Reader (stats wrong, gold 0, stage "?", not attaching)
-        - Upload / leaderboard
         - Auto-update
     validations:
       required: true

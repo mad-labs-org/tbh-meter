@@ -144,9 +144,8 @@ specifically (the part with medium confidence above).
 
 ### (c) Cross-source check
 Our `keep()` and the sibling wiki's `overLevelExpFactor` should agree on the over-level side at
-hero lv30 (they do, exactly). The wiki's `StageBenchmark.medianXp` (real per-clear EXP from meter
-uploads, in the Railway Postgres DB) is a second real-data oracle for `stage_clear_exp` if we want
-to validate absolute EXP/clear later.
+hero lv30 (they do, exactly). The player's own local run records (per-hero `xpGained`) are a
+second real-data oracle for `stage_clear_exp` if we want to validate absolute EXP/clear later.
 
 ---
 

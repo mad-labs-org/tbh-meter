@@ -5,7 +5,7 @@ in `src/main/`; three renderer windows: **LiveApp** (the overlay), **ListApp** (
 **SplashApp** (startup phases). State flows `reader-policy.ts` (pure decisions) → `reader-process.ts`
 (supervisor) → `ipc.ts` → renderer via the `MeterApi` preload (contract in `src/shared/ipc-types.ts`).
 
-Architecture, the `src/main` module map, and the upload flow live in **`README.md`**.
+Architecture, the `src/main` module map, and the data flow live in **`README.md`**.
 
 ## Gotchas that bite
 
@@ -15,8 +15,8 @@ Architecture, the `src/main` module map, and the upload flow live in **`README.m
   (`raw/<id>.json` + `live.json`, mtime advancing) to exercise the watchers.
 - **`src/shared/data/` and `src/renderer/public/{sprites,heroes}/` are generated** by
   `scripts/sync-data.mjs` (hook-enforced) — never hand-edit; extend the sync script instead.
-- **`error-report.ts` caps mirror the API's `@tbh/shared` `meterErrorReportSchema`** (external package,
-  not vendored here) — keep the `MAX_*` constants in sync.
+- **The meter is local-only.** It talks to no backend: runs are files in the meter folder, and the
+  only network traffic is the GitHub auto-update check. Don't add remote calls.
 - Packaged reader exe path: `process.resourcesPath/reader/tbh-reader.exe` (electron-builder extraResources).
 
 ## Verify before finishing
