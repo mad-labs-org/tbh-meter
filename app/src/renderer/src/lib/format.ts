@@ -80,7 +80,7 @@ export function modeBadgeClass(mode: string): string {
 }
 
 // Difficulty text color (no background) — for the combined stage chip in the runs
-// list, mirroring the web leaderboard's stage cell. Same hue family as MODE_BADGE.
+// list. Same hue family as MODE_BADGE.
 const MODE_TEXT: Record<string, string> = {
   Normal: "text-emerald-300",
   Nightmare: "text-sky-300",

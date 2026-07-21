@@ -6,9 +6,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "common.cancel": "キャンセル",
   "common.close": "閉じる",
   "common.reset": "リセット",
-  "common.signOut": "サインアウト",
-  "common.signInDiscord": "Discordでサインイン",
-  "common.waitingBrowser": "ブラウザを待っています…",
 
   // ── Live overlay ──
   "live.pillStarting": "起動中",
@@ -17,10 +14,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.offlineMsg": "メーターはオフライン — Task Bar Hero を起動してください",
   "live.blockedMsg": "リーダーがブロックされました — ウイルス対策ソフトが終了させている可能性があります。",
   "live.retry": "再試行",
-  "live.statusLive": "Live",
-  "live.statusOffline": "オフライン",
-  "live.syncLive": "Live — ランをリーダーボードにアップロード中",
-  "live.syncOff": "未同期 — サインインしてランをアップロード",
   "live.dps": "DPS",
   "live.mobs": "モブ",
   "live.gold": "ゴールド",
@@ -39,7 +32,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.expandTitle": "展開",
   "live.pinTitle": "最前面に表示（クリックで解除）",
   "live.unpinTitle": "最前面ではありません（クリックでメーターを他のウィンドウの手前に固定）",
-  "live.sessionStats": "セッション統計",
   "live.openLogs": "ログを開く",
   "live.dragResize": "ドラッグでサイズ変更",
   "live.dragScale": "ドラッグでメーターを拡大縮小",
@@ -55,15 +47,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "splash.tipLabel": "ヒント:",
   "splash.tip1": "左のハンドルをドラッグしてメーターを移動できます。",
   "splash.tip2": "戦闘に入るとDPSがリアルタイムで表示されます。",
-  "splash.tip3": "サインイン中はランが自動でリーダーボードにアップロードされます。",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "メーターはゲームのメモリを読むだけ — 何も書き込みません。",
 
   // ── Window headers ──
   "header.tabRuns": "ラン",
   "header.tabTracker": "トラッカー",
   "header.tabSettings": "設定",
-  "header.signIn": "サインイン",
-  "header.signedIn": "サインイン済み",
   "header.appVersion": "アプリのバージョン",
   "header.restartToUpdate": "再起動して更新",
   "header.updateReady": "アップデート v{version} 準備完了",
@@ -94,7 +84,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.startupDesc": "Windowsの起動時にメーターを自動で開きます。",
   "settings.runFilter": "ランフィルター",
   "settings.runFilterDesc":
-    "一覧に表示するランを選びます。ローカル限定 — リーダーボードには影響しません。",
+    "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "無視されたランを隠す",
   "settings.hideIgnoredDesc":
     "スキップ・部分計測・データ不完全のランは非表示のままです。セッションには引き続きカウントされ、いつでも一覧から表示できます。",
@@ -106,15 +96,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.maxRunsDesc":
     "このPCに保存するランを最大この数までにします。超えると古いランから自動で削除されます。お気に入りのランは常に保持され、上限にはカウントされません。",
   "settings.maxRunsUnit": "ラン",
-  "settings.leaderboard": "リーダーボード",
-  "settings.signedInAs": "サインイン中:",
-  "settings.uploadAuto": "成功したランは自動でアップロードされます。",
-  "settings.signInPitch":
-    "ヘッダーからDiscordでサインインすると、TBH Helperのリーダーボードにランクインできます。サインインすると、このPCから匿名でアップロード済みのランも自分のものになります。",
-  "settings.usageStats": "利用統計",
-  "settings.usageStatsLabel": "匿名の利用統計を共有する",
-  "settings.usageStatsDesc":
-    "何人がメーターを使っているかを把握するのに役立ちます（匿名、Google Analytics 経由）。個人データやランの詳細は含まれません。完全にオプトアウトするにはオフにしてください。",
+    "settings.diagnostics": "Diagnostics",
     "settings.diagnosticsLog": "診断ログ",
   "settings.diagnosticsLogDesc": "バグ報告用の診断情報を収集します。個人データは含まれません。",
   "diagnostics.collecting": "診断情報を収集中...",
@@ -125,11 +107,11 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "diagnostics.backToSettings": "設定に戻る",
   "settings.runHistory": "ラン履歴",
   "settings.runHistoryDesc":
-    "このPCに保存された全ランを削除します。リーダーボードに共有済みのランは影響を受けず、Web上に残ります。",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "ラン履歴を消去",
   "settings.clearConfirmTitle": "ラン履歴を消去しますか?",
   "settings.clearConfirmBody":
-    "このメーターの全ランをログアーカイブごと削除します。元に戻せません。お気に入りのランは残ります。リーダーボードに共有済みのランはそのまま残ります。",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "履歴を消去できませんでした。もう一度お試しください。",
   "settings.clearing": "消去中…",
   "settings.deleteAll": "全ランを削除",
@@ -167,13 +149,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "runs.newSession": "新しいセッション",
   "runs.newSessionConfirm": "確認?",
   "runs.newSessionTitle":
-    "現在のセッションを終了します。次のランから新しいセッションになります。アップロード済みのランはサイトに残ります。",
-  "runs.sessionStats": "セッション統計",
-  "runs.sessionStatsTitle": "現在のセッションの統計をブラウザで開きます",
-  "runs.hintNoRunsCurrent":
-    "現在のセッションにはまだランがありません。ランを終えるとサイトに表示されます。",
-  "runs.hintNoRuns":
-    "少なくとも1つランを終えてください。完了したランができるとセッションがサイトに保存されます。",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "フィルターに合うランがありません",
   "runs.showIgnoredOne": "無視された{count}件のランを表示",
   "runs.showIgnoredMany": "無視された{count}件のランを表示",
@@ -219,15 +195,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "detail.drops": "ドロップ",
   "detail.chestsOne": "宝箱{count}個",
   "detail.chestsMany": "宝箱{count}個",
-  "detail.shareView": "TBH Helperで見る",
-  "detail.sharing": "共有中…",
-  "detail.shareBtn": "リーダーボードに共有",
-  "detail.shareSignIn": "共有するにはDiscordでサインイン",
-  "detail.shareError": "問題が発生しました。もう一度お試しください。",
-  "detail.fullDetails":
-    "詳しい内訳が見たい? 各ヒーローの装備・スキル・ステータス付きのチーム情報は、TBH Helperのランページにあります。",
-  "detail.fullDetailsShare": "ランを共有するとサイトで見られます。",
-  "detail.viewFull": "全詳細を見る",
   "detail.xpByHero": "ヒーロー別XP",
   "detail.heroLv": "Lv {level}",
   "detail.levelUp": "レベルアップ",
@@ -239,30 +206,30 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "status.abandoned": "放棄",
   "quality.partialLabel": "部分計測",
   "quality.partialTitle":
-    "メーターがラン進行中に参加したため、合計値が少なく計測されています。リーダーボードにはアップロードされていません。",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "劣化",
   "quality.degradedTitle":
-    "このランの一部の値が読み取れなかったため、数値が誤っている可能性があります。リーダーボードにはアップロードされていません。",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "無効",
   "quality.skippedTitle":
-    "このランは有効なクリアではありません（短すぎる、または失敗・放棄で終了）。カウントされず、リーダーボードにもアップロードされていません。",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "青宝箱トラッカー",
@@ -277,7 +244,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.showHistory": "履歴を表示",
   "cooldowns.showingRecent": "{total}件中、最新{shown}件を表示",
   "cooldowns.stageLabel": "ステージ {code}",
-  "cooldowns.openStage": "このステージをサイトで開く",
   "cooldowns.ready": "準備完了",
   "cooldowns.readyCheck": "✓ 準備完了",
   "cooldowns.remove": "削除（次のドロップで再表示）",
@@ -309,30 +275,10 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "notifications.actBossTitle": "アクトボスの宝箱がドロップ",
   "notifications.actBossBody": "{where}：アクトボスの宝箱がドロップしました。",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "ランをリーダーボードで共有しよう",
-  "signin.body":
-    "サインインしていないため、ランはこのPCに保存され、リーダーボードには反映されません。Discordでサインインすると同期され、リーダーボードとプロフィールに反映されます。",
-  "signin.dontShow": "今後表示しない",
-  "signin.notNow": "あとで",
-
-  "signin.pendingTitle": "ランが同期されていません",
-  "signin.pendingBody":
-    "サインアウトしているため、完了したランがリーダーボードに反映されなくなりました（ローカルで{count}件保留中）。サインインして同期してください。",
-  "signin.expiredTitle": "セッションの有効期限が切れました",
-  "signin.expiredBody":
-    "サインアウトされたため、ランがリーダーボードへの同期を停止しました。ランはローカルに保存されています。再度サインインすると同期を再開します。",
   // ── Tray menu ──
   "tray.showLive": "ライブメーターを表示",
   "tray.openRuns": "ラン一覧を開く",
   "tray.quit": "終了",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "サインインしていません",
-  "dialog.notSignedInMsg": "ランがサイトにアップロードされていません。",
-  "dialog.notSignedInDetail":
-    "セッションページは空のままになります。Discordでサインインしてランをアップロードしてください。サインアウト中のラン（このセッション分を含む）はサインイン後すぐにアップロードされます。",
-  "dialog.openAnyway": "そのまま開く",
 
   // ── Chests / drops ──
   "chest.fallback": "宝箱",

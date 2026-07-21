@@ -31,18 +31,10 @@ function HistoryRow({ cd, now, cooldownMs }: { cd: ChestCooldown; now: number; c
         {level != null && <span className="font-mono text-[9px] text-sky-300">Lv{level}</span>}
       </span>
       <span className="truncate font-semibold text-zinc-200">{label}</span>
-      {mode && stageKey != null && (
-        <button
-          type="button"
-          title={t("cooldowns.openStage")}
-          onClick={() => window.meter.openStagePage(stageKey)}
-          className={cn(
-            "shrink-0 cursor-pointer text-[10px] font-bold uppercase hover:underline",
-            modeTextClass(mode),
-          )}
-        >
+      {mode && (
+        <span className={cn("shrink-0 text-[10px] font-bold uppercase", modeTextClass(mode))}>
           {modeLabel(mode, t)}
-        </button>
+        </span>
       )}
       <DropRatePct rate={rate} className="shrink-0" />
       <span

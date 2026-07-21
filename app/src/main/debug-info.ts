@@ -24,8 +24,6 @@ export interface DebugInfoOpts {
   readerState: string;
   /** The auto-updater state payload. */
   updateState: { state: string };
-  /** Whether the user is signed in (no token — just the boolean). */
-  signedIn: boolean;
   /** The full AppSettings object (sanitized on output — only whitelisted keys). */
   settings: AppSettings;
   /** The output directory (resolved, not the raw setting). */
@@ -61,11 +59,7 @@ export async function collectDebugInfo(opts: DebugInfoOpts): Promise<string> {
   section("Network");
   const net = await checkNetwork();
   w("Online", net.online ? "yes" : "no");
-  if (net.online) {
-    w("  GitHub API",    net.github    >= 0 ? `${net.github}ms`    : "unreachable");
-    w("  TBH Helper API", net.tbhHelper  >= 0 ? `${net.tbhHelper}ms`  : "unreachable");
-    w("  Discord OAuth",  net.discord    >= 0 ? `${net.discord}ms`    : "unreachable");
-  }
+  if (net.online) w("  GitHub API", `${net.github}ms`);
   w("  Proxy", net.proxy || "none");
 
   // ── App State ─────────────────────────────────────────────────────────
@@ -74,7 +68,6 @@ export async function collectDebugInfo(opts: DebugInfoOpts): Promise<string> {
   w("Uptime", formatUptime(process.uptime()));
   w("Reader status", opts.readerState);
   w("Update status", opts.updateState.state);
-  w("Auth", opts.signedIn ? "signed in" : "signed out");
 
   const lb = opts.getLiveBounds();
   if (lb) {
@@ -152,7 +145,6 @@ export async function collectDebugInfo(opts: DebugInfoOpts): Promise<string> {
   w("RC variant", opts.isRc ? "yes" : "no");
   w("Launch on startup", s.launchOnStartup ?? false);
   w("opacity", s.opacity);
-  w("analyticsEnabled", s.analyticsEnabled);
 
   // ── Log tails ─────────────────────────────────────────────────────────
   await appendLogTail(lines, join(opts.outputDir, "meter.log"), "meter.log", 50);
@@ -167,8 +159,6 @@ export async function collectDebugInfo(opts: DebugInfoOpts): Promise<string> {
 interface NetworkReport {
   online: boolean;
   github: number;
-  tbhHelper: number;
-  discord: number;
   proxy: string | null;
 }
 
@@ -189,17 +179,11 @@ async function checkNetwork(): Promise<NetworkReport> {
     }
   };
 
-  const [github, tbhHelper, discord] = await Promise.all([
-    probe("https://api.github.com"),
-    probe("https://api.tbherohelper.com"),
-    probe("https://discord.com"),
-  ]);
+  const github = await probe("https://api.github.com");
 
   return {
-    online: github >= 0 || tbhHelper >= 0 || discord >= 0,
+    online: github >= 0,
     github,
-    tbhHelper,
-    discord,
     proxy: process.env.HTTPS_PROXY || process.env.HTTP_PROXY || null,
   };
 }

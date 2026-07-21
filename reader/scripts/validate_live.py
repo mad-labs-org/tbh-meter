@@ -17,7 +17,7 @@ VALIDATES (with the game OPEN and IN COMBAT on a stage):
                 identity gated on hero_cat (the ghost discriminator since 1.00.20)
   [hero-class]  each deployed hero resolves a plausible EEquipClassType (classId) via hero_cat
   [save-build]  pick_live_psd + read_gold>0 + read_heroes>=1 (the SAVE path that broke on 1.00.12)
-  [build-record] read_build (the heroes[] the run UPLOADS) >=1 hero AND >=1 with items[] OR skills[]
+  [build-record] read_build (the heroes[] the run RECORDS) >=1 hero AND >=1 with items[] OR skills[]
                  (proves ATTRIBUTES/ITEMS/EQUIPPED_* — not just HEROES) + read_account_snapshot
                  (runes/inventory/stash) not-all-None (proves RUNES/INVENTORY/STASH/ITEMS)
   [xp-live]     each deployed hero's level+xp DECODE from the ACTk cipher and the decoded LEVEL matches
@@ -173,7 +173,7 @@ def main():
     # [save-build] the run BUILD (heroes/items/runes) comes from the SAVE (pick_live_psd + read_heroes),
     # NOT from the live party above. This is WHERE 1.00.12 broke and shipped green: the bucket-box shifted
     # the PlayerSaveData lists (+0x10) → read_gold=0 → pick_live_psd=None → read_heroes={} →
-    # the run goes out with heroes=[] → the app doesn't upload (eligible requires heroes>0) → empty session.
+    # the run goes out with heroes=[] → an empty party in the run record.
     # [party-live] (the LIVE path) passed and MASKED this. This check exercises the SAVE path.
     psd = save.pick_live_psd(reader, psd_list)
     save_gold = save.read_gold(reader, psd) if psd else 0
@@ -181,11 +181,11 @@ def main():
     checks.append(("save-build", bool(psd) and save_gold > 0 and len(save_heroes) >= 1,
                    f"psd={'ok' if psd else 'None'} saveGold={save_gold} saveHeroes={len(save_heroes)}"))
 
-    # [build-record] the heroes[] the run ACTUALLY uploads doesn't come from read_heroes (above, just roster
+    # [build-record] the heroes[] the run ACTUALLY records doesn't come from read_heroes (above, just roster
     # sanity) nor from the live party — it comes from build.read_build, a THIRD read of the save that
     # re-derefs ATTRIBUTES/ITEMS/EQUIPPED_ITEMS/EQUIPPED_SKILLS to assemble each hero's gear+skills+level. A
-    # shift in any of those lists leaves heroes.length>0 (upload PASSES) yet EVERY hero goes up with empty
-    # items[]/skills[] — silent fleet-wide gear loss, invisible to [save-build] and [party-live].
+    # shift in any of those lists leaves heroes.length>0 (the check PASSES) yet EVERY hero is recorded with
+    # empty items[]/skills[] — silent fleet-wide gear loss, invisible to [save-build] and [party-live].
     # Requires >=1 hero AND >=1 with non-empty items[] OR skills[] (proves the lists beyond HEROES resolve).
     # And read_account_snapshot (runes/inventory/stash): if ALL THREE come back None, the snapshot path is
     # dead (RUNES/INVENTORY/STASH/ITEMS shifted) — silent empty inventory/stash on every run.

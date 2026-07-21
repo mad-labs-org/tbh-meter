@@ -94,7 +94,7 @@ export const Bg: React.FC = () => {
 export const Wordmark: React.FC = () => (
   <div style={{ position: "absolute", top: 52, left: 64, display: "flex", alignItems: "center", gap: 11, opacity: 0.9 }}>
     <span style={{ width: 11, height: 11, borderRadius: 3, background: GRAD }} />
-    <span style={{ fontSize: 21, fontWeight: 800, color: C.text }}>Task Bar <span style={{ color: C.b400 }}>Helper</span></span>
+    <span style={{ fontSize: 21, fontWeight: 800, color: C.text }}>TBH <span style={{ color: C.b400 }}>Meter</span></span>
   </div>
 );
 

@@ -105,7 +105,7 @@ def test_unread_xp_is_err():
 def test_party_off_makes_heroes_err():
     # Live party off the whole run: the reader passes heroes_ok=False -> heroes becomes err (not a silent
     # [] nor the save's roster). The converter flags issues.heroes and — heroes ∈ CRITICAL_FIELDS — seals
-    # the run degraded: does NOT go to the leaderboard, but shows in the app, flagged.
+    # the run degraded: does NOT count, but shows in the app, flagged.
     assert _rec(heroes=[], heroes_ok=False)["heroes"] == {
         "ok": False, "error": "party live off (StageManager unresolved)"}
     # contrast: live party OK -> ok(heroes), even an empty list (heroes_ok distinguishes "off" from content).

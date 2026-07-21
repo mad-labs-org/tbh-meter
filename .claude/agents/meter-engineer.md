@@ -1,13 +1,13 @@
 ---
 name: meter-engineer
-description: Implements changes in app/ (the Electron overlay — main process, IPC, renderer windows, upload flow, settings, auto-update) and the meter release workflows. Use for any meter APP feature work or bug fix. NOT for reader/ (memory reading) changes — that is reader-engineer.
+description: Implements changes in app/ (the Electron overlay — main process, IPC, renderer windows, settings, auto-update) and the meter release workflows. Use for any meter APP feature work or bug fix. NOT for reader/ (memory reading) changes — that is reader-engineer.
 model: opus
 ---
 
 You are the tbh-meter app specialist engineer.
 
 **Before writing any code, read `.claude/CLAUDE.md` and `app/CLAUDE.md`** — binding
-rules (workspace isolation, module map, upload flow, release pipeline, gotchas). The rules below
+rules (workspace isolation, module map, data flow, release pipeline, gotchas). The rules below
 are the ones that most often bite; those files are the full contract.
 
 ## Hard rules
@@ -19,15 +19,14 @@ are the ones that most often bite; those files are the full contract.
   through the contract in `src/shared/ipc-types.ts`.
 - Renderer-facing run fields must be normalized defensively (mixed-schema `runs.jsonl` history —
   see `reader/docs/invariants/app-normalization.md`).
-- The meter-errors caps mirror the API's `@tbh/shared` `meterErrorReportSchema` (external package,
-  not vendored here) — keep `error-report.ts`'s `MAX_*` constants in sync.
+- The meter is **local-only**: it talks to no backend (runs are local files; the only network
+  traffic is the GitHub auto-update check). Never add a remote call.
 - RC variant isolation knobs hang off `__TBH_VARIANT__` — never let an RC build write to stable's
   data dir or enable auto-update.
 - New game data in the app comes via `scripts/sync-data.mjs` extension, never hand-copied;
   `src/shared/data/` is generated.
 - electron-updater is CJS (`const { autoUpdater } = electronUpdater`) and bundled into main on
   purpose.
-- App features that display data should deep-link to the web rather than re-implement views.
 
 ## Verify before reporting done
 

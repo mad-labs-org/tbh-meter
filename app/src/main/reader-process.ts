@@ -1,10 +1,9 @@
 import { spawn, execFileSync, type ChildProcess } from "node:child_process";
 import { EventEmitter } from "node:events";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { app } from "electron";
 import { resolveOutputDir } from "./settings.js";
-import { reportError } from "./error-report.js";
 import {
   classifyOutcome,
   computeBackoffMs,
@@ -30,16 +29,15 @@ import type { ReaderState, ReaderStatus } from "../shared/ipc-types.js";
 // that reads the GAME's memory, which antivirus loves to terminate or quarantine. So:
 //   • spawn() is GUARDED — a synchronous EPERM throw (Node does NOT route EPERM through
 //     the 'error' event) used to escape and crash the main process; now it's a normal
-//     spawn-failure we report + back off from.
+//     spawn-failure we back off from.
 //   • respawns BACK OFF (computeBackoffMs) instead of a fixed 5s, so a reader AV kills
 //     every few seconds doesn't churn cold-restarts forever (which never converges and
 //     just leaves the UI on a false "Starting up").
-//   • after enough consecutive failures we surface a "blocked" status: auto-report ONCE
-//     (with a tail of recent reader+supervisor activity, since the relay otherwise never
-//     sees the reader at all) and let the UI tell the user it's likely AV, with Retry.
+//   • after enough consecutive failures we surface a "blocked" status and let the UI
+//     tell the user it's likely AV, with Retry.
 //
-// State is intentionally a handful of plain module vars (matching auto-update.ts /
-// auto-upload.ts) plus ONE pure derivation: getReaderState() reads them, nothing sets a
+// State is intentionally a handful of plain module vars (matching auto-update.ts)
+// plus ONE pure derivation: getReaderState() reads them, nothing sets a
 // status field. Late events from a superseded child are ignored by identity (proc===child).
 //
 // Platform guard: spawn ONLY on win32 AND only when the exe exists, so dev on macOS
@@ -52,29 +50,10 @@ const READER_HZ = "10";
 // "starting" instead of "offline" while a real resolve is in flight.
 const ENGAGED_RE = /attached|resolving|re-attaching|measuring/i;
 
-// --- app-side activity ring buffer ----------------------------------------- //
-// The reader writes its own timestamped meter.log on disk, but that never leaves the
-// user's machine; and the error relay only ever saw thrown exceptions, never the reader's
-// lifecycle. So we keep a small in-memory tail of reader stdout/stderr AND supervisor
-// events, and attach it to the blocked/spawn-failed report — turning a context-free
-// "spawn EPERM" into "here is exactly what the reader was doing".
-const LOG_RING_MAX = 80;
-const ring: string[] = [];
-
+/** Supervisor breadcrumb (spawn/end/respawn/healthy). Console-only: the reader's own
+ *  on-disk meter.log / reader-diag.log are the durable diagnostics. */
 function note(line: string): void {
-  ring.push(`${process.uptime().toFixed(1)}s ${line}`);
-  if (ring.length > LOG_RING_MAX) ring.splice(0, ring.length - LOG_RING_MAX);
-}
-
-/** Oldest-first tail of the ring within `maxChars` (the relay shows ~1k of it). */
-function ringTail(maxChars: number): string {
-  let out = "";
-  for (let i = ring.length - 1; i >= 0; i--) {
-    const next = out ? `${ring[i]}\n${out}` : ring[i];
-    if (next.length > maxChars) break;
-    out = next;
-  }
-  return out;
+  console.log(`[reader-supervisor] ${process.uptime().toFixed(1)}s ${line}`);
 }
 
 /** Forward each non-empty line of a child stream to `fn` (shared by stdout + stderr). */
@@ -101,8 +80,7 @@ let managing = false; // true between startReader and stopReader
 let respawnTimer: ReturnType<typeof setTimeout> | null = null;
 let healthyTimer: ReturnType<typeof setTimeout> | null = null;
 let failStreak = 0; // consecutive failures (0 = healthy); drives backoff + blocked
-let reportedThisEpisode = false; // sent a report for the current failure run already?
-let spawnedAt = 0; // Date.now() of the current attempt (for alive-time telemetry)
+let spawnedAt = 0; // Date.now() of the current attempt (for alive-time logging)
 let engaged = false; // this attempt printed an attach/resolve line -> it reached the game
 
 /** Reader status, DERIVED from the supervisor's facts — there is no status field to keep
@@ -181,69 +159,9 @@ function killAllReaders(): void {
   }
 }
 
-/** Read a tail of the on-disk reader logs from the output directory, concatenated into ONE blob the
- *  error relay attaches to the Discord report. Order + per-file budgets matter:
- *   - reader-diag.log — the decision SPINE (attach/resolve path + the build fingerprint, party-pick,
- *     run-close). The FIRST place to look for resolution / instance-pick problems, so it leads and
- *     gets the largest share — it carries the player's build `fp=`, the missing piece when a
- *     "can't calibrate / stuck on this version" report came in with no way to see their game build.
- *   - meter.log — the verbose timestamped event log.
- *   - live.json — the current raw live snapshot (~1×/s), replaced the old cooked meter_live.txt.
- *  The per-file budgets sum WELL under error-report's 50k `logs` cap, so the relay never truncates a
- *  whole file away. Best-effort: missing/unreadable files are silently omitted — never let a
- *  log-read failure block the error report. */
-export function readReaderLogs(): string {
-  const dir = resolveOutputDir();
-  const parts: string[] = [];
-  const files = [
-    ["reader-diag.log", 16_000],
-    ["meter.log", 28_000],
-    ["live.json", 2_000],
-  ] as const;
-  for (const [name, tail] of files) {
-    try {
-      const content = readFileSync(join(dir, name), "utf-8");
-      // Tail: if the file is larger than its budget, keep the last `tail` chars (most recent).
-      const slice = content.length > tail ? `...(truncated)\n${content.slice(-tail)}` : content;
-      parts.push(`=== ${name} ===\n${slice}`);
-    } catch {
-      // file missing or unreadable — omit silently
-    }
-  }
-  return parts.join("\n\n");
-}
-
-/** Fire the once-per-episode report when the reader can't be kept alive. Best-effort
- *  (reportError never throws): carries structured signals + a tail of recent activity. */
-function reportReaderTrouble(outcome: string, info: ExitInfo, aliveMs: number, errMsg?: string): void {
-  const exe = readerExePath();
-  const ctx = outcome === "spawn-failed" ? "reader:spawn-failed" : "reader:blocked";
-  const message =
-    outcome === "spawn-failed"
-      ? `Reader exe could not be launched (${errMsg ?? "spawn error"}) — likely antivirus ` +
-        `quarantined or locked tbh-reader.exe.`
-      : `Reader launched but was killed ${failStreak}× in a row (last alive ` +
-        `${(aliveMs / 1000).toFixed(1)}s, code=${info.exitCode} sig=${info.signal}); likely ` +
-        `antivirus terminating tbh-reader.exe.`;
-  reportError(
-    ctx,
-    { message, stack: ringTail(1900) },
-    {
-      failStreak: String(failStreak),
-      outcome,
-      lastExitCode: info.exitCode == null ? "null" : String(info.exitCode),
-      lastSignal: info.signal ?? "null",
-      lastAliveMs: String(Math.round(aliveMs)),
-      engaged: String(engaged),
-      exePresent: String(!!exe && existsSync(exe)),
-    },
-    readReaderLogs(),
-  );
-}
-
-/** End-of-attempt handler. Updates the streak, fires the once-per-episode report, and
- *  schedules the next attempt with backoff. The async callers gate on identity + null
- *  `child` first, so this runs once per attempt and never for a superseded one. */
+/** End-of-attempt handler. Updates the streak and schedules the next attempt with
+ *  backoff. The async callers gate on identity + null `child` first, so this runs
+ *  once per attempt and never for a superseded one. */
 function onAttemptEnd(info: ExitInfo, errMsg?: string): void {
   if (healthyTimer) {
     clearTimeout(healthyTimer);
@@ -259,14 +177,7 @@ function onAttemptEnd(info: ExitInfo, errMsg?: string): void {
   );
 
   if (isFailure(outcome)) {
-    if (failStreak === 0) reportedThisEpisode = false; // a fresh failure episode begins
     failStreak++;
-    // Report once per episode: immediately on a spawn-failure (the EPERM that used to crash
-    // the app — high signal), or the moment we first cross into blocked.
-    if (!reportedThisEpisode && (outcome === "spawn-failed" || isBlocked(failStreak))) {
-      reportedThisEpisode = true;
-      reportReaderTrouble(outcome, info, aliveMs, errMsg);
-    }
   } else {
     failStreak = 0; // clean exit (code 0): normal "no game open" poll, or a graceful stop
   }
@@ -377,18 +288,15 @@ export function startReader(): void {
   quitting = false;
   managing = true;
   failStreak = 0;
-  reportedThisEpisode = false;
   note("startReader");
   attemptSpawn();
 }
 
-/** Manual "Retry" from the blocked UI: forget the failure streak and respawn now (also
- *  re-arms reporting so a fresh failure episode reports again). */
+/** Manual "Retry" from the blocked UI: forget the failure streak and respawn now. */
 export function retryReader(): void {
   if (!managing || quitting) return;
   note("manual retry");
   failStreak = 0;
-  reportedThisEpisode = false;
   attemptSpawn(); // clears any pending respawn timer itself
 }
 

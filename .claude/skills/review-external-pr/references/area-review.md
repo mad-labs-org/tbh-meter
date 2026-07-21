@@ -65,18 +65,15 @@ Main-process code has Node/OS privileges the renderer must never get. State flow
 - **IPC surface**: a new `ipcMain.handle`/`ipcMain.on` handler must validate its arguments and must not
   turn renderer-supplied input into filesystem/shell/exec/network actions. `shell.openExternal` with a
   URL derived from untrusted data is a hole.
-- **The sensitive modules**: `auto-update.ts` (feed URL + signature verification — electron-updater is
-  CJS and bundled on purpose; disabled for the RC variant), `request-signer.ts` (Ed25519 signing of
-  `POST /runs`), `error-report.ts` + `share.ts` (what data is uploaded and where — `API_URL`). Changes
-  here are red-flags §C and escalate.
-- `error-report.ts` size caps mirror the API's `@tbh/shared meterErrorReportSchema` (an external package,
-  not vendored) — a change that desyncs the `MAX_*` constants breaks reports.
+- **The sensitive modules**: `auto-update.ts` (the update feed URL — electron-updater is CJS and
+  bundled on purpose; disabled for the RC variant) and `net-fetch.ts`. The app is otherwise
+  local-only — ANY new outbound call is red-flags §C and escalates.
 - **Gates**: `pnpm check` (eslint + tsc over both tsconfigs) and `pnpm test` (vitest; `pretest` syncs data).
 
 ## `app/` renderer (`src/renderer/`) — overlay / list / splash
 
-- **XSS**: untrusted run/leaderboard data rendered via `dangerouslySetInnerHTML`, or a URL/HTML string
-  built from server or run data, is an injection path. React escapes by default — a diff that opts out
+- **XSS**: untrusted run data rendered via `dangerouslySetInnerHTML`, or a URL/HTML string
+  built from run data, is an injection path. React escapes by default — a diff that opts out
   needs a hard reason.
 - **The i18n every-key guard**: adding a UI string means the en-us key must be added to **all** locale
   dicts or `pnpm test` (`i18n.test.ts`) goes red — runtime falls back to English but the *test* does not.

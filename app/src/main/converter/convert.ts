@@ -58,7 +58,7 @@ function unwrap<T>(field: Field<T>, fallback: T, name: string, issues: Record<st
  *  recovered). The 1.00.10 bug is exactly this: `gold_gained` err. We also treat an unreadable
  *  `stageKey` or `total_damage` as degrading — without them the run can't be ranked or shown
  *  meaningfully. `heroes` err means the live party was unresolved (StageManager off): who played is
- *  unknown, so the run must NOT reach the leaderboard — it still shows locally, marked (the reader
+ *  unknown, so the run must NOT count — it still shows, marked (the reader
  *  emits heroes:err instead of dumping the save roster; see party-live-resolution).
  *  (Stage sub-fields like act/stageNo failing show as "?", not degraded — cosmetic.) */
 const CRITICAL_FIELDS = ["gold_gained", "stageKey", "total_damage", "heroes"] as const;
@@ -206,7 +206,7 @@ export function convert(raw: AnyRawRun): RunRecord {
   const record: RunRecord = {
     id: raw.id,
     ts: raw.ts,
-    // v1: reader-owned session id, passed through (external_id = id continuity). v2: the reader no
+    // v1: reader-owned session id, passed through (id continuity). v2: the reader no
     // longer emits a session — it's DERIVED by the app from run timestamps — so this is "" and the
     // app attaches the derived sessionId at read/index time (PR4). Never re-minted in the converter.
     sessionId: raw.raw_schema_version === 1 ? raw.session_id : "",

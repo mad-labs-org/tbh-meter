@@ -4,9 +4,7 @@ import { getReaderStatus, readerEvents, getReaderState, retryReader } from "./re
 import type { LiveSnapshot } from "../shared/run-types.js";
 import type { ReaderStatus, AppSettings } from "../shared/ipc-types.js";
 import { getSettings, updateSettings, resolveOutputDir, applyLaunchOnStartup, sanitizeRoute } from "./settings.js";
-import { getAnalyticsClientId } from "./analytics-id.js";
 import { clampCooldownMin } from "../shared/ipc-types.js";
-import { tMain } from "./i18n.js";
 import { listRuns, getRun, clearAllRuns, pruneToMaxRuns } from "./runs-store.js";
 import { getRunsSource, setFavoritePredicate } from "./sources/runs-source.js";
 import { isFavorite, toggleFavorite, invalidateFavoritesCache } from "./favorites-store.js";
@@ -27,12 +25,8 @@ import {
   updaterSupported,
   checkForUpdates,
 } from "./auto-update.js";
-import { initAuth, getStatus, signIn, signOut } from "./auth.js";
-import { shareRun, getShareStatus } from "./share.js";
-import { reportError } from "./error-report.js";
-import { requestUploadNow, countPendingRuns } from "./auto-upload.js";
-import { isValidSessionId, sessionStatsUrl, requestSessionReset } from "./session-stats.js";
-import { SITE_URL, DISCORD_INVITE_URL } from "./config.js";
+import { requestSessionReset } from "./session-stats.js";
+import { DISCORD_INVITE_URL, GITHUB_ORG_URL } from "./config.js";
 import { broadcast } from "./broadcast.js";
 
 interface IpcDeps {
@@ -74,9 +68,6 @@ export function registerIpcHandlers(deps: IpcDeps): void {
   // Single source of truth: app.getVersion() reads package.json's version, the same
   // field CI writes the computed release version into (see scripts/compute-version.mjs).
   ipcMain.handle("meter:get-app-version", () => app.getVersion());
-
-  // Stable per-install GA4 client_id for the overlay's usage analytics (analytics.ts).
-  ipcMain.handle("meter:get-analytics-id", () => getAnalyticsClientId());
 
   ipcMain.handle("meter:get-settings", () => getSettings());
 
@@ -144,13 +135,6 @@ export function registerIpcHandlers(deps: IpcDeps): void {
     if (typeof boxKey === "number") hideCooldownInOverlay(boxKey);
   });
   ipcMain.on("meter:clear-cooldowns", () => clearAllCooldowns());
-  // Open the web wiki's stage page for a stageKey. The numeric key resolves on the site and
-  // 301-redirects to the readable slug, so no slug is computed here. URL is built from
-  // SITE_URL (never escapes the allowlisted origin).
-  ipcMain.on("meter:open-stage-page", (_event, stageKey: unknown) => {
-    if (typeof stageKey !== "number" || !Number.isFinite(stageKey)) return;
-    void shell.openExternal(`${SITE_URL}/stages/${stageKey}`);
-  });
 
   ipcMain.handle("meter:open-list-window", () => {
     deps.openListWindow();
@@ -202,96 +186,20 @@ export function registerIpcHandlers(deps: IpcDeps): void {
     BrowserWindow.fromWebContents(event.sender)?.close();
   });
 
-  // --- Auth (Discord OAuth, main-process only) --------------------------------
-  // initAuth broadcasts the restored auth status and fires onSignedIn if a JWT
-  // session was restored from disk -> "meter:auth-changed" reaches the renderer.
-  initAuth();
-  ipcMain.handle("meter:auth-get-status", () => getStatus());
-  ipcMain.handle("meter:auth-sign-in", async () => {
-    try {
-      await signIn();
-    } catch (err) {
-      // Surface nothing to the renderer here; the auth-changed broadcast (or its
-      // absence) reflects the outcome. Log for diagnostics.
-      console.warn(`[auth] sign-in failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  });
-  ipcMain.handle("meter:auth-sign-out", () => signOut());
-  // Pending-sync backlog size: how many local runs are queued but not uploaded.
-  // The renderer uses it to prompt a signed-out user whose runs are silently piling
-  // up locally (issue #60).
-  ipcMain.handle("meter:get-pending-sync-count", () => countPendingRuns());
-
-  // --- Leaderboard sharing ----------------------------------------------------
-  ipcMain.handle("meter:share-run", (_event, runId: string) => shareRun(String(runId)));
-  ipcMain.handle("meter:get-share-status", (_event, runId: string) =>
-    getShareStatus(String(runId)),
-  );
-
-  // Open an allowlisted URL externally. Validate the origin so the renderer can
+  // Open an allowlisted URL externally. Validate the target so the renderer can
   // NOT ask the main process to open an arbitrary URL.
   ipcMain.on("meter:open-external", (_event, url: unknown) => {
-    if (typeof url !== "string") return;
-    if (!url.startsWith(SITE_URL) && url !== DISCORD_INVITE_URL) return;
+    if (url !== DISCORD_INVITE_URL && url !== GITHUB_ORG_URL) return;
     void shell.openExternal(url);
   });
 
-  // Open the website's session-stats dashboard. An explicit sessionId arg is
-  // validated; without one (or an invalid one), resolve the newest run's session.
-  // The URL is always built from SITE_URL + an encoded, colon-free sessionId, so
-  // it can never escape the allowlisted origin.
-  ipcMain.handle("meter:open-session-stats", async (event, arg: unknown) => {
-    const sessionId = isValidSessionId(arg) ? arg : getRunsSource().all()[0]?.sessionId;
-    if (!isValidSessionId(sessionId)) return; // nothing resolvable → no-op
-    // Upload requires sign-in (Phase 2): while signed out NOTHING is uploaded, so
-    // the website's session page would be empty (#252). Offer sign-in first — the
-    // auto-uploader drains the local backlog (including this session's runs) right
-    // after — instead of opening a dead-end page.
-    if (!(await getStatus()).signedIn) {
-      const win = BrowserWindow.fromWebContents(event.sender);
-      const opts = {
-        type: "warning" as const,
-        title: tMain("dialog.notSignedInTitle"),
-        message: tMain("dialog.notSignedInMsg"),
-        detail: tMain("dialog.notSignedInDetail"),
-        buttons: [tMain("common.signInDiscord"), tMain("dialog.openAnyway"), tMain("common.cancel")],
-        defaultId: 0,
-        cancelId: 2,
-        noLink: true,
-      };
-      const { response } = win
-        ? await dialog.showMessageBox(win, opts)
-        : await dialog.showMessageBox(opts);
-      if (response === 2) return;
-      if (response === 0) {
-        // Resolves when the browser OAuth flow completes; abandoning it (or a
-        // failure) leaves us signed out -> don't open the empty page.
-        await signIn().catch(() => {});
-        if (!(await getStatus()).signedIn) return;
-      }
-    }
-    // Freshen the page: fire-and-forget an immediate upload sweep before opening.
-    requestUploadNow();
-    void shell.openExternal(sessionStatsUrl(SITE_URL, sessionId));
-  });
-
-  // "New session" (#220): drop the flag file the reader consumes (~1s) to rotate the
-  // session id. Local runs and already-uploaded runs are untouched.
+  // "New session" (#220): record a session cut so subsequent runs start a fresh
+  // session. Local history is untouched.
   ipcMain.handle("meter:reset-session", () => requestSessionReset(resolveOutputDir()));
 
   // The CURRENT session = the session of the newest run, DERIVED app-side (Redesign 2) — same source
   // as the session-stats URL above (not the reader's vestigial session.json). null when no runs yet.
   ipcMain.handle("meter:get-current-session", () => getRunsSource().all()[0]?.sessionId ?? null);
-
-  // Renderer error reports (window error / unhandledrejection) -> Discord webhook.
-  // Inputs are untrusted: type-check and cap before forwarding.
-  ipcMain.on("meter:report-error", (_event, context: unknown, message: unknown, stack: unknown) => {
-    if (typeof context !== "string" || typeof message !== "string") return;
-    reportError(`renderer:${context.slice(0, 80)}`, {
-      message: message.slice(0, 1000),
-      stack: typeof stack === "string" ? stack.slice(0, 2000) : undefined,
-    });
-  });
 
   // Favorite predicate (Feature 3): wire the sidecar lookup into the source's index projection so
   // every listIndex() stamps `favorite`. Done before the first reload below so the initial list

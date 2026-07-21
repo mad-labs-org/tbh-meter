@@ -6,9 +6,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "common.cancel": "Скасувати",
   "common.close": "Закрити",
   "common.reset": "Скинути",
-  "common.signOut": "Вийти",
-  "common.signInDiscord": "Увійти через Discord",
-  "common.waitingBrowser": "Очікування браузера…",
 
   // ── Live overlay ──
   "live.pillStarting": "Запуск",
@@ -17,10 +14,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.offlineMsg": "Метер офлайн — відкрийте Task Bar Hero",
   "live.blockedMsg": "Рідер заблоковано — можливо, його закриває антивірус.",
   "live.retry": "Повторити",
-  "live.statusLive": "Live",
-  "live.statusOffline": "Офлайн",
-  "live.syncLive": "Live — забіги завантажуються до таблиці лідерів",
-  "live.syncOff": "Без синхронізації — увійдіть, щоб завантажувати забіги",
   "live.dps": "DPS",
   "live.mobs": "Моби",
   "live.gold": "Золото",
@@ -39,7 +32,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.expandTitle": "Розгорнути",
   "live.pinTitle": "Поверх усіх вікон (натисніть, щоб вимкнути)",
   "live.unpinTitle": "Не поверх вікон (натисніть, щоб закріпити метер поверх інших вікон)",
-  "live.sessionStats": "Статистика сесії",
   "live.openLogs": "Відкрити логи",
   "live.dragResize": "Потягніть, щоб змінити ширину",
   "live.dragScale": "Потягніть, щоб змінити масштаб метера",
@@ -55,15 +47,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "splash.tipLabel": "Порада:",
   "splash.tip1": "Перетягніть метер за ручку зліва, щоб перемістити його.",
   "splash.tip2": "Вступіть у бій, щоб бачити свій DPS у реальному часі.",
-  "splash.tip3": "Після входу забіги завантажуються до таблиці лідерів автоматично.",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "Метер лише ЧИТАЄ пам'ять гри — він ніколи нічого не записує.",
 
   // ── Window headers ──
   "header.tabRuns": "Забіги",
   "header.tabTracker": "Трекер",
   "header.tabSettings": "Налаштування",
-  "header.signIn": "Увійти",
-  "header.signedIn": "Ви увійшли",
   "header.appVersion": "Версія застосунку",
   "header.restartToUpdate": "Перезапустити для оновлення",
   "header.updateReady": "Оновлення v{version} готове",
@@ -95,7 +85,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.startupDesc": "Автоматично відкриває метер під час запуску Windows.",
   "settings.runFilter": "Фільтр забігів",
   "settings.runFilterDesc":
-    "Виберіть, які забіги видно у списку. Лише локально — таблиця лідерів не змінюється.",
+    "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "Приховувати ігноровані забіги",
   "settings.hideIgnoredDesc":
     "Пропущені, часткові та неповні забіги лишаються прихованими. Вони все одно йдуть у залік сесії, і їх завжди можна показати зі списку.",
@@ -107,15 +97,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.maxRunsDesc":
     "Тримає на цьому комп'ютері не більше ніж стільки забігів. У разі перевищення найстаріші видаляються автоматично. Улюблені забіги завжди зберігаються й не враховуються в ліміті.",
   "settings.maxRunsUnit": "забігів",
-  "settings.leaderboard": "Таблиця лідерів",
-  "settings.signedInAs": "Ви увійшли як",
-  "settings.uploadAuto": "Успішні забіги завантажуються автоматично.",
-  "settings.signInPitch":
-    "Увійдіть через Discord у шапці, щоб потрапити до таблиці лідерів TBH Helper. Вхід також прив'яже забіги, вже завантажені анонімно з цього комп'ютера.",
-  "settings.usageStats": "Статистика використання",
-  "settings.usageStatsLabel": "Ділитися анонімною статистикою використання",
-  "settings.usageStatsDesc":
-    "Допомагає нам бачити, скільки людей використовують метер (анонімно, через Google Analytics). Жодних особистих даних і деталей забігів. Вимкніть, щоб повністю відмовитися.",
+  "settings.diagnostics": "Diagnostics",
   "settings.diagnosticsLog": "Журнал діагностики",
   "settings.diagnosticsLogDesc": "Збір діагностичної інформації для звітів про помилки. Особисті дані не включаються.",
   "diagnostics.collecting": "Збір діагностики...",
@@ -126,11 +108,11 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "diagnostics.backToSettings": "Повернутися до налаштувань",
   "settings.runHistory": "Історія забігів",
   "settings.runHistoryDesc":
-    "Видаляє всі забіги, збережені на цьому комп'ютері. Забіги, вже надіслані до таблиці лідерів, не зачіпаються й лишаються в мережі.",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "Очистити історію забігів",
   "settings.clearConfirmTitle": "Очистити історію забігів?",
   "settings.clearConfirmBody":
-    "Це видалить усі забіги цього метера, включно з архівом логів. Скасувати не можна.Улюблені забіги зберігаються.  Забіги, вже надіслані до таблиці лідерів, лишаться там.",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "Не вдалося очистити історію. Спробуйте ще раз.",
   "settings.clearing": "Очищення…",
   "settings.deleteAll": "Видалити всі забіги",
@@ -168,13 +150,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "runs.newSession": "Нова сесія",
   "runs.newSessionConfirm": "Підтвердити?",
   "runs.newSessionTitle":
-    "Завершує поточну сесію. Наступні забіги почнуть нову; вже завантажені забіги лишаються на сайті.",
-  "runs.sessionStats": "Статистика сесії",
-  "runs.sessionStatsTitle": "Відкриває статистику поточної сесії у браузері",
-  "runs.hintNoRunsCurrent":
-    "У поточній сесії ще немає забігів. Завершіть забіг — і він з'явиться на сайті.",
-  "runs.hintNoRuns":
-    "Завершіть хоча б один забіг. Сесія зберігається на сайті, щойно в ній є завершений забіг.",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "Жоден забіг не проходить фільтр",
   "runs.showIgnoredOne": "Показати {count} ігнорований забіг",
   "runs.showIgnoredMany": "Показати ігноровані забіги: {count}",
@@ -220,15 +196,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "detail.drops": "Дроп",
   "detail.chestsOne": "{count} скриня",
   "detail.chestsMany": "Скринь: {count}",
-  "detail.shareView": "Відкрити на TBH Helper",
-  "detail.sharing": "Надсилання…",
-  "detail.shareBtn": "Надіслати до таблиці лідерів",
-  "detail.shareSignIn": "Увійдіть через Discord, щоб поділитися",
-  "detail.shareError": "Щось пішло не так. Спробуйте ще раз.",
-  "detail.fullDetails":
-    "Потрібен повний розбір? Загін зі спорядженням, навичками та статами кожного героя — на сторінці забігу на TBH Helper.",
-  "detail.fullDetailsShare": "Надішліть забіг, щоб переглянути його на сайті.",
-  "detail.viewFull": "Усі деталі",
   "detail.xpByHero": "Досвід за героями",
   "detail.heroLv": "Рів. {level}",
   "detail.levelUp": "Підвищення рівня",
@@ -240,30 +207,30 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "status.abandoned": "Покинутий",
   "quality.partialLabel": "Частковий",
   "quality.partialTitle":
-    "Метер під'єднався до забігу вже під час нього, тому підсумки занижені. Забіг не надіслано до таблиці лідерів.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "Пошкоджений",
   "quality.degradedTitle":
-    "Частину значень не вдалося прочитати, тому цифри можуть бути хибними. Забіг не надіслано до таблиці лідерів.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "Недійсний",
   "quality.skippedTitle":
-    "Це не валідне проходження (закоротке, поразка або вихід), тому забіг не зараховано й не надіслано до таблиці лідерів.",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "Трекер синьої скрині",
@@ -278,7 +245,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.showHistory": "Показати історію",
   "cooldowns.showingRecent": "показано останні {shown} з {total}",
   "cooldowns.stageLabel": "Етап {code}",
-  "cooldowns.openStage": "Відкрити цей етап на сайті",
   "cooldowns.ready": "Готова",
   "cooldowns.readyCheck": "✓ Готова",
   "cooldowns.remove": "Прибрати (повернеться з наступним дропом)",
@@ -310,30 +276,10 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "notifications.actBossTitle": "Випала скриня боса акту",
   "notifications.actBossBody": "{where}: щойно випала скриня боса акту.",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "Діліться забігами в таблиці лідерів",
-  "signin.body":
-    "Ви не увійшли, тож ваші забіги залишаються на цьому комп'ютері й не потрапляють до таблиці лідерів. Увійдіть через Discord, щоб синхронізувати їх і щоб вони зараховувалися в таблиці лідерів та вашому профілі.",
-  "signin.dontShow": "Більше не показувати",
-  "signin.notNow": "Не зараз",
-
-  "signin.pendingTitle": "Ваші забіги не синхронізуються",
-  "signin.pendingBody":
-    "Ви вийшли з облікового запису, тож завершені забіги перестали потрапляти до таблиці лідерів ({count} очікують локально). Увійдіть, щоб синхронізувати їх.",
-  "signin.expiredTitle": "Ваша сесія завершилася",
-  "signin.expiredBody":
-    "Ви вийшли з облікового запису, тож ваші забіги перестали синхронізуватися з таблицею лідерів. Вони зберігаються локально. Увійдіть знову, щоб продовжити.",
   // ── Tray menu ──
   "tray.showLive": "Показати live-метер",
   "tray.openRuns": "Відкрити забіги",
   "tray.quit": "Вийти",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "Ви не увійшли",
-  "dialog.notSignedInMsg": "Ваші забіги не завантажуються на сайт.",
-  "dialog.notSignedInDetail":
-    "Сторінка сесії буде порожньою. Увійдіть через Discord, щоб завантажувати забіги. Забіги без входу (включно із цієї сесії) завантажаться одразу після входу.",
-  "dialog.openAnyway": "Все одно відкрити",
 
   // ── Chests / drops ──
   "chest.fallback": "Скриня",

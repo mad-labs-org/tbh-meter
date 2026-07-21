@@ -72,11 +72,11 @@ describe("STRUCTURED v1 contract", () => {
     expect(STRUCTURED_V1_EXAMPLE.dps).toBeCloseTo(expected, 2);
   });
 
-  it("carries the run id verbatim from its raw (external_id continuity)", () => {
+  it("carries the run id verbatim from its raw (id continuity)", () => {
     expect(STRUCTURED_V1_EXAMPLE.id).toBe(RAW_V1_EXAMPLE.id);
   });
 
-  it("the run id is sessionId:run (the external_id shape the leaderboard dedups on)", () => {
+  it("the run id is sessionId:run (the stable run identity)", () => {
     expect(STRUCTURED_V1_EXAMPLE.id).toBe(
       `${STRUCTURED_V1_EXAMPLE.sessionId}:${STRUCTURED_V1_EXAMPLE.run}`,
     );

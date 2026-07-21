@@ -8,7 +8,7 @@ has in ~/tbh-dump), that if an offset/enum/seed index regresses the way it actua
 3 historical bugs, the gate GOES RED. It's the "test the alarm with real smoke": each test re-enacts a
 real breakage — chiefly 1.00.12, where the bucket-box inserted fields into PlayerSaveData and the gold
 list dropped to where CURRENCIES used to sit, with `BoxBucketUseBoxList` taking the old offset (0x28),
-and the presence-only check passed GREEN and shipped the fleet-wide upload breakage.
+and the presence-only check passed GREEN and shipped the fleet-wide broken run records.
 
 dump.cs lives OUTSIDE the repo (on the maintainer's machine) — so these tests SKIP where it doesn't
 exist (CI/contributor) and RUN where it does (the maintainer's Mac + the meter-game-update skill). That
@@ -158,7 +158,7 @@ class TestOffsetCorruptionCaught:
         assert "ATTRIBUTES" in out
 
     def test_hero_list_shift_caught_on_named_class(self, monkeypatch):
-        """The save's hero list (HEROES) is the root of the upload breakage (heroes=[] → eligible() skips).
+        """The save's hero list (HEROES) is the root of the empty-party breakage (heroes=[] in every record).
         Shifting it to 0x48 lands on `backendPostList` (a DIFFERENT named list, 1.00.23) → WRONG FIELD."""
         monkeypatch.setattr(O.PlayerSaveData, "HEROES", 0x48)
         rc, out = _run_dump()

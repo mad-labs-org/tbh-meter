@@ -29,8 +29,6 @@ Out of scope:
 
 - The Task Bar Hero game itself. This is an unaffiliated fan project; report game issues to the
   game's developer.
-- The Task Bar Hero Wiki / leaderboard API (a separate project at tbherohelper.com). The meter only
-  *calls* its public HTTP endpoints — report API/website issues there.
 - Dependency advisories with no demonstrated exploit in this project.
 - Findings that require an already-compromised machine or physical access.
 
@@ -43,7 +41,8 @@ which is the most common false-positive reported by antivirus software.
 
 ## How secrets are handled
 
-No credentials are committed to this repository. The app talks only to public endpoints
-(`api.tbherohelper.com`) and stores its own per-user auth token locally in the OS user-data
-directory. A [gitleaks](https://github.com/gitleaks/gitleaks) scan runs in CI on every pull request
-and push to keep the history secret-free (config: [`.gitleaks.toml`](../.gitleaks.toml)).
+No credentials are committed to this repository, and the app holds none: it is fully local
+(runs are files on the user's machine) and its only network traffic is the auto-update check
+against GitHub Releases. A [gitleaks](https://github.com/gitleaks/gitleaks) scan runs in CI on
+every pull request and push to keep the history secret-free (config:
+[`.gitleaks.toml`](../.gitleaks.toml)).

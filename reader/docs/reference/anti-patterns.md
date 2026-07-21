@@ -26,7 +26,7 @@ the "this smells bad" trigger.)
 | `xp = heroes_end[k] - heroes_start[k]` (raw delta from the save) | the save lags → 0 or 2x on autosave | [[invariants/metric-fallback-chains]] |
 | `return gain or 0` after `run_gain()` | conflates None (read failure) with 0 (valid zero gain) | [[invariants/metric-fallback-chains]] |
 | `if gold == 0: mark_partial` | hides COMPLETE runs when the live read fails | [[invariants/run-lifecycle]] |
-| `partial = total_damage == 0` (instead of `<= 0`) | reopens #163 (x-10 with all-zeros on the leaderboard) | [[invariants/run-lifecycle]] |
+| `partial = total_damage == 0` (instead of `<= 0`) | reopens #163 (x-10 recorded with all-zeros) | [[invariants/run-lifecycle]] |
 | skip by `EStageType.ACTBOSS` instead of `stage != 10` (StageNo) | different signals → discards a legit x-10 | [[invariants/run-lifecycle]] |
 | new run field set only in `close_run` (not in `new_run`) | leaks the previous run's value | [[invariants/run-lifecycle]] |
 | reading the Unit's 12 core stats at runtime (`CORE_STATS_OBSCURED`) | ObscuredFloat (XOR) → garbage; use FLAT `FINAL_STATS` | [[invariants/obscured-data-offlimits]] |

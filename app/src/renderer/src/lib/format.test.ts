@@ -10,10 +10,10 @@ describe("qualityBadge", () => {
     expect(qualityBadge("skipped")?.label).toBe("Invalid");
   });
 
-  it("explains in its title that the run is not on the leaderboard", () => {
-    expect(qualityBadge("partial")?.title).toMatch(/leaderboard/i);
-    expect(qualityBadge("degraded")?.title).toMatch(/leaderboard/i);
-    expect(qualityBadge("skipped")?.title).toMatch(/leaderboard/i);
+  it("explains the verdict in its title", () => {
+    expect(qualityBadge("partial")?.title).toMatch(/under-counted/i);
+    expect(qualityBadge("degraded")?.title).toMatch(/could not be read/i);
+    expect(qualityBadge("skipped")?.title).toMatch(/does not count/i);
   });
 
   it("tints invalid runs (degraded, skipped) red and partial runs amber", () => {
@@ -41,7 +41,7 @@ describe("runOutcomeBadge — one distinct marker per (status, quality)", () => 
     expect(badge?.iconClass).toBe("text-rose-400");
     expect(badge?.rowClass).toBe("bg-rose-500/10");
     expect(badge?.label).toBe("Bugged");
-    expect(badge?.title).toMatch(/leaderboard/i);
+    expect(badge?.title).toMatch(/could not be read/i);
   });
 
   it("maps a wipe (status fail) to Skull / red", () => {
@@ -113,7 +113,7 @@ describe("runOutcomeBadge — one distinct marker per (status, quality)", () => 
     expect(runOutcomeBadge("abandoned", undefined)?.Icon).toBe(LogOut);
   });
 
-  it("gives every non-counted outcome a title mentioning the leaderboard", () => {
+  it("gives every non-counted outcome an explanatory title", () => {
     const combos: [RunStatus, RunQuality | undefined][] = [
       ["success", "degraded"],
       ["fail", "skipped"],
@@ -122,7 +122,8 @@ describe("runOutcomeBadge — one distinct marker per (status, quality)", () => 
       ["success", "skipped"],
     ];
     for (const [status, quality] of combos) {
-      expect(runOutcomeBadge(status, quality)?.title).toMatch(/leaderboard/i);
+      const title = runOutcomeBadge(status, quality)?.title ?? "";
+      expect(title.length).toBeGreaterThan(20);
     }
   });
 

@@ -27,7 +27,6 @@ import {
   readerWillRun,
   getReaderState,
   getReaderStatus,
-  readReaderLogs,
 } from "./reader-process.js";
 import type { ReaderStatus } from "../shared/ipc-types.js";
 import type { LiveSnapshot } from "../shared/run-types.js";
@@ -43,9 +42,6 @@ import {
   shouldForceDismissSplash,
   SEARCHING_DISMISS_MS,
 } from "../shared/splash-decide.js";
-import { startAutoUpload, stopAutoUpload, notifySignedIn } from "./auto-upload.js";
-import { onSignedIn } from "./auth.js";
-import { installGlobalErrorReporting } from "./error-report.js";
 import { installCrashRecovery } from "./crash-recovery.js";
 import { isRcBuild } from "./variant.js";
 import { collectDebugInfo } from "./debug-info.js";
@@ -69,20 +65,15 @@ async function getIngestor(): Promise<Ingestor> {
 }
 
 // Side-by-side RC variant: claim its own app identity BEFORE anything reads a name-derived
-// path, so userData (settings, auth, uploads) lands in %APPDATA%\tbh-meter-rc and never
+// path, so userData (settings) lands in %APPDATA%\tbh-meter-rc and never
 // mixes with the real install (which would otherwise share settings.json — including a
 // custom outputDir — and break the data isolation). No-op for stable: the name is already
 // "tbh-meter", so existing installs' userData path is unchanged.
 app.setName(isRcBuild() ? "tbh-meter-rc" : "tbh-meter");
 
-// Discord webhook error reporting (no Sentry/Datadog) — installed before anything
-// else can fail so startup crashes are reported too. The reader-log tail (reader-diag.log +
-// meter.log + live.json) rides along on every report so a Discord post is self-sufficient to debug.
-installGlobalErrorReporting(readReaderLogs);
 // Recover from renderer-process crashes (Electron-42 transparent-overlay GPU cascade):
 // reload a renderer that died mid-session so the window comes back instead of sitting
-// blank forever. Separate from reporting above — recovery changes crash semantics, which
-// error-report.ts is explicitly not allowed to do. Loop-guarded against a reload storm.
+// blank forever. Loop-guarded against a reload storm.
 installCrashRecovery();
 
 let liveWin: BrowserWindow | null = null;
@@ -459,15 +450,6 @@ const liveDrag = createLiveDrag({
 // --------------------------------------------------------------------------- //
 
 app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
-  // Dev-only mocked API (pnpm dev:mock): intercept the main process's global fetch with MSW
-  // BEFORE any network call (auth/upload/update/error relay all fire below), so the meter runs
-  // end-to-end with no backend. The `import.meta.env.DEV` guard makes electron-vite dead-code-
-  // eliminate this block — and the dynamic import — from the production build, so MSW never ships.
-  if (import.meta.env.DEV && process.env.TBH_MOCK_API === "1") {
-    const { startMockApi } = await import("../mocks/node.js");
-    startMockApi();
-  }
-
   // a second instance is quitting (runIfPrimary skips this) — it must never reach
   // startReader, which would race a second reader against the primary before the quit lands.
   // Match the variant's appId so Windows treats the RC as a distinct app (its own taskbar
@@ -499,10 +481,6 @@ app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
     // best effort — never crash startup over a directory create failure
   }
 
-  // Watermark init + immediate upload on sign-in. Must be registered before
-  // registerIpcHandlers -> initAuth, which fires onSignedIn for a restored session.
-  onSignedIn(notifySignedIn);
-
   registerIpcHandlers({
     applyLiveSettings: () => {
       if (liveWin && !liveWin.isDestroyed()) {
@@ -532,7 +510,6 @@ app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
     },
     resetLiveWindow,
     debugInfo: async () => {
-      const { getStatus } = await import("./auth.js");
       return collectDebugInfo({
         getLiveBounds: () => {
           if (!liveWin || liveWin.isDestroyed()) return null;
@@ -547,7 +524,6 @@ app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
         splashActive,
         readerState: getReaderState(),
         updateState: getUpdateStatus(),
-        signedIn: (await getStatus()).signedIn,
         settings: getSettings(),
         outputDir: resolveOutputDir(),
         isRc: isRcBuild(),
@@ -632,7 +608,7 @@ app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
   // Converter (PR3): the reader now writes raw/<id>.json (PR2) instead of appending runs.jsonl,
   // so the Ingestor — not the old runs.jsonl mirror — OWNS logs/. On boot it ingests raw/ ->
   // logs/ (converting any run with no/stale structured log) AND migrates the legacy runs.jsonl into
-  // logs/ preserving each external_id; it then watches raw/ for new runs. App-read of logs/ is PR4.
+  // logs/ preserving each run id; it then watches raw/ for new runs. App-read of logs/ is PR4.
   const ingestor = await getIngestor();
   ingestor.setDir(dir);
   ingestor.start();
@@ -647,9 +623,6 @@ app.whenReady().then(() => runIfPrimary(isPrimaryInstance, async () => {
   // install / mid-flight / within the cooldown (all gated inside checkForUpdatesThrottled).
   app.on("browser-window-focus", () => checkForUpdatesThrottled());
   powerMonitor.on("resume", () => checkForUpdatesThrottled());
-
-  // Background auto-upload of new successful runs while signed in (no-op signed out).
-  startAutoUpload();
 
   app.on("activate", () => {
     if (liveWin && !liveWin.isDestroyed()) {
@@ -677,7 +650,6 @@ app.on("will-quit", () => runIfPrimary(isPrimaryInstance, () => {
   // Stop the reader (suppress respawn + kill the tree) BEFORE the sources stop, so
   // no late writes race the shutdown.
   stopReader();
-  stopAutoUpload();
   getRunsSource().stop();
   getLiveSource().stop();
   _ingestor?.stop();

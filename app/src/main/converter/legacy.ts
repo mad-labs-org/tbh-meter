@@ -4,9 +4,9 @@
 // (migration & continuity). Same mechanics as convert(), different input shape.
 //
 // TWO invariants this branch exists to hold:
-//  1. PRESERVE the external_id. A legacy record already has its `session_id:run` identity (and was
-//     possibly already uploaded under it). We carry that id VERBATIM — never re-mint — or the app
-//     would re-upload the migrated run as a NEW row and duplicate it on the leaderboard.
+//  1. PRESERVE the id. A legacy record already has its `session_id:run` identity. We carry that
+//     id VERBATIM — never re-mint — or a re-run of the migration would adopt the same run under a
+//     NEW id and duplicate it in logs/.
 //  2. The bugged records stay, marked honest. The 1.00.10 window wrote runs with `gold: 0` + mode
 //     "?" — values that never existed and can't be recovered. We don't delete them (the user would
 //     think the meter ate their runs) and we don't pretend they're good — we seal them `degraded`
@@ -15,7 +15,7 @@
 // It reuses the battle-tested `normalizeRecord` (runs-source.ts) for all the era field-mapping (PT
 // vs EN status, v5/v6/v7/v8 hero shapes, drops/deaths added per era) rather than re-deriving it —
 // then layers ONLY the converter's additions on top: the quality verdict + issues + the structured
-// schema stamp. `normalizeRecord` already builds the `session_id:run` id, so the external_id is
+// schema stamp. `normalizeRecord` already builds the `session_id:run` id, so the identity is
 // preserved for free.
 
 import type { RunRecord } from "../../shared/run-types.js";
@@ -40,11 +40,11 @@ function legacyDegradeIssues(r: RunRecord): Record<string, string> {
 }
 
 /** Convert ONE legacy `runs.jsonl` record (any era, schema <= 11) into a structured RunRecord,
- *  preserving its external_id. `lineIndex` is only an id fallback (passed to normalizeRecord) for a
+ *  preserving its id. `lineIndex` is only an id fallback (passed to normalizeRecord) for a
  *  malformed line missing run/session_id — exactly as the legacy reader path did. Returns the sealed
  *  record; never throws on a normal record (normalizeRecord is defensive). */
 export function convertLegacy(raw: Record<string, unknown>, lineIndex: number): RunRecord {
-  // 1. Reuse the proven era normalization — yields a RunRecord with the external_id already built
+  // 1. Reuse the proven era normalization — yields a RunRecord with the id already built
   //    as `session_id:run` (or the idx:N fallback), every field coerced defensively.
   const base = normalizeRecord(raw, lineIndex);
 

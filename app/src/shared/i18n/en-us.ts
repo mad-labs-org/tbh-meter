@@ -1,7 +1,6 @@
 // English UI strings — the source of truth (#232). Every key lives here and its type
 // drives `DictKey`. Other locale files provide partial overrides; missing keys fall
-// back to English at lookup time (see ./index.ts). Same architecture as the web wiki
-// (web/src/lib/locales/) so terminology stays consistent across the two apps.
+// back to English at lookup time (see ./index.ts).
 //
 // Game terms shown as raw data (stage codes like "3-9", mode abbreviations, hero
 // classes, item names) are NOT translated here.
@@ -11,9 +10,6 @@ export const DICT = {
   "common.cancel": "Cancel",
   "common.close": "Close",
   "common.reset": "Reset",
-  "common.signOut": "Sign out",
-  "common.signInDiscord": "Sign in with Discord",
-  "common.waitingBrowser": "Waiting for browser…",
 
   // ── Live overlay ──
   "live.pillStarting": "Starting",
@@ -22,10 +18,6 @@ export const DICT = {
   "live.offlineMsg": "Meter offline — open Task Bar Hero",
   "live.blockedMsg": "Reader blocked — antivirus may be closing it.",
   "live.retry": "Retry",
-  "live.statusLive": "Live",
-  "live.statusOffline": "Offline",
-  "live.syncLive": "Live — uploading runs to the leaderboard",
-  "live.syncOff": "Not syncing — sign in to upload your runs",
   "live.dps": "DPS",
   "live.mobs": "Mobs",
   "live.gold": "Gold",
@@ -44,7 +36,6 @@ export const DICT = {
   "live.expandTitle": "Expand",
   "live.pinTitle": "Always on top (click to turn off)",
   "live.unpinTitle": "Not always on top (click to pin the meter above other windows)",
-  "live.sessionStats": "Session stats",
   "live.openLogs": "Open logs",
   "live.dragResize": "Drag to resize",
   "live.dragScale": "Drag to scale the meter",
@@ -60,7 +51,7 @@ export const DICT = {
   "splash.tipLabel": "Tip:",
   "splash.tip1": "Drag the meter by the handle on the left to reposition it.",
   "splash.tip2": "Enter combat to see your DPS in real time.",
-  "splash.tip3": "Signed in, your runs upload to the leaderboard automatically.",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "The meter only READS the game's memory — it never writes anything.",
 
   // ── Window headers ──
@@ -68,8 +59,6 @@ export const DICT = {
   "header.tabTracker": "Tracker",
   "header.tabPlanner": "Leveling Planner",
   "header.tabSettings": "Settings",
-  "header.signIn": "Sign in",
-  "header.signedIn": "Signed in",
   "header.appVersion": "App version",
   "header.restartToUpdate": "Restart to update",
   "header.updateReady": "Update v{version} ready",
@@ -100,7 +89,7 @@ export const DICT = {
   "settings.startupDesc": "Open the meter automatically when Windows starts.",
   "settings.runFilter": "Run filter",
   "settings.runFilterDesc":
-    "Choose which runs show in your list. This is local only — it never changes the leaderboard.",
+    "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "Hide ignored runs",
   "settings.hideIgnoredDesc":
     "Skipped and unreadable-data runs stay hidden; partial clears (the meter joined mid-run) still show. Hidden runs still count toward your session and can be revealed from the runs list anytime.",
@@ -112,15 +101,7 @@ export const DICT = {
   "settings.maxRunsDesc":
     "Keep at most this many runs on this computer. When you go over, the oldest runs are deleted automatically. Favorited runs are always kept and don't count toward the limit.",
   "settings.maxRunsUnit": "runs",
-  "settings.leaderboard": "Leaderboard",
-  "settings.signedInAs": "Signed in as",
-  "settings.uploadAuto": "Successful runs upload automatically.",
-  "settings.signInPitch":
-    "Sign in with Discord from the header to rank on the TBH Helper leaderboard. Signing in also claims the runs already uploaded anonymously from this computer.",
-  "settings.usageStats": "Usage statistics",
-  "settings.usageStatsLabel": "Share anonymous usage statistics",
-  "settings.usageStatsDesc":
-    "Helps us see how many people use the meter (anonymous, via Google Analytics). No personal data, no run details. Turn this off to opt out completely.",
+  "settings.diagnostics": "Diagnostics",
   "settings.diagnosticsLog": "Diagnostics log",
   "settings.diagnosticsLogDesc":
     "Collect diagnostic info for bug reports. No personal data is included.",
@@ -132,11 +113,11 @@ export const DICT = {
   "diagnostics.backToSettings": "Back to Settings",
   "settings.runHistory": "Run history",
   "settings.runHistoryDesc":
-    "Delete all runs stored on this computer. Runs already shared to the leaderboard are not affected and stay on the web.",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "Clear run history",
   "settings.clearConfirmTitle": "Clear run history?",
   "settings.clearConfirmBody":
-    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone. Runs already shared to the leaderboard stay there.",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "Could not clear the run history. Please try again.",
   "settings.clearing": "Clearing…",
   "settings.deleteAll": "Delete all runs",
@@ -174,13 +155,7 @@ export const DICT = {
   "runs.newSession": "New session",
   "runs.newSessionConfirm": "Confirm?",
   "runs.newSessionTitle":
-    "Ends the current session. The next runs start a new session; runs already uploaded stay on the site.",
-  "runs.sessionStats": "Session stats",
-  "runs.sessionStatsTitle": "Open the current session's stats in your browser",
-  "runs.hintNoRunsCurrent":
-    "No runs in the current session yet. Finish a run and it'll appear on the site.",
-  "runs.hintNoRuns":
-    "Finish at least one run. Your session is saved on the site once it has a completed run.",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "No runs match your filter",
   "runs.showIgnoredOne": "Show {count} ignored run",
   "runs.showIgnoredMany": "Show {count} ignored runs",
@@ -227,15 +202,6 @@ export const DICT = {
   "detail.drops": "Drops",
   "detail.chestsOne": "{count} chest",
   "detail.chestsMany": "{count} chests",
-  "detail.shareView": "View on TBH Helper",
-  "detail.sharing": "Sharing…",
-  "detail.shareBtn": "Share to leaderboard",
-  "detail.shareSignIn": "Sign in with Discord to share",
-  "detail.shareError": "Something went wrong. Please try again.",
-  "detail.fullDetails":
-    "Want the full breakdown? The party with each hero's equipment, skills, and stats is on the run page on TBH Helper.",
-  "detail.fullDetailsShare": "Share the run to view it on the site.",
-  "detail.viewFull": "View full details",
   "detail.xpByHero": "XP by hero",
   "detail.heroLv": "Lv {level}",
   "detail.levelUp": "Leveled up",
@@ -247,32 +213,32 @@ export const DICT = {
   "status.abandoned": "Abandoned",
   "quality.partialLabel": "Partial",
   "quality.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "Degraded",
   "quality.degradedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "Invalid",
   "quality.skippedTitle":
-    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count and was not uploaded to the leaderboard.",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (the runs-list icon/tint + detail banner) — distinguishes WHY a run did
   //    not count by combining status + quality, unlike the quality-only verdict copy above. Purely
-  //    cosmetic; it never changes which runs count, upload, or are hidden. ──
+  //    cosmetic; it never changes which runs count or are hidden. ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "Blue-chest tracker",
@@ -287,7 +253,6 @@ export const DICT = {
   "cooldowns.showHistory": "Show history",
   "cooldowns.showingRecent": "showing {shown} most recent of {total}",
   "cooldowns.stageLabel": "Stage {code}",
-  "cooldowns.openStage": "Open this stage on the site",
   "cooldowns.ready": "Ready",
   "cooldowns.readyCheck": "✓ Ready",
   "cooldowns.remove": "Remove (reappears on the next drop)",
@@ -319,30 +284,10 @@ export const DICT = {
   "notifications.actBossTitle": "Act-boss chest dropped",
   "notifications.actBossBody": "{where}: an act-boss chest just dropped.",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "Share your runs on the leaderboard",
-  "signin.body":
-    "You're not signed in, so your runs stay on this computer and never reach the leaderboard. Sign in with Discord to sync them so they count for the leaderboard and your profile.",
-  "signin.dontShow": "Don't show this again",
-  "signin.notNow": "Not now",
-
-  "signin.pendingTitle": "Your runs aren't syncing",
-  "signin.pendingBody":
-    "You're signed out, so finished runs stopped reaching the leaderboard ({count} waiting locally). Sign in to sync them.",
-  "signin.expiredTitle": "Your session expired",
-  "signin.expiredBody":
-    "You were signed out, so your runs stopped syncing to the leaderboard. They're saved locally. Sign in again to resume.",
   // ── Tray menu ──
   "tray.showLive": "Show live meter",
   "tray.openRuns": "Open runs",
   "tray.quit": "Quit",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "You are not signed in",
-  "dialog.notSignedInMsg": "Your runs are not being uploaded to the site.",
-  "dialog.notSignedInDetail":
-    "The session page will show up empty. Sign in with Discord to upload your runs. Runs made while signed out (including this session's) are uploaded as soon as you sign in.",
-  "dialog.openAnyway": "Open anyway",
 
   // ── Chests / drops ──
   "chest.fallback": "Chest",
