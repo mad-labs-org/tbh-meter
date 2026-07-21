@@ -5,7 +5,6 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
-  ChartColumn,
   SlidersHorizontal,
   Filter,
   GripVertical,
@@ -123,7 +122,7 @@ const COLUMNS: RunColumn[] = [
       const badge = runOutcomeBadge(r.status, r.quality, t);
       return (
         <span className="inline-flex min-w-0 items-center gap-1">
-          {/* Stage + mode as one chip, like the web leaderboard's stage cell. */}
+          {/* Stage + mode as one chip. */}
           <span className="inline-flex items-center gap-1.5 rounded border border-surface-600 bg-surface-700/60 px-1.5 py-0.5">
             <span className="font-semibold tabular-nums text-white">{r.stage}</span>
             <span
@@ -378,11 +377,6 @@ export function RunListView({
         />
         <ColumnsMenu config={config} onChange={onRunColumnsChange} />
         {sessionHasRuns && <NewSessionButton />}
-        <SessionStatsButton
-          currentSessionId={currentSessionId}
-          currentHasRuns={currentHasRuns}
-          anyRuns={runs.length > 0}
-        />
         </div>
       </div>
 
@@ -537,63 +531,6 @@ function SessionDivider({ current }: { current: boolean }) {
         {current ? t("runs.currentSession") : t("runs.earlierRuns")}
       </span>
       <span className="h-px flex-1 bg-surface-600/40" />
-    </div>
-  );
-}
-
-// --------------------------------------------------------------------------- //
-// Session stats — opens the website's dashboard for the CURRENT (live) session. When the
-// reader is offline it falls back to the most recent session (top of the list). When there
-// is nothing to open yet (current session has no completed run, or no runs at all) it
-// surfaces a small popover instead of a silent no-op. Auto-dismisses on outside click.
-// --------------------------------------------------------------------------- //
-function SessionStatsButton({
-  currentSessionId,
-  currentHasRuns,
-  anyRuns,
-}: {
-  currentSessionId: string | null;
-  currentHasRuns: boolean;
-  anyRuns: boolean;
-}) {
-  const { t } = useI18n();
-  const [showHint, setShowHint] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useDismissOnOutsideClick(ref, showHint, () => setShowHint(false));
-
-  const onClick = (): void => {
-    if (currentSessionId != null && currentHasRuns) {
-      setShowHint(false);
-      void window.meter.openSessionStats(currentSessionId); // the live session
-    } else if (currentSessionId == null && anyRuns) {
-      setShowHint(false);
-      void window.meter.openSessionStats(); // reader offline -> newest session (top)
-    } else {
-      setShowHint((v) => !v); // nothing to open yet -> explain
-    }
-  };
-
-  // currentSessionId set = reader live but the current session has no shown run yet;
-  // otherwise there are no runs at all.
-  const hintText =
-    currentSessionId != null ? t("runs.hintNoRunsCurrent") : t("runs.hintNoRuns");
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        title={t("runs.sessionStatsTitle")}
-        onClick={onClick}
-        className="flex cursor-pointer items-center gap-1.5 rounded bg-surface-700 px-2 py-1 text-xs font-medium text-zinc-300 transition-colors hover:bg-surface-600 hover:text-white"
-      >
-        <ChartColumn className="size-3.5" />
-        {t("runs.sessionStats")}
-      </button>
-      {showHint && (
-        <div className="absolute right-0 top-full z-20 mt-1 w-60 rounded-lg border border-surface-600 bg-surface-800 p-2.5 text-xs leading-relaxed text-zinc-300 shadow-xl">
-          {hintText}
-        </div>
-      )}
     </div>
   );
 }

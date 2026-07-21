@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, RefreshCw } from "lucide-react";
-import type { AuthStatus, UpdateStatus } from "../../../shared/ipc-types.js";
-import { DiscordIcon } from "~/components/DiscordIcon";
+import type { UpdateStatus } from "../../../shared/ipc-types.js";
 import { useT } from "~/lib/i18n";
 import { cn } from "~/lib/utils";
 
@@ -43,7 +42,6 @@ export function ListHeader({ activeTab, onTabChange, onClose }: ListHeaderProps)
 
       <div className="ml-auto flex items-center gap-1.5" style={noDrag}>
         <VersionControl />
-        <AuthControl />
         <IconButton
           onClick={onClose}
           title={t("common.close")}
@@ -120,58 +118,6 @@ function VersionControl() {
     >
       v{version}
     </span>
-  );
-}
-
-/**
- * Discord auth in the runs-window header (mirrors the web header's AccountMenu):
- *   signed out -> "Sign in" button (opens the browser OAuth flow)
- *   signed in  -> avatar + username pill
- */
-function AuthControl() {
-  const t = useT();
-  const [auth, setAuth] = useState<AuthStatus | null>(null);
-  const [signingIn, setSigningIn] = useState(false);
-
-  useEffect(() => {
-    window.meter.authGetStatus().then(setAuth);
-    return window.meter.onAuthChanged((status) => {
-      setAuth(status);
-      setSigningIn(false);
-    });
-  }, []);
-
-  if (!auth) return null;
-
-  if (auth.signedIn) {
-    return (
-      <span className="flex min-w-0 items-center gap-1.5 rounded-full bg-surface-700 py-0.5 pl-0.5 pr-2">
-        {auth.avatarUrl ? (
-          <img src={auth.avatarUrl} alt="" className="size-5 rounded-full" />
-        ) : (
-          <span className="flex size-5 items-center justify-center rounded-full bg-brand-600 text-[10px] font-bold text-white">
-            {(auth.displayName ?? "?").charAt(0).toUpperCase()}
-          </span>
-        )}
-        <span className="max-w-24 truncate text-xs text-zinc-200">
-          {auth.displayName ?? t("header.signedIn")}
-        </span>
-      </span>
-    );
-  }
-
-  return (
-    <button
-      onClick={() => {
-        setSigningIn(true);
-        window.meter.authSignIn().catch(() => setSigningIn(false));
-      }}
-      disabled={signingIn}
-      className="flex cursor-pointer items-center gap-1.5 rounded bg-discord px-2 py-1 text-xs font-medium text-white transition-colors hover:bg-discord-dark disabled:cursor-default disabled:opacity-60"
-    >
-      <DiscordIcon className="size-3" />
-      {signingIn ? t("common.waitingBrowser") : t("header.signIn")}
-    </button>
   );
 }
 

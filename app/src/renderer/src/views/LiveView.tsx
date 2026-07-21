@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Swords, ScrollText, ChartColumn, Minus, Plus, X, ShieldAlert, Pin, PinOff } from "lucide-react";
+import { Swords, ScrollText, Minus, Plus, X, ShieldAlert, Pin, PinOff } from "lucide-react";
 import type { LiveSnapshot } from "../../../shared/run-types.js";
 import type { ReaderState } from "../../../shared/ipc-types.js";
 import { humanize, formatDuration, modeBadgeClass, modeTextClass, modeLabel } from "~/lib/format";
@@ -31,7 +31,6 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
   const [status, setStatus] = useState<ReaderState>("idle");
   const [expanded, setExpanded] = useState(true);
   const [pinned, setPinned] = useState(true);
-  const [signedIn, setSignedIn] = useState(false);
   // Smooth elapsed clock: anchored to each snapshot's elapsedSec + wall time, advanced by a
   // local interval. Decouples the displayed seconds from the file-poll/reader-write cadence,
   // which otherwise alias (poll 700ms vs write ~1s) and make the second tick unevenly.
@@ -55,12 +54,6 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
       setExpanded(s.liveExpanded);
       setPinned(s.alwaysOnTop);
     });
-  }, []);
-
-  // Auth = whether runs sync to the leaderboard. Drives the Live/Offline status pill.
-  useEffect(() => {
-    void window.meter.authGetStatus().then((s) => setSignedIn(s.signedIn));
-    return window.meter.onAuthChanged((s) => setSignedIn(s.signedIn));
   }, []);
 
   // While there's no live data, poll the reader status. First launch resolves the
@@ -178,13 +171,6 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
             onPointerDown={onStartDrag}
             className="flex min-w-0 flex-1 cursor-move select-none items-center gap-1.5"
           >
-            <span
-              title={syncTitle(signedIn, t)}
-              className={cn(
-                "size-1.5 shrink-0 rounded-full",
-                signedIn ? "live-pulse bg-brand-400" : "bg-amber-400",
-              )}
-            />
             <span className="truncate font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-300">
               {snap.stage}
             </span>
@@ -203,12 +189,6 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
             {snap.approx && <span className="ml-0.5 align-top text-[10px] text-zinc-500">~</span>}
           </span>
           <PinButton pinned={pinned} onTogglePin={togglePin} />
-          <IconButton
-            title={t("live.sessionStats")}
-            onClick={() => void window.meter.openSessionStats()}
-          >
-            <ChartColumn className="size-3.5" />
-          </IconButton>
           <IconButton title={t("live.openLogs")} onClick={onOpenLogs}>
             <ScrollText className="size-3.5" />
           </IconButton>
@@ -253,23 +233,7 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
         stage={snap.stage}
         mode={snap.mode}
         stageExtra={showThreat ? <StageThreatBadges info={threat} /> : undefined}
-      >
-        <span
-          title={syncTitle(signedIn, t)}
-          className={cn(
-            "flex items-center gap-1 font-mono text-[10px] font-bold uppercase tracking-[0.14em]",
-            signedIn ? "text-brand-300" : "text-amber-300",
-          )}
-        >
-          <span
-            className={cn(
-              "inline-block size-1.5 rounded-full",
-              signedIn ? "live-pulse bg-brand-400" : "bg-amber-400",
-            )}
-          />
-          {signedIn ? t("live.statusLive") : t("live.statusOffline")}
-        </span>
-      </TitleBar>
+      />
 
       <div className="px-3 pb-2 pt-2.5">
         <div className="flex items-end justify-between">
@@ -330,13 +294,8 @@ export function LiveView({ onStartDrag, onOpenLogs }: LiveViewProps) {
 
 // ── Shared pieces ─────────────────────────────────────────────────────────────
 
-/** Tooltip for the sync status dot: attributed (signed in) / local-only (signed out). */
-function syncTitle(signedIn: boolean, t: ReturnType<typeof useT>): string {
-  return signedIn ? t("live.syncLive") : t("live.syncOff");
-}
-
 /** Title bar: drag region (mac-traffic-light dots + "TBH Meter" + run #) plus a
- *  right-aligned slot for the live/offline indicator and controls. */
+ *  right-aligned slot for the reader-status indicator and controls. */
 function TitleBar({
   onStartDrag,
   onOpenLogs,
@@ -361,7 +320,7 @@ function TitleBar({
   mode?: string;
   /** Slot after the mode badge — the stage-threat element badges. */
   stageExtra?: React.ReactNode;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   const t = useT();
   return (
@@ -400,12 +359,6 @@ function TitleBar({
       <span className="ml-auto flex shrink-0 items-center gap-2">
         {children}
         <PinButton pinned={pinned} onTogglePin={onTogglePin} />
-        <IconButton
-          title={t("live.sessionStats")}
-          onClick={() => void window.meter.openSessionStats()}
-        >
-          <ChartColumn className="size-3.5" />
-        </IconButton>
         <IconButton title={t("live.openLogs")} onClick={onOpenLogs}>
           <ScrollText className="size-3.5" />
         </IconButton>

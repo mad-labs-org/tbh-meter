@@ -1,7 +1,7 @@
 // Canonical STRUCTURED v1 example — what the converter (PR3) produces from `raw-v1.ts`. Numbers are
 // DERIVED here (dps = total_damage / clear_time, rates = gained / ref) and the verdict is sealed
-// (`quality`, `issues`); the run `id` is carried verbatim from the raw (external_id continuity, so
-// migrated/uploaded runs never duplicate). Typed const → `tsc --noEmit` enforces the shape.
+// (`quality`, `issues`); the run `id` is carried verbatim from the raw (id continuity, so
+// migrated runs never duplicate). Typed const → `tsc --noEmit` enforces the shape.
 import type { RunRecord } from "../run-types.js";
 
 export const STRUCTURED_V1_EXAMPLE: RunRecord = {

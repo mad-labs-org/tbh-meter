@@ -362,8 +362,8 @@ def build_raw_record(*, ts_ms, run_outcome, game_version, duration,
     clock (`ts_ms` comes in as a parameter). Mirrors app/src/shared/raw-types.ts::RawRunV2 (keys 1:1).
 
     - `id` = the END TIMESTAMP in MILLISECONDS as a string (= `str(ts_ms)`). It's the run's IDENTITY —
-      NO session, NO counter: two plays on one machine are sequential, never share a ms. The upload
-      external_id is `device:id` (glued app-side). The FILE is raw/<id>.json. (v1 used
+      NO session, NO counter: two plays on one machine are sequential, never share a ms.
+      The FILE is raw/<id>.json. (v1 used
       `session_id:run`, which recycled on a reader restart → colliding id → the new run vanished.)
     - `*_ok=False` -> the field becomes err (not 0/None): this is what fixed gold:0 (didn't-read != zero).
     - stage fields (stageKey/act/stageNo/difficulty/total_mobs) = err when they didn't resolve.
@@ -589,7 +589,7 @@ def _is_partial(status, clear_time, measured, total_damage):
     """PARTIAL capture: the meter joined a run already in progress (< PARTIAL_CAPTURE_MIN of the
     official clear, i.e. <95%) -> undercount. Gated on clear_time>=30 so x-10 runs (boss, seconds)
     aren't mis-flagged. EXCEPTION: a success with measured damage <=0 is always a missed capture
-    (covers x-10 with clear<30s that skipped the check and pushed all-zeros to the leaderboard, #163)."""
+    (covers x-10 with clear<30s that skipped the check and recorded all-zero runs, #163)."""
     return bool(status == "success" and (
         (clear_time >= 30 and measured < clear_time * PARTIAL_CAPTURE_MIN) or total_damage <= 0))
 
@@ -959,7 +959,7 @@ def run(hz, output_dir, debug=False):
         diag(f"[party-pick]   ghost {hex(_ga)} heroes(hk,lvl,exp)={_gh}")
     # infra-log: the SAVE pick — PSD (the build's gold/heroes source) and CSD (current stage). PSD None was
     # the 1.00.12 bug (save offsets shifted → read_gold=0 → pick_live_psd None → run with no
-    # heroes/gold → upload stalled). Logging psd/gold/heroes here makes that failure mode visible.
+    # heroes/gold). Logging psd/gold/heroes here makes that failure mode visible.
     _psd = save.pick_live_psd(reader, psd_list)
     diag(f"[save-pick] psd_cands={len(psd_list)} psd={hex(_psd) if _psd else None} "
          f"gold={save.read_gold(reader, _psd) if _psd else None} "
@@ -1146,7 +1146,7 @@ def run(hz, output_dir, debug=False):
         # failed). Only on a clear (clear_time = official duration); gated on >=30s so x-10 runs
         # (boss, seconds) are never mis-flagged. EXCEPTION to the exception: a success with ZERO measured
         # damage is always a missed capture (the game doesn't clear a stage with no damage) — covers the gap of x-10s
-        # with clear <30s, which skipped the check and pushed all-zeros to the leaderboard (#163).
+        # with clear <30s, which skipped the check and recorded all-zero runs (#163).
         partial = _is_partial(status, clear_time, measured, R["dps"].total_damage)
         # save-side xp (fallback only): per-hero HeroExp delta (already includes runes/items/bonuses).
         # HeroExp zeroes on level-up -> the gain of whoever levels up is underestimated (rare for a high-level
@@ -1272,7 +1272,7 @@ def run(hz, output_dir, debug=False):
             head = f"measured {measured:.0f}s  (partial)"
         n_deaths = sum(R["deaths"].values())
         # degraded party (live off the WHOLE run): heroes becomes `err` in the raw -> the converter seals the run
-        # `degraded` (doesn't go to the leaderboard; shows in the app, flagged). The line gets a ⚠ in meter.log
+        # `degraded` (doesn't count; shows in the app, flagged). The line gets a ⚠ in meter.log
         # -> observable (and validate_live.py catches it live). Never slips through.
         party_warn = " ⚠party unavailable(live off)" if party_degraded else ""
         summary = (f"{mark} run #{run_num} [{status.upper()}]  Stage {act}-{stage} [{mode}]  "

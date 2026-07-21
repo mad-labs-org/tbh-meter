@@ -5,5 +5,5 @@
 # Optional, only for the LEGACY live panel (main.py v1; the product doesn't need it):
 #   rich>=13.7.0
 #
-# Mac/server side (upload/analysis/disasm — outside the reader) uses whatever you like
-# with no restriction (e.g. psycopg2 for the DB, capstone for disassembly).
+# Mac/server side (analysis/disasm — outside the reader) uses whatever you like
+# with no restriction (e.g. capstone for disassembly).

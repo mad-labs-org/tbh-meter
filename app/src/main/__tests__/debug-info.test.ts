@@ -66,7 +66,6 @@ function defaultOpts(overrides: Record<string, unknown> = {}) {
     splashActive: false,
     readerState: "ready",
     updateState: { state: "up-to-date" },
-    signedIn: true,
     settings: defaultSettings(),
     outputDir: dir,
     isRc: false,
@@ -152,22 +151,6 @@ describe("collectDebugInfo", () => {
     const out = await collectDebugInfo(defaultOpts());
     expect(out).toContain("Online: yes");
     expect(out).toMatch(/GitHub API: \d+ms/);
-    expect(out).toMatch(/TBH Helper API: \d+ms/);
-    expect(out).toMatch(/Discord OAuth: \d+ms/);
-  });
-
-  it("marks unreachable endpoints when some succeed and some fail", async () => {
-    let call = 0;
-    vi.stubGlobal("fetch", () => {
-      call++;
-      if (call === 1) return Promise.resolve(new Response(null, { status: 200 }));
-      return Promise.reject(new Error("down"));
-    });
-    const out = await collectDebugInfo(defaultOpts());
-    // One endpoint succeeded → online
-    expect(out).toContain("Online: yes");
-    // The failed ones show unreachable
-    expect(out).toContain("unreachable");
   });
 
   it("reports proxy from env vars", async () => {
@@ -181,19 +164,17 @@ describe("collectDebugInfo", () => {
   });
 
   // ── App State ────────────────────────────────────────────────────────
-  it("reports reader, update, auth, splash state", async () => {
+  it("reports reader, update, splash state", async () => {
     vi.stubGlobal("fetch", () => Promise.reject(new Error("offline")));
     const out = await collectDebugInfo(
       defaultOpts({
         readerState: "scanning",
         updateState: { state: "downloading" },
-        signedIn: false,
         splashActive: true,
       }),
     );
     expect(out).toContain("Reader status: scanning");
     expect(out).toContain("Update status: downloading");
-    expect(out).toContain("Auth: signed out");
     expect(out).toContain("Splash: active");
   });
 
@@ -302,7 +283,6 @@ describe("collectDebugInfo", () => {
     expect(out).toContain("liveFontScale:");
     expect(out).toContain("alwaysOnTop:");
     expect(out).toContain("opacity:");
-    expect(out).toContain("analyticsEnabled:");
     expect(out).toContain("Launch on startup:");
   });
 

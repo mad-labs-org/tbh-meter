@@ -6,9 +6,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "common.cancel": "Отмена",
   "common.close": "Закрыть",
   "common.reset": "Сбросить",
-  "common.signOut": "Выйти",
-  "common.signInDiscord": "Войти через Discord",
-  "common.waitingBrowser": "Ожидание браузера…",
 
   // ── Live overlay ──
   "live.pillStarting": "Запуск",
@@ -17,10 +14,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.offlineMsg": "Метер офлайн — откройте Task Bar Hero",
   "live.blockedMsg": "Ридер заблокирован — возможно, его закрывает антивирус.",
   "live.retry": "Повторить",
-  "live.statusLive": "Live",
-  "live.statusOffline": "Офлайн",
-  "live.syncLive": "Live — забеги загружаются в таблицу лидеров",
-  "live.syncOff": "Нет синхронизации — войдите, чтобы загружать забеги",
   "live.dps": "DPS",
   "live.mobs": "Мобы",
   "live.gold": "Золото",
@@ -39,7 +32,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.expandTitle": "Развернуть",
   "live.pinTitle": "Поверх всех окон (нажмите, чтобы выключить)",
   "live.unpinTitle": "Не поверх окон (нажмите, чтобы закрепить метер поверх других окон)",
-  "live.sessionStats": "Статистика сессии",
   "live.openLogs": "Открыть логи",
   "live.dragResize": "Потяните, чтобы изменить ширину",
   "live.dragScale": "Потяните, чтобы изменить масштаб метера",
@@ -55,15 +47,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "splash.tipLabel": "Совет:",
   "splash.tip1": "Перетащите метер за ручку слева, чтобы переместить его.",
   "splash.tip2": "Вступите в бой, чтобы видеть свой DPS в реальном времени.",
-  "splash.tip3": "После входа забеги загружаются в таблицу лидеров автоматически.",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "Метер только ЧИТАЕТ память игры — он никогда ничего не записывает.",
 
   // ── Window headers ──
   "header.tabRuns": "Забеги",
   "header.tabTracker": "Трекер",
   "header.tabSettings": "Настройки",
-  "header.signIn": "Войти",
-  "header.signedIn": "Вы вошли",
   "header.appVersion": "Версия приложения",
   "header.restartToUpdate": "Перезапустить для обновления",
   "header.updateReady": "Обновление v{version} готово",
@@ -94,7 +84,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.startupDesc": "Автоматически открывает метер при запуске Windows.",
   "settings.runFilter": "Фильтр забегов",
   "settings.runFilterDesc":
-    "Выберите, какие забеги видны в списке. Только локально — таблица лидеров не меняется.",
+    "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "Скрывать игнорируемые забеги",
   "settings.hideIgnoredDesc":
     "Пропущенные, частичные и неполные забеги остаются скрытыми. Они всё равно идут в зачёт сессии, и их всегда можно показать из списка.",
@@ -106,15 +96,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.maxRunsDesc":
     "Хранит на этом компьютере не больше указанного числа забегов. При превышении самые старые удаляются автоматически. Избранные забеги всегда сохраняются и не учитываются в лимите.",
   "settings.maxRunsUnit": "забегов",
-  "settings.leaderboard": "Таблица лидеров",
-  "settings.signedInAs": "Вы вошли как",
-  "settings.uploadAuto": "Успешные забеги загружаются автоматически.",
-  "settings.signInPitch":
-    "Войдите через Discord в шапке, чтобы попасть в таблицу лидеров TBH Helper. Вход также привяжет забеги, уже загруженные анонимно с этого компьютера.",
-  "settings.usageStats": "Статистика использования",
-  "settings.usageStatsLabel": "Делиться анонимной статистикой использования",
-  "settings.usageStatsDesc":
-    "Помогает нам видеть, сколько людей используют метер (анонимно, через Google Analytics). Никаких личных данных и деталей забегов. Отключите, чтобы полностью отказаться.",
+    "settings.diagnostics": "Diagnostics",
     "settings.diagnosticsLog": "Журнал диагностики",
   "settings.diagnosticsLogDesc": "Сбор диагностической информации для отчётов об ошибках. Личные данные не включены.",
   "diagnostics.collecting": "Сбор диагностики...",
@@ -125,11 +107,11 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "diagnostics.backToSettings": "Вернуться к настройкам",
   "settings.runHistory": "История забегов",
   "settings.runHistoryDesc":
-    "Удаляет все забеги, сохранённые на этом компьютере. Забеги, уже отправленные в таблицу лидеров, не затрагиваются и остаются в сети.",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "Очистить историю забегов",
   "settings.clearConfirmTitle": "Очистить историю забегов?",
   "settings.clearConfirmBody":
-    "Это удалит все забеги этого метера, включая архив логов. Отменить нельзя.Избранные забеги сохраняются.  Забеги, уже отправленные в таблицу лидеров, останутся там.",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "Не удалось очистить историю. Попробуйте ещё раз.",
   "settings.clearing": "Очистка…",
   "settings.deleteAll": "Удалить все забеги",
@@ -167,13 +149,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "runs.newSession": "Новая сессия",
   "runs.newSessionConfirm": "Подтвердить?",
   "runs.newSessionTitle":
-    "Завершает текущую сессию. Следующие забеги начнут новую; уже загруженные забеги остаются на сайте.",
-  "runs.sessionStats": "Статистика сессии",
-  "runs.sessionStatsTitle": "Открывает статистику текущей сессии в браузере",
-  "runs.hintNoRunsCurrent":
-    "В текущей сессии пока нет забегов. Завершите забег — и он появится на сайте.",
-  "runs.hintNoRuns":
-    "Завершите хотя бы один забег. Сессия сохраняется на сайте, как только в ней есть завершённый забег.",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "Ни один забег не проходит фильтр",
   "runs.showIgnoredOne": "Показать {count} игнорируемый забег",
   "runs.showIgnoredMany": "Показать игнорируемые забеги: {count}",
@@ -219,15 +195,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "detail.drops": "Дроп",
   "detail.chestsOne": "{count} сундук",
   "detail.chestsMany": "Сундуков: {count}",
-  "detail.shareView": "Открыть на TBH Helper",
-  "detail.sharing": "Отправка…",
-  "detail.shareBtn": "Отправить в таблицу лидеров",
-  "detail.shareSignIn": "Войдите через Discord, чтобы поделиться",
-  "detail.shareError": "Что-то пошло не так. Попробуйте ещё раз.",
-  "detail.fullDetails":
-    "Нужна полная раскладка? Отряд со снаряжением, навыками и статами каждого героя — на странице забега на TBH Helper.",
-  "detail.fullDetailsShare": "Отправьте забег, чтобы посмотреть его на сайте.",
-  "detail.viewFull": "Все подробности",
   "detail.xpByHero": "Опыт по героям",
   "detail.heroLv": "Ур. {level}",
   "detail.levelUp": "Повышение уровня",
@@ -239,30 +206,30 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "status.abandoned": "Брошен",
   "quality.partialLabel": "Частичный",
   "quality.partialTitle":
-    "Метер подключился к забегу уже по ходу, поэтому итоги занижены. Забег не отправлен в таблицу лидеров.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "Повреждённый",
   "quality.degradedTitle":
-    "Часть значений не удалось прочитать, поэтому цифры могут быть неверны. Забег не отправлен в таблицу лидеров.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "Недействительный",
   "quality.skippedTitle":
-    "Это не валидное прохождение (слишком короткое, поражение или выход), поэтому забег не засчитан и не отправлен в таблицу лидеров.",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "Трекер синего сундука",
@@ -277,7 +244,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.showHistory": "Показать историю",
   "cooldowns.showingRecent": "показаны последние {shown} из {total}",
   "cooldowns.stageLabel": "Этап {code}",
-  "cooldowns.openStage": "Открыть этот этап на сайте",
   "cooldowns.ready": "Готов",
   "cooldowns.readyCheck": "✓ Готов",
   "cooldowns.remove": "Убрать (вернётся при следующем дропе)",
@@ -309,30 +275,10 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "notifications.actBossTitle": "Выпал сундук босса акта",
   "notifications.actBossBody": "{where}: только что выпал сундук босса акта.",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "Делитесь забегами в таблице лидеров",
-  "signin.body":
-    "Вы не вошли в аккаунт, поэтому ваши забеги остаются на этом компьютере и не попадают в таблицу лидеров. Войдите через Discord, чтобы синхронизировать их и засчитать в таблице лидеров и вашем профиле.",
-  "signin.dontShow": "Больше не показывать",
-  "signin.notNow": "Не сейчас",
-
-  "signin.pendingTitle": "Ваши забеги не синхронизируются",
-  "signin.pendingBody":
-    "Вы вышли из аккаунта, поэтому завершённые забеги перестали попадать в таблицу лидеров ({count} ожидают локально). Войдите, чтобы синхронизировать их.",
-  "signin.expiredTitle": "Ваша сессия истекла",
-  "signin.expiredBody":
-    "Вы вышли из аккаунта, поэтому ваши забеги перестали синхронизироваться с таблицей лидеров. Они сохраняются локально. Войдите снова, чтобы продолжить.",
   // ── Tray menu ──
   "tray.showLive": "Показать live-метер",
   "tray.openRuns": "Открыть забеги",
   "tray.quit": "Выход",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "Вы не вошли",
-  "dialog.notSignedInMsg": "Ваши забеги не загружаются на сайт.",
-  "dialog.notSignedInDetail":
-    "Страница сессии будет пустой. Войдите через Discord, чтобы загружать забеги. Забеги без входа (включая забеги этой сессии) загрузятся сразу после входа.",
-  "dialog.openAnyway": "Всё равно открыть",
 
   // ── Chests / drops ──
   "chest.fallback": "Сундук",

@@ -3,31 +3,19 @@ import { EventEmitter } from "node:events";
 
 // Integration test for the reader supervisor's state machine. The win32 spawn/timer/IPC
 // path can't run on the dev Mac, so we mock the runtime edges (child_process, electron,
-// fs, settings, error-report) and drive time with fake timers to assert the WIRING:
-// backoff schedules, the blocked transition, report-once-per-episode, EPERM-doesn't-crash,
+// fs, settings) and drive time with fake timers to assert the WIRING:
+// backoff schedules, the blocked transition, EPERM-doesn't-crash,
 // manual retry, and recovery via the healthy timer. (The pure decisions live in — and are
 // tested directly by — reader-policy.test.ts.)
 //
 // vi.mock factories may only reference `mock`-prefixed vars (vitest hoisting rule).
 const mockSpawn = vi.fn();
 const mockExecFileSync = vi.fn();
-const mockReportError = vi.fn();
-// Backing for the mocked fs.readFileSync — readReaderLogs() tails the output-dir log files by
-// basename. Empty by default, so existing tests (which don't read files) behave as before:
-// readReaderLogs returns "" because every read throws ENOENT.
-const mockFiles = new Map<string, string>();
 
 vi.mock("node:child_process", () => ({ spawn: mockSpawn, execFileSync: mockExecFileSync }));
-vi.mock("node:fs", () => ({
-  existsSync: () => true,
-  readFileSync: (p: unknown) => {
-    if (typeof p === "string") for (const [name, content] of mockFiles) if (p.endsWith(name)) return content;
-    throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
-  },
-}));
+vi.mock("node:fs", () => ({ existsSync: () => true }));
 vi.mock("electron", () => ({ app: { isPackaged: true } }));
 vi.mock("../settings.js", () => ({ resolveOutputDir: () => "/tmp/out" }));
-vi.mock("../error-report.js", () => ({ reportError: mockReportError }));
 
 interface FakeChild extends EventEmitter {
   stdout: EventEmitter;
@@ -52,8 +40,6 @@ beforeEach(async () => {
   vi.resetModules();
   mockSpawn.mockReset();
   mockExecFileSync.mockReset();
-  mockReportError.mockReset();
-  mockFiles.clear();
   mockSpawn.mockImplementation(() => makeFakeChild());
   vi.useFakeTimers();
 
@@ -87,19 +73,16 @@ describe("reader supervisor", () => {
 
     lastChild().emit("exit", 0, null); // code 0 == clean ("game is not open" / closed)
     expect(mod.getReaderState()).toBe("offline");
-    expect(mockReportError).not.toHaveBeenCalled();
 
     vi.advanceTimersByTime(5_000); // base respawn cadence (clean exits don't back off)
     expect(mockSpawn).toHaveBeenCalledTimes(2);
-    expect(mockReportError).not.toHaveBeenCalled();
   });
 
-  it("abnormal exits back off (5/10/20/40s) and flip to blocked + ONE report at the 5th", () => {
+  it("abnormal exits back off (5/10/20/40s) and flip to blocked at the 5th", () => {
     mod.startReader();
 
     lastChild().emit("exit", 1, null); // streak 1
     expect(mod.getReaderState()).toBe("starting");
-    expect(mockReportError).not.toHaveBeenCalled();
 
     vi.advanceTimersByTime(5_000); // -> attempt 2
     lastChild().emit("exit", 1, null); // streak 2
@@ -108,19 +91,15 @@ describe("reader supervisor", () => {
     vi.advanceTimersByTime(20_000); // -> attempt 4
     lastChild().emit("exit", 1, null); // streak 4
     expect(mod.getReaderState()).toBe("starting");
-    expect(mockReportError).not.toHaveBeenCalled();
 
     vi.advanceTimersByTime(40_000); // -> attempt 5
     lastChild().emit("exit", 1, null); // streak 5 -> blocked
 
     expect(mockSpawn).toHaveBeenCalledTimes(5);
     expect(mod.getReaderState()).toBe("blocked");
-    expect(mockReportError).toHaveBeenCalledTimes(1);
-    expect(mockReportError.mock.calls[0][0]).toBe("reader:blocked");
-    expect(mockReportError.mock.calls[0][2]).toMatchObject({ failStreak: "5" });
   });
 
-  it("a synchronous spawn EPERM does NOT crash; it reports once and backs off to blocked", () => {
+  it("a synchronous spawn EPERM does NOT crash; it backs off to blocked", () => {
     const eperm = Object.assign(new Error("spawn EPERM"), { code: "EPERM" });
     mockSpawn.mockImplementation(() => {
       throw eperm;
@@ -128,8 +107,6 @@ describe("reader supervisor", () => {
 
     expect(() => mod.startReader()).not.toThrow(); // the bug we're fixing
     expect(mod.getReaderState()).toBe("starting");
-    expect(mockReportError).toHaveBeenCalledTimes(1);
-    expect(mockReportError.mock.calls[0][0]).toBe("reader:spawn-failed");
 
     vi.advanceTimersByTime(5_000); // attempt 2 (throws)
     vi.advanceTimersByTime(10_000); // attempt 3
@@ -138,7 +115,6 @@ describe("reader supervisor", () => {
 
     expect(mockSpawn).toHaveBeenCalledTimes(5);
     expect(mod.getReaderState()).toBe("blocked");
-    expect(mockReportError).toHaveBeenCalledTimes(1); // still one report this episode
   });
 
   it("manual retry clears the streak and respawns immediately", () => {
@@ -255,40 +231,5 @@ describe("reader supervisor — single-writer (kill before spawn, kill on quit)"
     });
     expect(() => mod.startReader()).not.toThrow();
     expect(mockSpawn).toHaveBeenCalledTimes(1); // still spawned ours after the futile kill
-  });
-});
-
-describe("readReaderLogs — the error-report attachment", () => {
-  it("includes reader-diag.log (the build fingerprint) and LEADS with it, then meter.log + live.json", () => {
-    // reader-diag.log is the decision spine — it carries `fp=<build>`, the piece missing when a
-    // "can't calibrate on this version" report came in with no way to see the player's game build.
-    mockFiles.set("reader-diag.log", "[attach] pid=4624 fp=1.00.21-0xABCDEF-0x123");
-    mockFiles.set("meter.log", "[ok] attached\n[ok] resolved");
-    mockFiles.set("live.json", '{"stage":"2-6","mode":"Hell"}');
-
-    const out = mod.readReaderLogs();
-
-    expect(out).toContain("=== reader-diag.log ===");
-    expect(out).toContain("fp=1.00.21-0xABCDEF-0x123");
-    expect(out).toContain("=== meter.log ===");
-    expect(out).toContain("=== live.json ===");
-    // reader-diag.log leads so the relay's 50k cap never truncates the most diagnostic file away.
-    expect(out.indexOf("=== reader-diag.log ===")).toBeLessThan(out.indexOf("=== meter.log ==="));
-  });
-
-  it("omits a missing file silently (best-effort — a log-read failure never blocks the report)", () => {
-    mockFiles.set("meter.log", "only meter.log present");
-    const out = mod.readReaderLogs();
-    expect(out).toContain("=== meter.log ===");
-    expect(out).not.toContain("reader-diag.log");
-    expect(out).not.toContain("live.json");
-  });
-
-  it("tails an oversized file to its budget (keeps the most recent bytes)", () => {
-    mockFiles.set("reader-diag.log", "X".repeat(20_000)); // > the 16k budget
-    const out = mod.readReaderLogs();
-    expect(out).toContain("...(truncated)");
-    // the diag section is bounded well under the 50k relay cap (16k budget + header).
-    expect(out.length).toBeLessThan(20_000);
   });
 });

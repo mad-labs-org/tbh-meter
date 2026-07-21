@@ -26,7 +26,7 @@ const cds = [cd(2109, 0), cd(4309, 61)]; // 1-9 NM READY, 3-9 TO 1:01 (real keys
 
 const settings = {
   outputDir: null, opacity: 1, alwaysOnTop: true, liveBounds: null, listBounds: null,
-  hideSignInPrompt: true, liveExpanded: true, runColumns: [], anonymousUpload: true,
+  liveExpanded: true, runColumns: [],
   hideNonCounted: true, minDurationSec: null, cooldownTrackerEnabled: true,
   chestCooldowns: cds, chestDropLog: cds.map((c) => ({ ...c })),
 };

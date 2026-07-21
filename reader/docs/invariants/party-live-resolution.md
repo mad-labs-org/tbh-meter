@@ -97,9 +97,8 @@ envelope. NEVER the save roster (the bug of 5 heroes with +0xp) nor a proxy-gues
 hero who only gained idle xp, re-introducing the bug): unknown party ≠ guessed party.
 
 `heroes` is a **CRITICAL** field in the converter ([[process/data-contract-id-based]]): `heroes: err` →
-`issues["heroes"]` → the run is sealed **`degraded`**. By the #262 rule: **it doesn't go to the leaderboard**
-(`auto-upload` skips degraded ones) but it **shows in the app**, marked and filterable (`hideNonCounted`,
-"Skip != hide"). The `meter.log` line still carries `⚠` for the maintainer, and the `validate_live` gate
+`issues["heroes"]` → the run is sealed **`degraded`**. By the #262 rule: **it doesn't count** but it
+**shows in the app**, marked and filterable (`hideNonCounted`, "Skip != hide"). The `meter.log` line still carries `⚠` for the maintainer, and the `validate_live` gate
 catches it live — the degradation is never silent.
 
 ## The formation slot (team position 0/1/2)
@@ -114,8 +113,8 @@ party in lockstep — the same pick<->read agreement, now extended to the slot.
 `close_run` stamps each hero's `slot` via `resolve_party_slots` and emits the party via
 `order_party_by_slot` — in FORMATION order, NOT the SAVE-ROSTER order `read_build`
 (PlayerSaveData.HEROES) happens to iterate. Before this the slot index was DISCARDED and the run
-record's order WAS the save roster's, so the in-game team order/position was lost through the app and
-up to the leaderboard. `slot` is ADDITIVE (no `RAW_SCHEMA_VERSION` bump,
+record's order WAS the save roster's, so the in-game team order/position was lost through the app.
+`slot` is ADDITIVE (no `RAW_SCHEMA_VERSION` bump,
 [[invariants/schema-versioning]]); the live overlay emits it too (`party_slots` in live.json)
 alongside the already-slot-ordered `party`.
 

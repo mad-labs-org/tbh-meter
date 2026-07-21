@@ -6,9 +6,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "common.cancel": "İptal",
   "common.close": "Kapat",
   "common.reset": "Sıfırla",
-  "common.signOut": "Çıkış yap",
-  "common.signInDiscord": "Discord ile giriş yap",
-  "common.waitingBrowser": "Tarayıcı bekleniyor…",
 
   // ── Live overlay ──
   "live.pillStarting": "Başlıyor",
@@ -17,10 +14,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.offlineMsg": "Meter çevrimdışı — Task Bar Hero'yu aç",
   "live.blockedMsg": "Okuyucu engellendi — antivirüs kapatıyor olabilir.",
   "live.retry": "Tekrar dene",
-  "live.statusLive": "Canlı",
-  "live.statusOffline": "Çevrimdışı",
-  "live.syncLive": "Canlı — runlar lider tablosuna yükleniyor",
-  "live.syncOff": "Senkron yok — runlarını yüklemek için giriş yap",
   "live.dps": "DPS",
   "live.mobs": "Moblar",
   "live.gold": "Altın",
@@ -39,7 +32,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.expandTitle": "Genişlet",
   "live.pinTitle": "Her zaman üstte (kapatmak için tıkla)",
   "live.unpinTitle": "Her zaman üstte değil (meter'i diğer pencerelerin üstüne sabitlemek için tıkla)",
-  "live.sessionStats": "Oturum istatistikleri",
   "live.openLogs": "Kayıtları aç",
   "live.dragResize": "Yeniden boyutlandırmak için sürükle",
   "live.dragScale": "Meter'i ölçeklemek için sürükle",
@@ -55,15 +47,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "splash.tipLabel": "İpucu:",
   "splash.tip1": "Meter'i taşımak için soldaki tutamaçtan sürükle.",
   "splash.tip2": "DPS'ini gerçek zamanlı görmek için savaşa gir.",
-  "splash.tip3": "Giriş yaptığında runların lider tablosuna otomatik yüklenir.",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "Meter oyunun belleğini sadece OKUR — asla hiçbir şey yazmaz.",
 
   // ── Window headers ──
   "header.tabRuns": "Runlar",
   "header.tabTracker": "Takipçi",
   "header.tabSettings": "Ayarlar",
-  "header.signIn": "Giriş yap",
-  "header.signedIn": "Giriş yapıldı",
   "header.appVersion": "Uygulama sürümü",
   "header.restartToUpdate": "Güncellemek için yeniden başlat",
   "header.updateReady": "v{version} güncellemesi hazır",
@@ -95,7 +85,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.startupDesc": "Windows açıldığında meter'i otomatik açar.",
   "settings.runFilter": "Run filtresi",
   "settings.runFilterDesc":
-    "Listende hangi runların görüneceğini seç. Sadece yereldir — lider tablosunu asla değiştirmez.",
+    "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "Yok sayılan runları gizle",
   "settings.hideIgnoredDesc":
     "Atlanan, kısmi ve eksik verili runlar gizli kalır. Oturumuna saymaya devam ederler ve run listesinden her an gösterilebilirler.",
@@ -107,15 +97,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.maxRunsDesc":
     "Bu bilgisayarda en fazla bu kadar run tutar. Sınırı aşınca en eski runlar otomatik silinir. Favori runlar her zaman korunur ve sınıra sayılmaz.",
   "settings.maxRunsUnit": "run",
-  "settings.leaderboard": "Lider tablosu",
-  "settings.signedInAs": "Giriş yapan:",
-  "settings.uploadAuto": "Başarılı runlar otomatik yüklenir.",
-  "settings.signInPitch":
-    "TBH Helper lider tablosunda sıralanmak için üst bardan Discord ile giriş yap. Giriş, bu bilgisayardan anonim yüklenmiş runları da hesabına bağlar.",
-  "settings.usageStats": "Kullanım istatistikleri",
-  "settings.usageStatsLabel": "Anonim kullanım istatistiklerini paylaş",
-  "settings.usageStatsDesc":
-    "Kaç kişinin meter kullandığını görmemize yardımcı olur (anonim, Google Analytics aracılığıyla). Kişisel veri veya koşu ayrıntısı yok. Tamamen çıkmak için kapatın.",
+    "settings.diagnostics": "Diagnostics",
     "settings.diagnosticsLog": "Tanı günlüğü",
   "settings.diagnosticsLogDesc": "Hata raporları için tanı bilgilerini toplar. Kişisel veri içermez.",
   "diagnostics.collecting": "Tanı bilgileri toplanıyor...",
@@ -126,11 +108,11 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "diagnostics.backToSettings": "Ayarlara dön",
   "settings.runHistory": "Run geçmişi",
   "settings.runHistoryDesc":
-    "Bu bilgisayardaki tüm runları siler. Lider tablosuna zaten paylaşılan runlar etkilenmez ve webde kalır.",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "Run geçmişini temizle",
   "settings.clearConfirmTitle": "Run geçmişi temizlensin mi?",
   "settings.clearConfirmBody":
-    "Bu, log arşivi dahil bu meter'deki her runu siler. Geri alınamaz.Favori runlar korunur.  Lider tablosuna paylaşılmış runlar orada kalır.",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "Geçmiş temizlenemedi. Lütfen tekrar dene.",
   "settings.clearing": "Temizleniyor…",
   "settings.deleteAll": "Tüm runları sil",
@@ -168,13 +150,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "runs.newSession": "Yeni oturum",
   "runs.newSessionConfirm": "Onayla?",
   "runs.newSessionTitle":
-    "Mevcut oturumu bitirir. Sonraki runlar yeni bir oturum başlatır; yüklenmiş runlar sitede kalır.",
-  "runs.sessionStats": "Oturum istatistikleri",
-  "runs.sessionStatsTitle": "Mevcut oturumun istatistiklerini tarayıcında açar",
-  "runs.hintNoRunsCurrent":
-    "Mevcut oturumda henüz run yok. Bir run bitir, sitede görünecek.",
-  "runs.hintNoRuns":
-    "En az bir run bitir. Oturumun, tamamlanmış bir runu olunca sitede kaydedilir.",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "Filtrene uyan run yok",
   "runs.showIgnoredOne": "{count} yok sayılan runu göster",
   "runs.showIgnoredMany": "{count} yok sayılan runu göster",
@@ -220,15 +196,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "detail.drops": "Düşenler",
   "detail.chestsOne": "{count} sandık",
   "detail.chestsMany": "{count} sandık",
-  "detail.shareView": "TBH Helper'da görüntüle",
-  "detail.sharing": "Paylaşılıyor…",
-  "detail.shareBtn": "Lider tablosunda paylaş",
-  "detail.shareSignIn": "Paylaşmak için Discord ile giriş yap",
-  "detail.shareError": "Bir şeyler ters gitti. Lütfen tekrar dene.",
-  "detail.fullDetails":
-    "Tam dökümü mü istiyorsun? Her kahramanın ekipmanı, yetenekleri ve statlarıyla takım, TBH Helper'daki run sayfasında.",
-  "detail.fullDetailsShare": "Sitede görmek için runu paylaş.",
-  "detail.viewFull": "Tüm detayları gör",
   "detail.xpByHero": "Kahraman başına XP",
   "detail.heroLv": "Sv {level}",
   "detail.levelUp": "Seviye atladı",
@@ -240,30 +207,30 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "status.abandoned": "Terk edildi",
   "quality.partialLabel": "Kısmi",
   "quality.partialTitle":
-    "Meter bu runa devam ederken katıldı, bu yüzden toplamlar eksik sayıldı. Lider tablosuna yüklenmedi.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "Bozuk",
   "quality.degradedTitle":
-    "Bu runda bazı değerler okunamadı, bu yüzden sayılar hatalı olabilir. Lider tablosuna yüklenmedi.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "Geçersiz",
   "quality.skippedTitle":
-    "Bu run geçerli bir bitirme değil (çok kısa, ya da yenilgi veya terk ile bitti), bu yüzden sayılmaz ve lider tablosuna yüklenmedi.",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "Mavi sandık takipçisi",
@@ -278,7 +245,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.showHistory": "Geçmişi göster",
   "cooldowns.showingRecent": "{total} kayıttan en yeni {shown} tanesi",
   "cooldowns.stageLabel": "Bölüm {code}",
-  "cooldowns.openStage": "Bu bölümü sitede aç",
   "cooldowns.ready": "Hazır",
   "cooldowns.readyCheck": "✓ Hazır",
   "cooldowns.remove": "Kaldır (bir sonraki düşüşte geri gelir)",
@@ -310,30 +276,10 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "notifications.actBossTitle": "Perde patronu sandığı düştü",
   "notifications.actBossBody": "{where}: az önce bir perde patronu sandığı düştü.",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "Runlarını lider tablosunda paylaş",
-  "signin.body":
-    "Giriş yapmadın, bu yüzden runların bu bilgisayarda kalır ve lider tablosuna ulaşmaz. Bunları senkronlamak ve lider tablosu ile profilinde sayılması için Discord ile giriş yap.",
-  "signin.dontShow": "Bir daha gösterme",
-  "signin.notNow": "Şimdi değil",
-
-  "signin.pendingTitle": "Runların senkronlanmıyor",
-  "signin.pendingBody":
-    "Çıkış yaptın, bu yüzden tamamlanan runlar lider tablosuna ulaşmayı durdurdu (yerelde {count} bekliyor). Senkronlamak için giriş yap.",
-  "signin.expiredTitle": "Oturumun sona erdi",
-  "signin.expiredBody":
-    "Çıkış yapıldı, bu yüzden runların lider tablosuna senkronlanmayı durdurdu. Yerel olarak kaydediliyorlar. Devam etmek için tekrar giriş yap.",
   // ── Tray menu ──
   "tray.showLive": "Canlı meter'i göster",
   "tray.openRuns": "Runları aç",
   "tray.quit": "Çık",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "Giriş yapmadın",
-  "dialog.notSignedInMsg": "Runların siteye yüklenmiyor.",
-  "dialog.notSignedInDetail":
-    "Oturum sayfası boş görünecek. Runlarını yüklemek için Discord ile giriş yap. Çıkışken yapılan runlar (bu oturumdakiler dahil) giriş yapar yapmaz yüklenir.",
-  "dialog.openAnyway": "Yine de aç",
 
   // ── Chests / drops ──
   "chest.fallback": "Sandık",

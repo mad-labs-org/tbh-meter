@@ -8,7 +8,6 @@ import { RunDetailView } from "~/views/RunDetailView";
 import { SettingsView } from "~/views/SettingsView";
 import { CooldownsView } from "~/views/CooldownsView";
 import { PlannerView } from "~/views/PlannerView";
-import { SignInPromptModal } from "~/components/SignInPromptModal";
 
 export default function ListApp() {
   const [activeTab, setActiveTab] = useState<ListTab>("runs");
@@ -63,8 +62,6 @@ export default function ListApp() {
           <SettingsView settings={settings} onSettingsChange={handleSettingsChange} />
         )}
       </main>
-
-      <SignInPromptModal />
     </div>
   );
 }

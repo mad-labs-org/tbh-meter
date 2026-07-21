@@ -67,15 +67,13 @@ The meter ships as **two pieces** that talk over the filesystem:
         │                            writes one run record per finished run + a live feed
         ▼
  app/     ──►  tbh-meter (Electron)  converts runs, derives sessions, draws the overlay
-        │                            + runs list, and (optionally) uploads to the leaderboard
-        ▼
- api.tbherohelper.com                public HTTP — the separate wiki / leaderboard project
+                                     + runs list
 ```
 
 - **`reader/`** — the memory reader. Pure `ctypes` + stdlib (zero runtime dependencies), frozen into a single `tbh-reader.exe` with PyInstaller. A **read-only** sensor: it never modifies game memory, files, or behavior, and never injects code.
-- **`app/`** — the Electron overlay. Owns everything user-facing: the live overlay, the runs list and detail views, session grouping, settings, Discord sign-in, the background uploader, and auto-update.
+- **`app/`** — the Electron overlay. Owns everything user-facing: the live overlay, the runs list and detail views, session grouping, settings, and auto-update.
 
-Your data is stored locally in **`~/tbh-meter/`** (configurable in Settings). Runs are uploaded **only** if you explicitly sign in to the leaderboard.
+The meter is fully local: your runs are stored as files in **`~/tbh-meter/`** (configurable in Settings) and never leave your machine. The only network traffic is the auto-update check against GitHub Releases.
 
 ## Build from source
 

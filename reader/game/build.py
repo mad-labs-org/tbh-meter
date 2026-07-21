@@ -183,7 +183,7 @@ def read_party_slots(reader, sm, hero_cat=None):
     index in StageManager.HeroList; empty slots are null, so the index IS the in-game position
     0/1/2, gaps included). Shares membership + the ghost discriminator with read_live_party (the
     same _iter_party_slots), so the slot map and the party never disagree. The run record carries
-    this per hero so the team's in-game order/position survives to the app and the leaderboard — it
+    this per hero so the team's in-game order/position survives to the app — it
     was previously LOST (heroes came out in SAVE-ROSTER order and the HeroList slot index was
     discarded). NEVER raises -> {}."""
     return {hk: slot for slot, hk, _uf in _iter_party_slots(reader, sm, hero_cat)}
@@ -250,8 +250,8 @@ def hero_in_run(hero_key, live_keys):
     """Does the hero make it into the run artifact? ONLY if it's in the LIVE party (`live_keys` =
     StageManager.HeroList ∪ party_seen) — the AUTHORITATIVE source. WITHOUT a live party (`live_keys`
     empty = sm null the WHOLE run), the run emits NO hero at all: the caller marks `heroes` as `err`
-    in the envelope ("party live off") and the converter seals the run `degraded` (doesn't make it to
-    the leaderboard; shows in the app, flagged). NEVER the raw save roster nor a proxy-guess (e.g.
+    in the envelope ("party live off") and the converter seals the run `degraded` (doesn't count;
+    shows in the app, flagged). NEVER the raw save roster nor a proxy-guess (e.g.
     xp>0 would include a hero that only earned idle xp, re-introducing the bug). Pure/testable."""
     return bool(live_keys) and hero_key in live_keys
 

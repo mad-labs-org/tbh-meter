@@ -26,13 +26,11 @@ export function getRun(id: string): RunRecord | null {
   return getRunsSource().getById(id);
 }
 
-/** Local-only wipe of EVERY local run source EXCEPT favorited runs, so a cleared run can never be
+/** Wipe of EVERY local run source EXCEPT favorited runs, so a cleared run can never be
  *  resurrected by the next ingest pass (favorites are kept on purpose — Feature 3):
  *   - logs/ (RunsSource.clearFile / per-id deleteRunFiles) — the app's read source;
  *   - raw/ — else the Ingestor re-converts each orphaned raw back into logs/;
  *   - runs.jsonl — else the Ingestor re-migrates each legacy line back into logs/.
- *  uploads.json (the share/dedup record) is kept — leaderboard entries live on the server, and the
- *  dedup index must survive so re-finished runs don't re-upload.
  *
  *  No favorites → the fast bulk wipe (preserves the legacy-clean fast path in the Ingestor). With
  *  favorites → delete every NON-favorited run id by hand and keep the favorites' files intact. */

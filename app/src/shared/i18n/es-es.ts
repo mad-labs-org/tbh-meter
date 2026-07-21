@@ -6,9 +6,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "common.cancel": "Cancelar",
   "common.close": "Cerrar",
   "common.reset": "Restablecer",
-  "common.signOut": "Cerrar sesión",
-  "common.signInDiscord": "Iniciar sesión con Discord",
-  "common.waitingBrowser": "Esperando al navegador…",
 
   // ── Live overlay ──
   "live.pillStarting": "Iniciando",
@@ -17,10 +14,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.offlineMsg": "Meter offline — abre Task Bar Hero",
   "live.blockedMsg": "Lector bloqueado — puede que el antivirus lo esté cerrando.",
   "live.retry": "Reintentar",
-  "live.statusLive": "Live",
-  "live.statusOffline": "Offline",
-  "live.syncLive": "Live — subiendo las runs a la clasificación",
-  "live.syncOff": "Sin sincronizar — inicia sesión para subir tus runs",
   "live.dps": "DPS",
   "live.mobs": "Mobs",
   "live.gold": "Oro",
@@ -39,7 +32,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.expandTitle": "Expandir",
   "live.pinTitle": "Siempre encima (haz clic para desactivar)",
   "live.unpinTitle": "No siempre encima (haz clic para fijar el meter sobre las demás ventanas)",
-  "live.sessionStats": "Estadísticas de la sesión",
   "live.openLogs": "Abrir registros",
   "live.dragResize": "Arrastra para redimensionar",
   "live.dragScale": "Arrastra para escalar el meter",
@@ -55,15 +47,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "splash.tipLabel": "Consejo:",
   "splash.tip1": "Arrastra el meter por el asa de la izquierda para recolocarlo.",
   "splash.tip2": "Entra en combate para ver tu DPS en tiempo real.",
-  "splash.tip3": "Con sesión iniciada, tus runs suben a la clasificación automáticamente.",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "El meter solo LEE la memoria del juego — nunca escribe nada.",
 
   // ── Window headers ──
   "header.tabRuns": "Runs",
   "header.tabTracker": "Tracker",
   "header.tabSettings": "Ajustes",
-  "header.signIn": "Iniciar sesión",
-  "header.signedIn": "Sesión iniciada",
   "header.appVersion": "Versión de la app",
   "header.restartToUpdate": "Reiniciar para actualizar",
   "header.updateReady": "Actualización v{version} lista",
@@ -95,7 +85,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.startupDesc": "Abre el meter automáticamente cuando arranca Windows.",
   "settings.runFilter": "Filtro de runs",
   "settings.runFilterDesc":
-    "Elige qué runs aparecen en tu lista. Es solo local — nunca cambia la clasificación.",
+    "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "Ocultar runs ignoradas",
   "settings.hideIgnoredDesc":
     "Las runs saltadas, parciales o con datos incompletos quedan ocultas. Siguen contando para tu sesión y puedes revelarlas en la lista cuando quieras.",
@@ -107,15 +97,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.maxRunsDesc":
     "Guarda como máximo esta cantidad de runs en este ordenador. Al superarlo, las runs más antiguas se borran automáticamente. Las runs favoritas siempre se conservan y no cuentan para el límite.",
   "settings.maxRunsUnit": "runs",
-  "settings.leaderboard": "Clasificación",
-  "settings.signedInAs": "Sesión iniciada como",
-  "settings.uploadAuto": "Las runs con éxito se suben automáticamente.",
-  "settings.signInPitch":
-    "Inicia sesión con Discord desde la cabecera para puntuar en la clasificación de TBH Helper. Iniciar sesión también reclama las runs ya subidas anónimamente desde este equipo.",
-  "settings.usageStats": "Estadísticas de uso",
-  "settings.usageStatsLabel": "Compartir estadísticas de uso anónimas",
-  "settings.usageStatsDesc":
-    "Nos ayuda a ver cuántas personas usan el meter (anónimo, mediante Google Analytics). Sin datos personales ni detalles de runs. Desactívalo para salir completamente.",
+    "settings.diagnostics": "Diagnostics",
     "settings.diagnosticsLog": "Registro de diagnóstico",
   "settings.diagnosticsLogDesc": "Recopila información de diagnóstico para informes de errores. No se incluyen datos personales.",
   "diagnostics.collecting": "Recopilando diagnóstico...",
@@ -126,11 +108,11 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "diagnostics.backToSettings": "Volver a Configuración",
   "settings.runHistory": "Historial de runs",
   "settings.runHistoryDesc":
-    "Borra todas las runs guardadas en este equipo. Las runs ya compartidas en la clasificación no se ven afectadas y siguen en la web.",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "Borrar historial de runs",
   "settings.clearConfirmTitle": "¿Borrar el historial de runs?",
   "settings.clearConfirmBody":
-    "Esto borra todas las runs de este meter, incluido el archivo de registros. No se puede deshacer.Las runs favoritas se conservan.  Las runs ya compartidas en la clasificación siguen ahí.",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "No se pudo borrar el historial. Inténtalo de nuevo.",
   "settings.clearing": "Borrando…",
   "settings.deleteAll": "Borrar todas las runs",
@@ -168,13 +150,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "runs.newSession": "Nueva sesión",
   "runs.newSessionConfirm": "¿Confirmar?",
   "runs.newSessionTitle":
-    "Termina la sesión actual. Las próximas runs empiezan una sesión nueva; las runs ya subidas siguen en el sitio.",
-  "runs.sessionStats": "Estadísticas de la sesión",
-  "runs.sessionStatsTitle": "Abre las estadísticas de la sesión actual en tu navegador",
-  "runs.hintNoRunsCurrent":
-    "Aún no hay runs en la sesión actual. Termina una run y aparecerá en el sitio.",
-  "runs.hintNoRuns":
-    "Termina al menos una run. Tu sesión se guarda en el sitio en cuanto tenga una run completada.",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "Ninguna run pasa tu filtro",
   "runs.showIgnoredOne": "Mostrar {count} run ignorada",
   "runs.showIgnoredMany": "Mostrar {count} runs ignoradas",
@@ -220,15 +196,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "detail.drops": "Drops",
   "detail.chestsOne": "{count} cofre",
   "detail.chestsMany": "{count} cofres",
-  "detail.shareView": "Ver en TBH Helper",
-  "detail.sharing": "Compartiendo…",
-  "detail.shareBtn": "Compartir en la clasificación",
-  "detail.shareSignIn": "Inicia sesión con Discord para compartir",
-  "detail.shareError": "Algo salió mal. Inténtalo de nuevo.",
-  "detail.fullDetails":
-    "¿Quieres el desglose completo? El equipo con el equipamiento, las skills y las stats de cada héroe está en la página de la run en TBH Helper.",
-  "detail.fullDetailsShare": "Comparte la run para verla en el sitio.",
-  "detail.viewFull": "Ver detalles completos",
   "detail.xpByHero": "XP por héroe",
   "detail.heroLv": "Nv {level}",
   "detail.levelUp": "Subió de nivel",
@@ -240,30 +207,30 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "status.abandoned": "Abandonada",
   "quality.partialLabel": "Parcial",
   "quality.partialTitle":
-    "El meter se unió a esta run ya empezada, así que los totales están incompletos. No se subió a la clasificación.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "Degradada",
   "quality.degradedTitle":
-    "Algunos valores no se pudieron leer en esta run, así que los números pueden estar mal. No se subió a la clasificación.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "Inválida",
   "quality.skippedTitle":
-    "Esta run no es un clear válido (demasiado corta, o terminó en derrota o abandono), así que no cuenta y no se subió a la clasificación.",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "Tracker de cofre azul",
@@ -278,7 +245,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.showHistory": "Mostrar historial",
   "cooldowns.showingRecent": "mostrando los {shown} más recientes de {total}",
   "cooldowns.stageLabel": "Fase {code}",
-  "cooldowns.openStage": "Abrir esta fase en el sitio",
   "cooldowns.ready": "Listo",
   "cooldowns.readyCheck": "✓ Listo",
   "cooldowns.remove": "Quitar (reaparece en el próximo drop)",
@@ -310,30 +276,10 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "notifications.actBossTitle": "Cayó un cofre de jefe de acto",
   "notifications.actBossBody": "{where}: acaba de caer un cofre de jefe de acto.",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "Comparte tus runs en la clasificación",
-  "signin.body":
-    "No has iniciado sesión, así que tus runs se quedan en este equipo y no llegan a la clasificación. Inicia sesión con Discord para sincronizarlas y que cuenten en la clasificación y tu perfil.",
-  "signin.dontShow": "No volver a mostrar",
-  "signin.notNow": "Ahora no",
-
-  "signin.pendingTitle": "Tus runs no se están sincronizando",
-  "signin.pendingBody":
-    "Has cerrado sesión, así que las runs completadas dejaron de llegar a la clasificación ({count} en espera localmente). Inicia sesión para sincronizarlas.",
-  "signin.expiredTitle": "Tu sesión ha caducado",
-  "signin.expiredBody":
-    "Se cerró tu sesión, así que tus runs dejaron de sincronizarse con la clasificación. Se guardan localmente. Inicia sesión de nuevo para reanudar.",
   // ── Tray menu ──
   "tray.showLive": "Mostrar live meter",
   "tray.openRuns": "Abrir runs",
   "tray.quit": "Salir",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "No has iniciado sesión",
-  "dialog.notSignedInMsg": "Tus runs no se están subiendo al sitio.",
-  "dialog.notSignedInDetail":
-    "La página de la sesión aparecerá vacía. Inicia sesión con Discord para subir tus runs. Las runs hechas sin sesión (incluidas las de esta sesión) se suben en cuanto inicies sesión.",
-  "dialog.openAnyway": "Abrir igualmente",
 
   // ── Chests / drops ──
   "chest.fallback": "Cofre",

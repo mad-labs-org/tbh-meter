@@ -16,7 +16,7 @@ EOF
 
 # settings: two active blue-chest cooldowns so the overlay shows the chest cards
 cat > "$SUP/settings.json" <<EOF
-{"outputDir":null,"opacity":1,"alwaysOnTop":true,"liveBounds":null,"listBounds":null,"hideSignInPrompt":true,"liveExpanded":true,"runColumns":[],"anonymousUpload":true,"hideNonCounted":true,"minDurationSec":null,"cooldownTrackerEnabled":true,"chestCooldowns":[{"stageKey":30901,"stage":"3-9","mode":"Hell","dropAt":$DROP},{"stageKey":20901,"stage":"2-9","mode":"Hell","dropAt":$(( NOW - 600000 ))}],"chestDropLog":[{"stageKey":30901,"stage":"3-9","mode":"Hell","dropAt":$DROP}]}
+{"outputDir":null,"opacity":1,"alwaysOnTop":true,"liveBounds":null,"listBounds":null,"liveExpanded":true,"runColumns":[],"hideNonCounted":true,"minDurationSec":null,"cooldownTrackerEnabled":true,"chestCooldowns":[{"stageKey":30901,"stage":"3-9","mode":"Hell","dropAt":$DROP},{"stageKey":20901,"stage":"2-9","mode":"Hell","dropAt":$(( NOW - 600000 ))}],"chestDropLog":[{"stageKey":30901,"stage":"3-9","mode":"Hell","dropAt":$DROP}]}
 EOF
 
 # a few completed runs for the list / sessions view

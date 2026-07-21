@@ -6,9 +6,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "common.cancel": "Hủy",
   "common.close": "Đóng",
   "common.reset": "Đặt lại",
-  "common.signOut": "Đăng xuất",
-  "common.signInDiscord": "Đăng nhập bằng Discord",
-  "common.waitingBrowser": "Đang chờ trình duyệt…",
 
   // ── Live overlay ──
   "live.pillStarting": "Đang khởi động",
@@ -17,10 +14,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.offlineMsg": "Meter ngoại tuyến — hãy mở Task Bar Hero",
   "live.blockedMsg": "Trình đọc bị chặn — có thể phần mềm diệt virus đang tắt nó.",
   "live.retry": "Thử lại",
-  "live.statusLive": "Live",
-  "live.statusOffline": "Ngoại tuyến",
-  "live.syncLive": "Live — các lượt chơi đang được tải lên bảng xếp hạng",
-  "live.syncOff": "Không đồng bộ — đăng nhập để tải lượt chơi lên",
   "live.dps": "DPS",
   "live.mobs": "Quái",
   "live.gold": "Vàng",
@@ -39,7 +32,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.expandTitle": "Mở rộng",
   "live.pinTitle": "Luôn ở trên cùng (bấm để tắt)",
   "live.unpinTitle": "Không ở trên cùng (bấm để ghim meter lên trên các cửa sổ khác)",
-  "live.sessionStats": "Thống kê phiên",
   "live.openLogs": "Mở nhật ký",
   "live.dragResize": "Kéo để đổi kích thước",
   "live.dragScale": "Kéo để phóng to/thu nhỏ meter",
@@ -55,15 +47,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "splash.tipLabel": "Mẹo:",
   "splash.tip1": "Kéo meter bằng tay nắm bên trái để di chuyển.",
   "splash.tip2": "Vào trận để xem DPS của bạn theo thời gian thực.",
-  "splash.tip3": "Khi đã đăng nhập, lượt chơi tự động tải lên bảng xếp hạng.",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "Meter chỉ ĐỌC bộ nhớ game — không bao giờ ghi gì cả.",
 
   // ── Window headers ──
   "header.tabRuns": "Lượt chơi",
   "header.tabTracker": "Theo dõi",
   "header.tabSettings": "Cài đặt",
-  "header.signIn": "Đăng nhập",
-  "header.signedIn": "Đã đăng nhập",
   "header.appVersion": "Phiên bản ứng dụng",
   "header.restartToUpdate": "Khởi động lại để cập nhật",
   "header.updateReady": "Bản cập nhật v{version} đã sẵn sàng",
@@ -95,7 +85,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.startupDesc": "Tự mở meter khi Windows khởi động.",
   "settings.runFilter": "Bộ lọc lượt chơi",
   "settings.runFilterDesc":
-    "Chọn lượt chơi nào hiện trong danh sách. Chỉ cục bộ — không bao giờ ảnh hưởng bảng xếp hạng.",
+    "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "Ẩn lượt chơi bị bỏ qua",
   "settings.hideIgnoredDesc":
     "Lượt bị bỏ qua, thiếu hoặc dữ liệu không đầy đủ sẽ bị ẩn. Chúng vẫn tính vào phiên và có thể hiện lại từ danh sách bất cứ lúc nào.",
@@ -107,15 +97,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.maxRunsDesc":
     "Giữ tối đa bấy nhiêu lượt chơi trên máy này. Khi vượt quá, các lượt cũ nhất bị xóa tự động. Lượt yêu thích luôn được giữ lại và không tính vào giới hạn.",
   "settings.maxRunsUnit": "lượt",
-  "settings.leaderboard": "Bảng xếp hạng",
-  "settings.signedInAs": "Đăng nhập với tên",
-  "settings.uploadAuto": "Lượt chơi thành công tự động tải lên.",
-  "settings.signInPitch":
-    "Đăng nhập bằng Discord ở thanh trên để xếp hạng trên bảng xếp hạng TBH Helper. Đăng nhập cũng nhận lại các lượt đã tải ẩn danh từ máy này.",
-  "settings.usageStats": "Thống kê sử dụng",
-  "settings.usageStatsLabel": "Chia sẻ thống kê sử dụng ẩn danh",
-  "settings.usageStatsDesc":
-    "Giúp chúng tôi biết bao nhiêu người dùng meter (ẩn danh, qua Google Analytics). Không có dữ liệu cá nhân hay chi tiết lượt chạy. Tắt để từ chối hoàn toàn.",
+    "settings.diagnostics": "Diagnostics",
     "settings.diagnosticsLog": "Nhật ký chẩn đoán",
   "settings.diagnosticsLogDesc": "Thu thập thông tin chẩn đoán cho báo cáo lỗi. Không bao gồm dữ liệu cá nhân.",
   "diagnostics.collecting": "Đang thu thập chẩn đoán...",
@@ -126,11 +108,11 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "diagnostics.backToSettings": "Quay lại Cài đặt",
   "settings.runHistory": "Lịch sử lượt chơi",
   "settings.runHistoryDesc":
-    "Xóa toàn bộ lượt chơi lưu trên máy này. Lượt đã chia sẻ lên bảng xếp hạng không bị ảnh hưởng và vẫn còn trên web.",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "Xóa lịch sử lượt chơi",
   "settings.clearConfirmTitle": "Xóa lịch sử lượt chơi?",
   "settings.clearConfirmBody":
-    "Thao tác này xóa mọi lượt chơi của meter, gồm cả kho nhật ký. Không thể hoàn tác.Lượt yêu thích vẫn được giữ.  Lượt đã chia sẻ lên bảng xếp hạng vẫn còn đó.",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "Không xóa được lịch sử. Vui lòng thử lại.",
   "settings.clearing": "Đang xóa…",
   "settings.deleteAll": "Xóa tất cả lượt chơi",
@@ -168,13 +150,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "runs.newSession": "Phiên mới",
   "runs.newSessionConfirm": "Xác nhận?",
   "runs.newSessionTitle":
-    "Kết thúc phiên hiện tại. Các lượt tiếp theo bắt đầu phiên mới; lượt đã tải lên vẫn còn trên trang.",
-  "runs.sessionStats": "Thống kê phiên",
-  "runs.sessionStatsTitle": "Mở thống kê phiên hiện tại trong trình duyệt",
-  "runs.hintNoRunsCurrent":
-    "Phiên hiện tại chưa có lượt chơi. Hoàn thành một lượt là nó sẽ hiện trên trang.",
-  "runs.hintNoRuns":
-    "Hãy hoàn thành ít nhất một lượt. Phiên của bạn được lưu trên trang khi có một lượt hoàn thành.",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "Không lượt chơi nào khớp bộ lọc",
   "runs.showIgnoredOne": "Hiện {count} lượt bị bỏ qua",
   "runs.showIgnoredMany": "Hiện {count} lượt bị bỏ qua",
@@ -220,15 +196,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "detail.drops": "Đồ rơi",
   "detail.chestsOne": "{count} rương",
   "detail.chestsMany": "{count} rương",
-  "detail.shareView": "Xem trên TBH Helper",
-  "detail.sharing": "Đang chia sẻ…",
-  "detail.shareBtn": "Chia sẻ lên bảng xếp hạng",
-  "detail.shareSignIn": "Đăng nhập bằng Discord để chia sẻ",
-  "detail.shareError": "Có lỗi xảy ra. Vui lòng thử lại.",
-  "detail.fullDetails":
-    "Muốn xem chi tiết đầy đủ? Đội hình với trang bị, kỹ năng và chỉ số của từng anh hùng có trên trang lượt chơi ở TBH Helper.",
-  "detail.fullDetailsShare": "Chia sẻ lượt chơi để xem trên trang.",
-  "detail.viewFull": "Xem chi tiết đầy đủ",
   "detail.xpByHero": "KN mỗi hero",
   "detail.heroLv": "Cấp {level}",
   "detail.levelUp": "Lên cấp",
@@ -240,30 +207,30 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "status.abandoned": "Bỏ dở",
   "quality.partialLabel": "Thiếu",
   "quality.partialTitle":
-    "Meter vào lượt này khi nó đã diễn ra, nên tổng số bị đếm thiếu. Lượt không được tải lên bảng xếp hạng.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "Hỏng dữ liệu",
   "quality.degradedTitle":
-    "Một số giá trị của lượt này không đọc được, nên con số có thể sai. Lượt không được tải lên bảng xếp hạng.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "Không hợp lệ",
   "quality.skippedTitle":
-    "Lượt này không phải lần phá đảo hợp lệ (quá ngắn, hoặc kết thúc bằng thất bại/bỏ dở), nên không được tính và không tải lên bảng xếp hạng.",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "Theo dõi rương xanh",
@@ -278,7 +245,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.showHistory": "Hiện lịch sử",
   "cooldowns.showingRecent": "hiện {shown} mới nhất trong {total}",
   "cooldowns.stageLabel": "Màn {code}",
-  "cooldowns.openStage": "Mở màn này trên trang",
   "cooldowns.ready": "Sẵn sàng",
   "cooldowns.readyCheck": "✓ Sẵn sàng",
   "cooldowns.remove": "Xóa (sẽ hiện lại ở lần rơi sau)",
@@ -310,30 +276,10 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "notifications.actBossTitle": "Rương trùm chương đã rơi",
   "notifications.actBossBody": "{where}: vừa rơi một rương trùm chương.",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "Chia sẻ lượt chơi của bạn lên bảng xếp hạng",
-  "signin.body":
-    "Bạn chưa đăng nhập, nên các lượt chơi của bạn ở lại trên máy này và không lên bảng xếp hạng. Đăng nhập bằng Discord để đồng bộ chúng và được tính vào bảng xếp hạng và hồ sơ của bạn.",
-  "signin.dontShow": "Đừng hiện lại",
-  "signin.notNow": "Để sau",
-
-  "signin.pendingTitle": "Lượt chơi của bạn không được đồng bộ",
-  "signin.pendingBody":
-    "Bạn đang đăng xuất, nên các lượt chơi đã hoàn thành ngừng lên bảng xếp hạng ({count} đang chờ cục bộ). Đăng nhập để đồng bộ chúng.",
-  "signin.expiredTitle": "Phiên của bạn đã hết hạn",
-  "signin.expiredBody":
-    "Bạn đã bị đăng xuất, nên lượt chơi của bạn ngừng đồng bộ lên bảng xếp hạng. Chúng vẫn được lưu cục bộ. Đăng nhập lại để tiếp tục.",
   // ── Tray menu ──
   "tray.showLive": "Hiện live meter",
   "tray.openRuns": "Mở lượt chơi",
   "tray.quit": "Thoát",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "Bạn chưa đăng nhập",
-  "dialog.notSignedInMsg": "Lượt chơi của bạn không được tải lên trang.",
-  "dialog.notSignedInDetail":
-    "Trang phiên sẽ trống. Đăng nhập bằng Discord để tải lượt chơi lên. Lượt chơi khi chưa đăng nhập (kể cả của phiên này) sẽ được tải lên ngay khi bạn đăng nhập.",
-  "dialog.openAnyway": "Vẫn mở",
 
   // ── Chests / drops ──
   "chest.fallback": "Rương",

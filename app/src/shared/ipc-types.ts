@@ -5,8 +5,8 @@ export interface Bounds { x: number; y: number; width: number; height: number; }
 export interface RunColumnConfig { key: string; visible: boolean; }
 /** Per-chest-type drop-notification toggles, mirroring the reader's `drops` indices [common(0), stageBoss(1), actBoss(2)]. */
 export interface ChestDropNotify { common: boolean; stageBoss: boolean; actBoss: boolean; }
-export interface AppSettings { outputDir: string | null; opacity: number; /** Keep the live overlay above every other window (default on). Two entry points write it: the overlay's pin button and the Settings checkbox. The overlay keeps a taskbar button (`skipTaskbar: false`), so an unpinned, covered meter is recoverable from the taskbar. */ alwaysOnTop: boolean; liveBounds: Bounds | null; listBounds: Bounds | null; hideSignInPrompt: boolean; liveExpanded: boolean; runColumns: RunColumnConfig[]; /** Send anonymous usage statistics (Google Analytics on the overlay) so we can see how many people use the meter — active-user counts only, no personal data and no run details. Default on; off fully disables the tag. Only the packaged build reports (`pnpm dev` never does). */ analyticsEnabled: boolean; /** Display filter (LOCAL, never touches the leaderboard): hide runs sealed `skipped` (too short / not a clean success) or `degraded` (a critical field unreadable). `counted` AND `partial` stay shown — a partial run is a REAL successful clear the reader joined mid-way (under-counted, so badged + tinted, but still the player's run); hiding partials made the list look empty after the slow first-launch attach, so players thought the meter wasn't recording runs. Default true; the toggle reveals the hidden runs (marked + filterable, never deleted). */ hideNonCounted: boolean; /** Display filter: hide runs shorter than this many seconds. null = off. The minimum is the SYSTEM floor (COUNT_FLOOR_SEC, 15s) — a preference, never below it; stage x-10 is exempt (ACT_BOSS_STAGE_NO). The floor itself is a converter constant, NOT this setting (don't conflate). */ minDurationSec: number | null; /** Auto-clean cap (Feature 2): keep at most this many NON-favorited runs locally; when the stored count exceeds it the app deletes the OLDEST non-favorited runs down to the cap (favorited runs are never deleted and never counted). null = OFF (unlimited history, the default). Clamped to MIN_MAX_RUNS before persisting (see prune.ts clampMaxRuns). */ maxRuns: number | null; /** Blue-chest cooldown tracker (#265): master on/off (default ON), toggled in the runs-window Tracker tab. Off = no auto-detect + overlay hidden; existing cooldowns are kept (not cleared), so re-enabling resumes them. */ cooldownTrackerEnabled: boolean; /** Per-chest-type OS drop notifications (independent of the cooldown tracker): fire when a chest of each type drops on ANY stage. `common` defaults OFF (drops ~constantly — would spam); `stageBoss` (blue) and `actBoss` default ON. Toggled in Settings. */ chestDropNotify: ChestDropNotify; /** Blue-chest cooldown tracker (#265). `chestCooldowns` = the ACTIVE per-BOX lines (one cooldown per chest level, keyed by boxKey; the hover X clears these); `chestDropLog` = the append-only drop HISTORY (the X never touches it). Both persist so a cooldown survives an app/game restart — remaining time is recomputed from each `dropAt`. */ chestCooldowns: ChestCooldown[]; chestDropLog: ChestCooldown[]; /** Blue-chest cooldown length in MINUTES (default DEFAULT_COOLDOWN_MIN). Single global value; the timestamp-anchored math re-derives every countdown when it changes (no migration). Clamped via clampCooldownMin. */ chestCooldownMin: number; /** Chest "route": blue-box keys (920xxx) the user pinned to always show — a card appears even before the box drops (placeholder = ready/available). Empty = no pins. */ chestRoute: number[]; /** Whether a drop on a box NOT in `chestRoute` still creates/updates a cooldown card. true (default) = additive: the route pins extras and everything auto-detected still shows (today's behavior). false = the route is an exclusive filter (only pinned levels track). Empty route + true = show all. */ trackOutsideRoute: boolean; /** Start the meter with Windows (#232): applied via app.setLoginItemSettings on the packaged Windows install (no-op elsewhere). Default off. */ launchOnStartup: boolean; /** UI language (#232): a locale code from shared/i18n LOCALES, or "auto" = follow the system language. */ language: string; /** Per-window UI scale (#232), applied as webContents zoom: 1 = 100%. The live overlay's bottom-edge drag adjusts liveFontScale too (its height is content-pinned, so scaling the content IS the vertical resize). Clamped to FONT_SCALE_MIN..MAX. */ liveFontScale: number; listFontScale: number; }
-export const DEFAULT_SETTINGS: AppSettings = { outputDir: null, opacity: 1, alwaysOnTop: true, liveBounds: null, listBounds: null, hideSignInPrompt: false, liveExpanded: true, runColumns: [], analyticsEnabled: true, hideNonCounted: true, minDurationSec: null, maxRuns: null, cooldownTrackerEnabled: true, chestDropNotify: { common: false, stageBoss: true, actBoss: true }, chestCooldowns: [], chestDropLog: [], chestCooldownMin: DEFAULT_COOLDOWN_MIN, chestRoute: [], trackOutsideRoute: true, launchOnStartup: false, language: "auto", liveFontScale: 1, listFontScale: 1 };
+export interface AppSettings { outputDir: string | null; opacity: number; /** Keep the live overlay above every other window (default on). Two entry points write it: the overlay's pin button and the Settings checkbox. The overlay keeps a taskbar button (`skipTaskbar: false`), so an unpinned, covered meter is recoverable from the taskbar. */ alwaysOnTop: boolean; liveBounds: Bounds | null; listBounds: Bounds | null; liveExpanded: boolean; runColumns: RunColumnConfig[]; /** Display filter (a view preference only — never deletes data): hide runs sealed `skipped` (too short / not a clean success) or `degraded` (a critical field unreadable). `counted` AND `partial` stay shown — a partial run is a REAL successful clear the reader joined mid-way (under-counted, so badged + tinted, but still the player's run); hiding partials made the list look empty after the slow first-launch attach, so players thought the meter wasn't recording runs. Default true; the toggle reveals the hidden runs (marked + filterable, never deleted). */ hideNonCounted: boolean; /** Display filter: hide runs shorter than this many seconds. null = off. The minimum is the SYSTEM floor (COUNT_FLOOR_SEC, 15s) — a preference, never below it; stage x-10 is exempt (ACT_BOSS_STAGE_NO). The floor itself is a converter constant, NOT this setting (don't conflate). */ minDurationSec: number | null; /** Auto-clean cap (Feature 2): keep at most this many NON-favorited runs locally; when the stored count exceeds it the app deletes the OLDEST non-favorited runs down to the cap (favorited runs are never deleted and never counted). null = OFF (unlimited history, the default). Clamped to MIN_MAX_RUNS before persisting (see prune.ts clampMaxRuns). */ maxRuns: number | null; /** Blue-chest cooldown tracker (#265): master on/off (default ON), toggled in the runs-window Tracker tab. Off = no auto-detect + overlay hidden; existing cooldowns are kept (not cleared), so re-enabling resumes them. */ cooldownTrackerEnabled: boolean; /** Per-chest-type OS drop notifications (independent of the cooldown tracker): fire when a chest of each type drops on ANY stage. `common` defaults OFF (drops ~constantly — would spam); `stageBoss` (blue) and `actBoss` default ON. Toggled in Settings. */ chestDropNotify: ChestDropNotify; /** Blue-chest cooldown tracker (#265). `chestCooldowns` = the ACTIVE per-BOX lines (one cooldown per chest level, keyed by boxKey; the hover X clears these); `chestDropLog` = the append-only drop HISTORY (the X never touches it). Both persist so a cooldown survives an app/game restart — remaining time is recomputed from each `dropAt`. */ chestCooldowns: ChestCooldown[]; chestDropLog: ChestCooldown[]; /** Blue-chest cooldown length in MINUTES (default DEFAULT_COOLDOWN_MIN). Single global value; the timestamp-anchored math re-derives every countdown when it changes (no migration). Clamped via clampCooldownMin. */ chestCooldownMin: number; /** Chest "route": blue-box keys (920xxx) the user pinned to always show — a card appears even before the box drops (placeholder = ready/available). Empty = no pins. */ chestRoute: number[]; /** Whether a drop on a box NOT in `chestRoute` still creates/updates a cooldown card. true (default) = additive: the route pins extras and everything auto-detected still shows (today's behavior). false = the route is an exclusive filter (only pinned levels track). Empty route + true = show all. */ trackOutsideRoute: boolean; /** Start the meter with Windows (#232): applied via app.setLoginItemSettings on the packaged Windows install (no-op elsewhere). Default off. */ launchOnStartup: boolean; /** UI language (#232): a locale code from shared/i18n LOCALES, or "auto" = follow the system language. */ language: string; /** Per-window UI scale (#232), applied as webContents zoom: 1 = 100%. The live overlay's bottom-edge drag adjusts liveFontScale too (its height is content-pinned, so scaling the content IS the vertical resize). Clamped to FONT_SCALE_MIN..MAX. */ liveFontScale: number; listFontScale: number; }
+export const DEFAULT_SETTINGS: AppSettings = { outputDir: null, opacity: 1, alwaysOnTop: true, liveBounds: null, listBounds: null, liveExpanded: true, runColumns: [], hideNonCounted: true, minDurationSec: null, maxRuns: null, cooldownTrackerEnabled: true, chestDropNotify: { common: false, stageBoss: true, actBoss: true }, chestCooldowns: [], chestDropLog: [], chestCooldownMin: DEFAULT_COOLDOWN_MIN, chestRoute: [], trackOutsideRoute: true, launchOnStartup: false, language: "auto", liveFontScale: 1, listFontScale: 1 };
 /** Font-scale clamp (#232): shared by the settings sliders, the overlay's bottom-edge drag and
  *  the main process's zoom apply, so every entry point agrees on the same bounds. */
 export const FONT_SCALE_MIN = 0.8;
@@ -45,25 +45,15 @@ export type UpdateStatus =
   | { state: "downloaded"; version: string }
   | { state: "up-to-date" }
   | { state: "error"; message: string };
-/** Current Discord auth state, surfaced to the renderer. */
-export interface AuthStatus { signedIn: boolean; displayName?: string; avatarUrl?: string; }
 /** Reader bring-up phase, surfaced to the startup splash. */
 export type ReaderStatus = "searching" | "resolving" | "scanning" | "ready";
 /** Reader supervisor status (Windows), surfaced to the renderer for the no-data message.
  *  idle = not managing; starting = bringing the reader up / first resolve; offline = no
  *  game open (re-polling); blocked = the reader keeps being killed (almost always AV). */
 export type ReaderState = "idle" | "starting" | "offline" | "blocked";
-/** Result of sharing a run to the leaderboard (discriminated, never throws across IPC). */
-export type ShareResult =
-  | { ok: true; url: string; duplicate: boolean }
-  | { ok: false; code: string; message: string };
 export interface MeterApi {
   /** App version (package.json's "version"); shown in Settings and used for updates. */
   getAppVersion(): Promise<string>;
-  /** Stable per-install GA4 client_id for usage analytics — an anonymous random UUID,
-   *  distinct from the device id and safe to expose. Persisted main-side because the
-   *  file:// renderer has no cookie storage. See main/analytics-id.ts. */
-  getAnalyticsClientId(): Promise<string>;
   getSettings(): Promise<AppSettings>;
   setSettings(partial: Partial<AppSettings>): Promise<AppSettings>;
   /** Settings changed in the MAIN process (e.g. follow-game auto-disabled by a manual
@@ -74,8 +64,7 @@ export interface MeterApi {
   listRuns(): Promise<RunIndexEntry[]>;
   getRun(id: string): Promise<RunRecord | null>;
   /** Delete ALL local run history (runs.jsonl + logs/ mirror) EXCEPT favorited runs (Feature 3),
-   *  which are kept. Leaderboard uploads are untouched — runs already shared stay on the web.
-   *  Returns false on failure. */
+   *  which are kept. Returns false on failure. */
   clearRuns(): Promise<boolean>;
   /** Toggle a run's favorite flag (Feature 3). Returns the NEW state (true = now favorited).
    *  Persists to the favorites.json sidecar and broadcasts onRunsChanged so every window re-renders
@@ -98,9 +87,6 @@ export interface MeterApi {
   /** Clear ALL tracked cooldowns + the drop history in one go (the Tracker tab's "Clear all").
    *  The pinned route is KEPT (it is config, edited via the level chips). */
   clearCooldowns(): void;
-  /** Open the web wiki's stage page for a stageKey in the browser (numeric key 301-redirects
-   *  to the slug). Used by the cooldown card's clickable mode tag. */
-  openStagePage(stageKey: number): void;
   openListWindow(): Promise<void>;
   /** Renderer-measured content height (px) for the live strip; main pins the window to it. */
   setLiveHeight(height: number): void;
@@ -140,46 +126,14 @@ export interface MeterApi {
   onUpdateStatus(cb: (status: UpdateStatus) => void): () => void;
   /** Quit and install a downloaded update now (only acts when status is "downloaded"). */
   quitAndInstall(): void;
-  /** Current Discord auth status (signed in, display name, avatar). */
-  authGetStatus(): Promise<AuthStatus>;
-  /** Start the Discord OAuth flow in the user's browser; resolves once it completes. */
-  authSignIn(): Promise<void>;
-  /** Sign out locally. */
-  authSignOut(): Promise<void>;
-  /** Subscribe to auth changes (sign-in/out, token refresh). Returns an unsubscribe fn. */
-  onAuthChanged(cb: (status: AuthStatus) => void): () => void;
-  /** Fired when the session was cleared involuntarily by a 401 (expired/rotated token,
-   *  no refresh) — distinct from a deliberate sign-out, so the UI can prompt a re-sign-in
-   *  instead of going silently offline. Returns an unsubscribe fn. */
-  onSessionExpired(cb: () => void): () => void;
-  /** Number of local runs queued for upload but not yet synced — used to prompt a
-   *  signed-out user whose runs are piling up locally (issue #60). */
-  getPendingSyncCount(): Promise<number>;
-  /** Share a successful run to the leaderboard; returns a discriminated result. */
-  shareRun(runId: string): Promise<ShareResult>;
-  /** Whether a run was already shared (and its public URL, if so). */
-  getShareStatus(runId: string): Promise<{ sharedUrl: string | null }>;
-  /** Subscribe to background auto-uploads completing (run id + public URL), so an open
-   *  RunDetailView flips to "View on TBH Helper" live. Returns an unsubscribe fn. */
-  onShareUpdated(cb: (payload: { runId: string; url: string }) => void): () => void;
-  /** Open an allowlisted URL (TBH Helper site, community Discord) in the default browser. */
+  /** Open an allowlisted URL (community Discord, project GitHub) in the default browser. */
   openExternal(url: string): void;
-  /** Open the website's session-stats dashboard for a play session in the browser.
-   *  Pass a sessionId to target a specific session; omit it to let the main process
-   *  resolve the newest run's session. Triggers an immediate upload sweep first so
-   *  the page reflects the latest runs. No-op when no session can be resolved.
-   *  While signed OUT, first shows a native prompt (sign in / open anyway / cancel)
-   *  since nothing was uploaded and the page would be empty. */
-  openSessionStats(sessionId?: string): Promise<void>;
-  /** Ask the reader to end the current session and start a new one (subsequent runs
-   *  get a fresh session id and run numbering). Local history and already-uploaded
-   *  runs are untouched. Resolves false when the request could not be written. */
+  /** Start a new session (subsequent runs get a fresh session id and run numbering).
+   *  Local history is untouched. Resolves false when the request could not be written. */
   resetSession(): Promise<boolean>;
-  /** The reader's current session id (from session.json), or null if none yet. Persists
-   *  across app restarts, so the runs list can mark the current session even between runs. */
+  /** The current session id, or null if none yet. Persists across app restarts, so the
+   *  runs list can mark the current session even between runs. */
   getCurrentSession(): Promise<string | null>;
-  /** Forward a renderer error to the main process's Discord error reporting. */
-  reportError(context: string, message: string, stack?: string): void;
   /** Collect diagnostic info (environment, app state, reader, settings, log tails)
    *  for bug reports. Returns a plaintext block with no PII or tokens. */
   debugInfo(): Promise<string>;

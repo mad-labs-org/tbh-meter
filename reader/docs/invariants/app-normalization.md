@@ -85,16 +85,15 @@ both via pure, testable functions in the same module:
 **Partial/skip is NO longer a discard on read.** What judges accounting is the **converter**: it
 seals `quality` (`counted`/`skipped`/`partial`/`degraded`) on the structured record (`classifyQuality`
 in `converter/helpers.ts`); the app **shows every run** and **hides** the non-`counted` ones via a
-**UI filter** (a "show ignored" toggle), deleting nothing (skip ≠ vanish). The upload checks the same
-verdict (only `counted` is sent — `auto-upload.ts`).
+**UI filter** (a "show ignored" toggle), deleting nothing (skip ≠ vanish).
 
 `normalizeRecord` (still in `runs-source.ts`) is **NOT** in the read path — it survives as a
 **migration-only** helper (`converter/legacy.ts`, via `convertLegacy`), which adopts each old line
 into `logs/` and **seals the verdict** (`quality`/`partial`) via `classifyQuality`
 (`converter/helpers.ts`), the SAME verdict as the conversion of a fresh raw. Suppressing
-`partial`/`degraded`/`skipped` from `success` is the job of the **upload gate** (`eligible()` in
-`auto-upload.ts`) **+ the UI filter** — **no** longer a discard on read (and never by
-`goldGained === 0`, which used to hide COMPLETE runs with a failed gold read).
+`partial`/`degraded`/`skipped` from `success` is the job of the **UI filter** — **no** longer a
+discard on read (and never by `goldGained === 0`, which used to hide COMPLETE runs with a failed
+gold read).
 
 > The gold number itself (the "2x", then "0") is the **reader**'s problem, fixed there via liveness
 > (`metrics/gold.py`). The app **trusts** the reader's gold and never tries to guess the value.

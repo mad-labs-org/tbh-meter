@@ -6,9 +6,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "common.cancel": "取消",
   "common.close": "关闭",
   "common.reset": "重置",
-  "common.signOut": "退出登录",
-  "common.signInDiscord": "使用 Discord 登录",
-  "common.waitingBrowser": "正在等待浏览器…",
 
   // ── Live overlay ──
   "live.pillStarting": "启动中",
@@ -17,10 +14,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.offlineMsg": "计量器离线 — 请打开 Task Bar Hero",
   "live.blockedMsg": "读取器被拦截 — 可能是杀毒软件在关闭它。",
   "live.retry": "重试",
-  "live.statusLive": "Live",
-  "live.statusOffline": "离线",
-  "live.syncLive": "Live — 正在将挑战上传到排行榜",
-  "live.syncOff": "未同步 — 登录后才会上传你的挑战",
   "live.dps": "DPS",
   "live.mobs": "怪物",
   "live.gold": "金币",
@@ -39,7 +32,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "live.expandTitle": "展开",
   "live.pinTitle": "始终置顶（点击关闭）",
   "live.unpinTitle": "未置顶（点击将计量器固定在其他窗口之上）",
-  "live.sessionStats": "会话统计",
   "live.openLogs": "打开记录",
   "live.dragResize": "拖动调整宽度",
   "live.dragScale": "拖动缩放计量器",
@@ -55,15 +47,13 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "splash.tipLabel": "提示：",
   "splash.tip1": "拖动左侧手柄即可移动计量器。",
   "splash.tip2": "进入战斗即可实时查看你的 DPS。",
-  "splash.tip3": "登录后，挑战会自动上传到排行榜。",
+  "splash.tip3": "Your run history is saved locally — open the runs window to browse it.",
   "splash.tip4": "计量器只会读取游戏内存 — 绝不写入任何内容。",
 
   // ── Window headers ──
   "header.tabRuns": "挑战",
   "header.tabTracker": "追踪器",
   "header.tabSettings": "设置",
-  "header.signIn": "登录",
-  "header.signedIn": "已登录",
   "header.appVersion": "应用版本",
   "header.restartToUpdate": "重启以更新",
   "header.updateReady": "更新 v{version} 已就绪",
@@ -92,7 +82,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.startup": "随 Windows 启动",
   "settings.startupDesc": "Windows 启动时自动打开计量器。",
   "settings.runFilter": "挑战筛选",
-  "settings.runFilterDesc": "选择列表中显示哪些挑战。仅本地生效 — 绝不影响排行榜。",
+  "settings.runFilterDesc": "Choose which runs show in your list. This is a view filter — hidden runs are kept, never deleted.",
   "settings.hideIgnored": "隐藏被忽略的挑战",
   "settings.hideIgnoredDesc":
     "被跳过、不完整或数据缺失的挑战保持隐藏。它们仍计入你的会话，随时可在列表中显示。",
@@ -104,15 +94,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "settings.maxRunsDesc":
     "本电脑最多保存这么多挑战。超出后会自动删除最旧的挑战。收藏的挑战始终保留，且不计入上限。",
   "settings.maxRunsUnit": "条",
-  "settings.leaderboard": "排行榜",
-  "settings.signedInAs": "当前登录：",
-  "settings.uploadAuto": "成功的挑战会自动上传。",
-  "settings.signInPitch":
-    "在顶栏使用 Discord 登录即可登上 TBH Helper 排行榜。登录还会认领此电脑已匿名上传的挑战。",
-  "settings.usageStats": "使用统计",
-  "settings.usageStatsLabel": "分享匿名使用统计",
-  "settings.usageStatsDesc":
-    "帮助我们了解有多少人在使用 meter（匿名，通过 Google Analytics）。没有个人数据，没有挑战详情。关闭以完全退出。",
+    "settings.diagnostics": "Diagnostics",
     "settings.diagnosticsLog": "诊断日志",
   "settings.diagnosticsLogDesc": "收集诊断信息用于错误报告。不包含个人数据。",
   "diagnostics.collecting": "正在收集诊断信息...",
@@ -123,11 +105,11 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "diagnostics.backToSettings": "返回设置",
   "settings.runHistory": "挑战历史",
   "settings.runHistoryDesc":
-    "删除本机保存的全部挑战。已分享到排行榜的挑战不受影响，仍保留在网页上。",
+    "Delete all runs stored on this computer.",
   "settings.clearHistory": "清空挑战历史",
   "settings.clearConfirmTitle": "清空挑战历史？",
   "settings.clearConfirmBody":
-    "这会删除本计量器的所有挑战，包括日志存档，且无法撤销。收藏的挑战会保留。已分享到排行榜的挑战会保留。",
+    "This deletes every run from this meter, including the logs archive. Favorited runs are kept. It cannot be undone.",
   "settings.clearError": "无法清空历史，请重试。",
   "settings.clearing": "正在清空…",
   "settings.deleteAll": "删除全部挑战",
@@ -163,11 +145,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "runs.newSession": "新会话",
   "runs.newSessionConfirm": "确认？",
   "runs.newSessionTitle":
-    "结束当前会话。之后的挑战将开启新会话；已上传的挑战仍保留在网站上。",
-  "runs.sessionStats": "会话统计",
-  "runs.sessionStatsTitle": "在浏览器中打开当前会话的统计",
-  "runs.hintNoRunsCurrent": "当前会话还没有挑战。完成一次挑战后即会出现在网站上。",
-  "runs.hintNoRuns": "至少完成一次挑战。会话在拥有一次完成的挑战后会保存到网站。",
+    "Ends the current session. The next runs start a new session.",
   "runs.emptyFiltered": "没有符合筛选条件的挑战",
   "runs.showIgnoredOne": "显示 {count} 个被忽略的挑战",
   "runs.showIgnoredMany": "显示 {count} 个被忽略的挑战",
@@ -213,15 +191,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "detail.drops": "掉落",
   "detail.chestsOne": "{count} 个宝箱",
   "detail.chestsMany": "{count} 个宝箱",
-  "detail.shareView": "在 TBH Helper 查看",
-  "detail.sharing": "分享中…",
-  "detail.shareBtn": "分享到排行榜",
-  "detail.shareSignIn": "使用 Discord 登录后分享",
-  "detail.shareError": "出错了，请重试。",
-  "detail.fullDetails":
-    "想看完整数据？每位英雄的装备、技能和属性都在 TBH Helper 的挑战页面上。",
-  "detail.fullDetailsShare": "分享该挑战即可在网站上查看。",
-  "detail.viewFull": "查看完整详情",
   "detail.xpByHero": "各英雄经验",
   "detail.heroLv": "等级 {level}",
   "detail.levelUp": "已升级",
@@ -233,30 +202,30 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "status.abandoned": "放弃",
   "quality.partialLabel": "不完整",
   "quality.partialTitle":
-    "计量器在挑战进行中才加入，因此总数被低估。该挑战未上传到排行榜。",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "quality.degradedLabel": "数据受损",
   "quality.degradedTitle":
-    "该挑战的部分数值无法读取，数字可能有误。该挑战未上传到排行榜。",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "quality.skippedLabel": "无效",
   "quality.skippedTitle":
-    "该挑战不是有效通关（太短，或以失败/放弃结束），因此不计入，也未上传到排行榜。",
+    "This run is not a valid clear (too short, or it ended in a fail or abandon), so it does not count.",
 
   // ── Run-outcome marker (untranslated placeholders — English source until localized) ──
   "outcome.buggedLabel": "Bugged",
   "outcome.buggedTitle":
-    "Some values could not be read for this run, so the numbers may be wrong. It was not uploaded to the leaderboard.",
+    "Some values could not be read for this run, so the numbers may be wrong.",
   "outcome.failedLabel": "Failed (wipe)",
   "outcome.failedTitle":
-    "The party was wiped before clearing the stage, so this run does not count and was not uploaded to the leaderboard.",
+    "The party was wiped before clearing the stage, so this run does not count.",
   "outcome.abandonedLabel": "Abandoned",
   "outcome.abandonedTitle":
-    "This run was left before the stage was cleared, so it does not count and was not uploaded to the leaderboard.",
+    "This run was left before the stage was cleared, so it does not count.",
   "outcome.partialLabel": "Partial",
   "outcome.partialTitle":
-    "The meter joined this run while it was already in progress, so its totals are under-counted. It was not uploaded to the leaderboard.",
+    "The meter joined this run while it was already in progress, so its totals are under-counted.",
   "outcome.tooShortLabel": "Too short",
   "outcome.tooShortTitle":
-    "This clear was below the minimum length to count, so it does not count and was not uploaded to the leaderboard.",
+    "This clear was below the minimum length to count, so it does not count.",
 
   // ── Blue-chest tracker ──
   "cooldowns.title": "蓝宝箱追踪器",
@@ -271,7 +240,6 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.showHistory": "显示历史",
   "cooldowns.showingRecent": "显示最近 {shown} 条，共 {total} 条",
   "cooldowns.stageLabel": "关卡 {code}",
-  "cooldowns.openStage": "在网站上打开此关卡",
   "cooldowns.ready": "就绪",
   "cooldowns.readyCheck": "✓ 就绪",
   "cooldowns.remove": "移除（下次掉落时重新出现）",
@@ -303,30 +271,10 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "notifications.actBossTitle": "章节首领宝箱已掉落",
   "notifications.actBossBody": "{where}：刚刚掉落了一个章节首领宝箱。",
 
-  // ── Sign-in prompt modal ──
-  "signin.title": "把你的挑战分享到排行榜",
-  "signin.body":
-    "你尚未登录，挑战只保存在本机，不会进入排行榜。使用 Discord 登录即可同步，并计入排行榜和你的个人资料。",
-  "signin.dontShow": "不再显示",
-  "signin.notNow": "暂不",
-
-  "signin.pendingTitle": "你的挑战未在同步",
-  "signin.pendingBody":
-    "你已退出登录，已完成的挑战因此停止上传到排行榜（本地有 {count} 个待同步）。登录即可同步。",
-  "signin.expiredTitle": "你的登录已过期",
-  "signin.expiredBody":
-    "你已退出登录，挑战因此停止同步到排行榜。挑战仍保存在本地。重新登录即可继续同步。",
   // ── Tray menu ──
   "tray.showLive": "显示实时悬浮窗",
   "tray.openRuns": "打开挑战列表",
   "tray.quit": "退出",
-
-  // ── Native dialogs (main process) ──
-  "dialog.notSignedInTitle": "你尚未登录",
-  "dialog.notSignedInMsg": "你的挑战没有上传到网站。",
-  "dialog.notSignedInDetail":
-    "会话页面将显示为空。使用 Discord 登录即可上传挑战。未登录时的挑战（包括本会话的）会在登录后立即上传。",
-  "dialog.openAnyway": "仍然打开",
 
   // ── Chests / drops ──
   "chest.fallback": "宝箱",

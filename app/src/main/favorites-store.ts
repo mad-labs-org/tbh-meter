@@ -1,7 +1,7 @@
 // Favorite runs — a main-owned SIDECAR keyed by run id, NOT a field on the converter-sealed
 // logs/<id>.json record (those are immutable: the converter writes them once and the read path
 // never mutates them — runs-source app-normalization invariant). Mirrors the session-cuts.json /
-// uploads.json pattern: a small JSON in the meter folder, read/written by main, exposed over IPC.
+// sidecar pattern: a small JSON in the meter folder, read/written by main, exposed over IPC.
 //
 // A favorited run is EXEMPT from auto-clean (max-runs prune) AND from "clear all runs", so a user
 // can pin the runs they care about and let everything else churn. The set is a list of run ids
@@ -11,7 +11,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { resolveOutputDir } from "./settings.js";
 
-/** Sidecar filename in the meter output dir (alongside session-cuts.json / uploads.json). */
+/** Sidecar filename in the meter output dir (alongside session-cuts.json). */
 export const FAVORITES_FILENAME = "favorites.json";
 
 /** Bound the file so a runaway never grows settings/meter dir unboundedly. A user will pin a

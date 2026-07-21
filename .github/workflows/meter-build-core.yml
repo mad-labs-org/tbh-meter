@@ -50,9 +50,8 @@ jobs:
     name: build ${{ inputs.variant }} ${{ inputs.version }}
     runs-on: windows-latest
     timeout-minutes: 45
-    # Only a STABLE (ship) build enters `production` — that's where the Ed25519 signing key lives
-    # and where the deploy gate (owner approval) sits. RC/PR builds get no environment, so they
-    # cannot read the key and build unsigned. The production key never reaches a test build.
+    # Only a STABLE (ship) build enters `production` — that's where the deploy gate
+    # (owner approval) sits. RC/PR builds get no environment.
     environment: ${{ inputs.variant == 'stable' && 'production' || '' }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -118,11 +117,6 @@ jobs:
           # rc → ~/tbh-meter-rc + auto-update OFF; stable (anything else) → defaults to the
           # shipped identity. electron.vite.config.ts bakes this into __TBH_VARIANT__.
           TBH_BUILD_VARIANT: ${{ inputs.variant }}
-          # Ed25519 key the app signs POST /runs with — electron.vite.config.ts bakes it into
-          # __TBH_SIGNING_PRIVATE_KEY__. Resolves to the `production` environment secret ONLY for
-          # stable builds (the only ones in that environment); empty for RC/PR → those build
-          # unsigned, so the production key never touches a test build running arbitrary code.
-          TBH_SIGNING_PRIVATE_KEY: ${{ secrets.TBH_SIGNING_PRIVATE_KEY }}
         run: |
           if [ "${{ inputs.variant }}" = "rc" ]; then
             pnpm build

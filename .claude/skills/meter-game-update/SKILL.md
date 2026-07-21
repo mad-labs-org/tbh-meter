@@ -136,7 +136,7 @@ It resolves via the embedded seed (same path as the RC's first launch) and requi
 `stats`, `stage`, `run-cycle`, `catálogos` (writes `validate_live_out.txt` on the share — read it
 back). **Exit != 0 → DO NOT SHIP.** This is the ONLY check that covers the OBFUSCATED classes the
 step-3 diff can't (`AggregateManager`/gold, `HeroRuntime`/party+xp, `StatsHolder`) AND the SAVE/record
-paths the run actually uploads (`save-build`+`build-record`, the 1.00.12 fleet-stoppage path). ⚠
+paths the run actually records (`save-build`+`build-record`, the 1.00.12 fleet-stoppage path). ⚠
 **NEVER validate only the field you just fixed** — on 1.00.11 the gold was confirmed but the party
 (`HeroRuntime`) shipped broken because nobody checked the rest; selftest + diff are NOT enough alone.
 See `docs/process/live-validation-gate.md`.
@@ -147,8 +147,8 @@ shipped a wrong seed/calibration THREE times, each silent, each because verifica
 converge; **(2)** party fell back to the save roster — `pick_live_sm`'s cap blew past the live
 `StageManager` (+0 xp, 6 heroes shown solo); **(3)** 1.00.12 — the bucket-box inserted fields into
 `PlayerSaveData` and shifted every save list +0x10, so `read_gold`/`read_heroes` read the WRONG list →
-`pick_live_psd` None → run `heroes=[]` → the app's `eligible()` (heroes>0) skipped every run →
-**fleet-wide upload stoppage**. Each passed GREEN because the gate it had was the wrong one (static
+`pick_live_psd` None → run `heroes=[]` →
+**fleet-wide broken run records (every run with an empty party)**. Each passed GREEN because the gate it had was the wrong one (static
 "offset exists" ≠ "offset correct"; the live gate exercised only the LIVE path, never the SAVE build
 the run record uses). So do NOT bump `GAME_VERSION` or ship until BOTH are checked:
 

@@ -9,13 +9,9 @@ import {
   Sparkles,
   Swords,
   Crosshair,
-  ExternalLink,
-  Loader2,
-  Upload,
   Star,
 } from "lucide-react";
 import type { RunRecord, RunStatus, RunQuality, RunHero } from "../../../shared/run-types.js";
-import type { AuthStatus } from "../../../shared/ipc-types.js";
 import type { Translate } from "../../../shared/i18n/index.js";
 import {
   humanize,
@@ -47,7 +43,6 @@ const STATUS_CHIP: Record<RunStatus, string> = {
 export function RunDetailView({ runId, onBack }: RunDetailViewProps) {
   const { t, lang } = useI18n();
   const [run, setRun] = useState<RunRecord | null | "loading" | "error">("loading");
-  const share = useShareState(runId);
   const favorite = useFavorite(runId);
 
   useEffect(() => {
@@ -85,8 +80,6 @@ export function RunDetailView({ runId, onBack }: RunDetailViewProps) {
   const hasBothTimes = measured > 0 && official > 0;
   const timesDiverge =
     hasBothTimes && Math.abs(measured - official) / Math.max(measured, official) > 0.2;
-
-  const shareable = run.status === "success" && run.stageKey != null;
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -151,14 +144,12 @@ export function RunDetailView({ runId, onBack }: RunDetailViewProps) {
         {timesDiverge && (
           <p className="mt-0.5 text-xs text-amber-500/70">{t("detail.measuredNe")}</p>
         )}
-
-        {shareable && <ShareControls share={share} />}
       </div>
 
       {/* ── Body ────────────────────────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-4 py-3">
-        {/* Outcome notice — explains why a non-counted run (wipe / abandon / too short / partial /
-            bugged) isn't on the leaderboard, with the per-field read failures (issues) when present. */}
+        {/* Outcome notice — explains why a run did not count (wipe / abandon / too short / partial /
+            bugged), with the per-field read failures (issues) when present. */}
         <QualityNotice status={run.status} quality={run.quality} issues={run.issues} />
 
         {/* Run metrics */}
@@ -228,10 +219,6 @@ export function RunDetailView({ runId, onBack }: RunDetailViewProps) {
             <ChestDrops drops={run.drops} size="md" />
           </div>
         )}
-
-        {/* Party, equipment, skills, and stats intentionally live on the web —
-            the meter only shows the run summary plus a bridge to the site. */}
-        {shareable && <FullDetailsCallout share={share} />}
       </div>
     </div>
   );
@@ -344,7 +331,7 @@ function XpHeroRow({ hero, total, t }: { hero: RunHero; total: number; t: Transl
 /** Banner shown for any run that did not count, labelled by its specific outcome (wipe / abandon /
  *  too short / partial / bugged) so the reason is explicit — not just "invalid". For a degraded
  *  (bugged) run, `issues` carries the per-field read failures (field → reason), surfaced so the user
- *  can see exactly what was lost. Cosmetic only — it never gates the leaderboard or the display. */
+ *  can see exactly what was lost. Cosmetic only — it never gates the display. */
 function QualityNotice({
   status,
   quality,
@@ -404,167 +391,6 @@ function useFavorite(runId: string): { on: boolean; toggle: () => void } {
     void window.meter.toggleFavorite(runId).then(setOn);
   };
   return { on, toggle };
-}
-
-interface ShareState {
-  auth: AuthStatus | null;
-  sharedUrl: string | null;
-  signingIn: boolean;
-  sharing: boolean;
-  error: string | null;
-  signIn: () => void;
-  share: () => void;
-}
-
-/**
- * Share/auth state for a run, lifted so both the header's ShareControls and the
- * FullDetailsCallout reflect the same status. Auth + network all run in the main
- * process; this hook just drives the IPC bridge. State machine:
- *   signed out          -> "Sign in with Discord"
- *   signed in, unshared  -> "Share to leaderboard"
- *   shared               -> "View on TBH Helper"
- */
-function useShareState(runId: string): ShareState {
-  const { t } = useI18n();
-  const [auth, setAuth] = useState<AuthStatus | null>(null);
-  const [sharedUrl, setSharedUrl] = useState<string | null>(null);
-  const [signingIn, setSigningIn] = useState(false);
-  const [sharing, setSharing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    window.meter.authGetStatus().then(setAuth).catch(() => setAuth({ signedIn: false }));
-    const off = window.meter.onAuthChanged((status) => {
-      setAuth(status);
-      setSigningIn(false);
-    });
-    return off;
-  }, []);
-
-  useEffect(() => {
-    setSharedUrl(null);
-    window.meter
-      .getShareStatus(runId)
-      .then((s) => setSharedUrl(s.sharedUrl))
-      .catch(() => setSharedUrl(null));
-    // A background auto-upload of THIS run flips us to "View on TBH Helper" live.
-    const off = window.meter.onShareUpdated((payload) => {
-      if (payload.runId === runId) setSharedUrl(payload.url);
-    });
-    return off;
-  }, [runId]);
-
-  const signIn = (): void => {
-    setSigningIn(true);
-    setError(null);
-    window.meter.authSignIn().catch(() => setSigningIn(false));
-  };
-
-  const share = (): void => {
-    setSharing(true);
-    setError(null);
-    window.meter
-      .shareRun(runId)
-      .then((result) => {
-        if (result.ok) {
-          setSharedUrl(result.url);
-        } else {
-          setError(result.message);
-        }
-      })
-      .catch(() => setError(t("detail.shareError")))
-      .finally(() => setSharing(false));
-  };
-
-  return { auth, sharedUrl, signingIn, sharing, error, signIn, share };
-}
-
-const SHARE_BUTTON_BASE =
-  "flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors disabled:cursor-default disabled:opacity-60";
-
-/** The share/sign-in/view action for the current share state. */
-function ShareAction({ share, viewLabel }: { share: ShareState; viewLabel: string }) {
-  const { t } = useI18n();
-  if (share.sharedUrl) {
-    const url = share.sharedUrl;
-    return (
-      <button
-        type="button"
-        onClick={() => window.meter.openExternal(url)}
-        className={cn(SHARE_BUTTON_BASE, "bg-emerald-600/15 text-emerald-300 hover:bg-emerald-600/25")}
-      >
-        <ExternalLink className="size-3.5" />
-        {viewLabel}
-      </button>
-    );
-  }
-  if (share.auth?.signedIn) {
-    return (
-      <button
-        type="button"
-        onClick={share.share}
-        disabled={share.sharing}
-        className={cn(SHARE_BUTTON_BASE, "bg-brand-600/20 text-brand-200 hover:bg-brand-600/30")}
-      >
-        {share.sharing ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
-        {share.sharing ? t("detail.sharing") : t("detail.shareBtn")}
-      </button>
-    );
-  }
-  return (
-    <button
-      type="button"
-      onClick={share.signIn}
-      disabled={share.signingIn}
-      className={cn(SHARE_BUTTON_BASE, "bg-discord/20 text-discord-foreground hover:bg-discord/30")}
-    >
-      {share.signingIn ? <Loader2 className="size-3.5 animate-spin" /> : null}
-      {share.signingIn ? t("common.waitingBrowser") : t("detail.shareSignIn")}
-    </button>
-  );
-}
-
-/** Header share controls: primary action + account line + error. */
-function ShareControls({ share }: { share: ShareState }) {
-  const { t } = useI18n();
-  return (
-    <div className="mt-2 flex flex-wrap items-center gap-2">
-      <ShareAction share={share} viewLabel={t("detail.shareView")} />
-
-      {share.auth?.signedIn && (
-        <span className="flex items-center gap-1.5 text-[11px] text-zinc-500">
-          {share.auth.displayName && (
-            <span className="text-zinc-400">{share.auth.displayName}</span>
-          )}
-          <button
-            type="button"
-            onClick={() => window.meter.authSignOut()}
-            className="cursor-pointer text-zinc-500 underline-offset-2 hover:text-zinc-300 hover:underline"
-          >
-            {t("common.signOut")}
-          </button>
-        </span>
-      )}
-
-      {share.error && <span className="text-[11px] text-red-400">{share.error}</span>}
-    </div>
-  );
-}
-
-/** The full per-hero breakdown lives on the web — this panel is the bridge. */
-function FullDetailsCallout({ share }: { share: ShareState }) {
-  const { t } = useI18n();
-  return (
-    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-surface-600 bg-surface-800/40 px-3 py-2.5">
-      <p className="text-xs text-zinc-400">
-        {t("detail.fullDetails")}
-        {!share.sharedUrl && (
-          <span className="text-zinc-500"> {t("detail.fullDetailsShare")}</span>
-        )}
-      </p>
-      <ShareAction share={share} viewLabel={t("detail.viewFull")} />
-    </div>
-  );
 }
 
 interface StatCardProps {

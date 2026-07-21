@@ -17,7 +17,7 @@ But an un-investigated hit in a STOP category (SKILL.md) blocks the review.
 
 ## Contents
 
-- [A. CI / workflow / repo-config tampering](#a) — the path to secrets and the signing key
+- [A. CI / workflow / repo-config tampering](#a) — the path to the release pipeline and its secrets
 - [B. Dependency / supply-chain changes](#b)
 - [C. Network egress, exfiltration & code execution](#c)
 - [D. Obfuscation & trojan-source](#d)
@@ -31,11 +31,11 @@ But an un-investigated hit in a STOP category (SKILL.md) blocks the review.
 ## A. CI / workflow / repo-config tampering — HIGHEST severity
 
 **Why.** A *fork* PR cannot read this repo's secrets on its own PR run — that's a deliberate
-boundary (CONTRIBUTING.md), so an attacker can't just print `TBH_SIGNING_PRIVATE_KEY` in a PR. The
-payoff comes **after merge**, when the workflow runs on `push`/`main` (or in the release build) with
-the `production` environment secrets — the Ed25519 signing key and `DISCORD_ANNOUNCE_WEBHOOK`. A
-poisoned action, a new exfil step, or a trigger that hands secrets to PR-controlled code is how you
-lose the signing key. **Any diff under `.github/` from an external contributor is a STOP → escalate**,
+boundary (CONTRIBUTING.md). The payoff comes **after merge**, when the workflow runs on
+`push`/`main` (or in the release build) with the `production` environment secrets
+(`DISCORD_ANNOUNCE_WEBHOOK`) and, above all, the ability to SHIP a release that auto-updates onto
+every user. A poisoned action, a new exfil step, or a trigger that hands secrets to PR-controlled
+code is how you lose the release pipeline. **Any diff under `.github/` from an external contributor is a STOP → escalate**,
 full stop; the patterns below are what you point the maintainer at.
 
 ```bash
@@ -59,7 +59,7 @@ Point the maintainer at these specific patterns (each is a known CI-attack primi
   SHA is a supply-chain regression. `added 'uses:'`
 - **Arbitrary network / shell in build steps** — `added 'curl|wget|Invoke-WebRequest|nc |bash <|\| *sh'`.
 - **Self-hosted runners** — `added 'runs-on:.*self-hosted'`.
-- **The release/signing path itself** — any edit to `meter-build-core.yml`, `meter-2-build.yml`,
+- **The release path itself** — any edit to `meter-build-core.yml`, `meter-2-build.yml`,
   `meter-3-ship.yml`, `meter-1-stage.yml`, or `codeql.yml`/`scorecard.yml`/`secret-scan.yml`/
   `dependency-review.yml` (weakening a security gate is as bad as adding an exploit).
 - **CODEOWNERS / branch-protection / gitleaks config** — a diff that removes reviewers, widens who
@@ -95,9 +95,10 @@ added 'postinstall|preinstall|prepare|prepublish|install"'   # lifecycle scripts
 <a id="c"></a>
 ## C. Network egress, exfiltration & code execution — STOP → escalate
 
-**Why.** The app already talks to exactly one place (`api.tbherohelper.com`, per SECURITY.md) and the
-reader talks to *nothing*. Any *new* outbound path or any dynamic code execution is how data (auth
-tokens, memory contents) leaves the machine or how attacker-controlled code runs.
+**Why.** The app talks to exactly one place (GitHub Releases, for the auto-update check — per
+SECURITY.md) and the reader talks to *nothing*. Any *new* outbound path or any dynamic code
+execution is how data (memory contents, local files) leaves the machine or how attacker-controlled
+code runs.
 
 ```bash
 added 'https?://|wss?://|fetch\(|XMLHttpRequest|WebSocket|dgram|net\.(connect|Socket)|dns\.'
@@ -105,9 +106,9 @@ added 'child_process|execSync|execFile|spawn|\beval\(|new Function|require\([^'\
 added 'socket|urllib|httplib|http\.client|requests|ftplib|smtplib|subprocess|os\.system|os\.popen|os\.exec|pty\.|pickle\.loads|marshal\.loads|__import__|getattr\('
 ```
 
-- **App main process** — scrutinize any change to `API_URL`, `error-report.ts`, `share.ts`,
-  `auto-update.ts` (the update **feed URL** — repointing it hijacks auto-update), and
-  `request-signer.ts` (the Ed25519 signing). A new host, or user data flowing to a new sink, is exfil.
+- **App main process** — scrutinize any change to `auto-update.ts` (the update **feed URL** —
+  repointing it hijacks auto-update) and `net-fetch.ts`. The app has NO other outbound calls:
+  a new host, or user data flowing to any sink, is exfil.
 - **Reader** — it is read-only and offline. Any `import socket/urllib/http/subprocess`, any
   `os.system`/`popen`/`exec*`, or any `ctypes` process-manipulation beyond reading
   (**`WriteProcessMemory`, `CreateRemoteThread`, `VirtualAllocEx`, `OpenProcess` with write/operation
@@ -116,8 +117,8 @@ added 'socket|urllib|httplib|http\.client|requests|ftplib|smtplib|subprocess|os\
 - **Dynamic execution** — `eval`, `new Function`, dynamic `require`/`import`, Node `vm`/`child_process`,
   Python `exec`/`eval`/`compile`/`pickle`/`marshal`/`__import__`/attribute-dispatch on attacker data.
   A meter has essentially no legitimate reason to build and run code at runtime.
-- **Token/credential reads that then move** — reading the local auth token, env vars, or keytar and
-  passing it into any of the sinks above.
+- **Credential reads that then move** — reading local files, env vars, or keytar and
+  passing them into any of the sinks above.
 
 <a id="d"></a>
 ## D. Obfuscation & trojan-source — STOP → escalate

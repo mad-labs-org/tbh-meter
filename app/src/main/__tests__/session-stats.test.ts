@@ -10,7 +10,6 @@ import {
   readCurrentSessionId,
   readSessionCuts,
   requestSessionReset,
-  sessionStatsUrl,
 } from "../session-stats.js";
 
 describe("isValidSessionId", () => {
@@ -26,7 +25,7 @@ describe("isValidSessionId", () => {
     expect(isValidSessionId(42)).toBe(false);
   });
 
-  it("rejects ids containing a colon (the external_id run separator)", () => {
+  it("rejects ids containing a colon (the legacy run-id separator)", () => {
     expect(isValidSessionId("abc:1")).toBe(false);
     expect(isValidSessionId(":")).toBe(false);
   });
@@ -34,14 +33,6 @@ describe("isValidSessionId", () => {
   it("rejects ids over the 190-char cap", () => {
     expect(isValidSessionId("a".repeat(190))).toBe(true);
     expect(isValidSessionId("a".repeat(191))).toBe(false);
-  });
-});
-
-describe("sessionStatsUrl", () => {
-  it("builds an origin-scoped, encoded URL", () => {
-    expect(sessionStatsUrl("https://tbherohelper.com", "abc 123")).toBe(
-      "https://tbherohelper.com/meter/session/abc%20123",
-    );
   });
 });
 
