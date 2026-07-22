@@ -11,12 +11,12 @@ import { createLiveDrag, type LiveDragDeps, type Point } from "../live-drag.js";
 
 function harness(opts: { bounds: { x: number; y: number; width: number; height: number } }) {
   let cursor: Point = { x: 0, y: 0 };
-  const setPosition = vi.fn();
+  const setBounds = vi.fn();
   const setWidth = vi.fn();
   const win = {
     isDestroyed: () => false,
     getBounds: () => opts.bounds,
-    setPosition,
+    setBounds,
   } as unknown as BrowserWindow;
   const deps: LiveDragDeps = {
     getWindow: () => win,
@@ -28,7 +28,7 @@ function harness(opts: { bounds: { x: number; y: number; width: number; height: 
     setCursor: (p: Point) => {
       cursor = p;
     },
-    setPosition,
+    setBounds,
     setWidth,
   };
 }
@@ -62,7 +62,21 @@ describe("createLiveDrag — move (position)", () => {
     h.setCursor({ x: 400.6, y: 250.4 });
     h.drag.move();
     // new top-left = cursor − grab offset = (400.6 − 50, 250.4 − 20) rounded
-    expect(h.setPosition).toHaveBeenCalledWith(351, 230);
+    expect(h.setBounds).toHaveBeenCalledWith({ x: 351, y: 230, width: 420, height: 48 });
+  });
+
+  it("keeps the pointer-down size when Windows reports mutated bounds mid-drag", () => {
+    const bounds = { x: 100, y: 50, width: 435, height: 92 };
+    const h = harness({ bounds });
+    h.setCursor({ x: 150, y: 70 });
+    h.drag.start("move");
+
+    bounds.x = 90;
+    bounds.width = 600;
+    h.setCursor({ x: 250, y: 170 });
+    h.drag.move();
+
+    expect(h.setBounds).toHaveBeenCalledWith({ x: 200, y: 150, width: 435, height: 92 });
   });
 });
 
@@ -76,7 +90,7 @@ describe("createLiveDrag — lifecycle", () => {
     h.setCursor({ x: 900, y: 10 });
     h.drag.move(); // ended
     expect(h.setWidth).not.toHaveBeenCalled();
-    expect(h.setPosition).not.toHaveBeenCalled();
+    expect(h.setBounds).not.toHaveBeenCalled();
   });
 
   it("is a no-op when the live window is gone", () => {

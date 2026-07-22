@@ -20,6 +20,9 @@ interface DragState {
   /** The window's left/top at grab (DIP). For resize, winX is the fixed left edge. */
   winX: number;
   winY: number;
+  /** Freeze the move size at grab so Windows cannot apply a transient edge resize. */
+  width: number;
+  height: number;
   /** Cursor offset within the window at grab (DIP) — keeps the grab point under the cursor while moving. */
   offX: number;
   offY: number;
@@ -51,7 +54,15 @@ export function createLiveDrag(deps: LiveDragDeps): {
       if (!win) return;
       const b = win.getBounds();
       const c = deps.getCursor();
-      state = { mode, winX: b.x, winY: b.y, offX: c.x - b.x, offY: c.y - b.y };
+      state = {
+        mode,
+        winX: b.x,
+        winY: b.y,
+        width: b.width,
+        height: b.height,
+        offX: c.x - b.x,
+        offY: c.y - b.y,
+      };
     },
 
     move(): void {
@@ -62,7 +73,12 @@ export function createLiveDrag(deps: LiveDragDeps): {
         // Left edge fixed (setWidth keeps b.x); width = cursor − left edge.
         deps.setWidth(c.x - state.winX);
       } else {
-        win.setPosition(Math.round(c.x - state.offX), Math.round(c.y - state.offY));
+        win.setBounds({
+          x: Math.round(c.x - state.offX),
+          y: Math.round(c.y - state.offY),
+          width: state.width,
+          height: state.height,
+        });
       }
     },
 
