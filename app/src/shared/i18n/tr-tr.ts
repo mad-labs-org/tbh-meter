@@ -247,6 +247,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.stageLabel": "Bölüm {code}",
   "cooldowns.ready": "Hazır",
   "cooldowns.readyCheck": "✓ Hazır",
+  "cooldowns.openedManually": "elle açıldı",
   "cooldowns.remove": "Kaldır (bir sonraki düşüşte geri gelir)",
   "cooldowns.spots": "noktalar",
   "cooldowns.notifTitle": "Mavi sandık hazır",

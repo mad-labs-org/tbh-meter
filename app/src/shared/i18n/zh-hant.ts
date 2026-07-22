@@ -242,6 +242,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.stageLabel": "關卡 {code}",
   "cooldowns.ready": "就緒",
   "cooldowns.readyCheck": "✓ 就緒",
+  "cooldowns.openedManually": "手動開啟",
   "cooldowns.remove": "移除（下次掉落時重新出現）",
   "cooldowns.spots": "刷新點",
   "cooldowns.notifTitle": "藍寶箱已就緒",

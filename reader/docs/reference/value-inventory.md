@@ -3,6 +3,7 @@ type: reference
 description: "Inventory of what the reader READS from game memory, classified by SOURCE: LIVE (real-time, preferred) vs SAVE (stale snapshot, fallback only) vs TODO (to be mapped). Each value points to the module/symbol that reads it — where to touch and what NOT to confuse."
 code_anchors:
   - metrics/gold.py
+  - metrics/boxes.py
   - metrics/xp.py
   - game/build.py
   - metrics/dps.py
@@ -32,6 +33,7 @@ Three layers, in order of preference:
 | Value | Module / reader | How it arrives |
 |---|---|---|
 | **COMBAT gold per run** | `metrics/gold.py::combat_gold_live` | AggregateManager (singleton, resolved by structure) → `AGGREGATES[GoldEarn][COMBAT_SUBKEY]`. Cumulative; the run delta = `run_gain(start, end)`. |
+| **Chest opens by category** | `metrics/boxes.py::box_open_counts_live` | AggregateManager → `AGGREGATES[BoxOpen]`. Cumulative subkeys confirmed live as total=0, regular=1, blue=2; the app ignores regular-only deltas and does not assign a blue delta when the tracked level is ambiguous. |
 | **Live XP / hero** | `game/build.py::read_live_party` · `metrics/xp.py::PartyXpAccumulator` | HeroRuntime of the deployed hero (`EXP_FAKE`, within-level), ACCUMULATED tick-by-tick per heroKey (first sighting seeds the baseline); the curve (`metrics/xp.py::curve`) fills the level-up. |
 | **Live level / hero** | `game/build.py::read_live_party` | HeroRuntime `LEVEL_FAKE`. |
 | **XP of who DIED / joined late** | `metrics/xp.py::PartyXpAccumulator` | the accumulated total is **banked** when the hero disappears from the HeroList (dead adds 0 while dead); a late deploy is credited from first sighting. (Replaced the re-read of the `uf` captured at the start.) |

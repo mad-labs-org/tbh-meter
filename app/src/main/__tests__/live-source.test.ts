@@ -21,6 +21,7 @@ function rawLive(over: Partial<RawLive> = {}): RawLive {
     xp_now: 19_800,
     party: [101, 201, 301],
     drops: [4, 1, 0],
+    box_opens: [0, 2, 0],
     ...over,
   };
 }
@@ -38,6 +39,7 @@ describe("cookLive — derives the overlay snapshot from the reader's raw live",
     expect(snap.damage).toBe(2_830_000);
     expect(snap.party).toEqual([101, 201, 301]);
     expect(snap.drops).toEqual([4, 1, 0]);
+    expect(snap.boxOpens).toEqual([0, 2, 0]);
     // live is always approximate (a mid-run snapshot).
     expect(snap.approx).toBe(true);
   });
@@ -83,6 +85,11 @@ describe("cookLive — derives the overlay snapshot from the reader's raw live",
     // Symmetric with the party guard above — a malformed drops never throws or leaks NaN.
     expect(cookLive(rawLive({ drops: undefined as unknown as number[] })).drops).toBeNull();
     expect(cookLive(rawLive({ drops: [4, NaN as unknown as number, 0] })).drops).toEqual([4, 0, 0]);
+  });
+
+  it("guards box_opens as an optional additive reader field", () => {
+    expect(cookLive(rawLive({ box_opens: undefined })).boxOpens).toBeNull();
+    expect(cookLive(rawLive({ box_opens: [0, NaN as unknown as number, 3] })).boxOpens).toEqual([0, 0, 3]);
   });
 
   it("re-keys party_stats (JSON-string keys) to numbers, keeping only finite values", () => {

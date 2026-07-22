@@ -25,6 +25,9 @@ export interface ChestCooldown {
    *  entry stays active and visible in the runs-window tab, and a re-detected drop brings it
    *  back (the fresh entry is un-hidden). The tab's X deletes the entry outright. */
   hidden?: boolean;
+  /** In-game manual open detected by the reader's BoxOpen aggregate. The active line is removed,
+   *  and the history row stays as an opened/ready record. */
+  openedAt?: number;
 }
 
 /**

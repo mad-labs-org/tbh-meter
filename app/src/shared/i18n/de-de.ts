@@ -247,6 +247,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.stageLabel": "Etappe {code}",
   "cooldowns.ready": "Bereit",
   "cooldowns.readyCheck": "✓ Bereit",
+  "cooldowns.openedManually": "manuell geöffnet",
   "cooldowns.remove": "Entfernen (erscheint beim nächsten Drop wieder)",
   "cooldowns.spots": "Spots",
   "cooldowns.notifTitle": "Blautruhe bereit",

@@ -246,6 +246,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.stageLabel": "Этап {code}",
   "cooldowns.ready": "Готов",
   "cooldowns.readyCheck": "✓ Готов",
+  "cooldowns.openedManually": "открыт вручную",
   "cooldowns.remove": "Убрать (вернётся при следующем дропе)",
   "cooldowns.spots": "споты",
   "cooldowns.notifTitle": "Синий сундук готов",

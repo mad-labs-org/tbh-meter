@@ -46,6 +46,8 @@ export interface RawLive {
   party: number[];
   /** Live chest-drop counts by EMonsterLogType index: [common(0), stageBoss(1), actBoss(2)]. */
   drops: number[];
+  /** Live chest-open aggregates: [total(0), regular(1), blue(2)]. */
+  box_opens?: number[];
   /** Live FINAL_STATS per deployed hero — `{heroKey: {statId: value}}` (ids are JSON strings).
    *  ADDITIVE (no schema bump): an older reader omits it; the app detects it by presence and the
    *  per-hero resistance tooltip simply doesn't render. Empty `{}` = no live party. */

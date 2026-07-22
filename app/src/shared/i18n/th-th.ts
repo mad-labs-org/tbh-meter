@@ -246,6 +246,7 @@ export const DICT: Partial<Record<DictKey, string>> = {
   "cooldowns.stageLabel": "ด่าน {code}",
   "cooldowns.ready": "พร้อม",
   "cooldowns.readyCheck": "✓ พร้อม",
+  "cooldowns.openedManually": "เปิดด้วยตนเอง",
   "cooldowns.remove": "ลบ (จะกลับมาเมื่อดรอปครั้งถัดไป)",
   "cooldowns.spots": "จุดฟาร์ม",
   "cooldowns.notifTitle": "กล่องฟ้าพร้อมแล้ว",

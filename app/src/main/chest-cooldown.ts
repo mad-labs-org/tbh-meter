@@ -10,8 +10,10 @@ import { bossBoxForStage, isBlueBox } from "../shared/chest-boxes.js";
  *  settings.json growth — ~200 recent farms is plenty of "history" context. */
 export const DROP_LOG_CAP = 200;
 
-/** The reader's stage-boss (blue) chest is `drops` index 1: [common(0), stageBoss(1), actBoss(2)]. */
-export const BLUE_CHEST_INDEX = 1;
+/** GetBoxLog uses EMonsterLogType: [common(0), stageBoss(1), actBoss(2)]. */
+export const BLUE_CHEST_DROP_INDEX = 1;
+/** BoxOpen aggregates use [total(0), regular(1), blue(2)], confirmed against live opens. */
+export const BLUE_CHEST_OPEN_INDEX = 2;
 
 /** Ephemeral per-stage last-seen count. NOT persisted: rebuilt from the live stream, used
  *  only to detect a rising edge correctly across stage switches. */
@@ -50,11 +52,23 @@ export function observeDrop(
   snap: LiveSnapshot,
 ): { dropped: boolean; boxKey: number; stageKey: number } | null {
   const stageKey = snap.stageKey;
-  const count = snap.drops?.[BLUE_CHEST_INDEX];
+  const count = snap.drops?.[BLUE_CHEST_DROP_INDEX];
   if (stageKey == null || typeof count !== "number" || !Number.isFinite(count)) return null;
   const boxKey = bossBoxForStage(stageKey);
   if (!isBlueBox(boxKey)) return null;
   return { dropped: observeRisingEdge(seen, boxKey!, count), boxKey: boxKey!, stageKey };
+}
+
+export function observeOpen(
+  seen: SeenCounts,
+  snap: LiveSnapshot,
+): number {
+  const count = snap.boxOpens?.[BLUE_CHEST_OPEN_INDEX];
+  if (typeof count !== "number" || !Number.isSafeInteger(count) || count < 0) return 0;
+  const previous = seen.get(BLUE_CHEST_OPEN_INDEX);
+  seen.set(BLUE_CHEST_OPEN_INDEX, count);
+  if (previous === undefined || count <= previous) return 0;
+  return count - previous;
 }
 
 /** Upsert a drop into the ACTIVE set: newest first, one entry per BOX (a re-drop of the same
@@ -68,6 +82,38 @@ export function applyDrop(active: ChestCooldown[], event: ChestCooldown): ChestC
  *  log; a later auto-detected drop re-creates the line (a pinned box returns as a placeholder). */
 export function clearCooldown(active: ChestCooldown[], boxKey: number): ChestCooldown[] {
   return active.filter((c) => c.boxKey !== boxKey);
+}
+
+/** Stamp the newest consumed drops that this process observed for one level. Return the older
+ *  unconsumed stack so a partial open can keep its timer active without guessing identities. */
+export function markObservedOpens(
+  log: ChestCooldown[],
+  observed: ChestCooldown[],
+  openedAt: number,
+  count: number,
+): { log: ChestCooldown[]; remaining: ChestCooldown[]; opened: number } {
+  const requested = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
+  const amount = Math.min(requested, observed.length);
+  if (amount === 0) return { log, remaining: observed, opened: 0 };
+
+  const consumed = observed.slice(-amount);
+  const remaining = observed.slice(0, -amount);
+  const selected = new Set<number>();
+  for (let i = consumed.length - 1; i >= 0; i -= 1) {
+    const event = consumed[i];
+    const index = log.findIndex((cd, candidate) =>
+      !selected.has(candidate)
+      && cd.boxKey === event.boxKey
+      && cd.dropAt === event.dropAt
+      && cd.openedAt == null,
+    );
+    if (index >= 0) selected.add(index);
+  }
+
+  const nextLog = log.map((cd, index) => selected.has(index)
+    ? { ...cd, openedAt: Math.max(cd.dropAt, openedAt) }
+    : cd);
+  return { log: nextLog, remaining, opened: amount };
 }
 
 /** Hide a box's line from the OVERLAY only — the overlay's `X` (a declutter, not a delete).
