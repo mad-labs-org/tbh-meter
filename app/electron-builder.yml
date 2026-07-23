@@ -46,6 +46,27 @@ publish:
   owner: mad-labs-org
   repo: tbh-meter
 
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  icon: resources/icon.png
+  category: Game
+  artifactName: tbh-meter-${version}.${ext}
+  extraResources:
+    - from: ../reader
+      to: reader
+      filter:
+        - "**/*"
+        - "!tests/**"
+        - "!docs/**"
+        - "!scripts/**"
+        - "!archive/**"
+        - "!dist/**"
+        - "!**/__pycache__/**"
+        - "!**/*.pyc"
+
 win:
   target:
     - target: nsis

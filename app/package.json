@@ -18,6 +18,7 @@
     "pretest": "node scripts/sync-data.mjs",
     "test": "vitest run",
     "dist:win": "pnpm build && electron-builder --win",
+    "dist:linux": "pnpm build && electron-builder --linux",
     "dist:dir": "pnpm build && electron-builder --dir"
   },
   "dependencies": {

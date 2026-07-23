@@ -12,12 +12,16 @@ require Windows at runtime. Used by il2cpp/ (finds classes) and by the metrics (
 """
 
 import ctypes
+import os
 import struct
+import sys
 import time
 from ctypes import wintypes
 
 from config.offsets import (PROCESS_NAME, MODULE_NAME,
                             Array, List, String, Dict, Dict8B)
+
+_IS_LINUX = sys.platform.startswith("linux")
 
 
 # ============================ structs / Win32 constants ====================== #
@@ -96,6 +100,8 @@ def _kernel32():
 
 
 def find_pid(name=None):
+    if _IS_LINUX:
+        return _linux_find_pid(name)
     nm = name or PROCESS_NAME
     nm = nm.encode() if isinstance(nm, str) else nm
     k = _kernel32()
@@ -117,20 +123,31 @@ def find_pid(name=None):
 
 def open_process(pid):
     """READ-ONLY handle (QUERY_INFORMATION|VM_READ). The ONE audited attach point."""
+    if _IS_LINUX:
+        return _linux_open_process(pid)
     return _kernel32().OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, False, pid)
 
 
 def close(handle):
-    if handle:
+    if not handle:
+        return
+    if _IS_LINUX:
         try:
-            _kernel32().CloseHandle(handle)
-        except Exception:
+            os.close(handle.fd)
+        except OSError:
             pass
+        return
+    try:
+        _kernel32().CloseHandle(handle)
+    except Exception:
+        pass
 
 
 def process_image_path(handle):
     """Full exe path of the attached process (QueryFullProcessImageNameW). Works
     with the read-only handle (PROCESS_QUERY_INFORMATION). None on failure."""
+    if _IS_LINUX:
+        return _linux_process_image_path(handle.pid) if handle else None
     size = wintypes.DWORD(MAX_PATH * 4)
     buf = ctypes.create_unicode_buffer(size.value)
     if not _kernel32().QueryFullProcessImageNameW(handle, 0, buf, ctypes.byref(size)):
@@ -141,6 +158,8 @@ def process_image_path(handle):
 def module_base(pid, name=None):
     """Load base of a module (enumerates modules, does NOT scan memory -> none of the
     resolve<3 hang). RVA + base = VA at runtime. Default = GameAssembly.dll."""
+    if _IS_LINUX:
+        return _linux_module_base(pid, name)
     nm = name or MODULE_NAME
     nm = nm.encode() if isinstance(nm, str) else nm
     k = _kernel32()
@@ -162,8 +181,129 @@ def module_base(pid, name=None):
     return None
 
 
+# ============================ linux: /proc backend =========================== #
+class _LinuxHandle:
+    __slots__ = ("pid", "fd")
+
+    def __init__(self, pid, fd):
+        self.pid = pid
+        self.fd = fd
+
+
+def _linux_pids():
+    for name in os.listdir("/proc"):
+        if name.isdigit():
+            yield int(name)
+
+
+def _linux_cmdline(pid):
+    try:
+        with open(f"/proc/{pid}/cmdline", "rb") as f:
+            return f.read().split(b"\x00")
+    except OSError:
+        return []
+
+
+def _linux_maps(pid):
+    out = []
+    try:
+        with open(f"/proc/{pid}/maps", "r") as f:
+            for line in f:
+                parts = line.split(None, 5)
+                if len(parts) < 5:
+                    continue
+                lo, hi = parts[0].split("-")
+                perms = parts[1]
+                path = parts[5].strip() if len(parts) >= 6 else ""
+                out.append((int(lo, 16), int(hi, 16), perms, path))
+    except OSError:
+        pass
+    return out
+
+
+def _linux_has_module(pid, module):
+    m = module.lower()
+    return any(os.path.basename(p).lower() == m for _, _, _, p in _linux_maps(pid))
+
+
+def _linux_find_pid(name):
+    target = (name or PROCESS_NAME).lower()
+    for pid in _linux_pids():
+        for arg in _linux_cmdline(pid):
+            try:
+                base = os.path.basename(arg.decode("utf-8", "replace").replace("\\", "/")).lower()
+            except Exception:
+                continue
+            if base == target and _linux_has_module(pid, MODULE_NAME):
+                return pid
+    return None
+
+
+def _linux_open_process(pid):
+    try:
+        fd = os.open(f"/proc/{pid}/mem", os.O_RDONLY)
+    except PermissionError:
+        sys.stderr.write(
+            "[error] cannot read game memory: ptrace denied. Run "
+            "`sudo sysctl kernel.yama.ptrace_scope=0` (or grant CAP_SYS_PTRACE).\n")
+        return None
+    except OSError:
+        return None
+    return _LinuxHandle(pid, fd)
+
+
+def _linux_module_maps(pid, name):
+    m = (name or MODULE_NAME).lower()
+    return [(lo, hi) for lo, hi, _, p in _linux_maps(pid)
+            if os.path.basename(p).lower() == m]
+
+
+def _linux_module_base(pid, name):
+    spans = _linux_module_maps(pid, name)
+    return min(lo for lo, _ in spans) if spans else None
+
+
+def _linux_module_span(pid, name):
+    spans = _linux_module_maps(pid, name)
+    if not spans:
+        return None, None
+    return min(lo for lo, _ in spans), max(hi for _, hi in spans) - min(lo for lo, _ in spans)
+
+
+def _linux_process_image_path(pid):
+    for _, _, _, p in _linux_maps(pid):
+        if os.path.basename(p).lower() == MODULE_NAME.lower():
+            exe = os.path.join(os.path.dirname(p), PROCESS_NAME)
+            return exe if os.path.exists(exe) else p
+    return None
+
+
+_LINUX_SKIP_PATHS = {"[vvar]", "[vsyscall]", "[vvar_vclock]"}
+
+
+def _linux_regions(pid, writable):
+    res = []
+    for lo, hi, perms, path in _linux_maps(pid):
+        if "r" not in perms:
+            continue
+        if writable and "w" not in perms:
+            continue
+        if path in _LINUX_SKIP_PATHS:
+            continue
+        res.append((lo, hi - lo))
+    return res
+
+
+def module_span(pid, name=None):
+    if _IS_LINUX:
+        return _linux_module_span(pid, name)
+    return None, None
+
+
 # ============================ scanner: regions + scanning ==================== #
 def regions(reader, protect_mask=READABLE):
+    if _IS_LINUX:
+        return _linux_regions(reader.handle.pid, protect_mask == WRITABLE)
     """[(base, size)] of the process's committed regions. protect_mask filters by protection:
     READABLE (default, for resolving classes) or WRITABLE (writable heap only, for value-scan)."""
     res = []
@@ -289,6 +429,11 @@ class Reader:
         """bytes read from the process, or None. Defensive (an address can free mid-fight)."""
         if not addr or size <= 0:
             return None
+        if _IS_LINUX:
+            try:
+                return os.pread(self.handle.fd, size, addr)
+            except (OSError, OverflowError, ValueError):
+                return None
         buf = (ctypes.c_char * size)()
         n = ctypes.c_size_t(0)
         if not _kernel32().ReadProcessMemory(

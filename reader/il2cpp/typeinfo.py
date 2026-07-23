@@ -61,6 +61,8 @@ def ga_module(pid):
     Reuses shared.memory's lazy kernel32 BUT sets the Module32First/Next argtypes here:
     shared's _kernel32() sets them too, but the probes required setting them explicitly so as
     not to TRUNCATE the 64-bit handle (ctypes assumes 32-bit int without argtypes). Defensive and cheap."""
+    if memory._IS_LINUX:
+        return memory.module_span(pid, "GameAssembly.dll")
     k = memory._kernel32()
     k.Module32First.argtypes = [wintypes.HANDLE, ctypes.POINTER(MODULEENTRY32)]
     k.Module32Next.argtypes = [wintypes.HANDLE, ctypes.POINTER(MODULEENTRY32)]
