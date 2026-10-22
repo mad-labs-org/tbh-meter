@@ -311,7 +311,7 @@ def test_no_raw_offsets_in_reference():
 
 def test_wikilinks_resolve():
     """Path-form links ([[invariants/foo]]) resolve; [[SOMETHING-ELSE]] is literal text."""
-    existing = {str(p.relative_to(DOCS)).removesuffix(".md") for p, _, _ in NOTES}
+    existing = {p.relative_to(DOCS).as_posix().removesuffix(".md") for p, _, _ in NOTES}
     errs = []
     for p, _fm, body in NOTES:
         for tgt in WIKILINK_RE.findall(strip_comments(body)):
@@ -329,7 +329,7 @@ def test_index_coverage_bidirectional():
         return
     text = strip_comments(idx.read_text(encoding="utf-8"))
     linked = {t.strip().removesuffix(".md") for t in WIKILINK_RE.findall(text) if "/" in t}
-    existing = {str(p.relative_to(DOCS)).removesuffix(".md") for p, _, _ in NOTES}
+    existing = {p.relative_to(DOCS).as_posix().removesuffix(".md") for p, _, _ in NOTES}
     errs = []
     for note in sorted(existing - linked):
         errs.append(f"_index.md does not list the note: {note}")

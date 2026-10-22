@@ -20,7 +20,7 @@ code_anchors:
   - game/obscured.py::decode_obscured_double
 asserts:
   - config.offsets.Unit.CORE_STATS_OBSCURED == 0x104
-  - config.offsets.Monster.CACHE_OBSCURED == 0x3C0
+  - config.offsets.Monster.CACHE_OBSCURED == 0x3F4
   - config.offsets.EEquipClassType.Knight == 1
   - config.offsets.EEquipClassType.Ranger == 2
 guarded_by:

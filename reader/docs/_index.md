@@ -18,6 +18,7 @@ How it works and how to maintain it: [README](README.md).
 - resolve a new class / fast path / calib / index / `TARGETS` → [[invariants/rva-index-resolution]]
 - cold scan every time / stale cache / `calib_seed` out of date / bumped `CACHE_FMT` / persistent "?" mode on every run (poisoned catalog) / stage vanished from the catalog ("?" on a single stage — hole) → [[invariants/cache-management]]
 - game updated / new version / gold 0 + stage "?" post-update / re-seed → [[guides/game-update]]
+- offset shifted post-update / stageKey unread / party live off after a new version / dps 0 after update / hand-patch offsets every version → [[invariants/field-offset-autocalibration]]
 - wrong party / extra heroes / +0xp / roster instead of party / playing solo shows 6 / StageManager NOT found → [[invariants/party-live-resolution]]
 - validate everything live post-update / partial validation let a bug slip through / don't ship broken → [[process/live-validation-gate]]
 - new log event / `ELogType` / klass pointer / `GetBoxLog` → [[guides/add-log-event]] · rule: [[invariants/log-event-detection]]
@@ -47,6 +48,7 @@ How it works and how to maintain it: [README](README.md).
 - [[invariants/log-event-detection]] — event by KLASS-POINTER, never the `ELogType` field (stripped from IL2CPP); new event → `TARGETS` + klass in the cache · `meter_windows.py`
 - [[invariants/memory-safety]] — read-only (`PROCESS_VM_READ`); null-guard every deref; `ri32`/`ri64` → None on a bad read; cap on iteration; never inject · `shared/memory.py`
 - [[invariants/obscured-data-offlimits]] — never read Obscured (XOR = garbage): core stats `@CORE_STATS_OBSCURED`, `@CACHE_OBSCURED`; hero class = `EEquipClassType`, never `EHeroType` (orphan) · `config/offsets.py`
+- [[invariants/field-offset-autocalibration]] — the 4 fragile offsets (`Monster.STAGE_KEY`, `UnitHealthController.HP_MAX`, `StageManager.HERO_LIST`, `Unit.CACHE`) auto-calibrate live by semantic signature at attach; static offsets are the fallback; no hand-patch per game update · `game/field_calib.py`
 - [[invariants/app-normalization]] — app normalizes defensively (`firstNum`/`numOrNull`), optional field in `run-types.ts`, arrays via `.filter`; never a field after `return` · `app/src/...`
 - [[invariants/party-live-resolution]] — run party = LIVE (`StageManager.HeroList`, `pick_live_sm` with NO cap), not the roster; with no live party it degrades honestly (`hero_in_run`, xp>0, `party_source`), never the roster · `game/save.py`
 

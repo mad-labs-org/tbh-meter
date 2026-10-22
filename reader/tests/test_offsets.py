@@ -184,9 +184,10 @@ class TestAggregateManagerOffset:
 
 
 class TestPlayerSaveDataOffset:
-    def test_aggregates_at_0xb8(self):
+    def test_aggregates_at_0xc0(self):
         # PlayerSaveData save lists shift whenever the devs insert feature fields near the top:
         # 1.00.12 (BoxBucketUse/GetBoxList, +0x10), 1.00.19 (Alchemy*, +0x10), 1.00.23 (backendPostList, +0x08),
-        # 1.00.27 (+0x08 again: dump has pendingEnchantList@0x48 + backendPostList@0x50 above currenySaveDatas@0x58).
-        # AGGREGATES: 0x88 → 0x98 (1.00.12) → 0xA8 (1.00.19) → 0xB0 (1.00.23) → 0xB8 (1.00.27). See offsets.py.
-        assert PlayerSaveData.AGGREGATES == 0xB8
+        # 1.00.27 (+0x08 again: dump has pendingEnchantList@0x48 + backendPostList@0x50 above currenySaveDatas@0x58),
+        # 1.2.8 (+0x08 again, live-confirmed: CURRENCIES 0x58→0x60, HEROES 0x60→0x68).
+        # AGGREGATES: 0x88 → 0x98 (1.00.12) → 0xA8 (1.00.19) → 0xB0 (1.00.23) → 0xB8 (1.00.27) → 0xC0 (1.2.8). See offsets.py.
+        assert PlayerSaveData.AGGREGATES == 0xC0

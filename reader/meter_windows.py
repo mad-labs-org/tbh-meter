@@ -98,7 +98,7 @@ PENDING_CLOSE_GRACE = 3.0
 # reader only logs/diags `partial`; the converter is the persisted spec). See docs/invariants/run-lifecycle.
 PARTIAL_CAPTURE_MIN = 0.95
 
-GAME_VERSION = "1.00.28"   # FALLBACK: the GameAssembly.dll build the reader was made against; the INSTALLED version comes from the game's Version.txt (_detect_game_version)
+GAME_VERSION = "1.3.0"   # FALLBACK: the GameAssembly.dll build the reader was made against; the INSTALLED version comes from the game's Version.txt (_detect_game_version)
 # raw/<id>.json: the LIVE format the reader emits (1 file per run). Bump ONLY when the SHAPE of the
 # output changes — NOT per game build (re-seed/address doesn't count). The converter (app) dispatches
 # on this value. Mirrors app/src/shared/raw-types.ts::RawRunV2. See [[invariants/schema-versioning]].
@@ -849,6 +849,7 @@ def resolve_all(reader, pid, fp, cache_path):
             if tup is not None:
                 print(f"[calib] fast path (fp {fp}) — resolved via RVA, no scan")
                 diag(f"[resolve] path=FAST fp={fp} (calib hit, RVA, no scan)")
+                _autocalibrate_fields(reader, tup, fp)
                 return tup
             print("[calib] fast path sanity-fail (RVA/idx/size) — falling back to scan")
             diag(f"[resolve] fast-path SANITY-FAIL (RVA/idx/size) → cold scan fp={fp}")
@@ -868,7 +869,23 @@ def resolve_all(reader, pid, fp, cache_path):
     else:
         diag(f"[resolve] path=SCAN fp={fp} → NOT calibrated (incomplete: "
              f"msm={bool(msm)} lm={bool(lm)} sc={bool(sc_class)} sf={bool(sf_class)})")
+    _autocalibrate_fields(reader, tup, fp)
     return tup
+
+
+def _autocalibrate_fields(reader, tup, fp):
+    """Auto-discover the four FRAGILE field offsets (Monster.STAGE_KEY, UnitHealthController.HP_MAX,
+    StageManager.HERO_LIST, Unit.CACHE) by semantic signature and apply them in-memory over the static
+    offsets, which stay as the fallback. Runs after BOTH resolve paths so the offsets are correct
+    before any reading. Read-only; nothing is written to the game or disk. A signature not found live
+    (e.g. not in combat) simply keeps the static offset — never makes a working build worse."""
+    try:
+        from game import field_calib
+        msm = tup[2]; stage_info = tup[6]; hero_cat = tup[8]; sm_list = tup[9]
+        field_calib.calibrate(reader, msm, sm_list, stage_info, hero_cat,
+                              log=lambda m: (print(m), diag(m)))
+    except Exception as e:
+        diag(f"[field-calib] skipped (error: {e}) — static offsets kept")
 
 
 def run(hz, output_dir, debug=False):

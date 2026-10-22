@@ -158,39 +158,42 @@ def _synth_dump(player_save_lines):
     return "".join(parts)
 
 
-# CORRECT PlayerSaveData body (1.00.27 offsets = the ones offsets.py has today).
+# CORRECT PlayerSaveData body (1.2.8 offsets = the ones offsets.py has today). 1.2.8 inserted one more
+# feature field above currenySaveDatas → the whole save-list block shifted +0x08 vs 1.00.27.
 _PSD_OK = "".join([
     _field("commonSaveData", "CommonSaveData", "commonSaveData", 0x10),
     _field("pendingEnchantList", "List<PendingEnchantSaveData>", "pendingEnchantList", 0x48),
     _field("backendPostList", "List<BackendPostSaveData>", "backendPostList", 0x50),
-    _field("currenySaveDatas", "List<CurrencySaveData>", "currenySaveDatas", 0x58),
-    _field("heroSaveDatas", "List<HeroSaveData>", "heroSaveDatas", 0x60),
-    _field("attributeSaveDatas", "List<AttributeSaveData>", "attributeSaveDatas", 0x70),
-    _field("RuneSaveData", "List<RuneSaveData>", "RuneSaveData", 0x80),
-    _field("inventorySaveDatas", "List<InventorySaveData>", "inventorySaveDatas", 0x88),
-    _field("stashSaveDatas", "List<StashSaveData>", "stashSaveDatas", 0x90),
-    _field("itemSaveDatas", "List<ItemSaveData>", "itemSaveDatas", 0xB0),
-    _field("aggregateSaveDatas", "List<AggregateSaveData>", "aggregateSaveDatas", 0xB8),
+    _field("newFeatureList_1_2_8", "List<int>", "newFeatureList_1_2_8", 0x58),  # 1.2.8 intruder (pushes the block +0x08)
+    _field("currenySaveDatas", "List<CurrencySaveData>", "currenySaveDatas", 0x60),
+    _field("heroSaveDatas", "List<HeroSaveData>", "heroSaveDatas", 0x68),
+    _field("attributeSaveDatas", "List<AttributeSaveData>", "attributeSaveDatas", 0x78),
+    _field("RuneSaveData", "List<RuneSaveData>", "RuneSaveData", 0x88),
+    _field("inventorySaveDatas", "List<InventorySaveData>", "inventorySaveDatas", 0x90),
+    _field("stashSaveDatas", "List<StashSaveData>", "stashSaveDatas", 0x98),
+    _field("itemSaveDatas", "List<ItemSaveData>", "itemSaveDatas", 0xB8),
+    _field("aggregateSaveDatas", "List<AggregateSaveData>", "aggregateSaveDatas", 0xC0),
 ])
 
 # Body of a build with an INSERTION NOT accommodated by offsets.py: at the offset offsets.py tracks as
-# CURRENCIES (0x58 since 1.00.27) the dump has the INTRUDING field `BoxBucketUseBoxList`, and the real
-# currency list shifted to 0x68 (untracked). It is the EXACT 1.00.12/…/1.00.27 class of bug — a field
+# CURRENCIES (0x60 since 1.2.8) the dump has the INTRUDING field `BoxBucketUseBoxList`, and the real
+# currency list shifted to 0x70 (untracked). It is the EXACT 1.00.12/…/1.2.8 class of bug — a field
 # present at the tracked offset let the presence-only check go green. The other tracked offsets still
 # hold the right field (only CURRENCIES trips → proves the name-check, not a wholesale shift).
 _PSD_SHIFTED = "".join([
     _field("commonSaveData", "CommonSaveData", "commonSaveData", 0x10),
     _field("pendingEnchantList", "List<PendingEnchantSaveData>", "pendingEnchantList", 0x48),
     _field("backendPostList", "List<BackendPostSaveData>", "backendPostList", 0x50),
-    _field("BoxBucketUseBoxList", "List<int>", "BoxBucketUseBoxList", 0x58),  # intruder where CURRENCIES goes
-    _field("heroSaveDatas", "List<HeroSaveData>", "heroSaveDatas", 0x60),
-    _field("currenySaveDatas", "List<CurrencySaveData>", "currenySaveDatas", 0x68),  # real currency, shifted
-    _field("attributeSaveDatas", "List<AttributeSaveData>", "attributeSaveDatas", 0x70),
-    _field("RuneSaveData", "List<RuneSaveData>", "RuneSaveData", 0x80),
-    _field("inventorySaveDatas", "List<InventorySaveData>", "inventorySaveDatas", 0x88),
-    _field("stashSaveDatas", "List<StashSaveData>", "stashSaveDatas", 0x90),
-    _field("itemSaveDatas", "List<ItemSaveData>", "itemSaveDatas", 0xB0),
-    _field("aggregateSaveDatas", "List<AggregateSaveData>", "aggregateSaveDatas", 0xB8),
+    _field("newFeatureList_1_2_8", "List<int>", "newFeatureList_1_2_8", 0x58),
+    _field("BoxBucketUseBoxList", "List<int>", "BoxBucketUseBoxList", 0x60),  # intruder where CURRENCIES goes
+    _field("heroSaveDatas", "List<HeroSaveData>", "heroSaveDatas", 0x68),
+    _field("currenySaveDatas", "List<CurrencySaveData>", "currenySaveDatas", 0x70),  # real currency, shifted
+    _field("attributeSaveDatas", "List<AttributeSaveData>", "attributeSaveDatas", 0x78),
+    _field("RuneSaveData", "List<RuneSaveData>", "RuneSaveData", 0x88),
+    _field("inventorySaveDatas", "List<InventorySaveData>", "inventorySaveDatas", 0x90),
+    _field("stashSaveDatas", "List<StashSaveData>", "stashSaveDatas", 0x98),
+    _field("itemSaveDatas", "List<ItemSaveData>", "itemSaveDatas", 0xB8),
+    _field("aggregateSaveDatas", "List<AggregateSaveData>", "aggregateSaveDatas", 0xC0),
 ])
 
 

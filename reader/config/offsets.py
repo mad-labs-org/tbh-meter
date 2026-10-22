@@ -109,11 +109,18 @@ ACTK_FAKE = 0xC                        # fakeValue offset for the 32-bit Obscure
 class Unit:                            # base of Hero/Monster (dump.cs ~319277)
     HEALTH_CONTROLLER = 0xB0           # -> UnitHealthController
     IS_HERO = 0x100                    # bool b_isHero
-    CACHE = 0x3B0                      # Hero.cache -> uf (progression wrapper). Unit's LAST field
+    CACHE = 0x3D8                      # Hero.cache -> uf (progression wrapper). Unit's LAST field
                                        # `Action OnCrowdControlAppliedAction` grows the base on some
                                        # recompiles: 1.00.14 put it @0x3A0 (Hero.cache 0x3A0->0x3A8), and
                                        # 1.00.27 grew it again @0x3A0->0x3A8 (base +0x8) -> Hero.cache
-                                       # 0x3A8->0x3B0. EVERY Unit subclass field shifts with it (Monster below).
+                                       # 0x3A8->0x3B0. 1.2.8 (version scheme jumped 1.00.28->1.2.8, a large
+                                       # recompile) grew it +0x20 -> Hero.cache 0x3B0->0x3D0. 1.3.0 grew it
+                                       # +0x8 again -> 0x3D0->0x3D8. LIVE-CONFIRMED in combat on build 1.3.0:
+                                       # at 0x3D8 the deployed heroes resolve HeroInfoData.HeroKey in hero_cat
+                                       # (party [401,301,201] read 3/3) and level/xp decode sanely
+                                       # (71/72/81). NOTE the Unit base and the Monster subclass do NOT grow
+                                       # uniformly across builds: on 1.3.0 CACHE shifted +0x8 while
+                                       # StageManager.HERO_LIST jumped +0x38 — each measured LIVE.
     CORE_STATS_OBSCURED = 0x104        # 12 core stats: ObscuredFloat (XOR) — DO NOT READ (garbage); use
                                        # xd.FINAL_STATS (Dict<StatType,float> PLAIN). Marker for
                                        # docs/invariants/obscured-data-offlimits (test_obscured_markers).
@@ -121,30 +128,53 @@ class Unit:                            # base of Hero/Monster (dump.cs ~319277)
 
 class UnitHealthController:            # HP in PURE float (dump.cs ~319894)
     HP_CURRENT = 0x40                  # VALIDATED (drops when taking damage); damage = Σ drops
-    HP_MAX = 0x4C
+    HP_MAX = 0x50                      # 1.3.0: 0x4C->0x50 (+0x4). LIVE-CONFIRMED on build 1.3.0: at 0x4C
+                                       # every live monster read hp_max=0 (dps=0 silently), while 0x50 reads
+                                       # the real max (cur<=max, 6/6 monsters). HP_CURRENT stayed at 0x40.
 
 
 class Monster:                         # extends Unit -> inherits the Unit-base +0x8 growth (see Unit.CACHE)
-    STAGE_KEY = 0x3DC                  # LIVE stageKey (the save's freezes on a stage change).
+    STAGE_KEY = 0x410                  # LIVE stageKey (the save's freezes on a stage change).
                                        # 1.00.14: 0x3CC->0x3D4; 1.00.27: 0x3D4->0x3DC (uniform Unit +0x8).
+                                       # 1.2.8: 0x3DC->0x408 (base grew +0x2C on the 1.00.28->1.2.8 recompile).
+                                       # 1.3.0: 0x408->0x410 (+0x8). LIVE-CONFIRMED in combat on build 1.3.0:
+                                       # 0x410 reads a key that resolves the StageInfoData catalog
+                                       # (3-1 -> 3301, stable across all live monsters), while the old 0x408
+                                       # reads garbage -> live_stage_key returns None -> "stageKey unread" +
+                                       # difficulty/total_mobs unresolved (the bug this fixes).
                                        # ⚠ diff_offsets gives a FALSE-OK here (obfuscated-name field: the old
-                                       # offset lands on ANOTHER obfuscated field, so a uniform +0x8 passes
-                                       # silently — the documented blind spot). This shift is DERIVED from the
-                                       # confirmed Unit +0x8 (cache 0x3B8->0x3C0) and confirmed live by
+                                       # offset lands on ANOTHER obfuscated field, so a uniform shift passes
+                                       # silently — the documented blind spot). It MUST be confirmed live by
                                        # validate_live (stage); it must be applied by hand.
-    CACHE_OBSCURED = 0x3C0             # Obscured cache — DO NOT READ; use the Monster PLAIN fields.
-                                       # 1.00.14: 0x3B0->0x3B8; 1.00.27: 0x3B8->0x3C0 (uniform Unit +0x8). Marker
-                                       # for docs/invariants/obscured-data-offlimits (also a diff FALSE-OK field).
+    CACHE_OBSCURED = 0x3F4             # Obscured cache — DO NOT READ; use the Monster PLAIN fields.
+                                       # 1.00.14: 0x3B0->0x3B8; 1.00.27: 0x3B8->0x3C0 (uniform Unit +0x8);
+                                       # 1.2.8: 0x3C0->0x3EC (base +0x2C); 1.3.0: 0x3EC->0x3F4 (+0x8, tracks
+                                       # STAGE_KEY 0x408->0x410).
+                                       # Marker for docs/invariants/obscured-data-offlimits (also a diff
+                                       # FALSE-OK field).
 
 
 class StageManager:                    # singleton (dump.cs ~327247)
-    HERO_LIST = 0x30                   # Hero[] = the live deployed party
+    HERO_LIST = 0x68                   # Hero[] = the live deployed party.
+                                       # 1.3.0: 0x30->0x68 (+0x38, StageManager restructured). LIVE-CONFIRMED
+                                       # in combat: at 0x68 the array holds the 3 deployed heroes whose
+                                       # Unit.CACHE(0x3D8)->HeroRuntime.INFO->HeroKey resolve [401,301,201]
+                                       # 3/3 in hero_cat; the old 0x30 holds no valid hero array -> party
+                                       # live off ("StageManager unresolved" — the heroes bug this fixes).
 
 
 class MonsterSpawnManager:             # singleton (dump.cs ~343052)
-    MONSTER_LIST = 0x28               # List<Unit> alive
-    DEAD_MONSTER_LIST = 0x30          # List<Unit> dead (clears on a reload of the same stage)
-    SUMMONED_LIST = 0x38
+    MONSTER_LIST = 0x28               # List<Unit> alive (unchanged on 1.3.0; live_monsters reads the
+                                       # fluctuating alive count — LIVE-CONFIRMED 8->17 as mobs spawn).
+    # 1.3.0 RESTRUCTURED MonsterSpawnManager: the old DEAD_MONSTER_LIST(0x30)/SUMMONED_LIST(0x38) layout
+    # is gone — 0x38 now reads a NON-pointer and 0x30 is a valid-but-empty List<Unit>. The alive list
+    # (0x28) is the only one that matters for the reported bug (stage/dps/mob-count all derive from it or
+    # from the catalog). DEAD only powers manual-restart detection and SUMMONED only aggregates summon DPS;
+    # both degrade GRACEFULLY (list_ptrs/ri32 on an empty or None list returns []/0, no crash). Pointed at
+    # the one remaining valid list (0x30) so neither reads garbage; re-crack them live if summon-DPS or
+    # restart-detection is needed on 1.3.0.
+    DEAD_MONSTER_LIST = 0x30          # List<Unit> dead — DEGRADED on 1.3.0 (empty; restart detection off).
+    SUMMONED_LIST = 0x30              # List<Unit> summoned — DEGRADED on 1.3.0 (summon DPS not aggregated).
 
 
 class LogManager:                      # singleton (dump.cs ~339652)
@@ -207,14 +237,18 @@ class PlayerSaveData:                  # plaintext save, snapshot (NOT live)
     # pendingEnchantList@0x48 and backendPostList@0x50 directly ABOVE currenySaveDatas@0x58 (vs
     # backendPostList@0x48 / currenySaveDatas@0x50 in 1.00.23-1.00.25) → ALL save lists below shifted
     # +0x08 once more (CURRENCIES 0x50→0x58 … AGGREGATES 0xB0→0xB8).
-    CURRENCIES = 0x58                  # List<CurrencySaveData>   (currenySaveDatas)
-    HEROES = 0x60                      # List<HeroSaveData>       (heroSaveDatas)
-    ATTRIBUTES = 0x70                  # List<AttributeSaveData> (invested skill/passive tree)
-    RUNES = 0x80                       # List<RuneSaveData> — account-wide runes (LIVE-CRACKED 2026-06-09)
-    INVENTORY_SLOTS = 0x88             # List<InventorySaveData> — inventory slot -> item uniqueId
-    STASH = 0x90                       # List<StashSaveData> — stash slot -> item uniqueId (separate from the inv)
-    ITEMS = 0xB0                       # List<ItemSaveData> (item data; the slots above reference by uniqueId)
-    AGGREGATES = 0xB8                  # List<AggregateSaveData> (gold/xp oracle, stale)
+    # 1.2.8 did it a FIFTH time (+0x08 again, same break class): ALL save lists below shifted +0x08 once
+    # more (CURRENCIES 0x58→0x60 … AGGREGATES 0xB8→0xC0). LIVE-CONFIRMED on build 1.2.8: at CURRENCIES=0x60
+    # the gold entry (Key==GOLD_KEY) reads the real balance and at HEROES=0x68 the save roster resolves 6
+    # catalog heroes (at 0x58/0x60 pick_live_psd returned None → save-build/build-record/xp-live all FAIL).
+    CURRENCIES = 0x60                  # List<CurrencySaveData>   (currenySaveDatas)
+    HEROES = 0x68                      # List<HeroSaveData>       (heroSaveDatas)
+    ATTRIBUTES = 0x78                  # List<AttributeSaveData> (invested skill/passive tree)
+    RUNES = 0x88                       # List<RuneSaveData> — account-wide runes (LIVE-CRACKED 2026-06-09)
+    INVENTORY_SLOTS = 0x90             # List<InventorySaveData> — inventory slot -> item uniqueId
+    STASH = 0x98                       # List<StashSaveData> — stash slot -> item uniqueId (separate from the inv)
+    ITEMS = 0xB8                       # List<ItemSaveData> (item data; the slots above reference by uniqueId)
+    AGGREGATES = 0xC0                  # List<AggregateSaveData> (gold/xp oracle, stale)
 
 
 class RuneSaveData:                    # invested rune node (account-wide). NAME-readable class in the save.
